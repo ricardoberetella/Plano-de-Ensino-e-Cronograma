@@ -20,7 +20,7 @@ const App: React.FC = () => {
   const loadPlans = async (profileId: string) => {
     setIsLoading(true);
     try {
-      // Tenta buscar do Firebase
+      // Tenta carregar do Firebase
       const dbPlans = await FirebaseService.getPlans(profileId);
       
       if (dbPlans && dbPlans.length > 0) {
@@ -29,19 +29,19 @@ const App: React.FC = () => {
         setCurrentPlan(updatedCurrent || dbPlans[0]);
         if (!selectedUnit) setSelectedUnit(updatedCurrent?.units[0] || dbPlans[0].units[0]);
       } else {
-        // Se falhar ou estiver vazio, usa os dados locais (SENAI)
+        // Fallback: Se o banco estiver vazio ou der erro, usa os planos locais (SENAI)
         const localPlans = SAMPLE_PLANS.filter(p => p.profileId === profileId);
         setPlans(localPlans);
-        if (localPlans.length > 0) {
+        if (localPlans.length > 0 && !currentPlan) {
           setCurrentPlan(localPlans[0]);
           setSelectedUnit(localPlans[0].units[0]);
         }
       }
     } catch (error) {
-      console.warn("Erro ao carregar dados. Usando modo de segurança local.");
+      console.warn("Usando modo offline (dados locais).");
       setPlans(SAMPLE_PLANS.filter(p => p.profileId === profileId));
     } finally {
-      // IMPORTANTE: Garante que a tela de loading suma
+      // ESSENCIAL: Garante que o loading desapareça mesmo se o Firebase falhar
       setIsLoading(false);
     }
   };
@@ -50,7 +50,6 @@ const App: React.FC = () => {
     if (isAuthenticated) {
       loadPlans(activeProfileId);
     } else {
-      // Se não logado, desativa o loading para mostrar a tela de login
       setIsLoading(false);
     }
   }, [isAuthenticated, activeProfileId]);
@@ -66,7 +65,7 @@ const App: React.FC = () => {
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
           <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Iniciando Sistema SENAI...</p>
+          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest italic">Iniciando SENAI Smart...</p>
         </div>
       </div>
     );
@@ -116,7 +115,7 @@ const App: React.FC = () => {
               await loadPlans(activeProfileId);
               setView('dashboard');
             } catch (e) {
-              alert("Erro ao sincronizar. O plano foi salvo apenas nesta sessão.");
+              alert("Salvamento local realizado (Erro na nuvem).");
               setView('dashboard');
             }
           }}
