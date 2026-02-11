@@ -1,7 +1,8 @@
 // App.tsx — COMPLETO e CORRIGIDO
-// ✅ Corrige o “sumiu a UC CRD” (ID diferente no Firebase) e mantém a CRD sempre selecionável
-// ✅ Copia a Situação-Problema da CRD do modelo (SAMPLE_PLANS) para o perfil beretella
-// ✅ Não mexe em layout — só lógica de dados/seleção
+// ✅ Não “prioriza CRD” na seleção (evita impressão de sumir LIDT)
+// ✅ Mantém UC atual se existir; senão usa a primeira do plano
+// ✅ Copia a Situação-Problema da CRD do modelo (SAMPLE_PLANS) apenas para o perfil beretella
+// ✅ Sem alterar layout — apenas lógica de dados/seleção
 
 import React, { useEffect, useState } from "react";
 import Layout from "./components/Layout";
@@ -25,7 +26,7 @@ const App: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   // ==========================================
-  // Helpers (robusto para CRD com IDs diferentes)
+  // Helpers (robusto para localizar CRD com IDs diferentes)
   // ==========================================
   const normalizeStr = (v: any) => String(v ?? "").trim().toLowerCase();
 
@@ -35,7 +36,6 @@ const App: React.FC = () => {
     const title = normalizeStr((u as any).title);
     const code = normalizeStr((u as any).code);
 
-    // cobre: "CRD", "uc-crd", "uc_crd", "crd-xxx", etc.
     return (
       id === "crd" ||
       id.includes("crd") ||
@@ -53,7 +53,7 @@ const App: React.FC = () => {
   };
 
   const applyCrdSituationFromSample = (plan: TeachingPlan): TeachingPlan => {
-    // Copia Situação-Problema/learningSituations do modelo para a UC CRD do plano do usuário
+    // Copia APENAS as learningSituations da CRD do modelo para CRD do plano do usuário
     const sampleCrd = getSampleCrdUnit();
     if (!sampleCrd) return plan;
 
@@ -68,26 +68,24 @@ const App: React.FC = () => {
     return { ...plan, units };
   };
 
+  // ✅ Seleção segura: mantém a UC atual se existir; senão usa a primeira
   const ensureValidSelectedUnit = (plan: TeachingPlan, preferredUnitId?: string | null) => {
     const units = plan.units || [];
     if (!units.length) return null;
 
+    // 1) Se alguém passou um id preferido, tenta ele primeiro
     if (preferredUnitId) {
       const found = units.find((u: any) => String(u.id) === String(preferredUnitId));
       if (found) return found;
     }
 
-    // Se já existir selectedUnit e ela ainda existe no plano
+    // 2) Se já havia uma selectedUnit e ela ainda existe, mantém
     if (selectedUnit?.id) {
       const found = units.find((u: any) => String(u.id) === String(selectedUnit.id));
       if (found) return found;
     }
 
-    // Prioriza CRD, se existir
-    const crd = units.find(isCrdUnit);
-    if (crd) return crd;
-
-    // Senão, primeira unidade
+    // 3) Senão, primeira unidade do plano (normalmente LIDT)
     return units[0];
   };
 
@@ -99,7 +97,7 @@ const App: React.FC = () => {
 
     const normalized = incomingPlans.map((p) => applyCrdSituationFromSample(p));
 
-    // Se houve mudança na CRD, persiste no Firebase (pra ficar definitivo)
+    // Se houve mudança na CRD, persiste no Firebase (definitivo)
     for (let i = 0; i < incomingPlans.length; i++) {
       const before = incomingPlans[i];
       const after = normalized[i];
@@ -133,23 +131,21 @@ const App: React.FC = () => {
 
         setPlans(normalizedPlans);
 
-        // Define currentPlan com preferência para manter o mesmo ID se já existia
+        // mantém o mesmo plano se possível
         let nextCurrent = currentPlan
           ? normalizedPlans.find((p) => p.id === currentPlan.id) || normalizedPlans[0]
           : normalizedPlans[0];
 
-        // GARANTE que nextCurrent tenha units
+        // garante units
         if (!nextCurrent.units || !nextCurrent.units.length) {
           nextCurrent = { ...nextCurrent, units: SAMPLE_PLANS?.[0]?.units ?? [] };
         }
 
         setCurrentPlan(nextCurrent);
 
+        // ✅ não força CRD: mantém UC atual ou primeira (LIDT normalmente)
         const nextUnit = ensureValidSelectedUnit(nextCurrent);
         setSelectedUnit(nextUnit);
-
-        // Se estiver em tela de UC, garante que UnitViewer receba uma unit válida
-        // (sem alterar layout)
       } else {
         // cria plano padrão baseado no sample
         const defaultPlan: TeachingPlan = {
@@ -158,7 +154,6 @@ const App: React.FC = () => {
           profileId: profileId,
         };
 
-        // Se for beretella, já cria com CRD ajustada igual ao modelo (já é o modelo)
         await FirebaseService.savePlan(defaultPlan);
 
         const newPlans = [defaultPlan];
@@ -210,7 +205,10 @@ const App: React.FC = () => {
     const updatedPlan = { ...currentPlan, units: updatedUnits };
     setCurrentPlan(updatedPlan);
 
-    const nextUnit = updatedUnits.find((u: any) => String(u.id) === String(selectedUnit.id)) || ensureValidSelectedUnit(updatedPlan);
+    const nextUnit =
+      updatedUnits.find((u: any) => String(u.id) === String(selectedUnit.id)) ||
+      ensureValidSelectedUnit(updatedPlan);
+
     setSelectedUnit(nextUnit);
 
     await handleSave(updatedPlan);
@@ -229,7 +227,10 @@ const App: React.FC = () => {
     const updatedPlan = { ...currentPlan, units: updatedUnits };
     setCurrentPlan(updatedPlan);
 
-    const nextUnit = updatedUnits.find((u: any) => String(u.id) === String(selectedUnit.id)) || ensureValidSelectedUnit(updatedPlan);
+    const nextUnit =
+      updatedUnits.find((u: any) => String(u.id) === String(selectedUnit.id)) ||
+      ensureValidSelectedUnit(updatedPlan);
+
     setSelectedUnit(nextUnit);
 
     await handleSave(updatedPlan);
@@ -279,8 +280,8 @@ const App: React.FC = () => {
             onSelectPlan={(p) => {
               setCurrentPlan(p);
 
-              // Sempre define uma unit válida (prioriza CRD se existir)
-              const nextUnit = ensureValidSelectedUnit(p);
+              // ✅ seleciona a primeira unidade do plano (normalmente LIDT)
+              const nextUnit = (p.units && p.units.length) ? p.units[0] : ensureValidSelectedUnit(p);
               setSelectedUnit(nextUnit);
 
               setView("plano-ensino");
