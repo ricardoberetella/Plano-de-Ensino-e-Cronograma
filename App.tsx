@@ -20,7 +20,7 @@ const App: React.FC = () => {
   const loadPlans = async (profileId: string) => {
     setIsLoading(true);
     try {
-      // Tenta carregar do Firebase Cloud
+      // Tenta buscar do Firebase Cloud
       const dbPlans = await FirebaseService.getPlans(profileId);
       
       if (dbPlans && dbPlans.length > 0) {
@@ -29,7 +29,7 @@ const App: React.FC = () => {
         setCurrentPlan(updatedCurrent || dbPlans[0]);
         if (!selectedUnit) setSelectedUnit(updatedCurrent?.units[0] || dbPlans[0].units[0]);
       } else {
-        // Se o banco estiver vazio, usa os modelos locais (SENAI)
+        // Se o Firebase estiver vazio, carrega os dados locais do SENAI
         const localPlans = SAMPLE_PLANS.filter(p => p.profileId === profileId);
         setPlans(localPlans);
         if (localPlans.length > 0) {
@@ -38,11 +38,10 @@ const App: React.FC = () => {
         }
       }
     } catch (error) {
-      console.warn("Firebase inacessível. Usando dados locais de contingência.");
-      const fallbackPlans = SAMPLE_PLANS.filter(p => p.profileId === profileId);
-      setPlans(fallbackPlans);
+      console.warn("Falha na conexão com Firebase. Usando modo de segurança local.");
+      setPlans(SAMPLE_PLANS.filter(p => p.profileId === profileId));
     } finally {
-      // Este bloco garante que a tela de loading suma de qualquer jeito
+      // ESTA LINHA É ESSENCIAL: Garante que o app destrave a tela branca
       setIsLoading(false);
     }
   };
@@ -51,12 +50,12 @@ const App: React.FC = () => {
     if (isAuthenticated) {
       loadPlans(activeProfileId);
     } else {
-      // Se não estiver logado, não precisa carregar planos, apenas parar o loading
       setIsLoading(false);
     }
   }, [isAuthenticated, activeProfileId]);
 
   const handleLogin = (password: string) => {
+    // Senha padrão definida no projeto
     if (password === 'ianes662') {
       setIsAuthenticated(true);
     }
@@ -117,7 +116,7 @@ const App: React.FC = () => {
               await loadPlans(activeProfileId);
               setView('dashboard');
             } catch (e) {
-              alert("Erro ao sincronizar com a nuvem. O plano foi salvo apenas localmente.");
+              alert("Erro ao salvar na nuvem. O plano foi mantido localmente.");
               setView('dashboard');
             }
           }}
