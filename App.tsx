@@ -20,7 +20,7 @@ const App: React.FC = () => {
   const loadPlans = async (profileId: string) => {
     setIsLoading(true);
     try {
-      // Tenta buscar do Firebase Cloud
+      // Tenta buscar do Firebase
       const dbPlans = await FirebaseService.getPlans(profileId);
       
       if (dbPlans && dbPlans.length > 0) {
@@ -29,7 +29,7 @@ const App: React.FC = () => {
         setCurrentPlan(updatedCurrent || dbPlans[0]);
         if (!selectedUnit) setSelectedUnit(updatedCurrent?.units[0] || dbPlans[0].units[0]);
       } else {
-        // Se o Firebase estiver vazio, carrega os dados locais do SENAI
+        // Se falhar ou estiver vazio, usa os dados locais (SENAI)
         const localPlans = SAMPLE_PLANS.filter(p => p.profileId === profileId);
         setPlans(localPlans);
         if (localPlans.length > 0) {
@@ -38,10 +38,10 @@ const App: React.FC = () => {
         }
       }
     } catch (error) {
-      console.warn("Falha na conexão com Firebase. Usando modo de segurança local.");
+      console.warn("Erro ao carregar dados. Usando modo de segurança local.");
       setPlans(SAMPLE_PLANS.filter(p => p.profileId === profileId));
     } finally {
-      // ESTA LINHA É ESSENCIAL: Garante que o app destrave a tela branca
+      // IMPORTANTE: Garante que a tela de loading suma
       setIsLoading(false);
     }
   };
@@ -50,12 +50,12 @@ const App: React.FC = () => {
     if (isAuthenticated) {
       loadPlans(activeProfileId);
     } else {
+      // Se não logado, desativa o loading para mostrar a tela de login
       setIsLoading(false);
     }
   }, [isAuthenticated, activeProfileId]);
 
   const handleLogin = (password: string) => {
-    // Senha padrão definida no projeto
     if (password === 'ianes662') {
       setIsAuthenticated(true);
     }
@@ -116,7 +116,7 @@ const App: React.FC = () => {
               await loadPlans(activeProfileId);
               setView('dashboard');
             } catch (e) {
-              alert("Erro ao salvar na nuvem. O plano foi mantido localmente.");
+              alert("Erro ao sincronizar. O plano foi salvo apenas nesta sessão.");
               setView('dashboard');
             }
           }}
