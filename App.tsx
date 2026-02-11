@@ -20,21 +20,28 @@ const App: React.FC = () => {
   const loadPlans = async (profileId: string) => {
     setIsLoading(true);
     try {
+      // Tenta carregar do Firebase
       const dbPlans = await FirebaseService.getPlans(profileId);
+      
       if (dbPlans && dbPlans.length > 0) {
         setPlans(dbPlans);
         const updatedCurrent = currentPlan ? dbPlans.find(p => p.id === currentPlan.id) : dbPlans[0];
         setCurrentPlan(updatedCurrent || dbPlans[0]);
         if (!selectedUnit) setSelectedUnit(updatedCurrent?.units[0] || dbPlans[0].units[0]);
       } else {
-        // Se não houver planos no DB, usa os modelos de exemplo
-        setPlans(SAMPLE_PLANS.filter(p => p.profileId === profileId));
+        // Se o Firebase estiver vazio ou falhar, usa os exemplos locais
+        const localPlans = SAMPLE_PLANS.filter(p => p.profileId === profileId);
+        setPlans(localPlans);
+        if (localPlans.length > 0) {
+          setCurrentPlan(localPlans[0]);
+          setSelectedUnit(localPlans[0].units[0]);
+        }
       }
     } catch (error) {
-      console.error("Erro ao carregar planos:", error);
+      console.error("Erro na carga inicial, usando dados locais:", error);
       setPlans(SAMPLE_PLANS.filter(p => p.profileId === profileId));
     } finally {
-      // GARANTE que o app vai abrir, mesmo se o Firebase falhar
+      // IMPORTANTE: Isso garante que a tela de loading suma
       setIsLoading(false);
     }
   };
@@ -58,7 +65,7 @@ const App: React.FC = () => {
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
           <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Carregando Sistema...</p>
+          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Iniciando Sistema...</p>
         </div>
       </div>
     );
@@ -103,9 +110,14 @@ const App: React.FC = () => {
         <PlanForm 
           initialPlan={currentPlan || undefined}
           onSave={async (newPlan) => {
-            await FirebaseService.savePlan(newPlan);
-            await loadPlans(activeProfileId);
-            setView('dashboard');
+            try {
+              await FirebaseService.savePlan(newPlan);
+              await loadPlans(activeProfileId);
+              setView('dashboard');
+            } catch (e) {
+              alert("Erro ao salvar. O app funcionará apenas localmente nesta sessão.");
+              setView('dashboard');
+            }
           }}
           onCancel={() => setView('dashboard')}
         />
