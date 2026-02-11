@@ -122,7 +122,7 @@ export const SAMPLE_PLANS: TeachingPlan[] = [
           {
             capacity: "Demonstrar atenção a detalhes",
             nsa: "Omite informações (cotas, símbolos, hachuras) no croqui e no relatório.",
-            apo: "O trabalho presenta algumas omissões ou erros de representação que necessitam de correção e revisão.",
+            apo: "O trabalho apresenta algumas omissões ou erros de representação que necessitam de correção e revisão.",
             par: "O trabalho é entregue de forma completa e precisa, com pouquíssimos ou nenhum erro, demonstrando cuidado na execução.",
             aut: "Além de entregar um trabalho preciso, identifica inconsistências ou informações faltantes no próprio desenho técnico fornecido."
           },
@@ -176,16 +176,8 @@ export const SAMPLE_PLANS: TeachingPlan[] = [
           { 
             topic: '2. Erros de medição', 
             subtopics: [
-              '2.1. Tipos',
-              '2.1.1. Aleatório',
-              '2.1.2. Sistemático',
-              '2.1.3. Grosseiro',
-              '2.2. Fontes de erro',
-              '2.2.1. Variação da temperatura',
-              '2.2.2. Paralaxe',
-              '2.2.3. Força de medição',
-              '2.2.4. Complexidade da peça',
-              '2.2.5. Condições do instrumento',
+              '2.1. Tipos (2.1.1. Aleatório, 2.1.2. Sistemático, 2.1.3. Grosseiro)', 
+              '2.2. Fontes de erro (2.2.1. Variação da temperatura, 2.2.2. Paralaxe, 2.2.3. Força de medição, 2.2.4. Complexidade da peça, 2.2.5. Condições do instrumento)', 
               '2.3. Processos de correção', 
               '2.4. Calibração do instrumento'
             ] 
@@ -195,9 +187,7 @@ export const SAMPLE_PLANS: TeachingPlan[] = [
             subtopics: [
               '3.1. Tipos', 
               '3.2. Características', 
-              '3.3. Leitura',
-              '3.3.1. Sistema métrico',
-              '3.3.2. Sistema inglês',
+              '3.3. Leitura (3.3.1. Sistema métrico, 3.3.2. Sistema Inglês)',
               '3.4. Conversão entre sistemas de medida',
               '3.5. Erros de leitura',
               '3.6. Utilização'
@@ -218,9 +208,7 @@ export const SAMPLE_PLANS: TeachingPlan[] = [
             subtopics: [
               '5.1. Tipos', 
               '5.2. Características', 
-              '5.3. Leitura',
-              '5.3.1. Sistema métrico',
-              '5.3.2. Sistema inglês',
+              '5.3. Leitura (5.3.1. Sistema métrico, 5.3.2. Sistema Inglês)',
               '5.4. Erros de leitura',
               '5.5. Utilização'
             ] 
@@ -239,10 +227,7 @@ export const SAMPLE_PLANS: TeachingPlan[] = [
           { 
             topic: '7. Verificadores', 
             subtopics: [
-              '7.1. Tipos',
-              '7.1.1. Folga',
-              '7.1.2. Raio',
-              '7.1.3. Rosca',
+              '7.1. Tipos (7.1.1. Folga, 7.1.2. Raio, 7.1.3. Rosca)', 
               '7.2. Utilização'
             ] 
           },
@@ -269,13 +254,13 @@ export const SAMPLE_PLANS: TeachingPlan[] = [
           {
             id: 'sa-crd-focus',
             title: 'Precisão em Foco: Verificação de Componentes para a Linha de Montagem',
-            context: 'A "UsiPrecision Componentes Mecânicos Ltda." é uma empresa de médio porte, com 150 funcionários, especializada na fabricação de peças usinadas para a Indústria automotiva e de máquinas agrícolas. Recentemente, a empresa tem enfrentado um aumento no índice de devoluções de um de seus principais clientes devido à inconsistência dimensional em lotes de "Pinos de Ancoragem", componentes críticos para a montagem de um sistema de transmissão. O gestor da qualidade identificou que a causa raiz do problema pode estar na falta de um procedimento padronizado de medição e na variação de critérios entre os inspetores do turno.',
-            challenge: 'Realizar uma inspeção dimensional completa em um lote piloto de 10 "Pinos de Ancoragem" para determinar se o lote pode ser aprovado para envio ao cliente. Para isso, vocês deverão: 1) Analisar o desenho técnico e suas tolerâncias; 2) Planejar a sequência de medições e selecionar os instrumentos adequados (escala, trena, paquímetro, micrômetro, goniômetro, relógios e verificadores); 3) Executar as medições aplicando as técnicas corretas; 4) Registrar os dados em um "Relatório de Inspeção Dimensional" para cada peça; 5) Emitir um parecer final (Aprovado ou Reprovado) justificando tecnicamente a decisão.',
+            context: 'A "UsiPrecision Componentes Mecânicos Ltda." é uma empresa de médio porte, com 150 funcionários, especializada na fabricação de peças usinadas para a Indústria automotiva e de máquinas agrícolas. Recentemente, a empresa tem enfrentado um aumento no índice de devoluções de um de seus principais clientes. O motivo alegado é a inconsistência dimensional em lotes de "Pinos de Ancoragem", componentes críticos para a montagem de um sistema de transmissão. O gestor da Qualidade identificou que a causa raiz do problema pode estar na falta de um procedimento padronizado de medição e na variação de critérios entre os inspetores do turno. Para resolver essa não conformidade e garantir a satisfação do cliente, a empresa decidiu investir na capacitação de sua equipe, começando pelos novos aprendizes.',
+            challenge: 'Vocês receberam um lote piloto de 10 "Pinos de Ancoragem" e o respectivo desenho técnico. A sua missão é realizar uma Inspeção dimensional completa em cada uma das peças para determinar se o lote pode ser aprovado para envio ao cliente. Para isso, vocês deverão: a) Analisar o Desenho Técnico (interpretar cotas, tolerâncias e acabamentos); b) Planejar a Inspeção (definir sequência e selecionar os instrumentos: escala, trena, paquímetro, micrômetro, goniômetro, relógios e verificadores); c) Executar as Medições (aplicar técnicas corretas de manuseio e leitura); d) Registrar os Dados (preencher o Relatório de Inspeção Dimensional); e) Emitir o Parecer (classificar cada peça como "Aprovada" ou "Reprovada" justificando a decisão).',
             expectedResults: [
-              'Relatórios de Inspeção Dimensional: Um relatório para cada peça inspecionada, devidamente preenchido com medições, comparações com as especificações e parecer final justificado.',
-              'Demonstração Prática: Habilidade no manuseio correto e seguro de todos os instrumentos de medição propostos (escala, trena, paquímetro, micrômetro, verificadores, relógios e goniômetro).',
-              'Argumentação Técnica: Capacidade de explicar oralmente o processo de inspeção, justificar a escolha dos instrumentos e defender as decisões de aprovação ou reprovação.',
-              'Organização do Posto de Trabalho: Bancada de inspeção limpa e organizada ao término da atividade, com instrumentos limpos e guardados em seus respectivos estojos.'
+              'Relatórios de Inspeção Dimensional: Um relatório para cada peça inspecionada, devidamente preenchido, com todas as medições, comparações com as especificações e o parecer final (Aprovado/Reprovado) claramente justificado.',
+              'Demonstração Prática: Habilidade no manuseio correto e seguro de todos os instrumentos de medição propostos (escala, trena, paquímetro, micrômetro, verificadores, relógios e goniômetro), realizando leituras precisas.',
+              'Argumentação Técnica: Capacidade de explicar oralmente o processo de inspeção realizado, justificar a escolha dos instrumentos e defender as conclusões sobre a aprovação ou reprovação do lote.',
+              'Organização do Posto de Trabalho: Ao término da atividade, a bancada de inspeção deverá estar limpa e organizada, com todos os instrumentos devidamente limpos e guardados em seus respectivos estojos, demonstrando zelo e responsabilidade com os equipamentos.'
             ]
           }
         ],
