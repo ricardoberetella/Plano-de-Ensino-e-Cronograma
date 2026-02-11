@@ -2,24 +2,23 @@ import { GoogleGenAI } from "@google/genai";
 
 export class GeminiService {
   async generateFullUnit(courseName: string, unitName: string) {
-    // No Vite/AI Studio, usamos import.meta.env em vez de process.env
-    // Isso evita que o app trave caso a variável não esteja definida
+    // No Vite/AI Studio, usamos import.meta.env
+    // Se a chave não existir, o código não quebra o app ao carregar
     const apiKey = (import.meta.env && import.meta.env.VITE_GEMINI_API_KEY) || "";
     
     if (!apiKey) {
-      console.error("Erro: VITE_GEMINI_API_KEY não encontrada nas configurações.");
-      throw new Error("Chave de API não configurada. O sistema funcionará apenas em modo manual.");
+      console.warn("Chave VITE_GEMINI_API_KEY não configurada. A IA está desativada.");
+      throw new Error("Chave de API não encontrada. Por favor, configure sua chave nas variáveis de ambiente.");
     }
 
     const ai = new GoogleGenAI(apiKey);
     
     try {
-      // Usamos o modelo flash por ser mais rápido para geração de planos
+      // Usamos o modelo flash que é mais rápido e econômico
       const model = ai.getGenerativeModel({ model: "gemini-1.5-flash" });
       
-      const prompt = `Gere uma Unidade Curricular completa para o curso "${courseName}" 
-      com o tema "${unitName}" seguindo rigorosamente o Modelo SENAI (MSEP). 
-      Inclua capacidades básicas, conhecimentos e critérios de avaliação NSA, APO, PAR, AUT.`;
+      const prompt = `Gere uma Unidade Curricular completa para o curso "${courseName}" com o tema "${unitName}" seguindo o Modelo SENAI (MSEP). 
+      Retorne capacidades básicas, conhecimentos e critérios de avaliação seguindo o padrão NSA, APO, PAR e AUT.`;
 
       const result = await model.generateContent(prompt);
       const response = await result.response;
