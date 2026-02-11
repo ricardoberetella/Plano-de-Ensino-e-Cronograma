@@ -20,7 +20,7 @@ const App: React.FC = () => {
   const loadPlans = async (profileId: string) => {
     setIsLoading(true);
     try {
-      // Tenta carregar do Firebase
+      // Tenta carregar do Firebase Cloud
       const dbPlans = await FirebaseService.getPlans(profileId);
       
       if (dbPlans && dbPlans.length > 0) {
@@ -29,7 +29,7 @@ const App: React.FC = () => {
         setCurrentPlan(updatedCurrent || dbPlans[0]);
         if (!selectedUnit) setSelectedUnit(updatedCurrent?.units[0] || dbPlans[0].units[0]);
       } else {
-        // Se o Firebase estiver vazio ou falhar, usa os exemplos locais
+        // Se o banco estiver vazio, usa os modelos locais (SENAI)
         const localPlans = SAMPLE_PLANS.filter(p => p.profileId === profileId);
         setPlans(localPlans);
         if (localPlans.length > 0) {
@@ -38,10 +38,11 @@ const App: React.FC = () => {
         }
       }
     } catch (error) {
-      console.error("Erro na carga inicial, usando dados locais:", error);
-      setPlans(SAMPLE_PLANS.filter(p => p.profileId === profileId));
+      console.warn("Firebase inacessível. Usando dados locais de contingência.");
+      const fallbackPlans = SAMPLE_PLANS.filter(p => p.profileId === profileId);
+      setPlans(fallbackPlans);
     } finally {
-      // IMPORTANTE: Isso garante que a tela de loading suma
+      // Este bloco garante que a tela de loading suma de qualquer jeito
       setIsLoading(false);
     }
   };
@@ -50,6 +51,7 @@ const App: React.FC = () => {
     if (isAuthenticated) {
       loadPlans(activeProfileId);
     } else {
+      // Se não estiver logado, não precisa carregar planos, apenas parar o loading
       setIsLoading(false);
     }
   }, [isAuthenticated, activeProfileId]);
@@ -65,7 +67,7 @@ const App: React.FC = () => {
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
           <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Iniciando Sistema...</p>
+          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Iniciando Sistema SENAI...</p>
         </div>
       </div>
     );
@@ -115,7 +117,7 @@ const App: React.FC = () => {
               await loadPlans(activeProfileId);
               setView('dashboard');
             } catch (e) {
-              alert("Erro ao salvar. O app funcionará apenas localmente nesta sessão.");
+              alert("Erro ao sincronizar com a nuvem. O plano foi salvo apenas localmente.");
               setView('dashboard');
             }
           }}
