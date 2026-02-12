@@ -42,11 +42,84 @@ const COMMON_SA_CRD = [
   }
 ];
 
-const COMMON_RUBRICS_CRD = [
-  { capacity: 'Medir peças com escala e trena', nsa: 'Comete erros de leitura acima de 1mm.', apo: 'Realiza a leitura com auxílio constante.', par: 'Mede de forma autônoma com precisão.', aut: 'Identifica desgaste no instrumento.' },
-  { capacity: 'Medir peças com paquímetro (0,05 e 0,02)', nsa: 'Não identifica o nônio.', apo: 'Lê medidas com auxílio de colegas.', par: 'Realiza leituras precisas sem erro de paralaxe.', aut: 'Verifica o erro de zero e calibração.' },
-  { capacity: 'Medir peças com micrômetro (0,01)', nsa: 'Derruba ou força o instrumento.', apo: 'Mede sem usar a catraca corretamente.', par: 'Realiza medição perfeita usando a catraca.', aut: 'Interpreta variações térmicas na medição.' },
-  { capacity: 'Zelo e Organização', nsa: 'Deixa instrumentos fora do estojo.', apo: 'Organiza após solicitação.', par: 'Mantém o posto limpo e organizado.', aut: 'Promove a organização entre os colegas.' }
+const FULL_KNOWLEDGE_CRD = [
+  { 
+    topic: '1. Metrologia', 
+    subtopics: ['I. Definição', 'II. Características', 'III. Aplicações', 'IV. Terminologia (Vocabulário Internacional de Metrologia - VIM)'] 
+  },
+  { 
+    topic: '2. Erros de medição', 
+    subtopics: ['I. Tipos', 'II. Aleatório', 'III. Sistemático', 'IV. Grosseiro', 'V. Fontes de erro', 'VI. Variação da temperatura', 'VII. Paralaxe', 'VIII. Força de medição', 'IX. Complexidade da peça', 'X. Condições do Instrumento', 'XI. Processos de correção', 'XII. Calibração do Instrumento'] 
+  },
+  { 
+    topic: '3. Escala', 
+    subtopics: ['I. Tipos', 'II. Características', 'III. Leitura', 'IV. Sistema métrico', 'V. Sistema Inglês', 'VI. Conversão entre sistemas de medida', 'VII. Erros de leitura', 'VIII. Utilização'] 
+  },
+  { 
+    topic: '4. Trena', 
+    subtopics: ['I. Tipos', 'II. Características', 'III. Leitura no sistema métrico', 'IV. Erros de leitura', 'V. Utilização'] 
+  },
+  { 
+    topic: '5. Paquímetros', 
+    subtopics: ['I. Tipos', 'II. Características', 'III. Leitura', 'IV. Sistema métrico', 'V. Sistema Inglês', 'VI. Erros de leitura', 'VII. Utilização'] 
+  },
+  { 
+    topic: '6. Micrômetros', 
+    subtopics: ['I. Tipos', 'II. Características', 'III. Leitura no sistema métrico', 'IV. Erros de leitura', 'V. Ajuste zero', 'VI. Utilização'] 
+  },
+  { 
+    topic: '7. Verificadores', 
+    subtopics: ['I. Tipos', 'II. Folga', 'III. Raio', 'IV. Rosca', 'V. Utilização'] 
+  },
+  { 
+    topic: '8. Relógios comparadores e apalpadores', 
+    subtopics: ['I. Tipos', 'II. Características', 'III. Ajuste zero', 'IV. Utilização'] 
+  },
+  { 
+    topic: '9. Goniômetro', 
+    subtopics: ['I. Tipos', 'II. Características', 'III. Erros de leitura', 'IV. Utilização'] 
+  }
+];
+
+const FULL_CAPACITIES_CRD = [
+  'I. Identificar a importância da metrologia na indústria metalmecânica.',
+  'II. Medir peças com escala.',
+  'III. Medir peças com trena.',
+  'IV. Medir peças com paquímetro.',
+  'V. Medir peças no sistema métrico com micrômetro.',
+  'VI. Verificar dimensões e perfis com verificadores.',
+  'VII. Medir por comparação com relógio apalpador e comparador.',
+  'VIII. Medir peças com goniômetro.'
+];
+
+const FULL_SOCIOEMOCIONAL_CRD = [
+  'PENSAMENTO ANALÍTICO: I. Demonstrar atenção a detalhes',
+  'AUTOGESTÃO: I. Organizar o ambiente de trabalho e as atividades',
+  'AUTOGESTÃO: II. Zelar pelo uso de equipamentos, instrumentos, ferramentas e materiais'
+];
+
+const FULL_RUBRICS_CRD = [
+  { 
+    capacity: 'Medir peças com paquímetro.', 
+    nsa: 'Tenta medir, mas comete erros grosseiros na leitura da escala ou no manuseio, orientação inicial.', 
+    apo: 'Realiza a medição com auxílio, cometendo erros pontuais na leitura do nônio ou no docente na soma das escalas ou no uso da catraca.', 
+    par: 'Mede a peça de forma autônoma e correta, aplicando as técnicas de manuseio e leitura.', 
+    aut: 'Mede com precisão e rapidez, identificando potenciais fontes de erro (paralaxe, periodicamente e argumenta sobre a adequação do micrômetro para a tolerância solicitada.' 
+  },
+  { 
+    capacity: 'Demonstrar atenção a detalhes.', 
+    nsa: 'O relatório de inspeção apresenta múltiplos erros de transcrição e omissões. Não identifica as peças não conformes.', 
+    apo: 'O relatório apresenta erros pontuais ou omissões. Identifica algumas, mas não todas, as peças não conformes.', 
+    par: 'Preenche o relatório de forma correta e completa, identificando todas as peças não conformes.', 
+    aut: 'Além de preencher o relatório corretamente, anota observações pertinentes sobre o acabamento da peça ou tendências de medidas que se aproximam dos limites de tolerância.' 
+  },
+  { 
+    capacity: 'Organizar o ambiente de trabalho e as atividades.', 
+    nsa: 'Deixa a bancada e os instrumentos desorganizados e sujos durante e após a atividade.', 
+    apo: 'Necessita de lembretes para organizar a bancada ou para limpar e guardar os instrumentos corretamente.', 
+    par: 'Mantém o ambiente de trabalho organizado e guarda os equipamentos corretamente ao final da tarefa, por iniciativa própria.', 
+    aut: 'Além de manter seu próprio espaço organizado, incentiva os colegas a fazerem o mesmo e propõe melhorias na disposição das ferramentas para otimizar o fluxo de trabalho.' 
+  }
 ];
 
 const COMMON_CAPACITIES_LIDT = [
@@ -90,22 +163,11 @@ export const SAMPLE_PLANS: TeachingPlan[] = [
         id: 'uc-crd-beretella',
         name: 'CONTROLE DIMENSIONAL',
         calendar: { startDate: '2026-01-26', endDate: '2026-06-23', markings: [] },
-        basicCapacities: [
-          '1. Identificar a importância da metrologia.',
-          '2. Medir peças com escala e trena.',
-          '3. Medir peças com paquímetro.',
-          '4. Medir peças com micrômetro.',
-          '5. Verificar dimensões com verificadores.',
-          '6. Medir por comparação com relógios.',
-          '7. Medir peças com goniômetro.'
-        ],
-        socioemocionalCapacities: ['Atenção a detalhes', 'Organização', 'Zelo pelos equipamentos'],
-        knowledge: [
-          { topic: '1. Metrologia Industrial', subtopics: ['Definições e Terminologia VIM', 'Erros de Medição', 'Sistemas de Unidades'] },
-          { topic: '2. Instrumentação Prática', subtopics: ['Escala, Trena e Paquímetro', 'Micrômetros e Goniômetro', 'Relógios Comparadores'] }
-        ],
+        basicCapacities: FULL_CAPACITIES_CRD,
+        socioemocionalCapacities: FULL_SOCIOEMOCIONAL_CRD,
+        knowledge: FULL_KNOWLEDGE_CRD,
         learningSituations: COMMON_SA_CRD,
-        rubrics: COMMON_RUBRICS_CRD,
+        rubrics: FULL_RUBRICS_CRD,
         schedule: CRD_SCHEDULE
       }
     ]
@@ -137,17 +199,11 @@ export const SAMPLE_PLANS: TeachingPlan[] = [
         id: 'uc-crd-gea',
         name: 'CONTROLE DIMENSIONAL',
         calendar: { startDate: '2026-01-26', endDate: '2026-06-23', markings: [] },
-        basicCapacities: [
-          '1. Importância da Metrologia.',
-          '2. Medir com paquímetro.',
-          '3. Medir com micrômetro.'
-        ],
-        socioemocionalCapacities: ['Zelo e Organização'],
-        knowledge: [
-          { topic: '1. Metrologia', subtopics: ['Conceitos Básicos'] }
-        ],
+        basicCapacities: FULL_CAPACITIES_CRD,
+        socioemocionalCapacities: FULL_SOCIOEMOCIONAL_CRD,
+        knowledge: FULL_KNOWLEDGE_CRD,
         learningSituations: COMMON_SA_CRD,
-        rubrics: COMMON_RUBRICS_CRD,
+        rubrics: FULL_RUBRICS_CRD,
         schedule: CRD_SCHEDULE
       }
     ]
