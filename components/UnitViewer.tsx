@@ -58,12 +58,12 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar 
     markings: [],
     colorLabels: { 
       green: 'Não letivo',
-      blue: 'CRD'
+      blue: 'Aulas do Cronograma'
     }
   };
 
   const [calendar, setCalendar] = useState<UnitCalendar>(unit.calendar || defaultCalendar);
-  const [selectedColor, setSelectedColor] = useState<CalendarColor>('blue');
+  const [selectedColor, setSelectedColor] = useState<CalendarColor>('green');
   
   const isInitialMount = useRef(true);
 
@@ -116,7 +116,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar 
         ...unit.calendar,
         colorLabels: {
           green: 'Não letivo',
-          blue: 'CRD',
+          blue: 'Aulas do Cronograma',
           ...unit.calendar.colorLabels
         }
       });
@@ -171,12 +171,6 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar 
     }
   };
 
-  const handleLabelUpdate = (color: CalendarColor, label: string) => {
-    if (color !== 'blue' && color !== 'green') return;
-    const newLabels = { ...calendar.colorLabels, [color]: label };
-    handleCalendarUpdate({ colorLabels: newLabels });
-  };
-
   const toggleMarking = (date: string) => {
     if (date < calendar.startDate || date > calendar.endDate) return;
 
@@ -213,7 +207,8 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar 
     return months;
   }, [calendar.startDate, calendar.endDate]);
 
-  const colorOptions: CalendarColor[] = ['green', 'blue', 'white'];
+  // A cor azul foi removida das opções manuais
+  const colorOptions: CalendarColor[] = ['green', 'white'];
 
   return (
     <div className="bg-white rounded-2xl md:rounded-3xl shadow-xl border border-slate-200 overflow-hidden animate-fadeIn">
@@ -537,30 +532,45 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar 
                 </button>
               </div>
 
-              <div className="space-y-4">
-                <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2">Selecionar Cor para Marcação:</p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                  {colorOptions.map(color => (
-                    <button
-                      key={color}
-                      onClick={() => setSelectedColor(color)}
-                      className={`flex items-center gap-4 bg-white p-3 rounded-2xl border-2 group transition-all shadow-sm ${selectedColor === color ? 'border-slate-900 ring-4 ring-slate-100' : 'border-slate-100 hover:border-blue-100'}`}
-                    >
-                      <div
-                        className={`w-10 h-10 rounded-xl flex-shrink-0 flex items-center justify-center border shadow-inner transition-transform active:scale-90 ${
-                          selectedColor === color ? 'border-transparent scale-110 shadow-lg' : 'border-slate-100'
-                        }`}
-                        style={{ backgroundColor: SOLID_COLOR_MAP[color] }}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div className="space-y-4">
+                  <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2">Ferramentas de Marcação Manual:</p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {colorOptions.map(color => (
+                      <button
+                        key={color}
+                        onClick={() => setSelectedColor(color)}
+                        className={`flex items-center gap-4 bg-white p-3 rounded-2xl border-2 group transition-all shadow-sm ${selectedColor === color ? 'border-slate-900 ring-4 ring-slate-100' : 'border-slate-100 hover:border-blue-100'}`}
                       >
-                        {selectedColor === color && (
-                          <div className={`w-3 h-3 rounded-full ${color === 'white' ? 'bg-slate-400' : 'bg-white shadow-md'}`}></div>
-                        )}
-                      </div>
-                      <span className={`text-[10px] font-black uppercase tracking-widest ${selectedColor === color ? 'text-slate-900' : 'text-slate-400'}`}>
-                        {color === 'white' ? 'Limpar Data' : (calendar.colorLabels?.[color] || (color === 'green' ? 'Não letivo' : 'CRD'))}
-                      </span>
-                    </button>
-                  ))}
+                        <div
+                          className={`w-10 h-10 rounded-xl flex-shrink-0 flex items-center justify-center border shadow-inner transition-transform active:scale-90 ${
+                            selectedColor === color ? 'border-transparent scale-110 shadow-lg' : 'border-slate-100'
+                          }`}
+                          style={{ backgroundColor: SOLID_COLOR_MAP[color] }}
+                        >
+                          {selectedColor === color && (
+                            <div className={`w-3 h-3 rounded-full ${color === 'white' ? 'bg-slate-400' : 'bg-white shadow-md'}`}></div>
+                          )}
+                        </div>
+                        <span className={`text-[10px] font-black uppercase tracking-widest ${selectedColor === color ? 'text-slate-900' : 'text-slate-400'}`}>
+                          {color === 'white' ? 'Limpar Data' : (calendar.colorLabels?.[color] || 'Não letivo')}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2">Status Automático:</p>
+                  <div className="bg-slate-50 p-6 rounded-2xl border border-dashed border-slate-200 flex items-center gap-6">
+                    <div className="w-12 h-12 rounded-xl bg-blue-600 border shadow-md flex items-center justify-center">
+                       <div className="w-3 h-3 bg-white/40 rounded-full animate-pulse"></div>
+                    </div>
+                    <div>
+                      <p className="text-[10px] font-black text-blue-600 uppercase tracking-widest">Aulas do Cronograma</p>
+                      <p className="text-[8px] font-bold text-slate-400 uppercase leading-relaxed mt-1">Sincronizado automaticamente com as datas da aba Cronograma.</p>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
