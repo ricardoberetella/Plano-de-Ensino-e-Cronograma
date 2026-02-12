@@ -1,8 +1,8 @@
 // App.tsx — COMPLETO e CORRIGIDO
-// ✅ Corrige: CRD aparece e LIDT some (units incompleto salvo no Firebase)
-// ✅ Faz MERGE das UCs com o SAMPLE_PLANS (recoloca LIDT se estiver faltando)
+// ✅ Compatível com o SEU Dashboard.tsx (onEdit/onView/onRefresh/onResetPlan)
+// ✅ Corrige: CRD aparece e LIDT some (units incompleto salvo no Firebase) via MERGE com SAMPLE_PLANS
 // ✅ Copia APENAS learningSituations da CRD do modelo para o perfil beretella
-// ✅ Não altera layout, só lógica
+// ✅ Não altera layout — só lógica
 
 import React, { useEffect, useState } from "react";
 import Layout from "./components/Layout";
@@ -62,7 +62,7 @@ const App: React.FC = () => {
     return sp.units.find(isCrdUnit) ?? null;
   };
 
-  // ✅ Merge das UCs: se o plano salvo no Firebase estiver faltando LIDT (ou qualquer UC do modelo),
+  // ✅ Merge das UCs: se o plano do Firebase estiver faltando LIDT (ou outra UC do modelo),
   // recoloca a UC do SAMPLE sem apagar as existentes.
   const mergeUnitsWithSample = (plan: TeachingPlan): TeachingPlan => {
     const sp = getSamplePlan();
@@ -79,18 +79,20 @@ const App: React.FC = () => {
     const merged: CurricularUnit[] = [...dbUnits];
     for (const su of sampleUnits) {
       const sid = normalizeStr((su as any).id);
-      if (!existingById.has(sid)) {
-        merged.push(su);
-      }
+      if (!existingById.has(sid)) merged.push(su);
     }
 
-    // Mantém a ordem do modelo (LIDT antes de CRD, etc), mas preserva unidades extras do banco
+    // Mantém a ordem do modelo, preserva extras do banco ao final
     const orderIndex = new Map<string, number>();
     sampleUnits.forEach((u, idx) => orderIndex.set(normalizeStr((u as any).id), idx));
 
     merged.sort((a, b) => {
-      const ai = orderIndex.has(normalizeStr((a as any).id)) ? (orderIndex.get(normalizeStr((a as any).id)) as number) : 999;
-      const bi = orderIndex.has(normalizeStr((b as any).id)) ? (orderIndex.get(normalizeStr((b as any).id)) as number) : 999;
+      const ai = orderIndex.has(normalizeStr((a as any).id))
+        ? (orderIndex.get(normalizeStr((a as any).id)) as number)
+        : 999;
+      const bi = orderIndex.has(normalizeStr((b as any).id))
+        ? (orderIndex.get(normalizeStr((b as any).id)) as number)
+        : 999;
       if (ai !== bi) return ai - bi;
       return normalizeStr((a as any).name).localeCompare(normalizeStr((b as any).name));
     });
@@ -98,7 +100,7 @@ const App: React.FC = () => {
     return { ...plan, units: merged };
   };
 
-  // Copia SOMENTE a situação-problema (learningSituations) da CRD do modelo para a CRD do plano
+  // Copia SOMENTE learningSituations da CRD do modelo para a CRD do plano
   const applyCrdSituationFromSample = (plan: TeachingPlan): TeachingPlan => {
     const sampleCrd = getSampleCrdUnit();
     if (!sampleCrd) return plan;
@@ -137,9 +139,10 @@ const App: React.FC = () => {
     const mergedPlans = incomingPlans.map((p) => mergeUnitsWithSample(p));
 
     // 2) Se for beretella, copia CRD do modelo
-    const normalized = profileId === "beretella"
-      ? mergedPlans.map((p) => applyCrdSituationFromSample(p))
-      : mergedPlans;
+    const normalized =
+      profileId === "beretella"
+        ? mergedPlans.map((p) => applyCrdSituationFromSample(p))
+        : mergedPlans;
 
     // 3) Persistir no Firebase se houve mudança (units faltando ou CRD alterada)
     for (let i = 0; i < incomingPlans.length; i++) {
@@ -151,7 +154,6 @@ const App: React.FC = () => {
 
       const beforeIds = beforeUnits.map((u: any) => normalizeStr(u.id)).sort();
       const afterIds = afterUnits.map((u: any) => normalizeStr(u.id)).sort();
-
       const unitsChanged = JSON.stringify(beforeIds) !== JSON.stringify(afterIds);
 
       const beforeCrd = beforeUnits.find(isCrdUnit)?.learningSituations ?? [];
@@ -180,17 +182,15 @@ const App: React.FC = () => {
 
       if (dbPlans && dbPlans.length > 0) {
         const normalizedPlans = await normalizePlansForProfile(profileId, dbPlans);
-
         setPlans(normalizedPlans);
 
-        let nextCurrent = currentPlan
-          ? normalizedPlans.find((p) => p.id === currentPlan.id) || normalizedPlans[0]
-          : normalizedPlans[0];
+        const nextCurrent =
+          currentPlan
+            ? normalizedPlans.find((p) => p.id === currentPlan.id) || normalizedPlans[0]
+            : normalizedPlans[0];
 
         setCurrentPlan(nextCurrent);
-
-        const nextUnit = ensureValidSelectedUnit(nextCurrent);
-        setSelectedUnit(nextUnit);
+        setSelectedUnit(ensureValidSelectedUnit(nextCurrent));
       } else {
         // cria plano padrão baseado no sample
         const sp = getSamplePlan();
@@ -198,6 +198,8 @@ const App: React.FC = () => {
           ...(sp as TeachingPlan),
           id: `plan-usinagem-${profileId}`,
           profileId: profileId,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
         };
 
         await FirebaseService.savePlan(defaultPlan);
@@ -225,7 +227,11 @@ const App: React.FC = () => {
   // Salvar
   // ======================================================
   const handleSave = async (updatedPlan: TeachingPlan) => {
-    const planToSave = { ...updatedPlan, profileId: activeProfileId };
+    const planToSave: TeachingPlan = {
+      ...updatedPlan,
+      profileId: activeProfileId,
+      updatedAt: new Date().toISOString(),
+    };
 
     try {
       await FirebaseService.savePlan(planToSave);
@@ -238,7 +244,36 @@ const App: React.FC = () => {
   };
 
   // ======================================================
-  // Atualizar cronograma
+  // Restaurar plano para o padrão oficial (SAMPLE)
+  // ======================================================
+  const handleResetPlan = async (planId: string) => {
+    const sp = getSamplePlan();
+    if (!sp) return;
+
+    // restaura “estrutura oficial” mas mantém id do plano e profile atual
+    const restored: TeachingPlan = {
+      ...(sp as TeachingPlan),
+      id: planId,
+      profileId: activeProfileId,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+
+    // se for beretella, garante CRD igual ao modelo (já é, mas mantém consistência)
+    const finalPlan = activeProfileId === "beretella" ? applyCrdSituationFromSample(restored) : restored;
+
+    try {
+      await FirebaseService.savePlan(finalPlan);
+      await loadPlans(activeProfileId);
+      setView("dashboard");
+    } catch (e) {
+      console.error("Erro ao restaurar plano:", e);
+      alert("Não foi possível restaurar o plano. Verifique a conexão e tente novamente.");
+    }
+  };
+
+  // ======================================================
+  // Atualizar cronograma / calendário
   // ======================================================
   const handleUpdateSchedule = async (newSchedule: ScheduleEntry[]) => {
     if (!currentPlan || !selectedUnit) return;
@@ -261,9 +296,6 @@ const App: React.FC = () => {
     await handleSave(updatedPlan);
   };
 
-  // ======================================================
-  // Atualizar calendário
-  // ======================================================
   const handleUpdateCalendar = async (newCalendar: UnitCalendar) => {
     if (!currentPlan || !selectedUnit) return;
 
@@ -312,7 +344,7 @@ const App: React.FC = () => {
       );
     }
 
-    if (!currentPlan) {
+    if (!currentPlan && (view !== "dashboard")) {
       return (
         <div className="w-full h-[70vh] flex items-center justify-center">
           <div className="text-slate-500 text-sm">Nenhum plano encontrado.</div>
@@ -325,29 +357,33 @@ const App: React.FC = () => {
         return (
           <Dashboard
             plans={plans}
-            currentPlan={currentPlan}
-            onSelectPlan={(p) => {
-              setCurrentPlan(p);
-              setSelectedUnit(p.units?.[0] ?? ensureValidSelectedUnit(p));
+            onEdit={(plan) => {
+              setCurrentPlan(plan);
+              setSelectedUnit(ensureValidSelectedUnit(plan));
+              setView("editor");
+            }}
+            onView={(plan) => {
+              setCurrentPlan(plan);
+              setSelectedUnit(ensureValidSelectedUnit(plan));
               setView("plano-ensino");
             }}
+            onRefresh={() => loadPlans(activeProfileId)}
+            onResetPlan={(id) => handleResetPlan(id)}
           />
         );
 
       case "editor":
-        return <PlanForm plan={currentPlan} onSave={handleSave} />;
+        return currentPlan ? <PlanForm plan={currentPlan} onSave={handleSave} /> : null;
 
       case "plano-ensino":
       case "cronograma":
       case "situacoes":
       case "calendario": {
-        const unitToShow = selectedUnit || ensureValidSelectedUnit(currentPlan);
+        const unitToShow = (currentPlan ? (selectedUnit || ensureValidSelectedUnit(currentPlan)) : null);
         if (!unitToShow) {
           return (
             <div className="w-full h-[70vh] flex items-center justify-center">
-              <div className="text-slate-500 text-sm">
-                Nenhuma unidade curricular disponível.
-              </div>
+              <div className="text-slate-500 text-sm">Nenhuma unidade curricular disponível.</div>
             </div>
           );
         }
@@ -363,7 +399,13 @@ const App: React.FC = () => {
 
       default:
         return (
-          <Dashboard plans={plans} currentPlan={currentPlan} onSelectPlan={() => {}} />
+          <Dashboard
+            plans={plans}
+            onEdit={() => {}}
+            onView={() => {}}
+            onRefresh={() => loadPlans(activeProfileId)}
+            onResetPlan={(id) => handleResetPlan(id)}
+          />
         );
     }
   };
