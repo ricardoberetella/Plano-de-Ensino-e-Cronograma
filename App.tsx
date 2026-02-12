@@ -31,8 +31,9 @@ const App: React.FC = () => {
     try {
       const dbPlans = await FirebaseService.getPlans(profileId);
       
+      // Lógica de detecção: se não houver planos ou se o plano salvo tiver menos de 3 unidades, inicializa do zero.
       const needsInit = !dbPlans || dbPlans.length === 0 || 
-                        dbPlans.some(p => p.units.some(u => 
+                        dbPlans.some(p => p.units.length < 3 || p.units.some(u => 
                           u.learningSituations.length === 0 || 
                           (u.id.includes('lidt') && (u.rubrics.length < 6 || u.schedule.length === 0)) ||
                           (u.id.includes('crd') && u.rubrics.length < 4) ||
