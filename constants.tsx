@@ -27,6 +27,29 @@ const CRD_SCHEDULE = [
   { id: 'c20', date: '23/06/2026', hours: 2, capacities: 'Todas as capacidades técnicas e socioemocionais da SA.', knowledge: 'Todos os conhecimentos da SA.', strategy: 'Feedback final sobre o desempenho na SA. Autoavaliação e fechamento da Unidade Curricular.', resources: 'Sala de aula, instrumentos de avaliação preenchidos.' }
 ];
 
+const LIDT_SCHEDULE = [
+  { id: 'l1', date: '26/01/2026', hours: 2, capacities: 'Todas as capacidades da SA', knowledge: '1.1. Definição de Desenho Técnico', strategy: '• Exposição dialogada; • Apresentação da UC, do MSEP e da Situação de Aprendizagem "Decifrando o Projeto"; • Dinâmica de Grupo: Formação das equipes e discussão inicial sobre a importância do desenho técnico no mundo do trabalho.', resources: 'Sala de aula, projetor, computador, Plano de Ensino, material da SA.' },
+  { id: 'l2', date: '02/02/2026', hours: 2, capacities: 'Interpretar desenhos técnicos de peças.', knowledge: '1.2. Normas técnicas; 1.3. Formatos de folha; 1.4. Linhas.', strategy: '• Exposição dialogada: Apresentação das normas ABNT, formatos de papel e tipos de linhas. • Atividade prática: Análise de desenhos técnicos para identificação dos tipos de linhas e suas aplicações.', resources: 'Sala de aula, projetor, exemplos de desenhos técnicos, apostila.' },
+  { id: 'l3', date: '09/02/2026', hours: 2, capacities: 'Interpretar desenhos técnicos de peças.', knowledge: '1.5. Escalas; 1.6. Figuras e sólidos geométricos.', strategy: '• Exposição dialogada e Demonstração: Explicação sobre escalas (natural, redução, ampliação). • Apresentação de figuras e sólidos geométricos.', resources: 'Projetor, modelos de sólidos geométricos, desenhos com diferentes escalas.' },
+  { id: 'l4', date: '16/02/2026', hours: 2, capacities: 'Elaborar croquis de peças.', knowledge: '2.1. Perspectiva (isométrica, vistas)...', strategy: '• Atividade prática: Introdução à perspectiva isométrica. Exercícios de esboço à mão livre de sólidos geométricos simples em perspectiva.', resources: 'Sala de aula, papel, lápis, borracha, modelos de sólidos.' },
+  { id: 'l5', date: '23/02/2026', hours: 2, capacities: 'Elaborar croquis de peças.', knowledge: '2.2. Projeção ortogonal (vistas, supressão de vistas).', strategy: '• Atividade prática: Desenho das 3 vistas principais (frontal, superior, lateral) a partir de modelos sólidos simples. Discussão sobre supressão de vistas.', resources: 'Sala de aula, papel, lápis, borracha, modelos de peças simples.' },
+  { id: 'l6', date: '02/03/2026', hours: 2, capacities: 'Elaborar croquis de peças.', knowledge: '2.5. Cotagem (vistas únicas, face de referência, eixo de simetria).', strategy: '• Exposição dialogada e Prática: Apresentação das regras de cotagem. Exercícios de cotagem de vistas ortogonais.', resources: 'Projetor, exemplos de desenhos cotados, exercícios impressos.' },
+  { id: 'l7', date: '09/03/2026', hours: 2, capacities: 'Interpretar desenhos técnicos de peças.', knowledge: '3.1. Cortes... 3.2. Meio corte.', strategy: '• Exposição dialogada e Demonstração: Explicação da necessidade e representação de cortes. Análise de desenhos com corte total e meio corte.', resources: 'Projetor, desenhos técnicos com cortes, peças seccionadas (se disponível).' },
+  { id: 'l8', date: '16/03/2026', hours: 2, capacities: 'Interpretar desenhos técnicos de peças.', knowledge: '3.3 a 3.7. Outros tipos de corte (composto, parcial, seção, omissão, encurtamento).', strategy: '• Estudo de caso: As equipes analisam desenhos complexos e identificam os diferentes tipos de cortes e seções, discutindo sua aplicação.', resources: 'Projetor, conjunto de desenhos técnicos variados.' },
+  { id: 'l9', date: '23/03/2026', hours: 2, capacities: 'Elaborar croquis de peças.', knowledge: '4. Vistas especiais (auxiliares, rotação de elemento).', strategy: '• Atividade prática: Exercícios de desenho de vistas auxiliares para representação de faces inclinadas.', resources: 'Sala de aula, papel, instrumentos de desenho, modelos de peças com faces inclinadas.' },
+  { id: 'l10', date: '30/03/2026', hours: 2, capacities: 'Interpretar desenho técnico de montagem.', knowledge: '5. Desenho de conjuntos (representação, elementos, vista explodida).', strategy: '• Exposição dialogada: Apresentação da estrutura de um desenho de conjunto, vista explodida e elementos padronizados.', resources: 'Projetor, exemplo de desenho de conjunto complexo (ex: morsa).' },
+  { id: 'l11', date: '06/04/2026', hours: 2, capacities: 'Interpretar desenho técnico de montagem.', knowledge: '5.3. Lista de materiais; 5.4. Balões de identificação.', strategy: '• Atividade em equipe: Análise do desenho de "Subconjunto do Acoplamento AC-102". As equipes devem correlacionar a lista de materiais com os balões na vista explodida.', resources: 'Cópia do desenho da SA para cada equipe, projetor.' },
+  { id: 'l12', date: '13/04/2026', hours: 2, capacities: 'Interpretar tolerância dimensional.', knowledge: '6.1. Tolerância dimensional (campos, sistema ISO).', strategy: '• Exposição dialogada: Introdução aos conceitos de tolerância, afastamentos e sistema de ajuste ISO (eixo-base e furo-base).', resources: 'Projetor, tabelas de tolerância ISO, exemplos de eixos e furos com ajustes.' },
+  { id: 'l13', date: '27/04/2026', hours: 2, capacities: 'Interpretar tolerância geométrica.', knowledge: '6.2. Tolerância geométrica (forma, posição, orientação, batimento).', strategy: '• Exposição dialogada: Apresentação dos símbolos e significado das principais tolerâncias geométricas (retitude, planicidade, paralelismo, etc.).', resources: 'Projetor, quadro de tolerâncias geométricas, peças de exemplo.' },
+  { id: 'l14', date: '04/05/2026', hours: 2, capacities: 'Interpretar acabamento superficial.', knowledge: '6.3. Acabamento superficial (rugosidade, tratamento, recartilhado, sobremetal).', strategy: '• Exposição dialogada: Explicação dos símbolos de acabamento superficial e sua relação com os processos de fabricação.', resources: 'Projetor, tabela de símbolos de rugosidade, rugosímetros (se disponível).' },
+  { id: 'l15', date: '11/05/2026', hours: 2, capacities: 'Todas as capacidades da SA.', knowledge: 'Todos os conhecimentos da SA.', strategy: '• Trabalho em equipe (Oficina): Início da elaboração dos croquis detalhados e do relatório de análise crítica do desafio proposto na SA. O docente atua como mediador.', resources: 'Sala de aula/oficina, cópias do projeto da SA, papel, instrumentos de desenho.' },
+  { id: 'l16', date: '18/05/2026', hours: 2, capacities: 'Todas as capacidades da SA.', knowledge: 'Todos os conhecimentos da SA.', strategy: '• Trabalho em equipe (Oficina): Continuação e refinamento dos croquis e preenchimento da ficha de análise crítica.', resources: 'Sala de aula/oficina, cópias do projeto da SA, papel, instrumentos de desenho.' },
+  { id: 'l17', date: '25/05/2026', hours: 2, capacities: 'Todas as capacidades da SA.', knowledge: 'Todos os conhecimentos da SA.', strategy: '• Trabalho em equipe (Oficina): Finalização dos croquis e do dossiê técnico. Revisão final das informações.', resources: 'Sala de aula/oficina, dossiê em fase de conclusão.' },
+  { id: 'l18', date: '01/06/2026', hours: 2, capacities: 'Todas as capacidades da SA.', knowledge: 'Todos os conhecimentos da SA.', strategy: '• Apresentação dos Resultados: Equipes apresentam seus Dossiês Técnicos e explicam a análise das tolerâncias.', resources: 'Sala de aula, projetor, dossiês finalizados.' },
+  { id: 'l19', date: '08/06/2026', hours: 2, capacities: 'Todas as capacidades da SA.', knowledge: 'Todos os conhecimentos da SA.', strategy: '• Feedback e Avaliação: Devolutiva do docente sobre o desempenho das equipes e autoavaliação.', resources: 'Sala de aula, fichas de avaliação.' },
+  { id: 'l20', date: '15/06/2026', hours: 2, capacities: 'Todas as capacidades da SA.', knowledge: 'Todos os conhecimentos da SA.', strategy: '• Encerramento da Unidade Curricular e fechamento de notas.', resources: 'Sala de aula.' }
+];
+
 const FULL_KNOWLEDGE_CRD = [
   { topic: '1. Metrologia', subtopics: ['I. Definição', 'II. Características', 'III. Aplicações', 'IV. Terminologia (Vocabulário Internacional de Metrologia - VIM)'] },
   { topic: '2. Erros de medição', subtopics: ['I. Tipos', 'I.I. Aleatório', 'I.I. Sistemático', 'I.I. Grosseiro', 'II. Fontes de erro', 'I.I. Variação da temperatura', 'I.I. Paralaxe', 'I.I. Força de medição', 'I.I. Complexidade da peça', 'I.I. Condições do Instrumento', 'I.I. Processos de correção', 'I.I. Calibração do Instrumento'] },
@@ -253,7 +276,7 @@ export const SAMPLE_PLANS: TeachingPlan[] = [
         knowledge: FULL_KNOWLEDGE_LIDT,
         learningSituations: COMMON_SA_LIDT,
         rubrics: FULL_RUBRICS_LIDT,
-        schedule: []
+        schedule: LIDT_SCHEDULE
       },
       {
         id: 'uc-crd-beretella',
@@ -289,7 +312,7 @@ export const SAMPLE_PLANS: TeachingPlan[] = [
         knowledge: FULL_KNOWLEDGE_LIDT,
         learningSituations: COMMON_SA_LIDT,
         rubrics: FULL_RUBRICS_LIDT,
-        schedule: []
+        schedule: LIDT_SCHEDULE
       },
       {
         id: 'uc-crd-gea',

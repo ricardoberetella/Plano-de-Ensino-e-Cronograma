@@ -26,10 +26,11 @@ const App: React.FC = () => {
       // Detecção de necessidade de inicialização ou atualização:
       // Se não houver planos OU se as unidades de LIDT/CRD estiverem sem Situações 
       // OU se as rubricas estiverem incompletas (menos que o total oficial de 6 para LIDT ou 4 para CRD).
+      // OU se a unidade LIDT estiver sem o cronograma recém-adicionado.
       const needsInit = !dbPlans || dbPlans.length === 0 || 
                         dbPlans.some(p => p.units.some(u => 
                           u.learningSituations.length === 0 || 
-                          (u.id.includes('lidt') && u.rubrics.length < 6) ||
+                          (u.id.includes('lidt') && (u.rubrics.length < 6 || u.schedule.length === 0)) ||
                           (u.id.includes('crd') && u.rubrics.length < 4)
                         ));
 
