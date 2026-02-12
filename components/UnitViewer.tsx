@@ -1,5 +1,4 @@
-
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { CurricularUnit, ScheduleEntry, UnitCalendar, CalendarMarking, CalendarColor } from '../types';
 
 interface Props {
@@ -64,66 +63,52 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar 
 
   const [calendar, setCalendar] = useState<UnitCalendar>(unit.calendar || defaultCalendar);
   const [selectedColor, setSelectedColor] = useState<CalendarColor>('green');
-  
-  const isInitialMount = useRef(true);
 
+  // SINCRONIZAÇÃO: Garante que se o banco de dados mudar, a tela atualiza
+  useEffect(() => {
+    setLocalSchedule(unit.schedule);
+  }, [unit.schedule]);
+
+  useEffect(() => {
+    if (unit.calendar) {
+      setCalendar(unit.calendar);
+    }
+  }, [unit.calendar]);
+
+  // Formata DD/MM/AAAA para YYYY-MM-DD
   const formatDateForCalendar = (dateStr: string) => {
     if (!dateStr || !dateStr.includes('/')) return null;
     const parts = dateStr.split('/');
     if (parts.length !== 3) return null;
     const [day, month, year] = parts;
-    if (!day || !month || !year || isNaN(Number(day)) || isNaN(Number(month)) || isNaN(Number(year))) return null;
     return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
   };
 
-  useEffect(() => {
-    const scheduleDates = localSchedule
+  // Memo para calcular as datas azuis vindas do cronograma
+  const scheduleDates = useMemo(() => {
+    return localSchedule
       .map(s => formatDateForCalendar(s.date))
       .filter((d): d is string => d !== null);
+  }, [localSchedule]);
 
-    const manualMarkings = calendar.markings.filter(m => m.color === 'green');
-    
-    const scheduleMarkings: CalendarMarking[] = scheduleDates.map(date => ({
+  // Memo para combinar marcas manuais (verdes) com automáticas (azuis) apenas para exibição
+  const displayMarkings = useMemo(() => {
+    const blueMarkings: CalendarMarking[] = scheduleDates.map(date => ({
       date,
       color: 'blue' as CalendarColor
     }));
 
-    const combinedMarkings = [...scheduleMarkings];
-    manualMarkings.forEach(manualMark => {
-      if (!combinedMarkings.some(m => m.date === manualMark.date)) {
-        combinedMarkings.push(manualMark);
+    const combined = [...calendar.markings];
+    blueMarkings.forEach(blue => {
+      const idx = combined.findIndex(m => m.date === blue.date);
+      if (idx >= 0) {
+        combined[idx] = blue;
+      } else {
+        combined.push(blue);
       }
     });
-
-    const currentMarkingsJson = JSON.stringify(calendar.markings.sort((a, b) => a.date.localeCompare(b.date)));
-    const nextMarkingsJson = JSON.stringify(combinedMarkings.sort((a, b) => a.date.localeCompare(b.date)));
-
-    if (currentMarkingsJson !== nextMarkingsJson) {
-      const updatedCalendar = { ...calendar, markings: combinedMarkings };
-      setCalendar(updatedCalendar);
-      if (!isInitialMount.current) {
-        onUpdateCalendar?.(updatedCalendar);
-      }
-    }
-    
-    isInitialMount.current = false;
-  }, [localSchedule]);
-
-  useEffect(() => {
-    setLocalSchedule(unit.schedule);
-    if (unit.calendar) {
-      setCalendar({
-        ...unit.calendar,
-        colorLabels: {
-          green: 'Não letivo',
-          blue: 'Aulas do Cronograma',
-          ...unit.calendar.colorLabels
-        }
-      });
-    } else {
-      setCalendar(defaultCalendar);
-    }
-  }, [unit.id]);
+    return combined;
+  }, [calendar.markings, scheduleDates]);
 
   const updateEntry = (id: string, field: keyof ScheduleEntry, value: any) => {
     const updated = localSchedule.map(entry => 
@@ -154,28 +139,17 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar 
     onUpdateSchedule?.(updated);
   };
 
-  const handleCalendarUpdate = (updates: Partial<UnitCalendar>) => {
-    const newCalendar = { ...calendar, ...updates };
-    setCalendar(newCalendar);
-    onUpdateCalendar?.(newCalendar);
-  };
-
-  const manualSaveCalendar = async () => {
-    setIsSaving(true);
-    try {
-      await onUpdateCalendar?.(calendar);
-    } catch (e) {
-      console.error('Erro ao salvar calendário:', e);
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
   const toggleMarking = (date: string) => {
     if (date < calendar.startDate || date > calendar.endDate) return;
 
-    const existing = calendar.markings.find(m => m.date === date);
+    // REGRA SOLICITADA: Bloquear marcação manual se a data já estiver no cronograma (azul)
+    if (scheduleDates.includes(date)) {
+      console.log("Data bloqueada pelo cronograma (azul)");
+      return;
+    }
+
     let newMarkings: CalendarMarking[];
+    const existing = calendar.markings.find(m => m.date === date);
     
     if (selectedColor === 'white') {
       newMarkings = calendar.markings.filter(m => m.date !== date);
@@ -191,7 +165,25 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar 
       }
     }
     
-    handleCalendarUpdate({ markings: newMarkings });
+    const newCalendar = { ...calendar, markings: newMarkings };
+    setCalendar(newCalendar);
+    onUpdateCalendar?.(newCalendar);
+  };
+
+  const handleCalendarUpdate = (updates: Partial<UnitCalendar>) => {
+    const newCalendar = { ...calendar, ...updates };
+    setCalendar(newCalendar);
+    onUpdateCalendar?.(newCalendar);
+  };
+
+  const manualSave = async () => {
+    setIsSaving(true);
+    try {
+      await onUpdateCalendar?.(calendar);
+      await onUpdateSchedule?.(localSchedule);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const monthsInRange = useMemo(() => {
@@ -207,7 +199,6 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar 
     return months;
   }, [calendar.startDate, calendar.endDate]);
 
-  // A cor azul foi removida das opções manuais
   const colorOptions: CalendarColor[] = ['green', 'white'];
 
   return (
@@ -219,7 +210,16 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar 
           </div>
           <h2 className="text-xl md:text-3xl font-black tracking-tight uppercase">{unit.name}</h2>
         </div>
-        <span className="text-slate-500 text-[10px] font-bold uppercase tracking-widest border border-slate-700 px-3 py-1 rounded-full">{unit.id.split('-')[1]}</span>
+        <div className="flex items-center gap-4">
+           <button 
+             onClick={manualSave}
+             className="hidden md:flex bg-blue-600 text-white px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-white hover:text-blue-600 transition-all gap-2 items-center border border-transparent hover:border-blue-600"
+           >
+             {isSaving ? <div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin"></div> : <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>}
+             Forçar Gravação
+           </button>
+           <span className="text-slate-500 text-[10px] font-bold uppercase tracking-widest border border-slate-700 px-3 py-1 rounded-full">{unit.id.split('-')[1]}</span>
+        </div>
       </div>
 
       <div className="flex border-b border-slate-200 bg-slate-50 sticky top-0 z-20 overflow-x-auto scrollbar-hide">
@@ -232,19 +232,9 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar 
             }`}
           >
             {tab === 'geral' ? 'Geral' : 
-             tab === 'sa' ? (
-               <div className="flex flex-col items-center leading-tight">
-                 <span>Situação</span>
-                 <span>Problema</span>
-               </div>
-             ) : 
+             tab === 'sa' ? 'Situação-Problema' : 
              tab === 'rubricas' ? 'Rubricas' : 
-             tab === 'cronograma' ? (
-               <div className="flex flex-col items-center leading-tight">
-                 <span>Plano de Aula /</span>
-                 <span>Cronograma</span>
-               </div>
-             ) : 'Calendário'}
+             tab === 'cronograma' ? 'Plano de Aula' : 'Calendário'}
           </button>
         ))}
       </div>
@@ -270,29 +260,9 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar 
                     Capacidades Básicas (Técnicas)
                   </h3>
                   <div className="space-y-4">
-                    {unit.basicCapacities.map((c, i) => {
-                      const hasManualNum = /^[IVXLCDM]+\.|\d+\./.test(c);
-                      return (
-                        <div key={i} className="flex gap-4 items-start group bg-white p-4 rounded-2xl border border-slate-100 shadow-sm hover:border-blue-200 transition-all">
-                          {!hasManualNum && (
-                            <span className="bg-slate-100 text-slate-400 w-6 h-6 rounded-lg flex items-center justify-center text-[10px] font-black flex-shrink-0 group-hover:bg-blue-600 group-hover:text-white transition-colors">{i + 1}</span>
-                          )}
-                          <p className="text-slate-700 text-xs md:text-sm leading-relaxed font-bold">{c}</p>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </section>
-                
-                <section>
-                  <h3 className="text-[10px] md:text-[11px] font-black text-slate-400 mb-6 uppercase tracking-[0.3em] flex items-center gap-3 italic">
-                     Capacidades Socioemocionais
-                  </h3>
-                  <div className="grid grid-cols-1 gap-3">
-                    {unit.socioemocionalCapacities.map((s, i) => (
-                      <div key={i} className="flex items-center gap-3 bg-white p-4 rounded-2xl border border-slate-100 shadow-sm">
-                        <div className="w-1.5 h-1.5 bg-blue-400 rounded-full shadow-sm"></div>
-                        <p className="text-slate-600 text-[10px] font-black uppercase tracking-tight leading-tight">{s}</p>
+                    {unit.basicCapacities.map((c, i) => (
+                      <div key={i} className="flex gap-4 items-start group bg-white p-4 rounded-2xl border border-slate-100 shadow-sm hover:border-blue-200 transition-all">
+                        <p className="text-slate-700 text-xs md:text-sm leading-relaxed font-bold">{c}</p>
                       </div>
                     ))}
                   </div>
@@ -306,12 +276,12 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar 
                 </h3>
                 <div className="grid grid-cols-1 gap-6">
                   {unit.knowledge.map((k, i) => (
-                    <div key={i} className="p-6 bg-white border border-slate-100 rounded-[2rem] border-l-4 border-l-blue-600 shadow-md hover:shadow-lg transition-all">
-                      <p className="font-black text-slate-900 text-xs md:text-sm uppercase mb-4 leading-tight tracking-tight">{k.topic}</p>
+                    <div key={i} className="p-6 bg-white border border-slate-100 rounded-[2rem] border-l-4 border-l-blue-600 shadow-md">
+                      <p className="font-black text-slate-900 text-xs md:text-sm uppercase mb-4">{k.topic}</p>
                       <ul className="space-y-2.5">
                         {k.subtopics.map((s, si) => (
-                          <li key={si} className="text-slate-500 text-[10px] md:text-[11px] font-bold flex items-start gap-3 leading-relaxed">
-                            <span className="text-blue-500 mt-1">•</span> <span>{s}</span>
+                          <li key={si} className="text-slate-500 text-[10px] md:text-[11px] font-bold flex items-start gap-3">
+                            <span className="text-blue-500">•</span> <span>{s}</span>
                           </li>
                         ))}
                       </ul>
@@ -324,42 +294,20 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar 
         )}
 
         {activeTab === 'sa' && (
-          <div className="max-w-4xl mx-auto space-y-10 md:space-y-16">
-            {unit.learningSituations.length > 0 ? unit.learningSituations.map((sa) => (
-              <div key={sa.id} className="space-y-6 md:space-y-10">
+          <div className="max-w-4xl mx-auto space-y-10">
+            {unit.learningSituations.map((sa) => (
+              <div key={sa.id} className="space-y-10">
                 <div className="bg-white border border-slate-200 p-6 md:p-10 rounded-[2.5rem] shadow-xl relative overflow-hidden">
                   <div className="absolute top-0 left-0 w-2 h-full bg-blue-600"></div>
                   <h3 className="text-xl md:text-2xl font-black text-slate-900 mb-6 uppercase tracking-tighter">{sa.title}</h3>
-                  <div className="space-y-3">
-                    <p className="text-[9px] font-black text-blue-400 uppercase tracking-widest">Contexto da Situação</p>
-                    <p className="text-slate-600 text-xs md:text-sm leading-relaxed font-medium">{sa.context}</p>
-                  </div>
+                  <p className="text-slate-600 text-xs md:text-sm leading-relaxed font-medium">{sa.context}</p>
                 </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10">
-                  <div className="bg-slate-900 p-8 rounded-[2rem] text-white shadow-2xl">
-                    <h4 className="font-black text-[9px] uppercase tracking-widest mb-6 text-red-500 flex items-center gap-2">
-                       Desafio Proposto
-                    </h4>
-                    <p className="text-slate-300 text-xs md:text-sm leading-relaxed italic">"{sa.challenge}"</p>
-                  </div>
-                  <div className="bg-white p-8 rounded-[2rem] border border-slate-100 shadow-lg">
-                    <h4 className="font-black text-[9px] text-slate-400 uppercase tracking-widest mb-6">Resultados Esperados</h4>
-                    <ul className="space-y-4">
-                      {sa.expectedResults.map((r, i) => (
-                        <li key={i} className="flex items-center gap-4 text-[11px] md:text-xs font-bold text-slate-700">
-                          <div className="w-2 h-2 bg-blue-600 rounded-full flex-shrink-0 shadow-sm"></div> {r}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
+                <div className="bg-slate-900 p-8 rounded-[2rem] text-white shadow-2xl">
+                  <h4 className="font-black text-[9px] uppercase tracking-widest mb-6 text-red-500">Desafio Proposto</h4>
+                  <p className="text-slate-300 text-xs md:text-sm leading-relaxed italic">"{sa.challenge}"</p>
                 </div>
               </div>
-            )) : (
-              <div className="py-20 text-center">
-                 <p className="text-slate-400 font-black uppercase text-[10px] tracking-widest italic">Aguardando definição de Situações de Aprendizagem...</p>
-              </div>
-            )}
+            ))}
           </div>
         )}
 
@@ -368,15 +316,15 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar 
             <table className="w-full text-left border-collapse min-w-[800px]">
               <thead>
                 <tr className="bg-slate-900 text-white">
-                  <th className="p-4 md:p-6 text-[9px] font-black uppercase tracking-widest border border-slate-800">Referência</th>
-                  <th className="p-4 md:p-6 text-[9px] font-black uppercase tracking-widest border border-slate-800 text-red-400">NSA</th>
-                  <th className="p-4 md:p-6 text-[9px] font-black uppercase tracking-widest border border-slate-800 text-orange-400">APO</th>
-                  <th className="p-4 md:p-6 text-[9px] font-black uppercase tracking-widest border border-slate-800 text-blue-400">PAR</th>
-                  <th className="p-4 md:p-6 text-[9px] font-black uppercase tracking-widest border border-slate-800 text-green-400">AUT</th>
+                  <th className="p-4 md:p-6 text-[9px] font-black uppercase border border-slate-800">Referência</th>
+                  <th className="p-4 md:p-6 text-[9px] font-black uppercase border border-slate-800 text-red-400">NSA</th>
+                  <th className="p-4 md:p-6 text-[9px] font-black uppercase border border-slate-800 text-orange-400">APO</th>
+                  <th className="p-4 md:p-6 text-[9px] font-black uppercase border border-slate-800 text-blue-400">PAR</th>
+                  <th className="p-4 md:p-6 text-[9px] font-black uppercase border border-slate-800 text-green-400">AUT</th>
                 </tr>
               </thead>
               <tbody className="text-[10px] md:text-[11px] font-medium">
-                {unit.rubrics.length > 0 ? unit.rubrics.map((row, i) => (
+                {unit.rubrics.map((row, i) => (
                   <tr key={i} className="hover:bg-slate-50 transition-colors">
                     <td className="p-4 md:p-6 border border-slate-100 font-black text-slate-800 bg-slate-50/50 w-64">{row.capacity}</td>
                     <td className="p-4 md:p-6 border border-slate-100 text-slate-500 italic leading-relaxed">{row.nsa}</td>
@@ -384,11 +332,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar 
                     <td className="p-4 md:p-6 border border-slate-100 text-slate-500 italic leading-relaxed">{row.par}</td>
                     <td className="p-4 md:p-6 border border-slate-100 text-slate-500 italic leading-relaxed">{row.aut}</td>
                   </tr>
-                )) : (
-                  <tr>
-                    <td colSpan={5} className="p-20 text-center text-slate-400 font-black uppercase tracking-widest text-[9px]">Não há rubricas definidas para esta unidade.</td>
-                  </tr>
-                )}
+                ))}
               </tbody>
             </table>
           </div>
@@ -396,19 +340,12 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar 
 
         {activeTab === 'cronograma' && (
           <div className="space-y-6">
-             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-white p-6 md:p-8 rounded-[2rem] border border-slate-200 shadow-lg gap-4">
-                <div className="space-y-1">
-                  <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest">Resumo do Planejamento</p>
-                  <div className="flex gap-6">
-                    <span className="text-[11px] md:text-sm font-black text-blue-600 uppercase">Carga Acumulada: {localSchedule.reduce((acc, s) => acc + s.hours, 0)}h</span>
-                    <span className="text-[11px] md:text-sm font-black text-slate-500 uppercase">Aulas: {localSchedule.length} sessões</span>
-                  </div>
-                </div>
+             <div className="flex justify-between items-center bg-white p-6 md:p-8 rounded-[2rem] border border-slate-200 shadow-lg">
+                <p className="text-[11px] md:text-sm font-black text-blue-600 uppercase">Carga Acumulada: {localSchedule.reduce((acc, s) => acc + s.hours, 0)}h</p>
                 <button 
                   onClick={addEntry}
-                  className="w-full sm:w-auto bg-blue-600 text-white px-8 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-900 shadow-xl transition-all flex items-center justify-center gap-2"
+                  className="bg-blue-600 text-white px-8 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-900 shadow-xl transition-all"
                 >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
                   Inserir Nova Aula
                 </button>
              </div>
@@ -417,41 +354,36 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar 
                 <table className="w-full text-left border-collapse min-w-[900px]">
                   <thead className="bg-slate-800 text-white text-[9px] uppercase font-black">
                     <tr>
-                      <th className="p-4 border-r border-slate-700 w-36">Horas / Data</th>
+                      <th className="p-4 border-r border-slate-700 w-36">Data / Horas</th>
                       <th className="p-4 border-r border-slate-700">Capacidades</th>
                       <th className="p-4 border-r border-slate-700">Base Tecnológica</th>
                       <th className="p-4 border-r border-slate-700">Estratégias / Recursos</th>
-                      <th className="p-4 w-12 text-center"></th>
+                      <th className="p-4 w-12"></th>
                     </tr>
                   </thead>
-                  <tbody className="text-[10px] md:text-[11px] divide-y divide-slate-100 bg-white">
+                  <tbody className="text-[10px] md:text-[11px] divide-y divide-slate-100">
                     {localSchedule.map(entry => (
-                      <tr key={entry.id} className="hover:bg-slate-50 transition-colors group">
+                      <tr key={entry.id} className="hover:bg-slate-50">
                         <td className="p-4 border-r border-slate-100 align-top">
-                           <div className="space-y-3">
-                              <input 
-                                type="text"
-                                value={entry.date}
-                                onChange={(e) => updateEntry(entry.id, 'date', e.target.value)}
-                                className="w-full bg-slate-100 font-black text-blue-600 p-2 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 text-center"
-                                placeholder="DD/MM/AAAA"
-                              />
-                              <div className="flex items-center justify-center gap-2">
-                                <input 
-                                  type="number"
-                                  value={entry.hours}
-                                  onChange={(e) => updateEntry(entry.id, 'hours', parseInt(e.target.value) || 0)}
-                                  className="w-12 bg-white border border-slate-200 text-slate-800 font-black p-1.5 rounded-lg text-center outline-none"
-                                />
-                                <span className="text-[9px] font-black text-slate-400 uppercase tracking-tighter">HORAS</span>
-                              </div>
-                           </div>
+                           <input 
+                             type="text"
+                             value={entry.date}
+                             onChange={(e) => updateEntry(entry.id, 'date', e.target.value)}
+                             className="w-full bg-slate-100 font-black text-blue-600 p-2 rounded-lg mb-2 text-center"
+                             placeholder="DD/MM/AAAA"
+                           />
+                           <input 
+                             type="number"
+                             value={entry.hours}
+                             onChange={(e) => updateEntry(entry.id, 'hours', parseInt(e.target.value) || 0)}
+                             className="w-full bg-white border border-slate-200 text-slate-800 font-black p-2 rounded-lg text-center"
+                           />
                         </td>
                         <td className="p-4 border-r border-slate-100 align-top">
                            <textarea 
                              value={entry.capacities}
                              onChange={(e) => updateEntry(entry.id, 'capacities', e.target.value)}
-                             className="w-full bg-transparent text-slate-700 font-bold resize-none outline-none focus:bg-white p-1 rounded-lg min-h-[70px] leading-relaxed"
+                             className="w-full bg-transparent text-slate-700 font-bold resize-none outline-none focus:bg-white p-1 rounded-lg min-h-[80px]"
                              rows={4}
                            />
                         </td>
@@ -459,30 +391,27 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar 
                            <textarea 
                              value={entry.knowledge}
                              onChange={(e) => updateEntry(entry.id, 'knowledge', e.target.value)}
-                             className="w-full bg-transparent text-slate-600 font-medium resize-none outline-none focus:bg-white p-1 rounded-lg min-h-[70px] leading-relaxed"
+                             className="w-full bg-transparent text-slate-600 font-medium resize-none outline-none focus:bg-white p-1 rounded-lg min-h-[80px]"
                              rows={4}
                            />
                         </td>
                         <td className="p-4 border-r border-slate-100 align-top">
-                           <div className="space-y-3">
-                              <textarea 
-                                value={entry.strategy}
-                                onChange={(e) => updateEntry(entry.id, 'strategy', e.target.value)}
-                                className="w-full bg-transparent font-black text-slate-900 outline-none focus:bg-white p-1 rounded-lg min-h-[50px] leading-snug"
-                                rows={3}
-                                placeholder="Estratégia docente..."
-                              />
-                              <input 
-                                type="text"
-                                value={entry.resources}
-                                onChange={(e) => updateEntry(entry.id, 'resources', e.target.value)}
-                                className="w-full bg-slate-50 text-[9px] text-slate-400 font-black uppercase outline-none focus:bg-white p-2 rounded-lg border border-slate-100"
-                                placeholder="Recursos e Ambientes"
-                              />
-                           </div>
+                           <textarea 
+                             value={entry.strategy}
+                             onChange={(e) => updateEntry(entry.id, 'strategy', e.target.value)}
+                             className="w-full bg-transparent font-black text-slate-900 outline-none focus:bg-white p-1 rounded-lg mb-2"
+                             placeholder="Estratégia docente..."
+                           />
+                           <input 
+                             type="text"
+                             value={entry.resources}
+                             onChange={(e) => updateEntry(entry.id, 'resources', e.target.value)}
+                             className="w-full bg-slate-50 text-[9px] text-slate-400 font-black p-2 rounded-lg"
+                             placeholder="Recursos/Ambientes"
+                           />
                         </td>
-                        <td className="p-4 text-center align-middle">
-                           <button onClick={() => removeEntry(entry.id)} className="text-slate-300 hover:text-red-500 p-2 rounded-full hover:bg-red-50 transition-all">
+                        <td className="p-4 text-center">
+                           <button onClick={() => removeEntry(entry.id)} className="text-slate-300 hover:text-red-500">
                               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                            </button>
                         </td>
@@ -519,22 +448,18 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar 
                   </div>
                 </div>
                 <button 
-                  onClick={manualSaveCalendar}
+                  onClick={manualSave}
                   disabled={isSaving}
-                  className="w-full md:w-auto bg-slate-900 text-white px-10 py-5 rounded-[2rem] text-[10px] font-black uppercase tracking-widest hover:bg-blue-600 shadow-2xl transition-all flex items-center justify-center gap-3 active:scale-95"
+                  className="w-full md:w-auto bg-slate-900 text-white px-10 py-5 rounded-[2rem] text-[10px] font-black uppercase tracking-widest hover:bg-blue-600 shadow-2xl transition-all flex items-center justify-center gap-3"
                 >
-                  {isSaving ? (
-                    <div className="w-4 h-4 border-2 border-slate-500 border-t-white rounded-full animate-spin"></div>
-                  ) : (
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>
-                  )}
-                  {isSaving ? 'Salvando...' : 'Salvar na Nuvem'}
+                  {isSaving ? <div className="w-4 h-4 border-2 border-slate-500 border-t-white rounded-full animate-spin"></div> : <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>}
+                  {isSaving ? 'Gravando...' : 'Gravar Alterações'}
                 </button>
               </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <div className="space-y-4">
-                  <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2">Ferramentas de Marcação Manual:</p>
+                  <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2">Marcação Manual (Verde):</p>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {colorOptions.map(color => (
                       <button
@@ -543,14 +468,10 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar 
                         className={`flex items-center gap-4 bg-white p-3 rounded-2xl border-2 group transition-all shadow-sm ${selectedColor === color ? 'border-slate-900 ring-4 ring-slate-100' : 'border-slate-100 hover:border-blue-100'}`}
                       >
                         <div
-                          className={`w-10 h-10 rounded-xl flex-shrink-0 flex items-center justify-center border shadow-inner transition-transform active:scale-90 ${
-                            selectedColor === color ? 'border-transparent scale-110 shadow-lg' : 'border-slate-100'
-                          }`}
+                          className={`w-10 h-10 rounded-xl flex-shrink-0 flex items-center justify-center border shadow-inner transition-transform ${selectedColor === color ? 'border-transparent scale-110 shadow-lg' : 'border-slate-100'}`}
                           style={{ backgroundColor: SOLID_COLOR_MAP[color] }}
                         >
-                          {selectedColor === color && (
-                            <div className={`w-3 h-3 rounded-full ${color === 'white' ? 'bg-slate-400' : 'bg-white shadow-md'}`}></div>
-                          )}
+                          {selectedColor === color && <div className={`w-3 h-3 rounded-full ${color === 'white' ? 'bg-slate-400' : 'bg-white shadow-md'}`}></div>}
                         </div>
                         <span className={`text-[10px] font-black uppercase tracking-widest ${selectedColor === color ? 'text-slate-900' : 'text-slate-400'}`}>
                           {color === 'white' ? 'Limpar Data' : (calendar.colorLabels?.[color] || 'Não letivo')}
@@ -561,14 +482,14 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar 
                 </div>
 
                 <div className="space-y-4">
-                  <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2">Status Automático:</p>
+                  <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2">Legenda Automática:</p>
                   <div className="bg-slate-50 p-6 rounded-2xl border border-dashed border-slate-200 flex items-center gap-6">
                     <div className="w-12 h-12 rounded-xl bg-blue-600 border shadow-md flex items-center justify-center">
                        <div className="w-3 h-3 bg-white/40 rounded-full animate-pulse"></div>
                     </div>
                     <div>
-                      <p className="text-[10px] font-black text-blue-600 uppercase tracking-widest">Aulas do Cronograma</p>
-                      <p className="text-[8px] font-bold text-slate-400 uppercase leading-relaxed mt-1">Sincronizado automaticamente com as datas da aba Cronograma.</p>
+                      <p className="text-[10px] font-black text-blue-600 uppercase tracking-widest">Bloqueado: Aulas do Cronograma</p>
+                      <p className="text-[8px] font-bold text-slate-400 uppercase leading-relaxed mt-1">Datas automáticas não permitem marcação manual.</p>
                     </div>
                   </div>
                 </div>
@@ -591,9 +512,6 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar 
                   days.push(`${monthStr}-${d}`);
                 }
 
-                const monthMarkings = calendar.markings.filter(m => m.date.startsWith(monthStr));
-                const schoolDaysCount = monthMarkings.filter(m => m.color === 'blue').length;
-
                 return (
                   <div key={monthStr} className="space-y-4">
                     <div className="bg-[#E30613] text-white py-2.5 px-6 rounded-2xl text-center shadow-xl transform skew-x-[-2deg]">
@@ -612,33 +530,28 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar 
                         {days.map((day, idx) => {
                           if (!day) return <div key={`empty-${idx}`} className="p-1 border-b border-r border-slate-50"></div>;
                           
-                          const marking = calendar.markings.find(m => m.date === day);
+                          const marking = displayMarkings.find(m => m.date === day);
                           const isSunday = idx % 7 === 0;
                           const dateNum = parseInt(day.split('-')[2]);
                           const isOutOfRange = day < calendar.startDate || day > calendar.endDate;
+                          const isBlue = scheduleDates.includes(day);
 
                           return (
                             <button
                               key={day}
                               disabled={isOutOfRange}
                               onClick={() => toggleMarking(day)}
+                              title={isBlue ? "Data do cronograma (bloqueada)" : ""}
                               className={`p-3 text-center text-xs md:text-sm font-black transition-all border-b border-r border-slate-50 last:border-r-0 relative h-14 md:h-16 flex items-center justify-center ${
                                 isSunday ? 'text-red-500 bg-red-50/20' : 'text-slate-800'
-                              } ${isOutOfRange ? 'opacity-20 cursor-not-allowed bg-slate-50' : 'hover:bg-blue-50 hover:text-blue-600'} ${marking ? 'shadow-inner' : ''}`}
+                              } ${isOutOfRange ? 'opacity-20 cursor-not-allowed bg-slate-50' : 'hover:bg-blue-50'} ${isBlue ? 'cursor-not-allowed' : ''}`}
                               style={marking ? { backgroundColor: COLOR_MAP[marking.color], color: TEXT_COLOR_MAP[marking.color] } : {}}
                             >
                               {dateNum}
+                              {isBlue && <div className="absolute top-1 right-1 w-1.5 h-1.5 bg-white/50 rounded-full"></div>}
                             </button>
                           );
                         })}
-                      </div>
-                      
-                      <div className="bg-slate-50 p-4 flex justify-between items-center border-t border-slate-100">
-                        <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest italic">Planejamento</span>
-                        <div className="bg-blue-600 text-white px-4 py-1.5 rounded-full text-[10px] font-black uppercase flex items-center gap-2 shadow-lg">
-                          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                          {schoolDaysCount} Dias Letivos
-                        </div>
                       </div>
                     </div>
                   </div>
