@@ -9,7 +9,7 @@ const CRD_SCHEDULE = [
   { id: 'c2', date: '03/02/2026', hours: 2, capacities: 'I. Identificar a importância da metrologia na indústria metalmecânica.', knowledge: '2. Erros de medição (2.1 a 2.4)', strategy: 'Discussão em grupo sobre os tipos e fontes de erro na medição. Demonstração de erros comuns (paralaxe, força excessiva).', resources: 'Sala de aula, projetor, instrumentos de medição para demonstração.' },
   { id: 'c3', date: '10/02/2026', hours: 2, capacities: 'II. Medir peças com escala. III. Medir peças com trena.', knowledge: '3. Escala (3.1 a 3.3). 4. Trena (4.1 a 4.3)', strategy: 'Demonstração prática do uso de escalas e trenas. Exercícios práticos de medição em peças simples.', resources: 'Laboratório de Metrologia, escalas, trenas, peças diversas.' },
   { id: 'c4', date: '24/02/2026', hours: 2, capacities: 'IV. Medir peças com paquímetro. I. Demonstrar atenção a detalhes.', knowledge: '5. Paquímetros (5.1, 5.2)', strategy: 'Exposição dialogada sobre os tipos de paquímetros e suas características. Demonstração do manuseio correto.', resources: 'Laboratório de Metrologia, projetor, diferentes tipos de paquímetros.' },
-  { id: 'c5', date: '03/03/2026', hours: 2, capacities: 'IV. Medir peças com paquímetro. I. Demonstrar atenção a detalhes.', knowledge: '5. Paquímetros (5.3, 5.4, 5.5)', strategy: 'Demonstração e exercício prático de leitura no sistema métrico (0,05mm e 0,02mm).', resources: 'Laboratório de Metrologia, paquímetros, peças didáticas com medidas conhecidas.' },
+  { id: 'c5', date: '03/03/2026', hours: 2, capacities: 'IV. Medir peças com paquímetro. I. Demonstrar atenção a detalhes.', knowledge: '5. Paquímetros (5.3, 5.4, 5.5)', strategy: 'Demonstração e exercício prático de leitura no sistema métrico (0,05mm e 0,02mm).', resources: 'Laboratório de Metrologia, paquímetros, peças didcidas com medidas conhecidas.' },
   { id: 'c6', date: '10/03/2026', hours: 2, capacities: 'IV. Medir peças com paquímetro. I. Demonstrar atenção a detalhes. I. Organizar o ambiente de trabalho e as atividades.', knowledge: '5. Paquímetros (5.5)', strategy: 'Exercício prático supervisionado de medição em peças variadas, com preenchimento de relatório simples.', resources: 'Laboratório de Metrologia, paquímetros, peças, formulário de relatório.' },
   { id: 'c7', date: '17/03/2026', hours: 2, capacities: 'V. Medir peças no sistema métrico com micrômetro. II. Zelar pelo uso de equipamentos, instrumentos, ferramentas e materiais.', knowledge: '6. Micrômetros (6.1, 6.2, 6.3)', strategy: 'Exposição sobre os tipos de micrômetros. Demonstração do manuseio, ajuste do zero e uso da catraca.', resources: 'Laboratório de Metrologia, projetor, diferentes tipos de micrômetros.' },
   { id: 'c8', date: '24/03/2026', hours: 2, capacities: 'V. Medir peças no sistema métrico com micrômetro. I. Demonstrar atenção a detalhes.', knowledge: '6. Micrômetros (6.3, 6.4, 6.5)', strategy: 'Demonstração e exercício prático de leitura no sistema métrico (0,01 mm).', resources: 'Laboratório de Metrologia, micrômetros, peças didáticas.' },
@@ -45,7 +45,7 @@ const FULL_CAPACITIES_CRD = [
   'I. Medir peças com trena.',
   'I. Medir peças com paquímetro.',
   'I. Medir peças no sistema métrico com micrômetro.',
-  'I. Verificar dimensões e perfis com verificadores.',
+  'I. Verificar dimensões e perfis with verificadores.',
   'I. Medir por comparação com relógio apalpador e comparador.',
   'I. Medir peças com goniômetro.'
 ];
@@ -186,6 +186,30 @@ const COMMON_SA_LIDT = [
   }
 ];
 
+const FULL_RUBRICS_LIDT = [
+  {
+    capacity: 'Interpretar desenho técnico de montagem de conjunto e subconjuntos',
+    nsa: 'Identifica os componentes apenas com auxílio constante e não consegue explicar a relação funcional entre eles.',
+    apo: 'Identifica a maioria dos componentes usando a lista de materiais, mas descreve suas funções de forma genérica.',
+    par: 'Identifica todos os componentes, relaciona-os com a lista de materiais e descreve suas funções de forma correta e autônoma.',
+    aut: 'Além de interpretar o conjunto, antecipa possíveis dificuldades de montagem, demonstrando visão sistêmica do projeto.'
+  },
+  {
+    capacity: 'Elaborar croquis de peças em projeção ortogonal e perspectiva',
+    nsa: 'O croqui não segue as normas de projeção e cotagem, necessitando de orientação constante.',
+    apo: 'O croqui apresenta as vistas corretas, mas contém erros nas normas de cotagem ou tipos de linha, que são corrigidos.',
+    par: 'Elabora croquis claros e proporcionais, aplicando corretamente as normas de projeção e cotagem.',
+    aut: 'Elabora croquis com excelente qualidade gráfica, incluindo detalhes adicionais (como um corte) para melhor representar a peça.'
+  },
+  {
+    capacity: 'Interpretar tolerância dimensional, geométrica e de acabamento superficial',
+    nsa: 'Não consegue identificar os símbolos de tolerância e rugosidade no desenho sem auxílio.',
+    apo: 'Identifica os símbolos, mas necessita de ajuda para interpretar seu significado ou para localizar no desenho.',
+    par: 'Identifica e explica corretamente o significado das tolerâncias e acabamentos.',
+    aut: 'Além de interpretar, correlaciona as tolerâncias com os processos de fabricação.'
+  }
+];
+
 export const SAMPLE_PLANS: TeachingPlan[] = [
   {
     id: 'plan-usinagem-beretella',
@@ -207,7 +231,7 @@ export const SAMPLE_PLANS: TeachingPlan[] = [
         socioemocionalCapacities: FULL_SOCIOEMOCIONAL_LIDT,
         knowledge: FULL_KNOWLEDGE_LIDT,
         learningSituations: COMMON_SA_LIDT,
-        rubrics: [],
+        rubrics: FULL_RUBRICS_LIDT,
         schedule: []
       },
       {
@@ -243,7 +267,7 @@ export const SAMPLE_PLANS: TeachingPlan[] = [
         socioemocionalCapacities: FULL_SOCIOEMOCIONAL_LIDT,
         knowledge: FULL_KNOWLEDGE_LIDT,
         learningSituations: COMMON_SA_LIDT,
-        rubrics: [],
+        rubrics: FULL_RUBRICS_LIDT,
         schedule: []
       },
       {
