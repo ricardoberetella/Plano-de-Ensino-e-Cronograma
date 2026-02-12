@@ -8,10 +8,9 @@ interface DashboardProps {
   onEdit: (plan: TeachingPlan) => void;
   onView: (plan: TeachingPlan) => void;
   onRefresh: () => void;
-  onResetPlan?: (id: string) => void;
 }
 
-const Dashboard: React.FC<DashboardProps> = ({ plans, onEdit, onView, onRefresh, onResetPlan }) => {
+const Dashboard: React.FC<DashboardProps> = ({ plans, onEdit, onView, onRefresh }) => {
   return (
     <div className="space-y-8 animate-fadeIn">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -84,13 +83,6 @@ const Dashboard: React.FC<DashboardProps> = ({ plans, onEdit, onView, onRefresh,
                       className="p-2.5 bg-slate-50 text-slate-400 hover:bg-slate-900 hover:text-white rounded-xl transition-all shadow-sm"
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-                    </button>
-                    <button 
-                      onClick={() => onResetPlan?.(plan.id)}
-                      title="Restaurar Padrão Oficial"
-                      className="p-2.5 bg-orange-50 text-orange-600 hover:bg-orange-600 hover:text-white rounded-xl transition-all shadow-sm"
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
                     </button>
                     <button 
                       onClick={async () => {

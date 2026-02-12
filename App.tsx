@@ -175,7 +175,6 @@ const App: React.FC = () => {
               onEdit={(p) => { setCurrentPlan(p); setView('editor'); }} 
               onView={(p) => { setCurrentPlan(p); setSelectedUnit(p.units[0]); setView('plano-curso'); }} 
               onRefresh={() => loadPlans(activeProfileId)}
-              onResetPlan={handleResetPlan}
             />
           )}
           
