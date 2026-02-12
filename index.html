@@ -15,11 +15,17 @@
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
     </style>
+    <script>
+        // Polyfill para o objeto process que é esperado pelo SDK do Google GenAI
+        // Isso evita a "tela branca" causada por ReferenceError: process is not defined
+        window.process = window.process || { env: {} };
+    </script>
 <script type="importmap">
 {
   "imports": {
     "react": "https://esm.sh/react@19",
     "react-dom": "https://esm.sh/react-dom@19",
+    "react-dom/client": "https://esm.sh/react-dom@19/client",
     "react-dom/": "https://esm.sh/react-dom@19/",
     "react/": "https://esm.sh/react@19/",
     "@google/genai": "https://esm.sh/@google/genai@1.40",
@@ -31,5 +37,7 @@
 </head>
 <body class="bg-slate-50 text-slate-900 overflow-x-hidden">
     <div id="root"></div>
+    <!-- Script principal da aplicação -->
+    <script type="module" src="./index.tsx"></script>
 </body>
 </html>
