@@ -22,30 +22,42 @@ const App: React.FC = () => {
     setIsLoading(true);
     try {
       const dbPlans = await FirebaseService.getPlans(profileId);
-      if (dbPlans && dbPlans.length > 0) {
+      
+      // Se não houver planos no Firebase OU se o plano principal estiver sem situações de aprendizagem (vazio),
+      // forçamos o carregamento das constantes.
+      const needsInit = !dbPlans || dbPlans.length === 0 || 
+                        dbPlans.some(p => p.units.some(u => u.learningSituations.length === 0));
+
+      if (needsInit) {
+        const defaultPlan = { 
+          ...SAMPLE_PLANS[0], 
+          id: `plan-usinagem-${profileId}`, 
+          profileId: profileId,
+          updatedAt: new Date().toISOString()
+        };
+        await FirebaseService.savePlan(defaultPlan);
+        const refreshedPlans = await FirebaseService.getPlans(profileId);
+        setPlans(refreshedPlans);
+        setCurrentPlan(refreshedPlans[0]);
+        setSelectedUnit(refreshedPlans[0].units[0]);
+      } else {
         setPlans(dbPlans);
         if (currentPlan) {
           const updatedCurrent = dbPlans.find(p => p.id === currentPlan.id);
-          if (updatedCurrent) setCurrentPlan(updatedCurrent);
+          if (updatedCurrent) {
+             setCurrentPlan(updatedCurrent);
+             if (selectedUnit) {
+               const updatedUnit = updatedCurrent.units.find(u => u.id === selectedUnit.id);
+               if (updatedUnit) setSelectedUnit(updatedUnit);
+             }
+          }
         } else {
           setCurrentPlan(dbPlans[0]);
           setSelectedUnit(dbPlans[0].units[0]);
         }
-      } else {
-        const defaultPlan = { 
-          ...SAMPLE_PLANS[0], 
-          id: `plan-usinagem-${profileId}`, 
-          profileId: profileId 
-        };
-        await FirebaseService.savePlan(defaultPlan);
-        const newPlans = [defaultPlan];
-        setPlans(newPlans);
-        setCurrentPlan(defaultPlan);
-        setSelectedUnit(defaultPlan.units[0]);
       }
     } catch (err) {
       console.error("Erro ao carregar Firebase:", err);
-      setPlans([]);
     } finally {
       setIsLoading(false);
     }
@@ -125,6 +137,7 @@ const App: React.FC = () => {
   const handleProfileChange = (profileId: string) => {
     setActiveProfileId(profileId);
     setCurrentPlan(null);
+    setSelectedUnit(null);
     setView('dashboard');
   };
 

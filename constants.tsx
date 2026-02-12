@@ -35,71 +35,33 @@ export const SAMPLE_PLANS: TeachingPlan[] = [
         knowledge: [
           { 
             topic: 'I. Desenho técnico', 
-            subtopics: [
-              '1.1. Definição', 
-              '1.2. Normas técnicas (1.2.1. Primeiro diedro, 1.2.2. Terceiro diedro)', 
-              '1.3. Formatos e dimensões das folhas',
-              '1.4. Linhas',
-              '1.5. Escalas',
-              '1.6. Figuras e sólidos geométricos'
-            ] 
+            subtopics: ['1.1. Definição', '1.2. Normas técnicas', '1.3. Formatos', '1.4. Linhas', '1.5. Escalas', '1.6. Projeções'] 
           },
           { 
-            topic: 'II. Tipos de corte', 
-            subtopics: [
-              '2.1. Corte total', 
-              '2.2. Meio corte',
-              '2.3. Corte composto',
-              '2.4. Corte parcial',
-              '2.5. Seção'
-            ] 
-          },
-          {
-            topic: 'III. Vistas especiais',
-            subtopics: [
-              '3.1. Vistas auxiliares',
-              '3.2. Rotação de elemento oblíquo'
-            ]
-          },
-          {
-            topic: 'IV. Desenho de conjuntos',
-            subtopics: [
-              '4.1. Representação de elementos de máquina',
-              '4.2. Elementos padronizados',
-              '4.3. Elementos de fixação',
-              '4.4. Elementos de transmissão',
-              '4.5. Vista explodida'
-            ]
-          },
-          {
-            topic: 'V. Tolerâncias',
-            subtopics: [
-              '5.1. Tolerância dimensional (Ajustes ISO)',
-              '5.2. Tolerância geométrica (GD&T)',
-              '5.3. Acabamento superficial (Rugosidade)'
-            ]
+            topic: 'II. Cortes e Seções', 
+            subtopics: ['2.1. Corte total', '2.2. Meio corte', '2.3. Corte composto', '2.4. Corte parcial', '2.5. Seção'] 
           }
         ],
         learningSituations: [
           {
-            id: 'sa-lidt-integrada',
+            id: 'sa-lidt-beretella',
             title: 'Precisão em Foco: Interpretação de Componentes Críticos',
             context: 'A "UsiPrecision Componentes Mecânicos Ltda." enfrenta um aumento no índice de devoluções de um de seus principais clientes devido à inconsistência dimensional em lotes de "Pinos de Ancoragem". O gestor da Qualidade identificou que a causa raiz pode estar na interpretação divergente dos desenhos técnicos entre os turnos. A empresa decidiu investir na capacitação técnica para garantir que 100% das peças estejam rigorosamente dentro das especificações do desenho técnico.',
-            challenge: 'Como parte da equipe técnica, sua missão é realizar a análise interpretativa completa do desenho técnico dos "Pinos de Ancoragem". Vocês deverão: a) Analisar o Desenho Técnico (interpretar cotas, tolerâncias dimensionais, geométricas e indicações de acabamento); b) Elaborar Croquis de Detalhamento das zonas críticas de montagem; c) Validar as especificações técnicas para subsidiar a equipe de medição.',
+            challenge: 'Como parte da equipe técnica, sua missão é realizar a análise interpretativa completa do desenho técnico dos "Pinos de Ancoragem". Vocês deverão: a) Analisar o Desenho Técnico; b) Elaborar Croquis de Detalhamento das zonas críticas de montagem; c) Validar as especificações técnicas para subsidiar a equipe de medição.',
             expectedResults: [
-              'Dossiê de Interpretação Técnica: Relatório detalhando cada cota e tolerância do desenho do Pino de Ancoragem.',
-              'Croquis Normalizados: Desenhos à mão livre representando vistas auxiliares e detalhes de tolerância geométrica.',
-              'Argumentação Técnica: Capacidade de explicar a importância de cada especificação do desenho para o funcionamento do sistema de transmissão.'
+              'Dossiê de Interpretação Técnica completo.',
+              'Croquis Normalizados das vistas auxiliares.',
+              'Argumentação Técnica sobre tolerâncias.'
             ]
           }
         ],
         rubrics: [
           {
-            capacity: "Interpretar desenho técnico de montagem de conjunto",
-            nsa: "Identifica componentes apenas com auxílio e não explica a relação funcional.",
-            apo: "Identifica componentes usando a lista, mas descreve funções de forma genérica.",
-            par: "Identifica todos os componentes e descreve suas funções de forma correta e autônoma.",
-            aut: "Antecipa dificuldades de montagem e demonstra visão sistêmica do projeto."
+            capacity: "Interpretar desenho técnico de montagem",
+            nsa: "Não identifica componentes básicos.",
+            apo: "Identifica com auxílio constante.",
+            par: "Identifica e explica funções corretamente.",
+            aut: "Antecipa falhas de montagem."
           }
         ],
         schedule: []
@@ -121,72 +83,44 @@ export const SAMPLE_PLANS: TeachingPlan[] = [
         socioemocionalCapacities: [
           'Pensamento analítico: 1. Demonstrar atenção a detalhes',
           'Autogestão: 2. Organizar o ambiente de trabalho e as atividades',
-          'Autogestão: 3. Zelar pelo uso de equipamentos, instrumentos, ferramentas e materiais'
+          'Autogestão: 3. Zelar pelo uso de equipamentos e instrumentos'
         ],
         knowledge: [
           { 
-            topic: '1. Metrologia', 
-            subtopics: [
-              '1.1. Definição', 
-              '1.2. Características', 
-              '1.3. Aplicações', 
-              '1.4. Terminologia (VIM)',
-              '1.5. Normas técnicas'
-            ] 
+            topic: '1. Metrologia e Erros', 
+            subtopics: ['1.1. Definição e VIM', '2.1. Tipos de Erro (Sistemático/Aleatório)', '2.2. Fontes de erro'] 
           },
           { 
-            topic: '2. Erros de medição', 
-            subtopics: [
-              '2.1. Tipos (Aleatório, Sistemático, Grosseiro)', 
-              '2.2. Fontes (Temperatura, Paralaxe, Força, Complexidade, Condições)', 
-              '2.3. Correção e Calibração'
-            ] 
-          },
-          { 
-            topic: '3. Escala e Trena', 
-            subtopics: ['3.1. Leitura Métrico/Inglês', '3.2. Conversões', '3.3. Erros e Utilização'] 
-          },
-          { 
-            topic: '4. Paquímetros e Micrômetros', 
-            subtopics: ['4.1. Tipos e Características', '4.2. Leitura e Ajuste Zero', '4.3. Manuseio e Conservação'] 
-          },
-          { 
-            topic: '5. Relógios e Goniômetro', 
-            subtopics: ['5.1. Medição por Comparação', '5.2. Medição Angular', '5.3. Verificadores de Rosca e Raio'] 
+            topic: '2. Instrumentos de Medição', 
+            subtopics: ['3. Escala e Trena', '5. Paquímetros', '6. Micrômetros', '8. Relógios', '9. Goniômetro'] 
           }
         ],
         learningSituations: [
           {
-            id: 'sa-crd-beretella',
+            id: 'sa-crd-beretella-final',
             title: 'Precisão em Foco: Verificação de Componentes para a Linha de Montagem',
             context: 'A "UsiPrecision Componentes Mecânicos Ltda." é uma empresa de médio porte, com 150 funcionários, especializada na fabricação de peças usinadas para a indústria automotiva e de máquinas agrícolas. Recentemente, a empresa tem enfrentado um aumento no índice de devoluções de um de seus principais clientes. O motivo alegado é a inconsistência dimensional em lotes de "Pinos de Ancoragem", componentes críticos para a montagem de um sistema de transmissão. O gestor da Qualidade identificou que a causa raiz do problema pode estar na falta de um procedimento padronizado de medição e na variação de critérios entre os inspetores do turno. Para resolver essa não conformidade e garantir a satisfação do cliente, a empresa decidiu investir na capacitação de sua equipe, começando pelos novos aprendizes. Vocês, como parte da nova equipe de controle dimensional, foram designados para uma tarefa importantíssima: estabelecer um método de inspeção confiável para garantir que 100% das peças enviadas ao cliente estejam rigorosamente dentro das especificações do desenho técnico. A sua atuação será fundamental para restaurar a confiança do cliente e evitar prejuízos com refugo e retrabalho. O ambiente de trabalho será a bancada de inspeção do laboratório de metrologia, que simula a estação de controle de qualidade da UsiPrecision.',
-            challenge: 'Vocês receberam um lote piloto de 10 "Pinos de Ancoragem" e o respectivo desenho técnico. A sua missão é realizar uma inspeção dimensional completa em cada uma das peças para determinar se o lote pode ser aprovado para envio ao cliente. Para isso, vocês deverão: a) Analisar o Desenho Técnico: Interpretar todas as cotas, tolerâncias dimensionais, indicações de acabamento e especificações geométricas presentes no desenho do "Pino de Ancoragem". b) Planejar a Inspeção: Definir a sequência de medições a serem realizadas e selecionar o instrumento mais adequado para cada característica da peça (ex: diâmetros externos, comprimentos, ângulos de chanfros, raios, planicidade de uma face). c) Executar as Medições: Utilizando os instrumentos disponíveis (escala, trena, paquímetro, micrômetro, goniômetro, relógios comparadores/apalpadores e verificadores), realizar todas as medições necessárias em cada pino, aplicando as técnicas corretas de manuseio e leitura para evitar erros. d) Registrar os Dados: Preencher um "Relatório de Inspeção Dimensional" para cada peça, anotando os valores medidos e comparando-os com os valores nominais e as tolerâncias especificadas no desenho. e) Emitir o Parecer: Com base nos dados do relatório, classificar cada peça como "Aprovada" ou "Reprovada". Para as peças reprovadas, vocês deverão indicar exatamente qual medida está fora da especificação e justificar a decisão.',
+            challenge: 'Vocês receberam um lote piloto de 10 "Pinos de Ancoragem" e o respectivo desenho técnico. A sua missão é realizar uma inspeção dimensional completa em cada uma das peças para determinar se o lote pode ser aprovado para envio ao cliente. Para isso, vocês deverão: a) Analisar o Desenho Técnico: Interpretar todas as cotas, tolerâncias dimensionais, indicações de acabamento e especificações geométricas presentes no desenho do "Pino de Ancoragem". b) Planejar a Inspeção: Definir a sequência de medições a serem realizadas e selecionar o instrumento mais adequado para cada característica da peça (ex: diâmetros externos, comprimentos, ângulos de chanfros, raios, planicidade de uma face). c) Executar as Medições: Utilizando os instrumentos disponíveis (escala, trena, paquímetro, micrômetro, goniômetro, relógios comparadores/apalpadores e verificadores), realizar todas as medições necessárias em cada pino, aplicando as técnicas corretas de manuseio e leitura para evitar erros. d) Registrar os Dados: Preencher um "Relatório de Inspeção Dimensional" para cada peça, anotando os valores medidos e comparando-os com os valores nominais e as tolerâncias especificadas no desenho. e) Emitir o Parecer: Com base nos dados do relatório, classificar cada peça como "Aprovada" ou "Reprovada". Para as peças reprovadas, vocês deverão indicar exatamente qual medida está fora da especificação e justificar a decisão. Ao final, vocês deverão apresentar os relatórios consolidados ao "Gestor da Qualidade" (docente), explicando o processo realizado e defendendo suas conclusões sobre a aprovação ou reprovação do lote.',
             expectedResults: [
-              'Relatórios de Inspeção Dimensional: Um relatório para cada peça inspecionada, devidamente preenchido, com todas as medições, comparações com as especificações e o parecer final (Aprovado/Reprovado) claramente justificado.',
-              'Demonstração Prática: Habilidade no manuseio correto e seguro de todos os instrumentos de medição propostos (escala, trena, paquímetro, micrômetro, verificadores, relógios e goniômetro), realizando leituras precisas.',
-              'Argumentação Técnica: Capacidade de explicar oralmente o processo de inspeção, justificar a escolha dos instrumentos e defender as decisões de aprovação ou reprovação com base nos dados técnicos do desenho e das medições.',
-              'Organização do Posto de Trabalho: Ao término da atividade, a bancada de inspeção deverá estar limpa e organizada, com todos os instrumentos devidamente limpos e guardados em seus respectivos estojos, demonstrando zelo e responsabilidade com os equipamentos.'
+              'a) Relatórios de Inspeção Dimensional: Um relatório para cada peça inspecionada, devidamente preenchido, com todas as medições, comparações com as especificações e o parecer final (Aprovado/Reprovado) claramente justificado.',
+              'b) Demonstração Prática: Habilidade no manuseio correto e seguro de todos os instrumentos de medição propostos (escala, trena, paquímetro, micrômetro, verificadores, relógios e goniômetro), realizando leituras precisas.',
+              'c) Argumentação Técnica: Capacidade de explicar oralmente o processo de inspeção, justificar a escolha dos instrumentos e defender as decisões de aprovação ou reprovação com base nos dados técnicos do desenho e das medições.',
+              'd) Organização do Posto de Trabalho: Ao término da atividade, a bancada de inspeção deverá estar limpa e organizada, com todos os instrumentos devidamente limpos e guardados em seus respectivos estojos, demonstrando zelo e responsabilidade com os equipamentos.'
             ]
           }
         ],
         rubrics: [
           {
-            capacity: "Medir peças com paquímetro e micrômetro.",
+            capacity: "Medir peças com paquímetro e micrômetro",
             nsa: "Comete erros grosseiros na leitura ou manuseio.",
-            apo: "Realiza medição com auxílio, cometendo erros pontuais de leitura.",
-            par: "Mede de forma autônoma e correta, aplicando técnicas adequadamente.",
-            aut: "Mede com alta precisão, identifica fontes de erro e garante repetibilidade."
+            apo: "Realiza medição com auxílio, cometendo erros pontuais.",
+            par: "Mede de forma autônoma e correta.",
+            aut: "Mede com alta precisão e identifica fontes de erro."
           }
         ],
         schedule: [
           { id: 'c-1', date: '27/01/2026', hours: 2, capacities: 'Importância da Metrologia', knowledge: '1. Metrologia', strategy: 'Exposição dialogada', resources: 'Material da SA' },
-          { id: 'c-2', date: '03/02/2026', hours: 2, capacities: 'Erros de medição', knowledge: '2. Erros', strategy: 'Demonstração prática', resources: 'Instrumentos' },
-          { id: 'c-3', date: '10/02/2026', hours: 2, capacities: 'Escala e Trena', knowledge: '3. Escala e 4. Trena', strategy: 'Exercício prático', resources: 'Peças' },
-          { id: 'c-4', date: '24/02/2026', hours: 2, capacities: 'Paquímetros', knowledge: '5. Paquímetros', strategy: 'Prática de leitura', resources: 'Peças didáticas' },
-          { id: 'c-5', date: '03/03/2026', hours: 2, capacities: 'Micrômetros', knowledge: '6. Micrômetros', strategy: 'Prática de leitura', resources: 'Micrômetros' },
-          { id: 'c-6', date: '17/03/2026', hours: 2, capacities: 'Relógios e Goniômetro', knowledge: '8. Relógios/9. Goniômetro', strategy: 'Medição técnica', resources: 'Instrumentos' },
-          { id: 'c-15', date: '19/05/2026', hours: 2, capacities: 'Execução SA - Precisão em Foco', knowledge: 'Base tecnológica SA', strategy: 'Medições e registros', resources: 'Lote de peças' },
-          { id: 'c-19', date: '16/06/2026', hours: 2, capacities: 'Apresentação SA - Defesa Técnica', knowledge: 'Base tecnológica SA', strategy: 'Defesa de resultados', resources: 'Relatórios' }
+          { id: 'c-15', date: '19/05/2026', hours: 2, capacities: 'Execução SA - Precisão em Foco', knowledge: 'Base tecnológica SA', strategy: 'Medições e registros', resources: 'Lote de peças' }
         ]
       }
     ]
