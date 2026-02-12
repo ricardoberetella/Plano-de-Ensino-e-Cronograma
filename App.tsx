@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Layout from './components/Layout';
 import Dashboard from './components/Dashboard';
 import PlanForm from './components/PlanForm';
@@ -18,15 +18,11 @@ const App: React.FC = () => {
   const [selectedUnit, setSelectedUnit] = useState<CurricularUnit | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const loadPlans = async (profileId: string) => {
+  const loadPlans = useCallback(async (profileId: string) => {
     setIsLoading(true);
     try {
       const dbPlans = await FirebaseService.getPlans(profileId);
       
-      // Detecção de necessidade de inicialização ou atualização:
-      // Se não houver planos OU se as unidades de LIDT/CRD estiverem sem Situações 
-      // OU se as rubricas estiverem incompletas (menos que o total oficial de 6 para LIDT ou 4 para CRD).
-      // OU se a unidade LIDT estiver sem o cronograma recém-adicionado.
       const needsInit = !dbPlans || dbPlans.length === 0 || 
                         dbPlans.some(p => p.units.some(u => 
                           u.learningSituations.length === 0 || 
@@ -35,7 +31,6 @@ const App: React.FC = () => {
                         ));
 
       if (needsInit) {
-        // Encontra o plano base nas constantes para o perfil atual
         const template = SAMPLE_PLANS.find(p => p.profileId === profileId) || SAMPLE_PLANS[0];
         const defaultPlan = { 
           ...template, 
@@ -69,7 +64,7 @@ const App: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [activeProfileId, currentPlan, selectedUnit]);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -81,7 +76,8 @@ const App: React.FC = () => {
     const planToSave = { ...updatedPlan, profileId: activeProfileId };
     try {
       await FirebaseService.savePlan(planToSave);
-      await loadPlans(activeProfileId);
+      const refreshed = await FirebaseService.getPlans(activeProfileId);
+      setPlans(refreshed);
       setView('dashboard');
     } catch (error) {
       console.error("Erro ao salvar dados:", error);
@@ -113,9 +109,10 @@ const App: React.FC = () => {
     const updatedUnits = currentPlan.units.map(u => 
       u.id === unitId ? { ...u, schedule: newSchedule } : u
     );
-    const updatedPlan = { ...currentPlan, units: updatedUnits, profileId: activeProfileId };
-    setCurrentPlan(updatedPlan);
+    const updatedPlan = { ...currentPlan, units: updatedUnits, profileId: activeProfileId, updatedAt: new Date().toISOString() };
     
+    // Atualização otimista
+    setCurrentPlan(updatedPlan);
     const newSelectedUnit = updatedUnits.find(u => u.id === unitId);
     if (newSelectedUnit) setSelectedUnit(newSelectedUnit);
 
@@ -128,9 +125,10 @@ const App: React.FC = () => {
     const updatedUnits = currentPlan.units.map(u => 
       u.id === unitId ? { ...u, calendar: newCalendar } : u
     );
-    const updatedPlan = { ...currentPlan, units: updatedUnits, profileId: activeProfileId };
+    const updatedPlan = { ...currentPlan, units: updatedUnits, profileId: activeProfileId, updatedAt: new Date().toISOString() };
+    
+    // Atualização otimista
     setCurrentPlan(updatedPlan);
-
     const newSelectedUnit = updatedUnits.find(u => u.id === unitId);
     if (newSelectedUnit) setSelectedUnit(newSelectedUnit);
 

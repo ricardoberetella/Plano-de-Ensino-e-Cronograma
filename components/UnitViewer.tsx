@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useMemo } from 'react';
 import { CurricularUnit, ScheduleEntry, UnitCalendar, CalendarMarking, CalendarColor } from '../types';
 
@@ -64,7 +65,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar 
   const [calendar, setCalendar] = useState<UnitCalendar>(unit.calendar || defaultCalendar);
   const [selectedColor, setSelectedColor] = useState<CalendarColor>('green');
 
-  // SINCRONIZAÇÃO: Garante que se o banco de dados mudar, a tela atualiza
+  // Sincroniza o estado local quando os dados da unidade mudam (vindo do Firebase)
   useEffect(() => {
     setLocalSchedule(unit.schedule);
   }, [unit.schedule]);
@@ -75,7 +76,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar 
     }
   }, [unit.calendar]);
 
-  // Formata DD/MM/AAAA para YYYY-MM-DD
+  // Formata DD/MM/AAAA para YYYY-MM-DD para compatibilidade com o calendário
   const formatDateForCalendar = (dateStr: string) => {
     if (!dateStr || !dateStr.includes('/')) return null;
     const parts = dateStr.split('/');
@@ -84,14 +85,14 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar 
     return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
   };
 
-  // Memo para calcular as datas azuis vindas do cronograma
+  // Calcula as datas que possuem aulas registradas no cronograma (Serão exibidas em Azul)
   const scheduleDates = useMemo(() => {
     return localSchedule
       .map(s => formatDateForCalendar(s.date))
       .filter((d): d is string => d !== null);
   }, [localSchedule]);
 
-  // Memo para combinar marcas manuais (verdes) com automáticas (azuis) apenas para exibição
+  // Combina as marcações manuais (verdes/etc) com as automáticas do cronograma (azuis)
   const displayMarkings = useMemo(() => {
     const blueMarkings: CalendarMarking[] = scheduleDates.map(date => ({
       date,
@@ -102,7 +103,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar 
     blueMarkings.forEach(blue => {
       const idx = combined.findIndex(m => m.date === blue.date);
       if (idx >= 0) {
-        combined[idx] = blue;
+        combined[idx] = blue; // Prioridade para a cor azul do cronograma
       } else {
         combined.push(blue);
       }
@@ -115,6 +116,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar 
       entry.id === id ? { ...entry, [field]: value } : entry
     );
     setLocalSchedule(updated);
+    // Salva imediatamente para evitar perda ao trocar de aba
     onUpdateSchedule?.(updated);
   };
 
@@ -142,9 +144,9 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar 
   const toggleMarking = (date: string) => {
     if (date < calendar.startDate || date > calendar.endDate) return;
 
-    // REGRA SOLICITADA: Bloquear marcação manual se a data já estiver no cronograma (azul)
+    // REGRA DE OURO: Se a data já é azul (cronograma), não permite marcar verde por cima
     if (scheduleDates.includes(date)) {
-      console.log("Data bloqueada pelo cronograma (azul)");
+      console.warn("Ação bloqueada: Esta data pertence ao Cronograma de Aulas.");
       return;
     }
 
@@ -194,7 +196,8 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar 
     const current = new Date(start.getFullYear(), start.getMonth(), 1);
     while (current <= end) {
       months.push(current.toISOString().substring(0, 7));
-      current.setMonth(current.getMonth() + 1);
+      current.setMonth(current.setMonth() + 1); // Fix increment logic
+      current.setDate(1);
     }
     return months;
   }, [calendar.startDate, calendar.endDate]);
@@ -216,7 +219,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar 
              className="hidden md:flex bg-blue-600 text-white px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-white hover:text-blue-600 transition-all gap-2 items-center border border-transparent hover:border-blue-600"
            >
              {isSaving ? <div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin"></div> : <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>}
-             Forçar Gravação
+             Sincronizar Agora
            </button>
            <span className="text-slate-500 text-[10px] font-bold uppercase tracking-widest border border-slate-700 px-3 py-1 rounded-full">{unit.id.split('-')[1]}</span>
         </div>
@@ -234,7 +237,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar 
             {tab === 'geral' ? 'Geral' : 
              tab === 'sa' ? 'Situação-Problema' : 
              tab === 'rubricas' ? 'Rubricas' : 
-             tab === 'cronograma' ? 'Plano de Aula' : 'Calendário'}
+             tab === 'cronograma' ? 'Plano de Aula / Cronograma' : 'Calendário'}
           </button>
         ))}
       </div>
@@ -247,8 +250,8 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar 
                <p className="text-[#E30613] text-[10px] font-black uppercase tracking-[0.3em] mb-2">Aviso Oficial</p>
                <h4 className="text-white font-black text-sm md:text-xl uppercase leading-tight mb-3 tracking-tight">PARA USO EXCLUSIVO NO PROEDUCADOR ATIVIDADE – CRONOGRAMA INTEGRADOR</h4>
                <div className="flex items-center gap-3">
-                 <span className="bg-blue-600 text-white text-[9px] font-black px-3 py-1 rounded uppercase italic">Situação de aprendizagem 3</span>
-                 <p className="text-slate-500 text-[8px] font-bold uppercase tracking-widest">Gerada pelo Assistente Virtual MSEP</p>
+                 <span className="bg-blue-600 text-white text-[9px] font-black px-3 py-1 rounded uppercase italic">MSEP - Modelo SENAI</span>
+                 <p className="text-slate-500 text-[8px] font-bold uppercase tracking-widest">Base de Dados Cloud Ativa</p>
                </div>
             </div>
 
@@ -257,11 +260,12 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar 
                 <section>
                   <h3 className="text-[10px] md:text-[11px] font-black text-slate-400 mb-6 uppercase tracking-[0.3em] flex items-center gap-3">
                     <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
-                    Capacidades Básicas (Técnicas)
+                    Capacidades Técnicas
                   </h3>
                   <div className="space-y-4">
                     {unit.basicCapacities.map((c, i) => (
                       <div key={i} className="flex gap-4 items-start group bg-white p-4 rounded-2xl border border-slate-100 shadow-sm hover:border-blue-200 transition-all">
+                        <span className="bg-slate-100 text-slate-400 w-5 h-5 rounded-md flex items-center justify-center text-[9px] font-black flex-shrink-0">{i+1}</span>
                         <p className="text-slate-700 text-xs md:text-sm leading-relaxed font-bold">{c}</p>
                       </div>
                     ))}
@@ -341,7 +345,10 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar 
         {activeTab === 'cronograma' && (
           <div className="space-y-6">
              <div className="flex justify-between items-center bg-white p-6 md:p-8 rounded-[2rem] border border-slate-200 shadow-lg">
-                <p className="text-[11px] md:text-sm font-black text-blue-600 uppercase">Carga Acumulada: {localSchedule.reduce((acc, s) => acc + s.hours, 0)}h</p>
+                <div className="space-y-1">
+                  <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Resumo do Cronograma</p>
+                  <p className="text-[11px] md:text-sm font-black text-blue-600 uppercase">Carga Acumulada: {localSchedule.reduce((acc, s) => acc + s.hours, 0)}h</p>
+                </div>
                 <button 
                   onClick={addEntry}
                   className="bg-blue-600 text-white px-8 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-900 shadow-xl transition-all"
@@ -372,12 +379,15 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar 
                              className="w-full bg-slate-100 font-black text-blue-600 p-2 rounded-lg mb-2 text-center"
                              placeholder="DD/MM/AAAA"
                            />
-                           <input 
-                             type="number"
-                             value={entry.hours}
-                             onChange={(e) => updateEntry(entry.id, 'hours', parseInt(e.target.value) || 0)}
-                             className="w-full bg-white border border-slate-200 text-slate-800 font-black p-2 rounded-lg text-center"
-                           />
+                           <div className="flex items-center justify-center gap-2">
+                             <input 
+                               type="number"
+                               value={entry.hours}
+                               onChange={(e) => updateEntry(entry.id, 'hours', parseInt(e.target.value) || 0)}
+                               className="w-12 bg-white border border-slate-200 text-slate-800 font-black p-1 rounded-lg text-center"
+                             />
+                             <span className="text-[8px] font-black text-slate-400 uppercase">Horas</span>
+                           </div>
                         </td>
                         <td className="p-4 border-r border-slate-100 align-top">
                            <textarea 
@@ -450,10 +460,10 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar 
                 <button 
                   onClick={manualSave}
                   disabled={isSaving}
-                  className="w-full md:w-auto bg-slate-900 text-white px-10 py-5 rounded-[2rem] text-[10px] font-black uppercase tracking-widest hover:bg-blue-600 shadow-2xl transition-all flex items-center justify-center gap-3"
+                  className="w-full md:w-auto bg-slate-900 text-white px-10 py-5 rounded-[2rem] text-[10px] font-black uppercase tracking-widest hover:bg-blue-600 shadow-2xl transition-all flex items-center justify-center gap-3 active:scale-95"
                 >
                   {isSaving ? <div className="w-4 h-4 border-2 border-slate-500 border-t-white rounded-full animate-spin"></div> : <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>}
-                  {isSaving ? 'Gravando...' : 'Gravar Alterações'}
+                  {isSaving ? 'Sincronizando...' : 'Gravar Alterações'}
                 </button>
               </div>
 
@@ -488,8 +498,8 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar 
                        <div className="w-3 h-3 bg-white/40 rounded-full animate-pulse"></div>
                     </div>
                     <div>
-                      <p className="text-[10px] font-black text-blue-600 uppercase tracking-widest">Bloqueado: Aulas do Cronograma</p>
-                      <p className="text-[8px] font-bold text-slate-400 uppercase leading-relaxed mt-1">Datas automáticas não permitem marcação manual.</p>
+                      <p className="text-[10px] font-black text-blue-600 uppercase tracking-widest">Aulas do Cronograma</p>
+                      <p className="text-[8px] font-bold text-slate-400 uppercase leading-relaxed mt-1">Datas bloqueadas para edição manual.</p>
                     </div>
                   </div>
                 </div>
@@ -541,14 +551,14 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar 
                               key={day}
                               disabled={isOutOfRange}
                               onClick={() => toggleMarking(day)}
-                              title={isBlue ? "Data do cronograma (bloqueada)" : ""}
+                              title={isBlue ? "Data bloqueada: Pertence ao cronograma de aulas" : ""}
                               className={`p-3 text-center text-xs md:text-sm font-black transition-all border-b border-r border-slate-50 last:border-r-0 relative h-14 md:h-16 flex items-center justify-center ${
                                 isSunday ? 'text-red-500 bg-red-50/20' : 'text-slate-800'
                               } ${isOutOfRange ? 'opacity-20 cursor-not-allowed bg-slate-50' : 'hover:bg-blue-50'} ${isBlue ? 'cursor-not-allowed' : ''}`}
                               style={marking ? { backgroundColor: COLOR_MAP[marking.color], color: TEXT_COLOR_MAP[marking.color] } : {}}
                             >
                               {dateNum}
-                              {isBlue && <div className="absolute top-1 right-1 w-1.5 h-1.5 bg-white/50 rounded-full"></div>}
+                              {isBlue && <div className="absolute top-1 right-1 w-1.5 h-1.5 bg-white/40 rounded-full shadow-sm"></div>}
                             </button>
                           );
                         })}
