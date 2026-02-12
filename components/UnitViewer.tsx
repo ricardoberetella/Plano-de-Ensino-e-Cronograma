@@ -52,13 +52,18 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar 
   const [localSchedule, setLocalSchedule] = useState<ScheduleEntry[]>(unit.schedule);
   const [isSaving, setIsSaving] = useState(false);
   
+  // Determina se é uma unidade de Controle Dimensional para aplicar a cor rosa
+  const isCRD = unit.id.toLowerCase().includes('crd');
+  const scheduleColor: CalendarColor = isCRD ? 'pink' : 'blue';
+
   const defaultCalendar: UnitCalendar = {
     startDate: '2026-01-26',
     endDate: '2026-06-15',
     markings: [],
     colorLabels: { 
       green: 'Não letivo',
-      blue: 'Aulas do Cronograma'
+      blue: 'Aulas do Cronograma',
+      pink: 'Aulas do Cronograma'
     }
   };
 
@@ -85,38 +90,37 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar 
     return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
   };
 
-  // Calcula as datas que possuem aulas registradas no cronograma (Serão exibidas em Azul)
+  // Calcula as datas que possuem aulas registradas no cronograma
   const scheduleDates = useMemo(() => {
     return localSchedule
       .map(s => formatDateForCalendar(s.date))
       .filter((d): d is string => d !== null);
   }, [localSchedule]);
 
-  // Combina as marcações manuais (verdes/etc) com as automáticas do cronograma (azuis)
+  // Combina as marcações manuais com as automáticas do cronograma (Azul ou Rosa)
   const displayMarkings = useMemo(() => {
-    const blueMarkings: CalendarMarking[] = scheduleDates.map(date => ({
+    const autoMarkings: CalendarMarking[] = scheduleDates.map(date => ({
       date,
-      color: 'blue' as CalendarColor
+      color: scheduleColor
     }));
 
     const combined = [...calendar.markings];
-    blueMarkings.forEach(blue => {
-      const idx = combined.findIndex(m => m.date === blue.date);
+    autoMarkings.forEach(auto => {
+      const idx = combined.findIndex(m => m.date === auto.date);
       if (idx >= 0) {
-        combined[idx] = blue; // Prioridade absoluta para a cor azul do cronograma
+        combined[idx] = auto; // Prioridade absoluta para a cor do cronograma
       } else {
-        combined.push(blue);
+        combined.push(auto);
       }
     });
     return combined;
-  }, [calendar.markings, scheduleDates]);
+  }, [calendar.markings, scheduleDates, scheduleColor]);
 
   const updateEntry = (id: string, field: keyof ScheduleEntry, value: any) => {
     const updated = localSchedule.map(entry => 
       entry.id === id ? { ...entry, [field]: value } : entry
     );
     setLocalSchedule(updated);
-    // Salva imediatamente para evitar perda ao trocar de aba
     onUpdateSchedule?.(updated);
   };
 
@@ -144,7 +148,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar 
   const toggleMarking = (date: string) => {
     if (date < calendar.startDate || date > calendar.endDate) return;
 
-    // REGRA DE OURO: Se a data já é azul (cronograma), não permite marcar verde por cima
+    // Se a data já pertence ao cronograma, não permite marcar por cima
     if (scheduleDates.includes(date)) {
       return;
     }
@@ -195,7 +199,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar 
     const current = new Date(start.getFullYear(), start.getMonth(), 1);
     while (current <= end) {
       months.push(current.toISOString().substring(0, 7));
-      current.setMonth(current.getMonth() + 1); // CORREÇÃO: Incremento correto do mês
+      current.setMonth(current.getMonth() + 1);
       current.setDate(1);
     }
     return months;
@@ -493,11 +497,14 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar 
                 <div className="space-y-4">
                   <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2">Legenda Automática:</p>
                   <div className="bg-slate-50 p-6 rounded-2xl border border-dashed border-slate-200 flex items-center gap-6">
-                    <div className="w-12 h-12 rounded-xl bg-blue-600 border shadow-md flex items-center justify-center">
+                    <div 
+                      className="w-12 h-12 rounded-xl border shadow-md flex items-center justify-center"
+                      style={{ backgroundColor: COLOR_MAP[scheduleColor] }}
+                    >
                        <div className="w-3 h-3 bg-white/40 rounded-full animate-pulse"></div>
                     </div>
                     <div>
-                      <p className="text-[10px] font-black text-blue-600 uppercase tracking-widest">Aulas do Cronograma</p>
+                      <p className="text-[10px] font-black uppercase tracking-widest" style={{ color: COLOR_MAP[scheduleColor] }}>Aulas do Cronograma</p>
                       <p className="text-[8px] font-bold text-slate-400 uppercase leading-relaxed mt-1">Datas bloqueadas para edição manual.</p>
                     </div>
                   </div>
@@ -543,21 +550,21 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar 
                           const isSunday = idx % 7 === 0;
                           const dateNum = parseInt(day.split('-')[2]);
                           const isOutOfRange = day < calendar.startDate || day > calendar.endDate;
-                          const isBlue = scheduleDates.includes(day);
+                          const isAuto = scheduleDates.includes(day);
 
                           return (
                             <button
                               key={day}
                               disabled={isOutOfRange}
                               onClick={() => toggleMarking(day)}
-                              title={isBlue ? "Data bloqueada: Pertence ao cronograma de aulas" : ""}
+                              title={isAuto ? "Data bloqueada: Pertence ao cronograma de aulas" : ""}
                               className={`p-3 text-center text-xs md:text-sm font-black transition-all border-b border-r border-slate-50 last:border-r-0 relative h-14 md:h-16 flex items-center justify-center ${
                                 isSunday ? 'text-red-500 bg-red-50/20' : 'text-slate-800'
-                              } ${isOutOfRange ? 'opacity-20 cursor-not-allowed bg-slate-50' : 'hover:bg-blue-50'} ${isBlue ? 'cursor-not-allowed' : ''}`}
+                              } ${isOutOfRange ? 'opacity-20 cursor-not-allowed bg-slate-50' : 'hover:bg-blue-50'} ${isAuto ? 'cursor-not-allowed' : ''}`}
                               style={marking ? { backgroundColor: COLOR_MAP[marking.color], color: TEXT_COLOR_MAP[marking.color] } : {}}
                             >
                               {dateNum}
-                              {isBlue && <div className="absolute top-1 right-1 w-1.5 h-1.5 bg-white/40 rounded-full shadow-sm"></div>}
+                              {isAuto && <div className="absolute top-1 right-1 w-1.5 h-1.5 bg-white/40 rounded-full shadow-sm"></div>}
                             </button>
                           );
                         })}
