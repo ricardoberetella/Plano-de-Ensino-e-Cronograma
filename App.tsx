@@ -130,10 +130,10 @@ const App: React.FC = () => {
     setView('dashboard');
   };
 
-  // Lógica para o Calendário Agregado
-  const aggregatedMarkings = useMemo(() => {
-    if (!currentPlan) return [];
-    const all: CalendarMarking[] = [];
+  // Lógica para o Calendário Agregado agrupando cores por data
+  const aggregatedMarkingsByDate = useMemo(() => {
+    if (!currentPlan) return {};
+    const markings: Record<string, Set<CalendarColor>> = {};
     
     currentPlan.units.forEach(unit => {
       const isCRD = unit.id.toLowerCase().includes('crd');
@@ -144,19 +144,21 @@ const App: React.FC = () => {
         if (!entry.date.includes('/')) return;
         const [d, m, y] = entry.date.split('/');
         const isoDate = `${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`;
-        all.push({ date: isoDate, color: unitColor });
+        if (!markings[isoDate]) markings[isoDate] = new Set();
+        markings[isoDate].add(unitColor);
       });
 
-      // Marcações Manuais (Não Letivos, etc)
+      // Marcações Manuais (Prioridade ao verde para não letivos)
       if (unit.calendar?.markings) {
         unit.calendar.markings.forEach(m => {
-          if (m.color === 'green') { // Mantém verde para feriados/não letivos
-            all.push(m);
+          if (m.color === 'green') {
+            if (!markings[m.date]) markings[m.date] = new Set();
+            markings[m.date].add('green');
           }
         });
       }
     });
-    return all;
+    return markings;
   }, [currentPlan]);
 
   const monthsList = useMemo(() => {
@@ -323,20 +325,35 @@ const App: React.FC = () => {
                             {days.map((day, idx) => {
                               if (!day) return <div key={`e-${idx}`} className="p-1 border-b border-r border-slate-50"></div>;
                               
-                              const marking = aggregatedMarkings.find(m => m.date === day);
+                              const dayMarkings = Array.from(aggregatedMarkingsByDate[day] || []);
                               const dateNum = parseInt(day.split('-')[2]);
                               const isSunday = idx % 7 === 0;
+
+                              // Estilo condicional para suporte a cores divididas
+                              let cellStyle: React.CSSProperties = { color: '#ffffff' };
+                              const hasCRD = dayMarkings.includes('pink');
+                              const hasLIDT = dayMarkings.includes('blue');
+
+                              if (dayMarkings.length === 0) {
+                                cellStyle = { color: isSunday ? '#ef4444' : '#1e293b' };
+                              } else if (hasCRD && hasLIDT) {
+                                // CRD à esquerda (Rosa), LIDT à direita (Azul)
+                                cellStyle.background = `linear-gradient(to right, ${COLOR_MAP.pink} 50%, ${COLOR_MAP.blue} 50%)`;
+                              } else {
+                                // Cor sólida
+                                cellStyle.backgroundColor = COLOR_MAP[dayMarkings[0]] || '#cbd5e1';
+                              }
 
                               return (
                                 <div
                                   key={day}
                                   className={`p-2 h-12 md:h-14 flex items-center justify-center text-[10px] font-black border-b border-r border-slate-50 relative ${
-                                    isSunday ? 'text-red-500 bg-red-50/10' : 'text-slate-800'
+                                    isSunday && dayMarkings.length === 0 ? 'bg-red-50/10' : ''
                                   }`}
-                                  style={marking ? { backgroundColor: COLOR_MAP[marking.color] || '#cbd5e1', color: '#ffffff' } : {}}
+                                  style={cellStyle}
                                 >
                                   {dateNum}
-                                  {marking && marking.color !== 'green' && (
+                                  {dayMarkings.length > 0 && !dayMarkings.includes('green') && (
                                     <div className="absolute top-1 right-1 w-1 h-1 bg-white/40 rounded-full"></div>
                                   )}
                                 </div>
