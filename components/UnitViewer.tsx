@@ -52,9 +52,10 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar 
   const [localSchedule, setLocalSchedule] = useState<ScheduleEntry[]>(unit.schedule);
   const [isSaving, setIsSaving] = useState(false);
   
-  // Determina se é uma unidade de Controle Dimensional para aplicar a cor rosa
+  // Determina a cor baseada na Unidade Curricular
   const isCRD = unit.id.toLowerCase().includes('crd');
-  const scheduleColor: CalendarColor = isCRD ? 'pink' : 'blue';
+  const isFUSI = unit.id.toLowerCase().includes('fusi');
+  const scheduleColor: CalendarColor = isCRD ? 'pink' : (isFUSI ? 'orange' : 'blue');
 
   const defaultCalendar: UnitCalendar = {
     startDate: '2026-01-26',
@@ -63,7 +64,8 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar 
     colorLabels: { 
       green: 'Não letivo',
       blue: 'Aulas do Cronograma',
-      pink: 'Aulas do Cronograma'
+      pink: 'Aulas do Cronograma',
+      orange: 'Aulas do Cronograma'
     }
   };
 
@@ -97,7 +99,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar 
       .filter((d): d is string => d !== null);
   }, [localSchedule]);
 
-  // Combina as marcações manuais com as automáticas do cronograma (Azul ou Rosa)
+  // Combina as marcações manuais com as automáticas do cronograma
   const displayMarkings = useMemo(() => {
     const autoMarkings: CalendarMarking[] = scheduleDates.map(date => ({
       date,

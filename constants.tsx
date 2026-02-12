@@ -11,7 +11,7 @@ const CRD_SCHEDULE = [
   { id: 'c4', date: '24/02/2026', hours: 2, capacities: 'IV. Medir peças com paquímetro. I. Demonstrar atenção a detalhes.', knowledge: '5. Paquímetros (5.1, 5.2)', strategy: 'Exposição dialogada sobre os tipos de paquímetros e suas características. Demonstração do manuseio correto.', resources: 'Laboratório de Metrologia, projetor, diferentes tipos de paquímetros.' },
   { id: 'c5', date: '03/03/2026', hours: 2, capacities: 'IV. Medir peças com paquímetro. I. Demonstrar atenção a detalhes.', knowledge: '5. Paquímetros (5.3, 5.4, 5.5)', strategy: 'Demonstração e exercício prático de leitura no sistema métrico (0,05mm e 0,02mm).', resources: 'Laboratório de Metrologia, paquímetros, peças didcidas com medidas conhecidas.' },
   { id: 'c6', date: '10/03/2026', hours: 2, capacities: 'IV. Medir peças com paquímetro. I. Demonstrar atenção a detalhes. I. Organizar o ambiente de trabalho e as atividades.', knowledge: '5. Paquímetros (5.5)', strategy: 'Exercício prático supervisionado de medição em peças variadas, com preenchimento de relatório simples.', resources: 'Laboratório de Metrologia, paquímetros, peças, formulário de relatório.' },
-  { id: 'c7', date: '17/03/2026', hours: 2, capacities: 'V. Medir peças no sistema métrico com micrômetro. II. Zelar pelo uso de equipamentos, instrumentos, ferramentas e materiais.', knowledge: '6. Micrômetros (6.1, 6.2, 6.3)', strategy: 'Exposição sobre os tipos de micrômetros. Demonstração do manuseio, ajuste do zero e uso da catraca.', resources: 'Laboratório de Metrologia, projetor, diferentes tipos de micrômetros.' },
+  { id: 'c7', date: '17/03/2026', hours: 2, capacities: 'V. Medir peças no sistema métrico com micrômetro. II. Zelar pelo uso de equipamentos, instrumentos, ferramentas e materiais.', knowledge: '6. Micrômetros (6.1, 6.2, 6.3)', strategy: 'Exposição sobre os tipos de micrômetros. Demonstração do manuseio, ajuste do zero e uso da catraca.', resources: 'Laboratório de Metrologia, projetor, differentes tipos de micrômetros.' },
   { id: 'c8', date: '24/03/2026', hours: 2, capacities: 'V. Medir peças no sistema métrico com micrômetro. I. Demonstrar atenção a detalhes.', knowledge: '6. Micrômetros (6.3, 6.4, 6.5)', strategy: 'Demonstração e exercício prático de leitura no sistema métrico (0,01 mm).', resources: 'Laboratório de Metrologia, micrômetros, peças didáticas.' },
   { id: 'c9', date: '31/03/2026', hours: 2, capacities: 'V. Medir peças no sistema métrico com micrômetro. I. Demonstrar atenção a detalhes. I. Organizar o ambiente de trabalho e as atividades.', knowledge: '6. Micrômetros (6.5)', strategy: 'Exercício prático supervisionado de medição com micrômetros e preenchimento de relatório, comparando com medidas do paquímetro.', resources: 'Laboratório de Metrologia, micrômetros, paquímetros, peças, relatório.' },
   { id: 'c10', date: '07/04/2026', hours: 2, capacities: 'VI. Verificar dimensões e perfis com verificadores.', knowledge: '7. Verificadores (7.1, 7.2)', strategy: 'Demonstração do uso de calibradores de folga, raio e rosca. Exercício prático de verificação em peças.', resources: 'Laboratório de Metrologia, jogos de verificadores, peças com roscas e raios.' },
@@ -48,6 +48,29 @@ const LIDT_SCHEDULE = [
   { id: 'l18', date: '01/06/2026', hours: 2, capacities: 'Todas as capacidades da SA.', knowledge: 'Todos os conhecimentos da SA.', strategy: '• Apresentação dos Resultados: Equipes apresentam seus Dossiês Técnicos e explicam a análise das tolerâncias.', resources: 'Sala de aula, projetor, dossiês finalizados.' },
   { id: 'l19', date: '08/06/2026', hours: 2, capacities: 'Todas as capacidades da SA.', knowledge: 'Todos os conhecimentos da SA.', strategy: '• Feedback e Avaliação: Devolutiva do docente sobre o desempenho das equipes e autoavaliação.', resources: 'Sala de aula, fichas de avaliação.' },
   { id: 'l20', date: '15/06/2026', hours: 2, capacities: 'Todas as capacidades da SA.', knowledge: 'Todos os conhecimentos da SA.', strategy: '• Encerramento da Unidade Curricular e fechamento de notas.', resources: 'Sala de aula.' }
+];
+
+const FUSI_SCHEDULE = [
+  { id: 'f1', date: '28/01/2026', hours: 2, capacities: 'Atuar em conformidade com normas de saúde e segurança no trabalho.', knowledge: '1. Segurança no Trabalho; 2. Higiene Industrial.', strategy: 'Apresentação da SA e das normas de segurança da oficina. Visita orientada aos ambientes de trabalho.', resources: 'Oficina, EPIs, roteiro de segurança.' },
+  { id: 'f2', date: '04/02/2026', hours: 2, capacities: 'Preparar o ambiente de trabalho conforme a atividade.', knowledge: '3. Máquinas e Ferramentas; 4. Materiais de fabricação.', strategy: 'Apresentação das máquinas operatrizes e ferramentas manuais. Identificação de materiais ferrosos e não ferrosos.', resources: 'Oficina, catálogo de máquinas, amostras de materiais.' },
+  { id: 'f3', date: '11/02/2026', hours: 2, capacities: 'Operar furadeira de bancada e coluna.', knowledge: '5. Processo de Furação (5.1, 5.2).', strategy: 'Demonstração de furação em chapas de aço. Cálculos básicos de RPM para furação.', resources: 'Furadeira, brocas, fluido de corte, tabelas de RPM.' },
+  { id: 'f4', date: '25/02/2026', hours: 2, capacities: 'Realizar serramento e limagem manual.', knowledge: '6. Processos manuais (6.1, 6.2).', strategy: 'Atividade prática: Serramento de tarugos e limagem de superfícies planas conforme desenho técnico.', resources: 'Arcos de serra, limas bastardas e murças, morsa.' },
+  { id: 'f5', date: '04/03/2026', hours: 2, capacities: 'Realizar roscagem manual com machos e cossinetes.', knowledge: '7. Roscagem (7.1, 7.2).', strategy: 'Demonstração e prática de abertura de roscas internas e externas em aço carbono.', resources: 'Jogos de machos, vira-machos, cossinetes, porta-cossinetes.' },
+  { id: 'f6', date: '11/03/2026', hours: 2, capacities: 'Zelar pela conservação e manutenção de ferramentas.', knowledge: '8. Manutenção básica e lubrificação.', strategy: 'Prática de limpeza de máquinas e aplicação de óleos protetivos. Organização do armário de ferramentas.', resources: 'Panos, óleos, graxas, ferramentas diversas.' },
+  { id: 'f7', date: '18/03/2026', hours: 2, capacities: 'Executar afiação de ferramentas simples.', knowledge: '9. Afiação de brocas (9.1).', strategy: 'Demonstração de afiação de brocas helicoidais no esmeril, observando ângulos de corte.', resources: 'Esmeril, brocas rombas, gabarito de afiação.' },
+  { id: 'f8', date: '25/03/2026', hours: 2, capacities: 'Executar traçagem de peças.', knowledge: '10. Traçagem (10.1, 10.2).', strategy: 'Prática de traçagem em chapas utilizando graminho, escala e riscador.', resources: 'Graminho, desempeno de granito, riscador, tinta de traçar.' },
+  { id: 'f9', date: '01/04/2026', hours: 2, capacities: 'Realizar montagem de componentes simples.', knowledge: '11. Elementos de fixação (11.1).', strategy: 'Atividade de montagem utilizando parafusos, porcas e arruelas seguindo ordem lógica.', resources: 'Parafusos diversos, chaves de aperto.' },
+  { id: 'f10', date: '08/04/2026', hours: 2, capacities: 'Executar todas as capacidades práticas da SA.', knowledge: 'Revisão dos fundamentos de usinagem.', strategy: 'Início da fabricação do "Dispositivo Guia": Serramento e desbaste inicial da base.', resources: 'Material bruto, oficina mecânica.' },
+  { id: 'f11', date: '15/04/2026', hours: 2, capacities: 'Executar todas as capacidades práticas da SA.', knowledge: 'Furação e Rebaixamento.', strategy: 'Furação da base e execução de rebaixos para parafusos Allen.', resources: 'Furadeira, brocas, fresas de rebaixar.' },
+  { id: 'f12', date: '29/04/2026', hours: 2, capacities: 'Executar todas as capacidades práticas da SA.', knowledge: 'Roscagem e Acabamento.', strategy: 'Execução de roscas M8 e acabamento fino com lima e lixa.', resources: 'Machos M8, limas finas, lixas metálicas.' },
+  { id: 'f13', date: '06/05/2026', hours: 2, capacities: 'Executar todas as capacidades práticas da SA.', knowledge: 'Montagem final.', strategy: 'Montagem do conjunto e verificação de ajustes manuais.', resources: 'Componentes fabricados, ferramentas de aperto.' },
+  { id: 'f14', date: '13/05/2026', hours: 2, capacities: 'Executar todas as capacidades práticas da SA.', knowledge: 'Controle de Qualidade Final.', strategy: 'Verificação funcional do dispositivo e limpeza das superfícies.', resources: 'Instrumentos de medição, solventes.' },
+  { id: 'f15', date: '20/05/2026', hours: 2, capacities: 'Executar todas as capacidades práticas da SA.', knowledge: 'Apresentação do protótipo.', strategy: 'Exposição dos dispositivos finalizados e feedback coletivo.', resources: 'Dispositivos montados.' },
+  { id: 'f16', date: '27/05/2026', hours: 2, capacities: 'Manter a organização do ambiente.', knowledge: '5S na Oficina.', strategy: 'Grande mutirão de organização e inventário de ferramentas da turma.', resources: 'Material de limpeza, listas de inventário.' },
+  { id: 'f17', date: '03/06/2026', hours: 2, capacities: 'Avaliar processos de usinagem.', knowledge: 'Produtividade e Qualidade.', strategy: 'Debate sobre erros comuns na fabricação e como evitá-los.', resources: 'Peças com defeitos para análise.' },
+  { id: 'f18', date: '10/06/2026', hours: 2, capacities: 'Consolidar conhecimentos técnicos.', knowledge: 'Revisão Geral.', strategy: 'Quiz técnico sobre ferramentas e processos manuais.', resources: 'Computador/Celular.' },
+  { id: 'f19', date: '17/06/2026', hours: 2, capacities: 'Finalizar documentação técnica.', knowledge: 'Relatório de Oficina.', strategy: 'Escrita do relatório técnico individual sobre a prática.', resources: 'Caderno, formulários.' },
+  { id: 'f20', date: '24/06/2026', hours: 2, capacities: 'Autoavaliação e encerramento.', knowledge: 'Fechamento da UC.', strategy: 'Feedback individual sobre evolução técnica e comportamental.', resources: 'Fichas de avaliação.' }
 ];
 
 const FULL_KNOWLEDGE_CRD = [
@@ -100,8 +123,6 @@ const COMMON_SA_CRD = [
     ]
   }
 ];
-
-// --- NOVOS CONTEÚDOS LIDT TRANSCRITOS DOS PRINTS ---
 
 const FULL_CAPACITIES_LIDT = [
   '1. Interpretar desenhos técnicos de peças a partir de projetos da metalmecânica.',
@@ -254,6 +275,44 @@ const FULL_RUBRICS_LIDT = [
   }
 ];
 
+const FULL_CAPACITIES_FUSI = [
+  '1. Atuar em conformidade com normas de saúde e segurança no trabalho.',
+  '2. Preparar o ambiente de trabalho conforme a atividade e o processo de fabricação.',
+  '3. Operar furadeira de bancada e coluna.',
+  '4. Realizar serramento e limagem manual seguindo desenhos técnicos.',
+  '5. Realizar roscagem manual com machos e cossinetes.',
+  '6. Zelar pela conservação e manutenção de ferramentas e máquinas operatrizes.'
+];
+
+const FULL_SOCIOEMOCIONAL_FUSI = [
+  'Autogestão: 1. Organizar o ambiente de trabalho',
+  'Autogestão: 2. Zelar pela conservação dos equipamentos',
+  'Pensamento analítico: 1. Demonstrar atenção a detalhes na fabricação'
+];
+
+const FULL_KNOWLEDGE_FUSI = [
+  { topic: '1. Segurança no Trabalho', subtopics: ['EPIs e EPCs', 'Normas Regulamentadoras (NR-12)'] },
+  { topic: '2. Materiais', subtopics: ['Metais Ferrosos e Não Ferrosos', 'Propriedades Mecânicas Básicas'] },
+  { topic: '3. Processos Manuais', subtopics: ['Serramento', 'Limagem', 'Traçagem'] },
+  { topic: '4. Furação', subtopics: ['Máquinas de furar', 'Tipos de Brocas', 'Cálculo de RPM'] },
+  { topic: '5. Roscagem Manual', subtopics: ['Machos e Cossinetes', 'Diâmetros de Furação para Rosca'] }
+];
+
+const COMMON_SA_FUSI = [
+  {
+    id: 'sa-fusi-integrada',
+    title: 'Situação-problema: Manutenção de Dispositivo - Fabricação de Placa Guia',
+    context: 'A oficina de manutenção da empresa "Mecânica Master" recebeu um chamado para fabricar uma Placa Guia de reposição para uma máquina de furação que parou por desgaste excessivo da peça original. O desenho técnico já está disponível, mas a peça deve ser produzida manualmente por um aprendiz qualificado, utilizando processos de bancada para garantir o ajuste preciso. Você foi escalado para essa tarefa crítica.',
+    challenge: 'A partir de um bloco de aço SAE 1020, você deve fabricar a Placa Guia realizando: a) Traçagem precisa do material; b) Serramento manual para remoção do sobremetal; c) Limagem para atingir as dimensões nominais e o esquadro; d) Furação em furadeira de bancada; e) Roscagem manual de dois furos M8. Ao final, a peça deve ser montada na máquina para teste funcional.',
+    expectedResults: ['Peça fabricada dentro das tolerâncias do desenho.', 'Uso correto de EPIs.', 'Ambiente organizado ao final do processo.']
+  }
+];
+
+const FULL_RUBRICS_FUSI = [
+  { capacity: 'Operar furadeira de bancada', nsa: 'Não utiliza EPIs e não fixa a peça corretamente.', apo: 'Opera com ajuda mas esquece de usar fluido de corte.', par: 'Opera corretamente, seguindo as normas de segurança e parâmetros de corte.', aut: 'Opera com perfeição e auxilia na troca de brocas e ajuste de rotação.' },
+  { capacity: 'Realizar limagem manual', nsa: 'Não consegue manter o paralelismo nem o esquadro da peça.', apo: 'Atinge as medidas mas deixa rebarbas excessivas.', par: 'Realiza a limagem com bom acabamento e dentro das tolerâncias.', aut: 'Apresenta acabamento de alta qualidade e esquadro perfeito.' }
+];
+
 export const SAMPLE_PLANS: TeachingPlan[] = [
   {
     id: 'plan-usinagem-beretella',
@@ -288,6 +347,17 @@ export const SAMPLE_PLANS: TeachingPlan[] = [
         learningSituations: COMMON_SA_CRD,
         rubrics: FULL_RUBRICS_CRD,
         schedule: CRD_SCHEDULE
+      },
+      {
+        id: 'uc-fusi-beretella',
+        name: 'FUNDAMENTOS DA USINAGEM',
+        calendar: { startDate: '2026-01-28', endDate: '2026-06-24', markings: [] },
+        basicCapacities: FULL_CAPACITIES_FUSI,
+        socioemocionalCapacities: FULL_SOCIOEMOCIONAL_FUSI,
+        knowledge: FULL_KNOWLEDGE_FUSI,
+        learningSituations: COMMON_SA_FUSI,
+        rubrics: FULL_RUBRICS_FUSI,
+        schedule: FUSI_SCHEDULE
       }
     ]
   },
@@ -324,6 +394,17 @@ export const SAMPLE_PLANS: TeachingPlan[] = [
         learningSituations: COMMON_SA_CRD,
         rubrics: FULL_RUBRICS_CRD,
         schedule: CRD_SCHEDULE
+      },
+      {
+        id: 'uc-fusi-gea',
+        name: 'FUNDAMENTOS DA USINAGEM',
+        calendar: { startDate: '2026-01-28', endDate: '2026-06-24', markings: [] },
+        basicCapacities: FULL_CAPACITIES_FUSI,
+        socioemocionalCapacities: FULL_SOCIOEMOCIONAL_FUSI,
+        knowledge: FULL_KNOWLEDGE_FUSI,
+        learningSituations: COMMON_SA_FUSI,
+        rubrics: FULL_RUBRICS_FUSI,
+        schedule: FUSI_SCHEDULE
       }
     ]
   }

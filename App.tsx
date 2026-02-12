@@ -13,7 +13,8 @@ const COLOR_MAP: Record<string, string> = {
   blue: '#3b82f6',
   pink: '#ec4899',
   green: '#22c55e',
-  red: '#ef4444'
+  red: '#ef4444',
+  orange: '#f97316'
 };
 
 const App: React.FC = () => {
@@ -34,7 +35,8 @@ const App: React.FC = () => {
                         dbPlans.some(p => p.units.some(u => 
                           u.learningSituations.length === 0 || 
                           (u.id.includes('lidt') && (u.rubrics.length < 6 || u.schedule.length === 0)) ||
-                          (u.id.includes('crd') && u.rubrics.length < 4)
+                          (u.id.includes('crd') && u.rubrics.length < 4) ||
+                          (u.id.includes('fusi') && u.schedule.length === 0)
                         ));
 
       if (needsInit) {
@@ -130,16 +132,15 @@ const App: React.FC = () => {
     setView('dashboard');
   };
 
-  // Lógica para o Calendário Agregado agrupando cores por data
   const aggregatedMarkingsByDate = useMemo(() => {
     if (!currentPlan) return {};
     const markings: Record<string, Set<CalendarColor>> = {};
     
     currentPlan.units.forEach(unit => {
       const isCRD = unit.id.toLowerCase().includes('crd');
-      const unitColor: CalendarColor = isCRD ? 'pink' : 'blue';
+      const isFUSI = unit.id.toLowerCase().includes('fusi');
+      const unitColor: CalendarColor = isCRD ? 'pink' : (isFUSI ? 'orange' : 'blue');
       
-      // Marcações de Cronograma (Auto)
       unit.schedule.forEach(entry => {
         if (!entry.date.includes('/')) return;
         const [d, m, y] = entry.date.split('/');
@@ -148,7 +149,6 @@ const App: React.FC = () => {
         markings[isoDate].add(unitColor);
       });
 
-      // Marcações Manuais (Prioridade ao verde para não letivos)
       if (unit.calendar?.markings) {
         unit.calendar.markings.forEach(m => {
           if (m.color === 'green') {
@@ -267,22 +267,21 @@ const App: React.FC = () => {
 
           {view === 'calendario' && currentPlan && (
             <div className="max-w-6xl mx-auto animate-fadeIn space-y-10 pb-20">
-               {/* Cabeçalho do Calendário Geral */}
                <div className="bg-white rounded-[3rem] border border-slate-200 shadow-xl p-8 md:p-12 text-center relative overflow-hidden">
                   <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-1 bg-[#E30613] rounded-b-full"></div>
                   <h2 className="text-3xl md:text-5xl font-[1000] text-slate-900 tracking-tighter uppercase mb-4 italic leading-none">MSEP - CALENDÁRIO GERAL</h2>
                   <p className="text-slate-400 font-black uppercase text-[10px] tracking-[0.3em] mb-8">Cronograma Semestral Unificado</p>
                   
-                  {/* Legenda de Cores por Unidade */}
                   <div className="max-w-2xl mx-auto bg-slate-50 rounded-3xl p-6 border border-slate-100 shadow-inner">
                     <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-4">Legenda de Atividades</p>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                       {currentPlan.units.map(unit => {
                         const isCRD = unit.id.toLowerCase().includes('crd');
-                        const color = isCRD ? 'pink' : 'blue';
+                        const isFUSI = unit.id.toLowerCase().includes('fusi');
+                        const color = isCRD ? 'pink' : (isFUSI ? 'orange' : 'blue');
                         return (
                           <div key={unit.id} className="flex items-center gap-3">
-                            <div className={`w-4 h-4 rounded-md shadow-sm flex-shrink-0 ${isCRD ? 'bg-pink-500' : 'bg-blue-500'}`}></div>
+                            <div className={`w-4 h-4 rounded-md shadow-sm flex-shrink-0`} style={{ backgroundColor: COLOR_MAP[color] }}></div>
                             <span className="text-[9px] font-black text-slate-700 uppercase">{unit.id.split('-')[1]}</span>
                           </div>
                         );
@@ -295,7 +294,6 @@ const App: React.FC = () => {
                   </div>
                </div>
 
-               {/* Grid de Meses */}
                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                  {monthsList.map(monthStr => {
                    const [year, month] = monthStr.split('-').map(Number);
@@ -329,18 +327,20 @@ const App: React.FC = () => {
                               const dateNum = parseInt(day.split('-')[2]);
                               const isSunday = idx % 7 === 0;
 
-                              // Estilo condicional para suporte a cores divididas
                               let cellStyle: React.CSSProperties = { color: '#ffffff' };
                               const hasCRD = dayMarkings.includes('pink');
                               const hasLIDT = dayMarkings.includes('blue');
+                              const hasFUSI = dayMarkings.includes('orange');
 
                               if (dayMarkings.length === 0) {
                                 cellStyle = { color: isSunday ? '#ef4444' : '#1e293b' };
                               } else if (hasCRD && hasLIDT) {
-                                // CRD à esquerda (Rosa), LIDT à direita (Azul)
                                 cellStyle.background = `linear-gradient(to right, ${COLOR_MAP.pink} 50%, ${COLOR_MAP.blue} 50%)`;
+                              } else if (hasFUSI && hasLIDT) {
+                                cellStyle.background = `linear-gradient(to right, ${COLOR_MAP.orange} 50%, ${COLOR_MAP.blue} 50%)`;
+                              } else if (hasFUSI && hasCRD) {
+                                cellStyle.background = `linear-gradient(to right, ${COLOR_MAP.orange} 50%, ${COLOR_MAP.pink} 50%)`;
                               } else {
-                                // Cor sólida
                                 cellStyle.backgroundColor = COLOR_MAP[dayMarkings[0]] || '#cbd5e1';
                               }
 
