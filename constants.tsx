@@ -28,106 +28,15 @@ const CRD_SCHEDULE = [
 ];
 
 const FULL_KNOWLEDGE_CRD = [
-  { 
-    topic: '1. Metrologia', 
-    subtopics: [
-      'I. Definição', 
-      'II. Características', 
-      'III. Aplicações', 
-      'IV. Terminologia (Vocabulário Internacional de Metrologia - VIM)'
-    ] 
-  },
-  { 
-    topic: '2. Erros de medição', 
-    subtopics: [
-      'I. Tipos', 
-      'I.I. Aleatório', 
-      'I.I. Sistemático', 
-      'I.I. Grosseiro', 
-      'II. Fontes de erro', 
-      'I.I. Variação da temperatura', 
-      'I.I. Paralaxe', 
-      'I.I. Força de medição', 
-      'I.I. Complexidade da peça', 
-      'I.I. Condições do Instrumento', 
-      'I.I. Processos de correção', 
-      'I.I. Calibração do Instrumento'
-    ] 
-  },
-  { 
-    topic: '3. Escala', 
-    subtopics: [
-      'I. Tipos', 
-      'II. Características', 
-      'III. Leitura', 
-      'I.I. Sistema métrico', 
-      'I.I. Sistema Inglês', 
-      'IV. Conversão entre sistemas de medida', 
-      'V. Erros de leitura', 
-      'VI. Utilização'
-    ] 
-  },
-  { 
-    topic: '4. Trena', 
-    subtopics: [
-      'I. Tipos', 
-      'II. Características', 
-      'III. Leitura no sistema métrico', 
-      'IV. Erros de leitura', 
-      'V. Utilização'
-    ] 
-  },
-  { 
-    topic: '5. Paquímetros', 
-    subtopics: [
-      'I. Tipos', 
-      'II. Características', 
-      'III. Leitura', 
-      'I.I. Sistema métrico', 
-      'I.I. Sistema Inglês', 
-      'IV. Erros de leitura', 
-      'V. Utilização'
-    ] 
-  },
-  { 
-    topic: '6. Micrômetros', 
-    subtopics: [
-      'I. Tipos', 
-      'II. Características', 
-      'III. Leitura no sistema métrico', 
-      'IV. Erros de leitura', 
-      'V. Ajuste zero', 
-      'VI. Utilização'
-    ] 
-  },
-  { 
-    topic: '7. Verificadores', 
-    subtopics: [
-      'I. Tipos', 
-      'I.I. Folga', 
-      'I.I. Raio', 
-      'I.I. Rosca', 
-      'II. Utilização'
-    ] 
-  },
-  { 
-    topic: '8. Relógios comparadores e apalpadores', 
-    subtopics: [
-      'I. Tipos', 
-      'II. Características', 
-      'III. Ajuste zero', 
-      'IV. Utilização'
-    ] 
-  },
-  { 
-    topic: '9. Goniômetro', 
-    subtopics: [
-      'I. Tipos', 
-      'II. Características', 
-      'III. Erros de leitura', 
-      'IV. Utilização'
-    ] 
-  }
+  { topic: '1. Metrologia', subtopics: ['I. Definição', 'II. Características', 'III. Aplicações', 'IV. Terminologia (Vocabulário Internacional de Metrologia - VIM)'] },
+  { topic: '2. Erros de medição', subtopics: ['I. Tipos', 'I.I. Aleatório', 'I.I. Sistemático', 'I.I. Grosseiro', 'II. Fontes de erro', 'I.I. Variação da temperatura', 'I.I. Paralaxe', 'I.I. Força de medição', 'I.I. Complexidade da peça', 'I.I. Condições do Instrumento', 'I.I. Processos de correção', 'I.I. Calibração do Instrumento'] },
+  { topic: '3. Escala', subtopics: ['I. Tipos', 'II. Características', 'III. Leitura', 'I.I. Sistema métrico', 'I.I. Sistema Inglês', 'IV. Conversão entre sistemas de medida', 'V. Erros de leitura', 'VI. Utilização'] },
+  { topic: '4. Trena', subtopics: ['I. Tipos', 'II. Características', 'III. Leitura no sistema métrico', 'IV. Erros de leitura', 'V. Utilização'] },
+  { topic: '5. Paquímetros', subtopics: ['I. Tipos', 'II. Características', 'III. Leitura', 'I.I. Sistema métrico', 'I.I. Sistema Inglês', 'IV. Erros de leitura', 'V. Utilização'] },
+  { topic: '6. Micrômetros', subtopics: ['I. Tipos', 'II. Características', 'III. Leitura no sistema métrico', 'IV. Erros de leitura', 'V. Ajuste zero', 'VI. Utilização'] },
+  { topic: '7. Verificadores', subtopics: ['I. Tipos', 'I.I. Folga', 'I.I. Raio', 'I.I. Rosca', 'II. Utilização'] },
+  { topic: '8. Relógios comparadores e apalpadores', subtopics: ['I. Tipos', 'II. Características', 'III. Ajuste zero', 'IV. Utilização'] },
+  { topic: '9. Goniômetro', subtopics: ['I. Tipos', 'II. Características', 'III. Erros de leitura', 'IV. Utilização'] }
 ];
 
 const FULL_CAPACITIES_CRD = [
@@ -148,34 +57,10 @@ const FULL_SOCIOEMOCIONAL_CRD = [
 ];
 
 const FULL_RUBRICS_CRD = [
-  { 
-    capacity: 'Medir peças com paquímetro.', 
-    nsa: 'Tenta medir, mas comete erros grosseiros na leitura da escala ou no manuseio.', 
-    apo: 'Realiza a medição com auxílio, cometendo erros pontuais na leitura do nônio ou no manuseio.', 
-    par: 'Mede a peça de forma autônoma e correta, aplicando as técnicas de manuseio e leitura.', 
-    aut: 'Mede com precisão e rapidez, identificando potenciais fontes de erro (paralaxe, etc).' 
-  },
-  { 
-    capacity: 'Medir peças com micrômetro.', 
-    nsa: 'Comete erros no posicionamento do instrumento ou na leitura, necessitando orientação inicial.', 
-    apo: 'Realiza a medição com auxílio do docente na soma das escalas ou no uso da catraca.', 
-    par: 'Realiza a medição de forma correta e autônoma, utilizando a catraca periodicamente.', 
-    aut: 'Argumenta sobre a adequação do micrômetro para a tolerância solicitada e identifica erros térmicos.' 
-  },
-  { 
-    capacity: 'Demonstrar atenção a detalhes.', 
-    nsa: 'O relatório de inspeção apresenta múltiplos erros de transcrição e omissões. Não identifica as peças não conformes.', 
-    apo: 'O relatório apresenta erros pontuais ou omissões. Identifica algumas, mas não todas, as peças não conformes.', 
-    par: 'Preenche o relatório de forma correta e completa, identificando todas as peças não conformes.', 
-    aut: 'Além de preencher o relatório corretamente, anota observações pertinentes sobre o acabamento da peça ou tendências de medidas que se aproximam dos limites de tolerância.' 
-  },
-  { 
-    capacity: 'Organizar o ambiente de trabalho e as atividades.', 
-    nsa: 'Deixa a bancada e os instrumentos desorganizados e sujos durante e após a atividade.', 
-    apo: 'Necessita de lembretes para organizar a bancada ou para limpar e guardar os instrumentos corretamente.', 
-    par: 'Mantém o ambiente de trabalho organizado e guarda os equipamentos corretamente ao final da tarefa, por iniciativa própria.', 
-    aut: 'Além de manter seu próprio espaço organizado, incentiva os colegas a fazerem o mesmo e propõe melhorias na disposição das ferramentas para otimizar o fluxo de trabalho.' 
-  }
+  { capacity: 'Medir peças com paquímetro.', nsa: 'Tenta medir, mas comete erros grosseiros na leitura da escala ou no manuseio.', apo: 'Realiza a medição com auxílio, cometendo erros pontuais na leitura do nônio ou no manuseio.', par: 'Mede a peça de forma autônoma e correta, aplicando as técnicas de manuseio e leitura.', aut: 'Mede com precisão e rapidez, identificando potenciais fontes de erro (paralaxe, etc).' },
+  { capacity: 'Medir peças com micrômetro.', nsa: 'Comete erros no posicionamento do instrumento ou na leitura, necessitando orientação inicial.', apo: 'Realiza a medição com auxílio do docente na soma das escalas ou no uso da catraca.', par: 'Realiza a medição de forma correta e autônoma, utilizando a catraca periodicamente.', aut: 'Argumenta sobre a adequação do micrômetro para a tolerância solicitada e identifica erros térmicos.' },
+  { capacity: 'Demonstrar atenção a detalhes.', nsa: 'O relatório de inspeção apresenta múltiplos erros de transcrição e omissões. Não identifica as peças não conformes.', apo: 'O relatório apresenta erros pontuais ou omissões. Identifica algumas, mas não todas, as peças não conformes.', par: 'Preenche o relatório de forma correta e completa, identificando todas as peças não conformes.', aut: 'Além de preencher o relatório corretamente, anota observações pertinentes sobre o acabamento da peça ou tendências de medidas que se aproximam dos limites de tolerância.' },
+  { capacity: 'Organizar o ambiente de trabalho e as atividades.', nsa: 'Deixa a bancada e os instrumentos desorganizados e sujos durante e após a atividade.', apo: 'Necessita de lembretes para organizar a bancada ou para limpar e guardar os instrumentos corretamente.', par: 'Mantém o ambiente de trabalho organizado e guarda os equipamentos corretamente ao final da tarefa, por iniciativa própria.', aut: 'Além de manter seu próprio espaço organizado, incentiva os colegas a fazerem o mesmo e propõe melhorias na disposição das ferramentas para otimizar o fluxo de trabalho.' }
 ];
 
 const COMMON_SA_CRD = [
@@ -193,17 +78,97 @@ const COMMON_SA_CRD = [
   }
 ];
 
-const COMMON_CAPACITIES_LIDT = [
-  'I. Interpretar desenhos técnicos de peças a partir de projetos da metalmecânica.',
-  'II. Elaborar croquis de peças em projeção ortogonal e em perspectiva à mão livre.',
-  'III. Interpretar desenho técnico de montagem de conjunto e subconjuntos.',
-  'IV. Interpretar tolerância dimensional, geométrica e de acabamento superficial.'
+// --- NOVOS CONTEÚDOS LIDT TRANSCRITOS DOS PRINTS ---
+
+const FULL_CAPACITIES_LIDT = [
+  '1. Interpretar desenhos técnicos de peças a partir de projetos da metalmecânica.',
+  '2. Elaborar croquis de peças em projeção ortogonal e em perspectiva à mão livre, a partir de modelos.',
+  '3. Interpretar desenho técnico de montagem de conjunto e subconjuntos a partir de projetos da metalmecânica.',
+  '4. Interpretar tolerância dimensional, geométrica e de acabamento superficial em desenho técnico.'
 ];
 
-const COMMON_KNOWLEDGE_LIDT = [
-  { topic: 'I. Desenho Técnico', subtopics: ['Normas técnicas (ABNT)', 'Formatos e Legendas', 'Escalas', 'Linhas'] },
-  { topic: 'II. Projeções Ortogonais', subtopics: ['1º e 3º Diedros', 'Vistas essenciais', 'Vistas auxiliares'] },
-  { topic: 'III. Cortes e Seções', subtopics: ['Corte total', 'Meio corte', 'Corte parcial', 'Seções'] }
+const FULL_SOCIOEMOCIONAL_LIDT = [
+  'Pensamento analítico: 1. Demonstrar atenção a detalhes',
+  'Pensamento analítico: 2. Demonstrar senso crítico',
+  'Trabalho em equipe: 1. Demonstrar escuta ativa'
+];
+
+const FULL_KNOWLEDGE_LIDT = [
+  {
+    topic: '1. Desenho técnico',
+    subtopics: [
+      '1.1. Definição',
+      '1.2. Normas técnicas',
+      '1.2.1. Primeiro diedro',
+      '1.2.2. Terceiro diedro',
+      '1.3. Formatos e dimensões das folhas',
+      '1.4. Linhas',
+      '1.5. Escalas',
+      '1.6. Figuras e sólidos geométricos',
+      '1.6.1. Superfície e figura plana',
+      '1.6.2. Cubo, pirâmide e prisma',
+      '1.6.3. Cilindro, cone e esfera'
+    ]
+  },
+  {
+    topic: '2. Projeções ortogonais (Repetição no print como Desenho Técnico 2.1 a 2.6)',
+    subtopics: [
+      '2.1. Definição',
+      '2.2. Normas técnicas (1º e 3º Diedros)',
+      '2.3. Formatos e dimensões das folhas',
+      '2.4. Linhas',
+      '2.5. Escalas',
+      '2.6. Figuras e sólidos geométricos'
+    ]
+  },
+  {
+    topic: '3. Tipos de corte',
+    subtopics: [
+      '3.1. Corte total',
+      '3.2. Meio corte',
+      '3.3. Corte composto',
+      '3.4. Corte parcial',
+      '3.5. Seção',
+      '3.6. Omissão de corte',
+      '3.7. Encurtamento'
+    ]
+  },
+  {
+    topic: '4. Vistas especiais',
+    subtopics: [
+      '4.1. Vistas auxiliares',
+      '4.2. Rotação de elemento oblíquo'
+    ]
+  },
+  {
+    topic: '5. Desenho de conjuntos',
+    subtopics: [
+      '5.1. Representação de elementos de máquina',
+      '5.1.1. Elementos padronizados',
+      '5.1.2. Elementos de fixação',
+      '5.1.3. Elementos de transmissão',
+      '5.2. Vista explodida',
+      '5.3. Lista de materiais',
+      '5.4. Balões de identificação'
+    ]
+  },
+  {
+    topic: '6. Tolerâncias',
+    subtopics: [
+      '6.1. Tolerância dimensional',
+      '6.1.1. Campos de tolerância',
+      '6.1.2. Sistemas de ajustes e tolerância ISO',
+      '6.2. Tolerância geométrica',
+      '6.2.1. De forma e posição',
+      '6.2.2. De orientação',
+      '6.2.3. De batimento',
+      '6.3. Acabamento superficial',
+      '6.3.1. Rugosidade',
+      '6.3.2. Tratamento',
+      '6.3.3. Recartilhado',
+      '6.3.4. Sobremetal'
+    ]
+  }
 ];
 
 export const SAMPLE_PLANS: TeachingPlan[] = [
@@ -223,9 +188,9 @@ export const SAMPLE_PLANS: TeachingPlan[] = [
         id: 'uc-lidt-beretella',
         name: 'LEITURA E INTERPRETAÇÃO DE DESENHO TÉCNICO',
         calendar: { startDate: '2026-01-26', endDate: '2026-06-15', markings: [] },
-        basicCapacities: COMMON_CAPACITIES_LIDT,
-        socioemocionalCapacities: ['Atenção a detalhes', 'Senso crítico', 'Escuta ativa'],
-        knowledge: COMMON_KNOWLEDGE_LIDT,
+        basicCapacities: FULL_CAPACITIES_LIDT,
+        socioemocionalCapacities: FULL_SOCIOEMOCIONAL_LIDT,
+        knowledge: FULL_KNOWLEDGE_LIDT,
         learningSituations: [],
         rubrics: [],
         schedule: []
@@ -259,9 +224,9 @@ export const SAMPLE_PLANS: TeachingPlan[] = [
         id: 'uc-lidt-gea',
         name: 'LEITURA E INTERPRETAÇÃO DE DESENHO TÉCNICO',
         calendar: { startDate: '2026-01-26', endDate: '2026-06-15', markings: [] },
-        basicCapacities: COMMON_CAPACITIES_LIDT,
-        socioemocionalCapacities: ['Atenção a detalhes', 'Senso crítico'],
-        knowledge: COMMON_KNOWLEDGE_LIDT,
+        basicCapacities: FULL_CAPACITIES_LIDT,
+        socioemocionalCapacities: FULL_SOCIOEMOCIONAL_LIDT,
+        knowledge: FULL_KNOWLEDGE_LIDT,
         learningSituations: [],
         rubrics: [],
         schedule: []
