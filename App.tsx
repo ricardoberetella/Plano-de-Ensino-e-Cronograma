@@ -23,14 +23,17 @@ const App: React.FC = () => {
     try {
       const dbPlans = await FirebaseService.getPlans(profileId);
       
-      // Se não houver planos no Firebase OU se o plano principal estiver sem situações de aprendizagem (vazio),
-      // forçamos o carregamento das constantes.
+      // Detecção de necessidade de inicialização:
+      // Se não houver planos OU se as unidades de LIDT/CRD estiverem sem Situações ou Rubricas,
+      // forçamos o carregamento das constantes atualizadas.
       const needsInit = !dbPlans || dbPlans.length === 0 || 
-                        dbPlans.some(p => p.units.some(u => u.learningSituations.length === 0));
+                        dbPlans.some(p => p.units.some(u => u.learningSituations.length === 0 || u.rubrics.length === 0));
 
       if (needsInit) {
+        // Encontra o plano base nas constantes para o perfil atual
+        const template = SAMPLE_PLANS.find(p => p.profileId === profileId) || SAMPLE_PLANS[0];
         const defaultPlan = { 
-          ...SAMPLE_PLANS[0], 
+          ...template, 
           id: `plan-usinagem-${profileId}`, 
           profileId: profileId,
           updatedAt: new Date().toISOString()
@@ -84,8 +87,9 @@ const App: React.FC = () => {
   const handleResetPlan = async (planId: string) => {
     setIsLoading(true);
     try {
+      const template = SAMPLE_PLANS.find(p => p.profileId === activeProfileId) || SAMPLE_PLANS[0];
       const templatePlan = { 
-        ...SAMPLE_PLANS[0], 
+        ...template, 
         id: planId, 
         profileId: activeProfileId,
         updatedAt: new Date().toISOString()
