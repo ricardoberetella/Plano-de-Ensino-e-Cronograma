@@ -138,7 +138,8 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar 
       capacities: 'Nova Capacidade',
       knowledge: 'Novo Conhecimento',
       strategy: 'Estratégia Docente',
-      resources: 'Recursos'
+      resources: 'Recursos',
+      completed: false
     };
     const updated = [...localSchedule, newEntry];
     setLocalSchedule(updated);
@@ -373,30 +374,53 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar 
                   </thead>
                   <tbody className="text-[10px] md:text-[11px] divide-y divide-slate-100">
                     {localSchedule.map(entry => (
-                      <tr key={entry.id} className="hover:bg-slate-50">
+                      <tr 
+                        key={entry.id} 
+                        className={`transition-all duration-300 ${entry.completed ? '' : 'hover:bg-slate-50'}`}
+                        style={entry.completed ? { backgroundColor: COLOR_MAP[scheduleColor], color: '#ffffff' } : {}}
+                      >
                         <td className="p-4 border-r border-slate-100 align-top">
-                           <input 
-                             type="text"
-                             value={entry.date}
-                             onChange={(e) => updateEntry(entry.id, 'date', e.target.value)}
-                             className="w-full bg-slate-100 font-black text-blue-600 p-2 rounded-lg mb-2 text-center"
-                             placeholder="DD/MM/AAAA"
-                           />
+                           <div className="flex items-center gap-2 mb-2">
+                             <button 
+                               onClick={() => updateEntry(entry.id, 'completed', !entry.completed)}
+                               title={entry.completed ? "Desmarcar aula" : "Marcar como realizada"}
+                               className={`w-5 h-5 rounded-full border-2 flex-shrink-0 transition-all shadow-sm flex items-center justify-center ${
+                                 entry.completed 
+                                   ? 'bg-white border-white text-slate-900' 
+                                   : 'border-slate-300 hover:border-slate-400 bg-white'
+                               }`}
+                             >
+                               {entry.completed && <div className="w-2 h-2 rounded-full bg-current"></div>}
+                             </button>
+                             <input 
+                               type="text"
+                               value={entry.date}
+                               onChange={(e) => updateEntry(entry.id, 'date', e.target.value)}
+                               className={`w-full font-black p-2 rounded-lg text-center transition-colors ${
+                                 entry.completed ? 'bg-white/20 text-white placeholder:text-white/50' : 'bg-slate-100 text-blue-600'
+                               }`}
+                               placeholder="DD/MM/AAAA"
+                             />
+                           </div>
                            <div className="flex items-center justify-center gap-2">
                              <input 
                                type="number"
                                value={entry.hours}
                                onChange={(e) => updateEntry(entry.id, 'hours', parseInt(e.target.value) || 0)}
-                               className="w-12 bg-white border border-slate-200 text-slate-800 font-black p-1 rounded-lg text-center"
+                               className={`w-12 border font-black p-1 rounded-lg text-center transition-colors ${
+                                 entry.completed ? 'bg-white/20 border-white/30 text-white' : 'bg-white border-slate-200 text-slate-800'
+                               }`}
                              />
-                             <span className="text-[8px] font-black text-slate-400 uppercase">Horas</span>
+                             <span className={`text-[8px] font-black uppercase transition-colors ${entry.completed ? 'text-white/70' : 'text-slate-400'}`}>Horas</span>
                            </div>
                         </td>
                         <td className="p-4 border-r border-slate-100 align-top">
                            <textarea 
                              value={entry.capacities}
                              onChange={(e) => updateEntry(entry.id, 'capacities', e.target.value)}
-                             className="w-full bg-transparent text-slate-700 font-bold resize-none outline-none focus:bg-white p-1 rounded-lg min-h-[80px]"
+                             className={`w-full bg-transparent font-bold resize-none outline-none p-1 rounded-lg min-h-[80px] transition-colors ${
+                               entry.completed ? 'text-white placeholder:text-white/50' : 'text-slate-700 focus:bg-white'
+                             }`}
                              rows={4}
                            />
                         </td>
@@ -404,7 +428,9 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar 
                            <textarea 
                              value={entry.knowledge}
                              onChange={(e) => updateEntry(entry.id, 'knowledge', e.target.value)}
-                             className="w-full bg-transparent text-slate-600 font-medium resize-none outline-none focus:bg-white p-1 rounded-lg min-h-[80px]"
+                             className={`w-full bg-transparent font-medium resize-none outline-none p-1 rounded-lg min-h-[80px] transition-colors ${
+                               entry.completed ? 'text-white/90 placeholder:text-white/50' : 'text-slate-600 focus:bg-white'
+                             }`}
                              rows={4}
                            />
                         </td>
@@ -412,19 +438,26 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar 
                            <textarea 
                              value={entry.strategy}
                              onChange={(e) => updateEntry(entry.id, 'strategy', e.target.value)}
-                             className="w-full bg-transparent font-black text-slate-900 outline-none focus:bg-white p-1 rounded-lg mb-2"
+                             className={`w-full bg-transparent font-black outline-none p-1 rounded-lg mb-2 transition-colors ${
+                               entry.completed ? 'text-white placeholder:text-white/50' : 'text-slate-900 focus:bg-white'
+                             }`}
                              placeholder="Estratégia docente..."
                            />
                            <input 
                              type="text"
                              value={entry.resources}
                              onChange={(e) => updateEntry(entry.id, 'resources', e.target.value)}
-                             className="w-full bg-slate-50 text-[9px] text-slate-400 font-black p-2 rounded-lg"
+                             className={`w-full text-[9px] font-black p-2 rounded-lg transition-colors ${
+                               entry.completed ? 'bg-white/10 text-white/80 placeholder:text-white/50' : 'bg-slate-50 text-slate-400'
+                             }`}
                              placeholder="Recursos/Ambientes"
                            />
                         </td>
                         <td className="p-4 text-center">
-                           <button onClick={() => removeEntry(entry.id)} className="text-slate-300 hover:text-red-500">
+                           <button 
+                             onClick={() => removeEntry(entry.id)} 
+                             className={`transition-colors ${entry.completed ? 'text-white/40 hover:text-white' : 'text-slate-300 hover:text-red-500'}`}
+                           >
                               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                            </button>
                         </td>

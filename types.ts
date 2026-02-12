@@ -31,6 +31,7 @@ export interface ScheduleEntry {
   knowledge: string;
   strategy: string;
   resources: string;
+  completed?: boolean;
 }
 
 export interface LearningSituation {
