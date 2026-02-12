@@ -171,6 +171,21 @@ const FULL_KNOWLEDGE_LIDT = [
   }
 ];
 
+const COMMON_SA_LIDT = [
+  {
+    id: 'sa-lidt-integrada',
+    title: 'Situação-problema: Dispositivo de furação - Interpretando e detalhando componentes Mecânicos',
+    context: 'A "Usinatec Soluções Industriais" é uma empresa de médio porte especializada na fabricação de componentes e conjuntos mecânicos sob encomenda. Recentemente, a empresa fechou um contrato para a produção de um lote de morsas de bancada (torno de bancada) para um novo cliente, uma renomada escola técnica. O departamento de engenharia finalizou o projeto completo do conjunto, mas, antes de liberar a documentação para a oficina, o gestor de produção solicitou que a equipe de aprendizes do setor de planejamento realize uma análise técnica detalhada dos desenhos. Vocês, atuando como aprendizes de Mecânico de Usinagem, foram organizados em equipes e receberam o conjunto de desenhos técnicos do dispositivo de furação. A tarefa de vocês é garantir que toda a informação contida nos desenhos seja compreendida em sua totalidade, evitando erros de fabricação, retrabalho e desperdício de material, que poderiam comprometer o prazo de entrega e a lucratividade do projeto. O sucesso desta análise preliminar demonstrará a competência da equipe para interpretar projetos complexos e prepará-los para a produção.',
+    challenge: 'Cada equipe receberá o projeto completo do dispositivo de furação, contendo o desenho de conjunto, subconjuntos e os desenhos de detalhes de cada componente. O desafio de vocês é elaborar um Dossiê Técnico de Análise de Projeto. Para isso, vocês deverão: a) Analisar o Desenho de Conjunto: Interpretar o desenho de montagem principal para entender o funcionamento da morsa, identificar cada um dos seus componentes por meio da lista de materiais e dos balões de identificação, e compreender como eles se relacionam. b) Elaborar Croquis Detalhados: Escolher três componentes-chave do dispositivo e, a partir da análise dos seus desenhos de detalhe, elaborar croquis à mão livre para cada um. Os croquis devem conter: - Representação em projeção ortogonal (vistas frontal, superior e lateral) e uma perspectiva isométrica. - Aplicação correta das normas de desenho técnico (tipos de linhas, cotagem, etc.). c) Interpretar especificações: - Para um dos componentes que vocês fizeram o croqui, criar uma "Ficha de Análise Crítica" que identifique e explique o significado prático de todas as especificações de tolerância (dimensional e geométrica) e de acabamento superficial (rugosidade) presentes no desenho. Vocês devem justificar por que cada uma dessas especificações é importante para a montagem e o funcionamento correto da peça no conjunto final.',
+    expectedResults: [
+      'a) Relatório de Interpretação do Conjunto: Um texto curto descrevendo a função do dispositivo de furação, listando seus principais componentes e explicando a função de cada um dentro do mecanismo.',
+      'b) Folhas de Croquis: Desenhos à mão livre, claros e legíveis, dos três componentes selecionados, executados em folhas padronizadas, seguindo as normas técnicas de representação e cotagem.',
+      'c) Ficha de Análise: Uma tabela ou documento detalhando, para um dos componentes, as tolerâncias e os acabamentos superficiais identificados, com uma coluna explicando o impacto de cada especificação no processo de usinagem e na funcionalidade da peça (ex: "A tolerância de paralelismo entre as faces X e Y garante que o dispositivo deslize sem travar"; "A rugosidade na face de contato é necessária para garantir o atrito e a fixação da peça a ser usinada").',
+      '7. Este dossiê será a evidência do desenvolvimento das capacidades de leitura, interpretação e representação de projetos mecânicos, demonstrando que a equipe está apta a compreender as informações técnicas essenciais para a fabricação de um produto.'
+    ]
+  }
+];
+
 export const SAMPLE_PLANS: TeachingPlan[] = [
   {
     id: 'plan-usinagem-beretella',
@@ -191,7 +206,7 @@ export const SAMPLE_PLANS: TeachingPlan[] = [
         basicCapacities: FULL_CAPACITIES_LIDT,
         socioemocionalCapacities: FULL_SOCIOEMOCIONAL_LIDT,
         knowledge: FULL_KNOWLEDGE_LIDT,
-        learningSituations: [],
+        learningSituations: COMMON_SA_LIDT,
         rubrics: [],
         schedule: []
       },
@@ -227,7 +242,7 @@ export const SAMPLE_PLANS: TeachingPlan[] = [
         basicCapacities: FULL_CAPACITIES_LIDT,
         socioemocionalCapacities: FULL_SOCIOEMOCIONAL_LIDT,
         knowledge: FULL_KNOWLEDGE_LIDT,
-        learningSituations: [],
+        learningSituations: COMMON_SA_LIDT,
         rubrics: [],
         schedule: []
       },
