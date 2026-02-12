@@ -103,7 +103,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar 
     blueMarkings.forEach(blue => {
       const idx = combined.findIndex(m => m.date === blue.date);
       if (idx >= 0) {
-        combined[idx] = blue; // Prioridade para a cor azul do cronograma
+        combined[idx] = blue; // Prioridade absoluta para a cor azul do cronograma
       } else {
         combined.push(blue);
       }
@@ -146,7 +146,6 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar 
 
     // REGRA DE OURO: Se a data já é azul (cronograma), não permite marcar verde por cima
     if (scheduleDates.includes(date)) {
-      console.warn("Ação bloqueada: Esta data pertence ao Cronograma de Aulas.");
       return;
     }
 
@@ -196,7 +195,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar 
     const current = new Date(start.getFullYear(), start.getMonth(), 1);
     while (current <= end) {
       months.push(current.toISOString().substring(0, 7));
-      current.setMonth(current.setMonth() + 1); // Fix increment logic
+      current.setMonth(current.getMonth() + 1); // CORREÇÃO: Incremento correto do mês
       current.setDate(1);
     }
     return months;
@@ -463,7 +462,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar 
                   className="w-full md:w-auto bg-slate-900 text-white px-10 py-5 rounded-[2rem] text-[10px] font-black uppercase tracking-widest hover:bg-blue-600 shadow-2xl transition-all flex items-center justify-center gap-3 active:scale-95"
                 >
                   {isSaving ? <div className="w-4 h-4 border-2 border-slate-500 border-t-white rounded-full animate-spin"></div> : <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>}
-                  {isSaving ? 'Sincronizando...' : 'Gravar Alterações'}
+                  {isSaving ? 'Gravando...' : 'Gravar Alterações'}
                 </button>
               </div>
 
