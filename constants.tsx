@@ -27,19 +27,39 @@ const CRD_SCHEDULE = [
   { id: 'c20', date: '23/06/2026', hours: 2, capacities: 'Todas as capacidades técnicas e socioemocionais da SA.', knowledge: 'Todos os conhecimentos da SA.', strategy: 'Feedback final sobre o desempenho na SA. Autoavaliação e fechamento da Unidade Curricular.', resources: 'Sala de aula, instrumentos de avaliação preenchidos.' }
 ];
 
-const COMMON_SA = [
+const COMMON_SA_CRD = [
   {
     id: 'sa-crd-integrada',
     title: 'Precisão em Foco: Verificação de Componentes para a Linha de Montagem',
-    context: 'A "UsiPrecision Componentes Mecânicos Ltda." é uma empresa de médio porte, com 150 funcionários, especializada na fabricação de peças usinadas para a indústria automotiva e de máquinas agrícolas. Recentemente, a empresa tem enfrentado um aumento no índice de devoluções de um de seus principais clientes. O motivo alegado é a inconsistência dimensional em lotes de "Pinos de Ancoragem", componentes críticos para a montagem de um sistema de transmissão. O gestor da Qualidade identificou que a causa raiz do problema pode estar na falta de um procedimento padronizado de medição e na variação de critérios entre os inspetores do turno. Para resolver essa não conformidade e garantir a satisfação do cliente, a empresa decidiu investir na capacitação de sua equipe, começando pelos novos aprendizes. Vocês, como parte da nova equipe de controle dimensional, foram designados para uma tarefa importantíssima: estabelecer um método de inspeção confiável para garantir que 100% das peças enviadas ao cliente estejam rigorosamente dentro das especificações do desenho técnico. A sua atuação será fundamental para restaurar a confiança do cliente e evitar prejuízos com refugo e retrabalho. O ambiente de trabalho será a bancada de inspeção do laboratório de metrologia, que simula a estação de controle de qualidade da UsiPrecision.',
-    challenge: 'Vocês receberam um lote piloto de 10 "Pinos de Ancoragem" e o respectivo desenho técnico. A sua missão é realizar uma inspeção dimensional completa em cada uma das peças para determinar se o lote pode ser aprovado para envio ao cliente. Para isso, vocês deverão: a) Analisar o Desenho Técnico; b) Planejar a Inspeção (definir sequência e instrumentos); c) Executar as Medições aplicando as técnicas corretas; d) Registrar os Dados no Relatório; e) Emitir o Parecer (Aprovado ou Reprovado) justificando a decisão.',
+    context: 'A "UsiPrecision Componentes Mecânicos Ltda." é uma empresa de médio porte, especializada na fabricação de peças usinadas para a indústria automotiva. Recentemente, a empresa tem enfrentado um aumento no índice de devoluções devido à inconsistência dimensional em lotes de "Pinos de Ancoragem". O gestor da Qualidade identificou que a causa raiz do problema pode estar na falta de um procedimento padronizado de medição. Como parte da nova equipe de controle dimensional, sua missão é estabelecer um método de inspeção confiável.',
+    challenge: 'Vocês receberam um lote piloto de 10 "Pinos de Ancoragem" e o respectivo desenho técnico. Deverão: a) Analisar o Desenho Técnico; b) Planejar a Inspeção; c) Executar as Medições; d) Registrar os Dados no Relatório; e) Emitir o Parecer.',
     expectedResults: [
-      'Relatórios de Inspeção Dimensional: Um relatório para cada peça inspecionada, devidamente preenchido, com todas as medições e o parecer final claramente justificado.',
-      'Demonstração Prática: Habilidade no manuseio correto e seguro de todos os instrumentos (escala, trena, paquímetro, micrômetro, verificadores, relógios e goniômetro).',
-      'Argumentação Técnica: Capacidade de explicar oralmente o processo e defender as decisões de aprovação ou reprovação.',
-      'Organização do Posto de Trabalho: Bancada limpa e organizada, com instrumentos guardados em seus estojos ao término da atividade.'
+      'Relatórios de Inspeção Dimensional completos.',
+      'Habilidade no manuseio correto e seguro dos instrumentos.',
+      'Argumentação Técnica sobre as decisões de aprovação/reprovação.',
+      'Zelo e organização com os equipamentos do laboratório.'
     ]
   }
+];
+
+const COMMON_RUBRICS_CRD = [
+  { capacity: 'Medir peças com escala e trena', nsa: 'Comete erros de leitura acima de 1mm.', apo: 'Realiza a leitura com auxílio constante.', par: 'Mede de forma autônoma com precisão.', aut: 'Identifica desgaste no instrumento.' },
+  { capacity: 'Medir peças com paquímetro (0,05 e 0,02)', nsa: 'Não identifica o nônio.', apo: 'Lê medidas com auxílio de colegas.', par: 'Realiza leituras precisas sem erro de paralaxe.', aut: 'Verifica o erro de zero e calibração.' },
+  { capacity: 'Medir peças com micrômetro (0,01)', nsa: 'Derruba ou força o instrumento.', apo: 'Mede sem usar a catraca corretamente.', par: 'Realiza medição perfeita usando a catraca.', aut: 'Interpreta variações térmicas na medição.' },
+  { capacity: 'Zelo e Organização', nsa: 'Deixa instrumentos fora do estojo.', apo: 'Organiza após solicitação.', par: 'Mantém o posto limpo e organizado.', aut: 'Promove a organização entre os colegas.' }
+];
+
+const COMMON_CAPACITIES_LIDT = [
+  'I. Interpretar desenhos técnicos de peças a partir de projetos da metalmecânica.',
+  'II. Elaborar croquis de peças em projeção ortogonal e em perspectiva à mão livre.',
+  'III. Interpretar desenho técnico de montagem de conjunto e subconjuntos.',
+  'IV. Interpretar tolerância dimensional, geométrica e de acabamento superficial.'
+];
+
+const COMMON_KNOWLEDGE_LIDT = [
+  { topic: 'I. Desenho Técnico', subtopics: ['Normas técnicas (ABNT)', 'Formatos e Legendas', 'Escalas', 'Linhas'] },
+  { topic: 'II. Projeções Ortogonais', subtopics: ['1º e 3º Diedros', 'Vistas essenciais', 'Vistas auxiliares'] },
+  { topic: 'III. Cortes e Seções', subtopics: ['Corte total', 'Meio corte', 'Corte parcial', 'Seções'] }
 ];
 
 export const SAMPLE_PLANS: TeachingPlan[] = [
@@ -59,9 +79,9 @@ export const SAMPLE_PLANS: TeachingPlan[] = [
         id: 'uc-lidt-beretella',
         name: 'LEITURA E INTERPRETAÇÃO DE DESENHO TÉCNICO',
         calendar: { startDate: '2026-01-26', endDate: '2026-06-15', markings: [] },
-        basicCapacities: ['I. Interpretar desenhos técnicos', 'II. Elaborar croquis', 'III. Interpretar montagem', 'IV. Interpretar tolerâncias'],
+        basicCapacities: COMMON_CAPACITIES_LIDT,
         socioemocionalCapacities: ['Atenção a detalhes', 'Senso crítico', 'Escuta ativa'],
-        knowledge: [{ topic: 'I. Desenho técnico', subtopics: ['1. Normas', '2. Projeções', '3. Escalas'] }],
+        knowledge: COMMON_KNOWLEDGE_LIDT,
         learningSituations: [],
         rubrics: [],
         schedule: []
@@ -70,16 +90,22 @@ export const SAMPLE_PLANS: TeachingPlan[] = [
         id: 'uc-crd-beretella',
         name: 'CONTROLE DIMENSIONAL',
         calendar: { startDate: '2026-01-26', endDate: '2026-06-23', markings: [] },
-        basicCapacities: ['1. Importância da Metrologia', '2. Escala e Trena', '3. Paquímetro', '4. Micrômetro', '5. Verificadores', '6. Relógios', '7. Goniômetro'],
+        basicCapacities: [
+          '1. Identificar a importância da metrologia.',
+          '2. Medir peças com escala e trena.',
+          '3. Medir peças com paquímetro.',
+          '4. Medir peças com micrômetro.',
+          '5. Verificar dimensões com verificadores.',
+          '6. Medir por comparação com relógios.',
+          '7. Medir peças com goniômetro.'
+        ],
         socioemocionalCapacities: ['Atenção a detalhes', 'Organização', 'Zelo pelos equipamentos'],
         knowledge: [
-          { topic: '1. Metrologia', subtopics: ['Conceitos', 'Terminologia VIM'] },
-          { topic: '2. Instrumentos', subtopics: ['Manuseio', 'Leitura', 'Conservação'] }
+          { topic: '1. Metrologia Industrial', subtopics: ['Definições e Terminologia VIM', 'Erros de Medição', 'Sistemas de Unidades'] },
+          { topic: '2. Instrumentação Prática', subtopics: ['Escala, Trena e Paquímetro', 'Micrômetros e Goniômetro', 'Relógios Comparadores'] }
         ],
-        learningSituations: COMMON_SA,
-        rubrics: [
-          { capacity: 'Medir peças com paquímetro e micrômetro', nsa: 'Comete erros grosseiros.', apo: 'Mede com auxílio.', par: 'Mede de forma autônoma.', aut: 'Mede com alta precisão.' }
-        ],
+        learningSituations: COMMON_SA_CRD,
+        rubrics: COMMON_RUBRICS_CRD,
         schedule: CRD_SCHEDULE
       }
     ]
@@ -100,9 +126,9 @@ export const SAMPLE_PLANS: TeachingPlan[] = [
         id: 'uc-lidt-gea',
         name: 'LEITURA E INTERPRETAÇÃO DE DESENHO TÉCNICO',
         calendar: { startDate: '2026-01-26', endDate: '2026-06-15', markings: [] },
-        basicCapacities: ['Interpretar desenhos'],
-        socioemocionalCapacities: ['Atenção'],
-        knowledge: [],
+        basicCapacities: COMMON_CAPACITIES_LIDT,
+        socioemocionalCapacities: ['Atenção a detalhes', 'Senso crítico'],
+        knowledge: COMMON_KNOWLEDGE_LIDT,
         learningSituations: [],
         rubrics: [],
         schedule: []
@@ -111,11 +137,17 @@ export const SAMPLE_PLANS: TeachingPlan[] = [
         id: 'uc-crd-gea',
         name: 'CONTROLE DIMENSIONAL',
         calendar: { startDate: '2026-01-26', endDate: '2026-06-23', markings: [] },
-        basicCapacities: ['Metrologia Industrial'],
+        basicCapacities: [
+          '1. Importância da Metrologia.',
+          '2. Medir com paquímetro.',
+          '3. Medir com micrômetro.'
+        ],
         socioemocionalCapacities: ['Zelo e Organização'],
-        knowledge: [],
-        learningSituations: COMMON_SA,
-        rubrics: [],
+        knowledge: [
+          { topic: '1. Metrologia', subtopics: ['Conceitos Básicos'] }
+        ],
+        learningSituations: COMMON_SA_CRD,
+        rubrics: COMMON_RUBRICS_CRD,
         schedule: CRD_SCHEDULE
       }
     ]
