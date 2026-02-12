@@ -1,14 +1,13 @@
-
 import { initializeApp } from "firebase/app";
-import { 
-  getFirestore, 
-  collection, 
-  getDocs, 
-  setDoc, 
-  doc, 
-  deleteDoc, 
-  query, 
-  where 
+import {
+  getFirestore,
+  collection,
+  getDocs,
+  setDoc,
+  doc,
+  deleteDoc,
+  query,
+  where
 } from "firebase/firestore";
 import { TeachingPlan } from "../types";
 
@@ -25,25 +24,41 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
 
+const safeIsoNow = () => new Date().toISOString();
+
+const safeArray = <T>(v: any): T[] => (Array.isArray(v) ? v : []);
+
 export const FirebaseService = {
   async getPlans(profileId: string): Promise<TeachingPlan[]> {
     try {
-      // Simplificamos a query para usar apenas WHERE. 
-      // Firestore exige um índice composto manual para WHERE + ORDER BY simultâneos.
       const q = query(
-        collection(db, "plans"), 
+        collection(db, "plans"),
         where("profileId", "==", profileId)
       );
-      
+
       const querySnapshot = await getDocs(q);
-      const results = querySnapshot.docs.map(doc => doc.data() as TeachingPlan);
-      
-      // Realizamos a ordenação no lado do cliente (Client-side sorting)
-      // para evitar a necessidade de configuração de índices no console do Firebase.
+
+      const results: TeachingPlan[] = querySnapshot.docs.map((snap) => {
+        const data = snap.data() as Partial<TeachingPlan>;
+
+        // ✅ garante id sempre (Firestore id)
+        const plan: TeachingPlan = {
+          ...(data as TeachingPlan),
+          id: (data.id as any) || snap.id,
+          profileId: (data.profileId as any) || profileId,
+          createdAt: (data.createdAt as any) || safeIsoNow(),
+          updatedAt: (data.updatedAt as any) || (data.createdAt as any) || safeIsoNow(),
+          units: safeArray<any>(data.units) as any
+        };
+
+        return plan;
+      });
+
+      // ordenação local (mais recentes primeiro)
       return results.sort((a, b) => {
         const dateA = new Date(a.updatedAt || a.createdAt).getTime();
         const dateB = new Date(b.updatedAt || b.createdAt).getTime();
-        return dateB - dateA; // Descendente (mais recentes primeiro)
+        return dateB - dateA;
       });
     } catch (error) {
       console.error("Erro ao buscar planos no Firebase:", error);
@@ -53,11 +68,19 @@ export const FirebaseService = {
 
   async savePlan(plan: TeachingPlan): Promise<void> {
     try {
+      if (!plan?.id) throw new Error("Plano sem ID (plan.id vazio).");
+
       const planRef = doc(db, "plans", plan.id);
-      await setDoc(planRef, {
+
+      const payload: TeachingPlan = {
         ...plan,
-        updatedAt: new Date().toISOString()
-      }, { merge: true });
+        createdAt: plan.createdAt || safeIsoNow(),
+        updatedAt: safeIsoNow(),
+        units: safeArray<any>((plan as any).units) as any
+      };
+
+      // ✅ merge:true evita apagar campos existentes no documento
+      await setDoc(planRef, payload, { merge: true });
     } catch (error) {
       console.error("Erro ao salvar no Firebase:", error);
       throw error;
