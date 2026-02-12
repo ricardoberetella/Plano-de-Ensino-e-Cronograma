@@ -150,10 +150,17 @@ const FULL_SOCIOEMOCIONAL_CRD = [
 const FULL_RUBRICS_CRD = [
   { 
     capacity: 'Medir peças com paquímetro.', 
-    nsa: 'Tenta medir, mas comete erros grosseiros na leitura da escala ou no manuseio, orientação inicial.', 
-    apo: 'Realiza a medição com auxílio, cometendo erros pontuais na leitura do nônio ou no docente na soma das escalas ou no uso da catraca.', 
+    nsa: 'Tenta medir, mas comete erros grosseiros na leitura da escala ou no manuseio.', 
+    apo: 'Realiza a medição com auxílio, cometendo erros pontuais na leitura do nônio ou no manuseio.', 
     par: 'Mede a peça de forma autônoma e correta, aplicando as técnicas de manuseio e leitura.', 
-    aut: 'Mede com precisão e rapidez, identificando potenciais fontes de erro (paralaxe, periodicamente e argumenta sobre a adequação do micrômetro para a tolerância solicitada.' 
+    aut: 'Mede com precisão e rapidez, identificando potenciais fontes de erro (paralaxe, etc).' 
+  },
+  { 
+    capacity: 'Medir peças com micrômetro.', 
+    nsa: 'Comete erros no posicionamento do instrumento ou na leitura, necessitando orientação inicial.', 
+    apo: 'Realiza a medição com auxílio do docente na soma das escalas ou no uso da catraca.', 
+    par: 'Realiza a medição de forma correta e autônoma, utilizando a catraca periodicamente.', 
+    aut: 'Argumenta sobre a adequação do micrômetro para a tolerância solicitada e identifica erros térmicos.' 
   },
   { 
     capacity: 'Demonstrar atenção a detalhes.', 
@@ -175,7 +182,7 @@ const COMMON_SA_CRD = [
   {
     id: 'sa-crd-integrada',
     title: 'Situação de aprendizagem: Precisão em Foco',
-    context: 'Unidade Curricular: Controle Dimensional. Atividade - Cronograma Integrador. Para uso exclusivo no Proeducador.',
+    context: 'Unidade Curricular: Controle Dimensional. Atividade - Cronograma Integrador. Para uso exclusivo no Proeducador. A "UsiPrecision" enfrenta aumento de devoluções por inconsistência dimensional em lotes de "Pinos de Ancoragem".',
     challenge: 'Estabelecer um método de inspeção confiável para garantir que 100% das peças enviadas ao cliente estejam rigorosamente dentro das especificações do desenho técnico.',
     expectedResults: [
       'Relatórios de Inspeção Dimensional completos.',
