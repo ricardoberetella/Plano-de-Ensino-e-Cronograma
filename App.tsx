@@ -23,11 +23,15 @@ const App: React.FC = () => {
     try {
       const dbPlans = await FirebaseService.getPlans(profileId);
       
-      // Detecção de necessidade de inicialização:
-      // Se não houver planos OU se as unidades de LIDT/CRD estiverem sem Situações ou Rubricas,
-      // forçamos o carregamento das constantes atualizadas.
+      // Detecção de necessidade de inicialização ou atualização:
+      // Se não houver planos OU se as unidades de LIDT/CRD estiverem sem Situações 
+      // OU se as rubricas estiverem incompletas (menos que o total oficial de 6 para LIDT ou 4 para CRD).
       const needsInit = !dbPlans || dbPlans.length === 0 || 
-                        dbPlans.some(p => p.units.some(u => u.learningSituations.length === 0 || u.rubrics.length === 0));
+                        dbPlans.some(p => p.units.some(u => 
+                          u.learningSituations.length === 0 || 
+                          (u.id.includes('lidt') && u.rubrics.length < 6) ||
+                          (u.id.includes('crd') && u.rubrics.length < 4)
+                        ));
 
       if (needsInit) {
         // Encontra o plano base nas constantes para o perfil atual

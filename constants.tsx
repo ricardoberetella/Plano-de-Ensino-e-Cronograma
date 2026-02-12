@@ -45,7 +45,7 @@ const FULL_CAPACITIES_CRD = [
   'I. Medir peças com trena.',
   'I. Medir peças com paquímetro.',
   'I. Medir peças no sistema métrico com micrômetro.',
-  'I. Verificar dimensões e perfis with verificadores.',
+  'I. Verificar dimensões e perfis com verificadores.',
   'I. Medir por comparação com relógio apalpador e comparador.',
   'I. Medir peças com goniômetro.'
 ];
@@ -57,7 +57,7 @@ const FULL_SOCIOEMOCIONAL_CRD = [
 ];
 
 const FULL_RUBRICS_CRD = [
-  { capacity: 'Medir peças with paquímetro.', nsa: 'Tenta medir, mas comete erros grosseiros na leitura da escala ou no manuseio.', apo: 'Realiza a medição com auxílio, cometendo erros pontuais na leitura do nônio ou no manuseio.', par: 'Mede a peça de forma autônoma e correta, aplicando as técnicas de manuseio e leitura.', aut: 'Mede com precisão e rapidez, identificando potenciais fontes de erro (paralaxe, etc).' },
+  { capacity: 'Medir peças com paquímetro.', nsa: 'Tenta medir, mas comete erros grosseiros na leitura da escala ou no manuseio.', apo: 'Realiza a medição com auxílio, cometendo erros pontuais na leitura do nônio ou no manuseio.', par: 'Mede a peça de forma autônoma e correta, aplicando as técnicas de manuseio e leitura.', aut: 'Mede com precisão e rapidez, identificando potenciais fontes de erro (paralaxe, etc).' },
   { capacity: 'Medir peças com micrômetro.', nsa: 'Comete erros no posicionamento do instrumento ou na leitura, necessitando orientação inicial.', apo: 'Realiza a medição com auxílio do docente na soma das escalas ou no uso da catraca.', par: 'Realiza a medição de forma correta e autônoma, utilizando a catraca periodicamente.', aut: 'Argumenta sobre a adequação do micrômetro para a tolerância solicitada e identifica erros térmicos.' },
   { capacity: 'Demonstrar atenção a detalhes.', nsa: 'O relatório de inspeção apresenta múltiplos erros de transcrição e omissões. Não identifica as peças não conformes.', apo: 'O relatório apresenta erros pontuais ou omissões. Identifica algumas, mas não todas, as peças não conformes.', par: 'Preenche o relatório de forma correta e completa, identificando todas as peças não conformes.', aut: 'Além de preencher o relatório corretamente, anota observações pertinentes sobre o acabamento da peça ou tendências de medidas que se aproximam dos limites de tolerância.' },
   { capacity: 'Organizar o ambiente de trabalho e as atividades.', nsa: 'Deixa a bancada e os instrumentos desorganizados e sujos durante e após a atividade.', apo: 'Necessita de lembretes para organizar a bancada ou para limpar e guardar os instrumentos corretamente.', par: 'Mantém o ambiente de trabalho organizado e guarda os equipamentos corretamente ao final da tarefa, por iniciativa própria.', aut: 'Além de manter seu próprio espaço organizado, incentiva os colegas a fazerem o mesmo e propõe melhorias na disposição das ferramentas para otimizar o fluxo de trabalho.' }
@@ -203,10 +203,31 @@ const FULL_RUBRICS_LIDT = [
   },
   {
     capacity: 'Interpretar tolerância dimensional, geométrica e de acabamento superficial',
-    nsa: 'Não consegue identificar os símbolos de tolerância e rugosidade no desenho sem auxílio.',
-    apo: 'Identifica os símbolos, mas necessita de ajuda para interpretar seu significado ou para localizar no desenho.',
-    par: 'Identifica e explica corretamente o significado das tolerâncias e acabamentos.',
-    aut: 'Além de interpretar, correlaciona as tolerâncias com os processos de fabricação.'
+    nsa: 'Não consegue identificar os símbolos de tolerância e rugosidade no desenho ou confunde seus significados.',
+    apo: 'Identifica os símbolos, mas necessita de ajuda para interpretar seu significado ou para explicar sua importância funcional.',
+    par: 'Identifica e explica corretamente o significado das tolerâncias e acabamentos, relacionando-os com a função da peça.',
+    aut: 'Além de interpretar, correlaciona as tolerâncias com os processos de fabricação necessários para atingi-las.'
+  },
+  {
+    capacity: 'Demonstrar atenção a detalhes',
+    nsa: 'Omite informações (cotas, símbolos, hachuras) no croqui e no relatório.',
+    apo: 'O trabalho apresenta algumas omissões ou erros de representação que necessitam de correção e revisão.',
+    par: 'O trabalho é entregue de forma completa e precisa, com pouquíssimos ou nenhum erro, demonstrando cuidado na execução.',
+    aut: 'Além de entregar um trabalho preciso, identifica inconsistências ou informações faltantes no próprio desenho técnico fornecido.'
+  },
+  {
+    capacity: 'Demonstrar senso crítico',
+    nsa: 'Aceita as informações do desenho sem questionar e preenche a ficha de forma mecânica, apenas reproduzindo definições.',
+    apo: 'Levanta dúvidas básicas sobre o projeto, mas sua análise é superficial e depende do estímulo do docente.',
+    par: 'Analisa as informações, questiona as implicações das especificações e elabora justificativas coerentes para a função das peças.',
+    aut: 'Identifica potenciais inconsistências no projeto (ex: tolerância inadequada) e propõe discussões fundamentadas sobre o tema.'
+  },
+  {
+    capacity: 'Demonstrar escuta ativa',
+    nsa: 'Mostra-se disperso durante as apresentações e não consegue responder às perguntas de forma adequada.',
+    apo: 'Ouve as explicações, mas necessita que as perguntas sejam repetidas ou reformuladas para compreendê-las.',
+    par: 'Ouve atentamente, compreende as perguntas de primeira e responde de forma clara e pertinente durante a apresentação.',
+    aut: 'Participa ativamente, fazendo perguntas relevantes aos outros e contribuindo para a discussão, além de responder com precisão e segurança.'
   }
 ];
 
@@ -218,7 +239,7 @@ export const SAMPLE_PLANS: TeachingPlan[] = [
     modality: 'Presencial',
     totalHours: 400,
     objective: 'Desenvolver capacidades técnicas e socioemocionais relativas aos elementos de máquina, ferramentas, processos de fabricação, manutenção e usinagem convencional seguindo normas de saúde e segurança.',
-    methodology: 'Metodologia SENAI de Educação Profissional (MSEP). Uso de situações de aprendizagem realistas através do Cronograma Integrador.',
+    methodology: 'Metodologia SENAI de Educação Profissional (MSEP). Uso de situações de aprendizagem realistas através do Cronograma Integradror.',
     evaluation: 'Contínua baseada em rubricas de desempenho e qualidade das peças usinadas.',
     bibliography: 'Guia de Aprendizagem Profissional SENAI: Fresamento e Torneamento. NBR 10067, NBR 8403, VIM.',
     createdAt: new Date().toISOString(),
