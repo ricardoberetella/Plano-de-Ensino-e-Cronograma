@@ -1,13 +1,20 @@
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import Layout from './components/Layout';
 import Dashboard from './components/Dashboard';
 import PlanForm from './components/PlanForm';
 import UnitViewer from './components/UnitViewer';
 import Login from './components/Login';
-import { TeachingPlan, ViewType, CurricularUnit, ScheduleEntry, UnitCalendar } from './types';
+import { TeachingPlan, ViewType, CurricularUnit, ScheduleEntry, UnitCalendar, CalendarMarking, CalendarColor } from './types';
 import { SAMPLE_PLANS } from './constants';
 import { FirebaseService } from './services/firebase';
+
+const COLOR_MAP: Record<string, string> = {
+  blue: '#3b82f6',
+  pink: '#ec4899',
+  green: '#22c55e',
+  red: '#ef4444'
+};
 
 const App: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -85,37 +92,15 @@ const App: React.FC = () => {
     }
   };
 
-  const handleResetPlan = async (planId: string) => {
-    setIsLoading(true);
-    try {
-      const template = SAMPLE_PLANS.find(p => p.profileId === activeProfileId) || SAMPLE_PLANS[0];
-      const templatePlan = { 
-        ...template, 
-        id: planId, 
-        profileId: activeProfileId,
-        updatedAt: new Date().toISOString()
-      };
-      await FirebaseService.savePlan(templatePlan);
-      await loadPlans(activeProfileId);
-    } catch (error) {
-      console.error('Erro ao restaurar padrão:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   const handleUpdateSchedule = async (unitId: string, newSchedule: ScheduleEntry[]) => {
     if (!currentPlan) return;
     const updatedUnits = currentPlan.units.map(u => 
       u.id === unitId ? { ...u, schedule: newSchedule } : u
     );
     const updatedPlan = { ...currentPlan, units: updatedUnits, profileId: activeProfileId, updatedAt: new Date().toISOString() };
-    
-    // Atualização otimista
     setCurrentPlan(updatedPlan);
     const newSelectedUnit = updatedUnits.find(u => u.id === unitId);
     if (newSelectedUnit) setSelectedUnit(newSelectedUnit);
-
     await FirebaseService.savePlan(updatedPlan);
     setPlans(prev => prev.map(p => p.id === updatedPlan.id ? updatedPlan : p));
   };
@@ -126,12 +111,9 @@ const App: React.FC = () => {
       u.id === unitId ? { ...u, calendar: newCalendar } : u
     );
     const updatedPlan = { ...currentPlan, units: updatedUnits, profileId: activeProfileId, updatedAt: new Date().toISOString() };
-    
-    // Atualização otimista
     setCurrentPlan(updatedPlan);
     const newSelectedUnit = updatedUnits.find(u => u.id === unitId);
     if (newSelectedUnit) setSelectedUnit(newSelectedUnit);
-
     await FirebaseService.savePlan(updatedPlan);
     setPlans(prev => prev.map(p => p.id === updatedPlan.id ? updatedPlan : p));
   };
@@ -147,6 +129,39 @@ const App: React.FC = () => {
     setSelectedUnit(null);
     setView('dashboard');
   };
+
+  // Lógica para o Calendário Agregado
+  const aggregatedMarkings = useMemo(() => {
+    if (!currentPlan) return [];
+    const all: CalendarMarking[] = [];
+    
+    currentPlan.units.forEach(unit => {
+      const isCRD = unit.id.toLowerCase().includes('crd');
+      const unitColor: CalendarColor = isCRD ? 'pink' : 'blue';
+      
+      // Marcações de Cronograma (Auto)
+      unit.schedule.forEach(entry => {
+        if (!entry.date.includes('/')) return;
+        const [d, m, y] = entry.date.split('/');
+        const isoDate = `${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`;
+        all.push({ date: isoDate, color: unitColor });
+      });
+
+      // Marcações Manuais (Não Letivos, etc)
+      if (unit.calendar?.markings) {
+        unit.calendar.markings.forEach(m => {
+          if (m.color === 'green') { // Mantém verde para feriados/não letivos
+            all.push(m);
+          }
+        });
+      }
+    });
+    return all;
+  }, [currentPlan]);
+
+  const monthsList = useMemo(() => {
+    return ['2026-01', '2026-02', '2026-03', '2026-04', '2026-05', '2026-06'];
+  }, []);
 
   if (!isAuthenticated) {
     return <Login onLogin={() => setIsAuthenticated(true)} />;
@@ -248,25 +263,90 @@ const App: React.FC = () => {
             </div>
           )}
 
-          {view === 'calendario' && (
-            <div className="bg-white rounded-[3rem] border border-slate-200 shadow-2xl p-10 md:p-20 animate-fadeIn max-w-5xl mx-auto text-center relative overflow-hidden">
-               <div className="absolute top-0 left-1/2 -translate-x-1/2 w-40 h-1.5 bg-[#E30613] rounded-b-full"></div>
-               <h2 className="text-4xl md:text-6xl font-[1000] text-slate-900 tracking-tighter uppercase mb-6 italic leading-none">MSEP<br/>CALENDÁRIO</h2>
-               <p className="text-slate-400 font-black uppercase text-[11px] tracking-[0.4em] mb-4">Planejamento Semestral Integrado</p>
-               <p className="text-blue-600 font-black uppercase text-[14px] mb-16 italic tracking-widest">Prof. {activeProfileId === 'beretella' ? 'Ricardo Beretella' : 'Ricardo Gea'}</p>
-               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                  <div className="bg-slate-50 p-10 rounded-[2.5rem] border border-slate-100 group hover:border-blue-200 transition-colors">
-                    <p className="text-4xl font-black text-blue-600 italic">26/01</p>
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-4">Início Letivo</p>
+          {view === 'calendario' && currentPlan && (
+            <div className="max-w-6xl mx-auto animate-fadeIn space-y-10 pb-20">
+               {/* Cabeçalho do Calendário Geral */}
+               <div className="bg-white rounded-[3rem] border border-slate-200 shadow-xl p-8 md:p-12 text-center relative overflow-hidden">
+                  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-1 bg-[#E30613] rounded-b-full"></div>
+                  <h2 className="text-3xl md:text-5xl font-[1000] text-slate-900 tracking-tighter uppercase mb-4 italic leading-none">MSEP - CALENDÁRIO GERAL</h2>
+                  <p className="text-slate-400 font-black uppercase text-[10px] tracking-[0.3em] mb-8">Cronograma Semestral Unificado</p>
+                  
+                  {/* Legenda de Cores por Unidade */}
+                  <div className="max-w-2xl mx-auto bg-slate-50 rounded-3xl p-6 border border-slate-100 shadow-inner">
+                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-4">Legenda de Atividades</p>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      {currentPlan.units.map(unit => {
+                        const isCRD = unit.id.toLowerCase().includes('crd');
+                        const color = isCRD ? 'pink' : 'blue';
+                        return (
+                          <div key={unit.id} className="flex items-center gap-3">
+                            <div className={`w-4 h-4 rounded-md shadow-sm flex-shrink-0 ${isCRD ? 'bg-pink-500' : 'bg-blue-500'}`}></div>
+                            <span className="text-[9px] font-black text-slate-700 uppercase">{unit.id.split('-')[1]}</span>
+                          </div>
+                        );
+                      })}
+                      <div className="flex items-center gap-3">
+                        <div className="w-4 h-4 rounded-md shadow-sm flex-shrink-0 bg-green-500"></div>
+                        <span className="text-[9px] font-black text-slate-700 uppercase">Não Letivo</span>
+                      </div>
+                    </div>
                   </div>
-                  <div className="bg-slate-50 p-10 rounded-[2.5rem] border border-slate-100 group hover:border-red-200 transition-colors">
-                    <p className="text-4xl font-black text-red-600 italic">16/02</p>
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-4">Pausa Pedagógica</p>
-                  </div>
-                  <div className="bg-slate-50 p-10 rounded-[2.5rem] border border-slate-100 group hover:border-slate-800 transition-colors">
-                    <p className="text-4xl font-black text-slate-800 italic">23/06</p>
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-4">Encerramento</p>
-                  </div>
+               </div>
+
+               {/* Grid de Meses */}
+               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                 {monthsList.map(monthStr => {
+                   const [year, month] = monthStr.split('-').map(Number);
+                   const firstDay = new Date(year, month - 1, 1);
+                   const lastDay = new Date(year, month, 0);
+                   const monthName = firstDay.toLocaleDateString('pt-BR', { month: 'long' });
+                   
+                   const days = [];
+                   for (let i = 0; i < firstDay.getDay(); i++) days.push(null);
+                   for (let i = 1; i <= lastDay.getDate(); i++) {
+                     const d = i < 10 ? `0${i}` : i;
+                     days.push(`${monthStr}-${d}`);
+                   }
+
+                   return (
+                     <div key={monthStr} className="space-y-4">
+                       <div className="bg-slate-900 text-white py-2 px-5 rounded-2xl text-center shadow-md">
+                         <h4 className="text-[10px] font-black uppercase tracking-widest italic">{monthName} {year}</h4>
+                       </div>
+                       <div className="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-lg">
+                          <div className="grid grid-cols-7 text-center bg-slate-50 border-b border-slate-100">
+                            {['D','S','T','Q','Q','S','S'].map((d, i) => (
+                              <div key={i} className={`py-3 text-[8px] font-black ${i === 0 ? 'text-red-500' : 'text-slate-400'}`}>{d}</div>
+                            ))}
+                          </div>
+                          <div className="grid grid-cols-7">
+                            {days.map((day, idx) => {
+                              if (!day) return <div key={`e-${idx}`} className="p-1 border-b border-r border-slate-50"></div>;
+                              
+                              const marking = aggregatedMarkings.find(m => m.date === day);
+                              const dateNum = parseInt(day.split('-')[2]);
+                              const isSunday = idx % 7 === 0;
+
+                              return (
+                                <div
+                                  key={day}
+                                  className={`p-2 h-12 md:h-14 flex items-center justify-center text-[10px] font-black border-b border-r border-slate-50 relative ${
+                                    isSunday ? 'text-red-500 bg-red-50/10' : 'text-slate-800'
+                                  }`}
+                                  style={marking ? { backgroundColor: COLOR_MAP[marking.color] || '#cbd5e1', color: '#ffffff' } : {}}
+                                >
+                                  {dateNum}
+                                  {marking && marking.color !== 'green' && (
+                                    <div className="absolute top-1 right-1 w-1 h-1 bg-white/40 rounded-full"></div>
+                                  )}
+                                </div>
+                              );
+                            })}
+                          </div>
+                       </div>
+                     </div>
+                   );
+                 })}
                </div>
             </div>
           )}
