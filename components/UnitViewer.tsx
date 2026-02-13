@@ -99,10 +99,34 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
     return months;
   }, [calendar.startDate, calendar.endDate]);
 
+  const handlePrint = () => {
+    window.print();
+  };
+
   return (
     <div className="bg-white rounded-[2.5rem] shadow-2xl border border-slate-200 overflow-hidden animate-fadeIn">
+      {/* Estilos de Impressão (Oculto na tela) */}
+      <style>{`
+        @media print {
+          body * { visibility: hidden; }
+          .print-content, .print-content * { visibility: visible; }
+          .print-content { position: absolute; left: 0; top: 0; width: 100%; padding: 1cm; background: white !important; }
+          .no-print { display: none !important; }
+          .print-header { border-bottom: 3px solid #E30613; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; padding-bottom: 10px; }
+          .print-logo { background: #E30613; color: white; padding: 5px 15px; font-weight: 900; font-style: italic; font-size: 24pt; border-radius: 2px; }
+          .print-course-title { font-weight: 900; font-size: 14pt; color: #1e293b; text-transform: uppercase; text-align: right; }
+          table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+          th, td { border: 1px solid #000; padding: 6px; text-align: left; font-size: 8pt; vertical-align: top; }
+          th { background-color: #f3f4f6 !important; font-weight: bold; text-transform: uppercase; -webkit-print-color-adjust: exact; }
+          .sa-block { margin-bottom: 20px; page-break-inside: avoid; }
+          .sa-title { font-size: 12pt; font-weight: 900; color: #000; border-bottom: 1px solid #000; margin-bottom: 8px; text-transform: uppercase; }
+          .sa-label { font-size: 8pt; font-weight: 800; text-transform: uppercase; color: #666; display: block; margin-bottom: 2px; }
+          .sa-text { font-size: 9pt; line-height: 1.4; color: #000; }
+        }
+      `}</style>
+
       {/* Header */}
-      <div className="bg-slate-900 p-8 text-white flex justify-between items-center">
+      <div className="bg-slate-900 p-8 text-white flex justify-between items-center no-print">
         <div>
           <span className="bg-blue-600 px-3 py-1 rounded text-[9px] font-black uppercase tracking-widest mb-2 inline-block">MSEP - Unidade Curricular</span>
           <h2 className="text-3xl font-black tracking-tighter uppercase leading-none">{unit.name}</h2>
@@ -110,7 +134,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
       </div>
 
       {/* Tabs */}
-      <div className="flex border-b border-slate-200 bg-slate-50 overflow-x-auto scrollbar-hide">
+      <div className="flex border-b border-slate-200 bg-slate-50 overflow-x-auto scrollbar-hide no-print">
         {(['geral', 'sa', 'rubricas', 'cronograma', 'calendario'] as const).map(tab => (
           <button
             key={tab}
@@ -137,7 +161,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
 
       <div className="p-6 md:p-10 max-h-[75vh] overflow-y-auto custom-scrollbar bg-[#FDFDFD]">
         {activeTab === 'geral' && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 no-print">
             <section>
               <h3 className="text-[11px] font-black text-slate-400 mb-6 uppercase tracking-[0.3em]">Capacidades Técnicas</h3>
               <div className="space-y-3">
@@ -164,57 +188,99 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
 
         {activeTab === 'sa' && (
           <div className="max-w-4xl mx-auto space-y-16">
-            {unit.learningSituations.map((sa) => (
-              <div key={sa.id} className="animate-fadeIn">
-                <div className="mb-8 p-10 bg-white border border-slate-200 rounded-[3rem] shadow-xl relative overflow-hidden">
-                  <div className="absolute top-0 left-0 w-2 h-full bg-blue-600"></div>
-                  <h3 className="text-2xl font-black text-slate-900 mb-6 tracking-tighter uppercase leading-tight">{sa.title}</h3>
-                  <div className="space-y-6">
-                    <div>
-                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Contextualização</p>
-                      <p className="text-slate-600 text-sm leading-relaxed font-medium">{sa.context}</p>
-                    </div>
-                    <div className="bg-slate-900 p-8 rounded-[2rem] text-white">
-                      <p className="text-[10px] font-black text-red-500 uppercase tracking-widest mb-3">Desafio Proposto</p>
-                      <p className="text-slate-300 text-sm italic font-medium">"{sa.challenge}"</p>
-                    </div>
-                  </div>
-                </div>
+            <div className="flex justify-end mb-6 no-print">
+              <button 
+                onClick={handlePrint}
+                className="bg-blue-600 text-white px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl flex items-center gap-3 hover:bg-slate-900 transition-all"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+                Imprimir Situação de Aprendizagem
+              </button>
+            </div>
 
-                {sa.expectedResults && (
-                  <div className="space-y-8 px-4">
-                    <div>
-                      <h4 className="text-xl font-black text-slate-900 uppercase tracking-tighter mb-2 italic">Resultados esperados</h4>
-                      <p className="text-slate-500 font-bold text-sm">{sa.expectedResults[0]}</p>
-                    </div>
-                    
-                    <div className="space-y-4">
-                      {sa.expectedResults.slice(1).map((res, idx) => {
-                        const letterMatch = res.match(/^[a-z]\)/i);
-                        const letter = letterMatch ? letterMatch[0].toUpperCase().replace(')', '') : String.fromCharCode(65 + idx);
-                        const text = res.replace(/^[a-z]\)\s*/i, '');
-                        return (
-                          <div key={idx} className="bg-slate-50/50 border border-slate-100 p-6 rounded-[1.5rem] flex items-center gap-6 hover:bg-white hover:shadow-lg transition-all group">
-                            <div className="w-10 h-10 bg-white border border-slate-200 rounded-xl flex items-center justify-center shrink-0 shadow-sm group-hover:border-blue-500 group-hover:bg-blue-50 transition-colors">
-                              <span className="text-xs font-black text-slate-900 group-hover:text-blue-600">{letter}</span>
-                            </div>
-                            <p className="text-slate-800 font-black text-sm tracking-tight leading-snug">
-                              {text}
-                            </p>
-                          </div>
-                        );
-                      })}
+            {/* Conteúdo Visível na Tela */}
+            <div className="no-print space-y-16">
+              {unit.learningSituations.map((sa) => (
+                <div key={sa.id} className="animate-fadeIn">
+                  <div className="mb-8 p-10 bg-white border border-slate-200 rounded-[3rem] shadow-xl relative overflow-hidden">
+                    <div className="absolute top-0 left-0 w-2 h-full bg-blue-600"></div>
+                    <h3 className="text-2xl font-black text-slate-900 mb-6 tracking-tighter uppercase leading-tight">{sa.title}</h3>
+                    <div className="space-y-6">
+                      <div>
+                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Contextualização</p>
+                        <p className="text-slate-600 text-sm leading-relaxed font-medium">{sa.context}</p>
+                      </div>
+                      <div className="bg-slate-900 p-8 rounded-[2rem] text-white">
+                        <p className="text-[10px] font-black text-red-500 uppercase tracking-widest mb-3">Desafio Proposto</p>
+                        <p className="text-slate-300 text-sm italic font-medium">"{sa.challenge}"</p>
+                      </div>
                     </div>
                   </div>
-                )}
-                <div className="h-px bg-slate-100 my-16"></div>
+
+                  {sa.expectedResults && (
+                    <div className="space-y-8 px-4">
+                      <div>
+                        <h4 className="text-xl font-black text-slate-900 uppercase tracking-tighter mb-2 italic">Resultados esperados</h4>
+                        <p className="text-slate-500 font-bold text-sm">{sa.expectedResults[0]}</p>
+                      </div>
+                      
+                      <div className="space-y-4">
+                        {sa.expectedResults.slice(1).map((res, idx) => {
+                          const letterMatch = res.match(/^[a-z]\)/i);
+                          const letter = letterMatch ? letterMatch[0].toUpperCase().replace(')', '') : String.fromCharCode(65 + idx);
+                          const text = res.replace(/^[a-z]\)\s*/i, '');
+                          return (
+                            <div key={idx} className="bg-slate-50/50 border border-slate-100 p-6 rounded-[1.5rem] flex items-center gap-6 hover:bg-white hover:shadow-lg transition-all group">
+                              <div className="w-10 h-10 bg-white border border-slate-200 rounded-xl flex items-center justify-center shrink-0 shadow-sm group-hover:border-blue-500 group-hover:bg-blue-50 transition-colors">
+                                <span className="text-xs font-black text-slate-900 group-hover:text-blue-600">{letter}</span>
+                              </div>
+                              <p className="text-slate-800 font-black text-sm tracking-tight leading-snug">{text}</p>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {/* ÁREA DE IMPRESSÃO - SA */}
+            <div className="hidden print-content print:block">
+              <div className="print-header">
+                <div className="print-logo">SENAI</div>
+                <div className="print-course-title">Mecânico de Usinagem Convencional</div>
               </div>
-            ))}
+              <h2 style={{fontSize: '14pt', fontWeight: 'bold', marginBottom: '20px', textAlign: 'center'}}>Relatório: Situação de Aprendizagem</h2>
+              {unit.learningSituations.map(sa => (
+                <div key={sa.id} className="sa-block">
+                  <h3 className="sa-title">{sa.title}</h3>
+                  <div style={{marginBottom: '15px'}}>
+                    <span className="sa-label">Contextualização:</span>
+                    <p className="sa-text">{sa.context}</p>
+                  </div>
+                  <div style={{marginBottom: '15px', border: '1px solid #ccc', padding: '10px'}}>
+                    <span className="sa-label" style={{color: '#E30613'}}>Desafio:</span>
+                    <p className="sa-text" style={{fontStyle: 'italic'}}>{sa.challenge}</p>
+                  </div>
+                  {sa.expectedResults && (
+                    <div>
+                      <span className="sa-label">Resultados Esperados:</span>
+                      <ul style={{marginTop: '5px'}}>
+                        {sa.expectedResults.map((res, i) => (
+                          <li key={i} className="sa-text" style={{marginBottom: '3px'}}>{res}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
         )}
 
         {activeTab === 'rubricas' && (
-          <div className="overflow-x-auto rounded-[2rem] border border-slate-200 bg-white p-2">
+          <div className="overflow-x-auto rounded-[2rem] border border-slate-200 bg-white p-2 no-print">
             <table className="w-full text-left border-collapse min-w-[800px]">
               <thead>
                 <tr className="bg-slate-900 text-white">
@@ -242,26 +308,30 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
 
         {activeTab === 'cronograma' && (
           <div className="space-y-8">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 border-b border-slate-100 pb-6">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 border-b border-slate-100 pb-6 no-print">
               <div>
                 <h3 className="text-3xl font-[1000] text-slate-900 uppercase tracking-tighter italic leading-none">Plano de Aula</h3>
                 <p className="text-slate-500 font-black uppercase text-[10px] tracking-[0.2em] mt-2 italic">Cronograma Fiel (PDF)</p>
               </div>
               <div className="flex gap-3">
                 <button 
+                  onClick={handlePrint}
+                  className="bg-blue-600 text-white px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl flex items-center gap-3 hover:bg-slate-900 transition-all"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+                  Imprimir Cronograma
+                </button>
+                <button 
                   onClick={handleResetToTemplate}
                   className="bg-slate-100 text-slate-500 hover:text-red-500 border border-slate-200 px-4 py-2 rounded-xl text-[8px] font-black uppercase tracking-widest transition-all"
                 >
                   Restaurar Padrão
                 </button>
-                <div className="bg-slate-900 text-white px-6 py-3 rounded-2xl flex flex-col items-center md:items-end shadow-xl border border-slate-800">
-                  <span className="text-[8px] font-black text-blue-400 uppercase tracking-widest mb-1">Carga Horária Lançada</span>
-                  <span className="text-2xl font-[1000] italic leading-none">{totalHoursSum} HORAS</span>
-                </div>
               </div>
             </div>
             
-            <div className="space-y-6">
+            {/* Lista Visível */}
+            <div className="space-y-6 no-print">
               {localSchedule.map((entry, idx) => (
                 <div key={entry.id} className="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-lg hover:shadow-xl transition-all">
                   <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
@@ -275,9 +345,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                           className="text-blue-600 font-[1000] text-lg md:text-xl leading-none w-full bg-transparent border-none outline-none focus:ring-1 focus:ring-blue-100 rounded text-center lg:text-left whitespace-nowrap overflow-visible"
                           placeholder="Data"
                         />
-                        <span className="text-[10px] font-black uppercase text-slate-400 tracking-wider mt-1 mb-3 italic">
-                          {getDayOfWeek(entry.date)}
-                        </span>
+                        <span className="text-[10px] font-black uppercase text-slate-400 tracking-wider mt-1 mb-3 italic">{getDayOfWeek(entry.date)}</span>
                       </div>
                       <span className="bg-slate-100 text-slate-500 px-3 py-1 rounded-full text-[8px] font-black uppercase whitespace-nowrap">{entry.hours} HORAS</span>
                     </div>
@@ -285,41 +353,21 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                       <div className="space-y-6">
                         <div>
                           <h5 className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2 border-l-2 border-blue-500 pl-2">Capacidades</h5>
-                          <textarea 
-                            rows={4} 
-                            value={entry.capacities} 
-                            onChange={(e) => updateEntry(entry.id, 'capacities', e.target.value)}
-                            className="w-full bg-transparent border-none outline-none text-slate-700 text-xs font-bold leading-relaxed resize-none whitespace-pre-line"
-                          />
+                          <textarea rows={4} value={entry.capacities} onChange={(e) => updateEntry(entry.id, 'capacities', e.target.value)} className="w-full bg-transparent border-none outline-none text-slate-700 text-xs font-bold leading-relaxed resize-none whitespace-pre-line" />
                         </div>
                         <div>
                           <h5 className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2 border-l-2 border-red-500 pl-2">Conhecimentos</h5>
-                          <textarea 
-                            rows={4} 
-                            value={entry.knowledge} 
-                            onChange={(e) => updateEntry(entry.id, 'knowledge', e.target.value)}
-                            className="w-full bg-transparent border-none outline-none text-slate-800 text-[11px] font-black uppercase leading-tight resize-none whitespace-pre-line"
-                          />
+                          <textarea rows={4} value={entry.knowledge} onChange={(e) => updateEntry(entry.id, 'knowledge', e.target.value)} className="w-full bg-transparent border-none outline-none text-slate-800 text-[11px] font-black uppercase leading-tight resize-none whitespace-pre-line" />
                         </div>
                       </div>
                       <div className="space-y-6">
                         <div>
                           <h5 className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2 border-l-2 border-orange-500 pl-2">Estratégias Docentes</h5>
-                          <textarea 
-                            rows={4} 
-                            value={entry.strategy} 
-                            onChange={(e) => updateEntry(entry.id, 'strategy', e.target.value)}
-                            className="w-full bg-transparent border-none outline-none text-slate-600 text-xs font-medium leading-relaxed resize-none whitespace-pre-line"
-                          />
+                          <textarea rows={4} value={entry.strategy} onChange={(e) => updateEntry(entry.id, 'strategy', e.target.value)} className="w-full bg-transparent border-none outline-none text-slate-600 text-xs font-medium leading-relaxed resize-none whitespace-pre-line" />
                         </div>
                         <div>
                           <h5 className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2 border-l-2 border-green-500 pl-2">Recursos / Ambientes</h5>
-                          <textarea 
-                            rows={3} 
-                            value={entry.resources} 
-                            onChange={(e) => updateEntry(entry.id, 'resources', e.target.value)}
-                            className="w-full bg-transparent border-none outline-none text-slate-500 text-[10px] font-bold italic leading-snug resize-none whitespace-pre-line"
-                          />
+                          <textarea rows={3} value={entry.resources} onChange={(e) => updateEntry(entry.id, 'resources', e.target.value)} className="w-full bg-transparent border-none outline-none text-slate-500 text-[10px] font-bold italic leading-snug resize-none whitespace-pre-line" />
                         </div>
                       </div>
                     </div>
@@ -327,11 +375,49 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                 </div>
               ))}
             </div>
+
+            {/* ÁREA DE IMPRESSÃO - CRONOGRAMA */}
+            <div className="hidden print-content print:block">
+              <div className="print-header">
+                <div className="print-logo">SENAI</div>
+                <div className="print-course-title">Mecânico de Usinagem Convencional</div>
+              </div>
+              <h2 style={{fontSize: '14pt', fontWeight: 'bold', marginBottom: '10px', textAlign: 'center'}}>Unidade Curricular: {unit.name}</h2>
+              <p style={{fontSize: '10pt', marginBottom: '10px', textAlign: 'center'}}>Cronograma / Plano de Aula</p>
+              <table>
+                <thead>
+                  <tr>
+                    <th style={{width: '10%'}}>Data/Aula</th>
+                    <th style={{width: '45%'}}>Conhecimentos / Capacidades (Texto Integral)</th>
+                    <th style={{width: '45%'}}>Estratégias Docentes / Recursos</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {localSchedule.map((entry, i) => (
+                    <tr key={entry.id}>
+                      <td style={{textAlign: 'center'}}>
+                        <strong>{entry.date}</strong><br/>
+                        <span style={{fontSize: '7pt'}}>{getDayOfWeek(entry.date)}</span><br/>
+                        <span style={{fontSize: '7pt', color: '#666'}}>{entry.hours}h</span>
+                      </td>
+                      <td>
+                        <div style={{marginBottom: '5px'}}><strong>Conhecimentos:</strong> {entry.knowledge}</div>
+                        <div><strong>Capacidades:</strong> {entry.capacities}</div>
+                      </td>
+                      <td>
+                        <div style={{marginBottom: '5px'}}><strong>Estratégias:</strong> {entry.strategy}</div>
+                        <div><strong>Recursos:</strong> {entry.resources}</div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
 
         {activeTab === 'calendario' && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 no-print">
             {monthsInRange.map(monthStr => {
               const [year, month] = monthStr.split('-').map(Number);
               const firstDay = new Date(year, month - 1, 1);
