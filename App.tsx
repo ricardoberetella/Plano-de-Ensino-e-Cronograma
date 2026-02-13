@@ -31,8 +31,8 @@ const App: React.FC = () => {
     try {
       const dbPlans = await FirebaseService.getPlans(profileId);
       
-      // Se não houver planos, cria o inicial
       if (!dbPlans || dbPlans.length === 0) {
+        // Se não existir nada mesmo, cria o inicial do template
         const template = SAMPLE_PLANS.find(p => p.profileId === profileId) || SAMPLE_PLANS[0];
         const defaultPlan = { 
           ...template, 
@@ -45,49 +45,41 @@ const App: React.FC = () => {
         setPlans(refreshed);
         setCurrentPlan(refreshed[0]);
         setSelectedUnit(refreshed[0].units[0]);
-        return;
-      }
-
-      // Lógica de Migração Inteligente: Não sobrescreve o plano, apenas adiciona o que falta
-      const updatedPlans = [...dbPlans];
-      let hasChanged = false;
-
-      for (let i = 0; i < updatedPlans.length; i++) {
-        const plan = updatedPlans[i];
-        const template = SAMPLE_PLANS.find(p => p.profileId === profileId) || SAMPLE_PLANS[0];
-        
-        // Verifica se a unidade FUSI existe no plano do banco
-        const hasFusi = plan.units.some(u => u.id.toLowerCase().includes('fusi'));
-        
-        if (!hasFusi) {
-          const fusiTemplate = template.units.find(u => u.id.toLowerCase().includes('fusi'));
-          if (fusiTemplate) {
-            // Adiciona a unidade faltante preservando todas as outras (e suas datas)
-            plan.units.push(fusiTemplate);
-            plan.updatedAt = new Date().toISOString();
-            await FirebaseService.savePlan(plan);
-            hasChanged = true;
-          }
-        }
-      }
-
-      const finalPlans = hasChanged ? await FirebaseService.getPlans(profileId) : dbPlans;
-      setPlans(finalPlans);
-
-      if (currentPlan) {
-        const updatedCurrent = finalPlans.find(p => p.id === currentPlan.id);
-        if (updatedCurrent) {
-          setCurrentPlan(updatedCurrent);
-          if (selectedUnit) {
-            const updatedUnit = updatedCurrent.units.find(u => u.id === selectedUnit.id);
-            if (updatedUnit) setSelectedUnit(updatedUnit);
-          }
-        }
       } else {
-        setCurrentPlan(finalPlans[0]);
-        setSelectedUnit(finalPlans[0].units[0]);
+        // LÓGICA SEGURA: Se o plano existe, verifica se a unidade FUSI falta
+        let hasInjected = false;
+        const processedPlans = await Promise.all(dbPlans.map(async (plan) => {
+          const hasFusi = plan.units.some(u => u.id.toLowerCase().includes('fusi'));
+          if (!hasFusi) {
+            const template = SAMPLE_PLANS.find(p => p.profileId === profileId) || SAMPLE_PLANS[0];
+            const fusiTemplate = template.units.find(u => u.id.toLowerCase().includes('fusi'));
+            if (fusiTemplate) {
+              plan.units.push(fusiTemplate);
+              plan.updatedAt = new Date().toISOString();
+              await FirebaseService.savePlan(plan);
+              hasInjected = true;
+            }
+          }
+          return plan;
+        }));
+
+        const finalPlans = hasInjected ? await FirebaseService.getPlans(profileId) : processedPlans;
+        setPlans(finalPlans);
+        
+        if (currentPlan) {
+          const updatedCurrent = finalPlans.find(p => p.id === currentPlan.id);
+          if (updatedCurrent) {
+            setCurrentPlan(updatedCurrent);
+            if (selectedUnit) {
+              const updatedUnit = updatedCurrent.units.find(u => u.id === selectedUnit.id);
+              if (updatedUnit) setSelectedUnit(updatedUnit);
+            }
+          }
+        } else {
+          setCurrentPlan(finalPlans[0]);
+          setSelectedUnit(finalPlans[0].units[0]);
+        }
       }
-      
     } catch (err) {
       console.error("Erro ao carregar Firebase:", err);
     } finally {

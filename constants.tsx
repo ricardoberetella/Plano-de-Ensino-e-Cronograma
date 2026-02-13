@@ -4,7 +4,7 @@ import { TeachingPlan } from './types';
 export const SENAI_BLUE = "#005DAA";
 export const SENAI_RED = "#E30613";
 
-const CRD_SCHEDULE = [
+export const CRD_SCHEDULE = [
   { id: 'c1', date: '27/01/2026', hours: 2, capacities: 'I. Identificar a importância da metrologia na indústria metalmecânica.', knowledge: '1. Metrologia (1.1 a 1.5)', strategy: 'Apresentação da Situação de Aprendizagem (SA). Exposição dialogada sobre a importância da metrologia, normas e terminologia.', resources: 'Sala de aula, projetor, computador, material da SA.' },
   { id: 'c2', date: '03/02/2026', hours: 2, capacities: 'I. Identificar a importância da metrologia na indústria metalmecânica.', knowledge: '2. Erros de medição (2.1 a 2.4)', strategy: 'Discussão em grupo sobre os tipos e fontes de erro na medição. Demonstração de erros comuns (paralaxe, força excessiva).', resources: 'Sala de aula, projetor, instrumentos de medição para demonstração.' },
   { id: 'c3', date: '10/02/2026', hours: 2, capacities: 'II. Medir peças com escala. III. Medir peças com trena.', knowledge: '3. Escala (3.1 a 3.3). 4. Trena (4.1 a 4.3)', strategy: 'Demonstração prática do uso de escalas e trenas. Exercícios práticos de medição em peças simples.', resources: 'Laboratório de Metrologia, escalas, trenas, peças diversas.' },
@@ -27,7 +27,7 @@ const CRD_SCHEDULE = [
   { id: 'c20', date: '23/06/2026', hours: 2, capacities: 'Todas as capacidades técnicas e socioemocionais da SA.', knowledge: 'Todos os conhecimentos da SA.', strategy: 'Feedback final sobre o desempenho na SA. Autoavaliação e fechamento da Unidade Curricular.', resources: 'Sala de aula, instrumentos de avaliação preenchidos.' }
 ];
 
-const LIDT_SCHEDULE = [
+export const LIDT_SCHEDULE = [
   { id: 'l1', date: '26/01/2026', hours: 2, capacities: 'Todas as capacidades da SA', knowledge: '1.1. Definição de Desenho Técnico', strategy: '• Exposição dialogada; • Apresentação da UC, do MSEP e da Situação de Aprendizagem "Decifrando o Projeto"; • Dinâmica de Grupo: Formação das equipes e discussão inicial sobre a importância do desenho técnico no mundo do trabalho.', resources: 'Sala de aula, projetor, computador, Plano de Ensino, material da SA.' },
   { id: 'l2', date: '02/02/2026', hours: 2, capacities: 'Interpretar desenhos técnicos de peças.', knowledge: '1.2. Normas técnicas; 1.3. Formatos de folha; 1.4. Linhas.', strategy: '• Exposição dialogada: Apresentação das normas ABNT, formatos de papel e tipos de linhas. • Atividade prática: Análise de desenhos técnicos para identificação dos tipos de linhas e suas aplicações.', resources: 'Sala de aula, projetor, exemplos de desenhos técnicos, apostila.' },
   { id: 'l3', date: '09/02/2026', hours: 2, capacities: 'Interpretar desenhos técnicos de peças.', knowledge: '1.5. Escalas; 1.6. Figuras e sólidos geométricos.', strategy: '• Exposição dialogada e Demonstração: Explicação sobre escalas (natural, redução, ampliação). • Apresentação de figuras e sólidos geométricos.', resources: 'Projetor, modelos de sólidos geométricos, desenhos com diferentes escalas.' },
@@ -50,7 +50,7 @@ const LIDT_SCHEDULE = [
   { id: 'l20', date: '15/06/2026', hours: 2, capacities: 'Todas as capacidades da SA.', knowledge: 'Todos os conhecimentos da SA.', strategy: '• Encerramento da Unidade Curricular e fechamento de notas.', resources: 'Sala de aula.' }
 ];
 
-const FUSI_SCHEDULE = [
+export const FUSI_SCHEDULE = [
   { id: 'f1', date: '28/01/2026', hours: 2, capacities: 'Atuar em conformidade com normas de saúde e segurança no trabalho.', knowledge: '1. Segurança no Trabalho; 2. Higiene Industrial.', strategy: 'Apresentação da SA e das normas de segurança da oficina. Visita orientada aos ambientes de trabalho.', resources: 'Oficina, EPIs, roteiro de segurança.' },
   { id: 'f2', date: '04/02/2026', hours: 2, capacities: 'Preparar o ambiente de trabalho conforme a atividade.', knowledge: '3. Máquinas e Ferramentas; 4. Materiais de fabricação.', strategy: 'Apresentação das máquinas operatrizes e ferramentas manuais. Identificação de materiais ferrosos e não ferrosos.', resources: 'Oficina, catálogo de máquinas, amostras de materiais.' },
   { id: 'f3', date: '11/02/2026', hours: 2, capacities: 'Operar furadeira de bancada e coluna.', knowledge: '5. Processo de Furação (5.1, 5.2).', strategy: 'Demonstração de furação em chapas de aço. Cálculos básicos de RPM para furação.', resources: 'Furadeira, brocas, fluido de corte, tabelas de RPM.' },
