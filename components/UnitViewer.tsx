@@ -34,6 +34,10 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
 
   useEffect(() => { setLocalSchedule(unit.schedule); }, [unit.schedule]);
 
+  const totalHoursSum = useMemo(() => {
+    return localSchedule.reduce((sum, entry) => sum + (Number(entry.hours) || 0), 0);
+  }, [localSchedule]);
+
   const formatDateForCalendar = (dateStr: string) => {
     if (!dateStr || !dateStr.includes('/')) return null;
     const parts = dateStr.split('/');
@@ -206,9 +210,15 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
 
         {activeTab === 'cronograma' && (
           <div className="space-y-8">
-            <div className="mb-4">
-              <h3 className="text-3xl font-[1000] text-slate-900 uppercase tracking-tighter italic leading-none">Plano de Aula</h3>
-              <p className="text-slate-500 font-black uppercase text-[10px] tracking-[0.2em] mt-2 italic">Plano de Aula Cronograma</p>
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 border-b border-slate-100 pb-6">
+              <div>
+                <h3 className="text-3xl font-[1000] text-slate-900 uppercase tracking-tighter italic leading-none">Plano de Aula</h3>
+                <p className="text-slate-500 font-black uppercase text-[10px] tracking-[0.2em] mt-2 italic">Plano de Aula Cronograma</p>
+              </div>
+              <div className="bg-slate-900 text-white px-6 py-3 rounded-2xl flex flex-col items-center md:items-end shadow-xl border border-slate-800">
+                <span className="text-[8px] font-black text-blue-400 uppercase tracking-widest mb-1">Carga Horária Lançada</span>
+                <span className="text-2xl font-[1000] italic leading-none">{totalHoursSum} HORAS</span>
+              </div>
             </div>
             
             <div className="space-y-6">
