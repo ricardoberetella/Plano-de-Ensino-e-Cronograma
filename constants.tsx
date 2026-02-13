@@ -5,9 +5,9 @@ export const SENAI_BLUE = "#005DAA";
 export const SENAI_RED = "#E30613";
 
 // Versão do cronograma - Alterar esta string força o App a atualizar o banco de dados com os novos dados "fiéis"
-export const SCHEDULE_VERSION = "2026-V4-REPO-FIDELIDADE";
+export const SCHEDULE_VERSION = "2026-V5-REPOSICAO-FINAL";
 
-// --- CRONOGRAMA LIDT (Ajustado para não ter aulas em feriados) ---
+// --- CRONOGRAMA LIDT (Revisado) ---
 export const LIDT_SCHEDULE = [
   { id: 'l1', date: '26/01/2026', hours: 2, capacities: 'Todas as capacidades da SA', knowledge: '1.1. Definição de Desenho Técnico', strategy: '• Exposição dialogada; • Apresentação da UC, do MSEP e da Situação de Aprendizagem "Decifrando o Projeto".', resources: 'Sala de aula, projetor.' },
   { id: 'l2', date: '02/02/2026', hours: 2, capacities: 'Interpretar desenhos técnicos de peças.', knowledge: '1.2. Normas técnicas; 1.3. Formatos de folha; 1.4. Linhas.', strategy: '• Exposição dialogada: Apresentação das normas ABNT.', resources: 'Exemplos de desenhos técnicos.' },
@@ -31,7 +31,7 @@ export const LIDT_SCHEDULE = [
   { id: 'l20', date: '22/06/2026', hours: 2, capacities: 'Todas as capacidades da SA.', knowledge: 'Fechamento de Notas.', strategy: '• Encerramento da Unidade Curricular.', resources: 'Diário de classe.' }
 ];
 
-// --- CRONOGRAMA CRD (Ajustado para não ter aulas em feriados) ---
+// --- CRONOGRAMA CRD (Revisado) ---
 export const CRD_SCHEDULE = [
   { id: 'c1', date: '27/01/2026', hours: 2, capacities: 'I. Identificar a importância da metrologia.', knowledge: '1. Metrologia', strategy: 'Apresentação da SA. Exposição dialogada.', resources: 'Projetor.' },
   { id: 'c2', date: '03/02/2026', hours: 2, capacities: 'I. Identificar a importância da metrologia.', knowledge: '2. Erros de medição', strategy: 'Discussão em grupo sobre tipos de erro.', resources: 'Instrumentos de medição.' },
@@ -51,8 +51,9 @@ export const CRD_SCHEDULE = [
   { id: 'c16', date: '23/06/2026', hours: 2, capacities: 'Finalização.', knowledge: 'Autoavaliação.', strategy: 'Feedback e encerramento da UC.', resources: 'Fichas preenchidas.' }
 ];
 
-// --- CRONOGRAMA FUSI (FIDELIDADE TOTAL - 60 AULAS) ---
-// Removidos os dias 16/02, 17/02, 20/04, 21/04 por não serem dias letivos.
+// --- CRONOGRAMA FUSI (EFETIVO - 60 AULAS) ---
+// Removidos definitivamente: 16/02, 17/02, 20/04, 21/04.
+// Compensação: Aula do dia 20/05 movida para 25/04 (Sábado).
 export const FUSI_SCHEDULE = [
   { id: 'f01', hours: 4, date: '26/01/2026', capacities: 'Definir parâmetros; Torneamento; Parâmetros de corte/ferramenta.', knowledge: 'TEORIA (TEOR)', strategy: 'Exposição dialogada: Apresentação da SA2 e cálculos técnicos.', resources: 'Sala de aula, projetor.' },
   { id: 'f02', hours: 4, date: '28/01/2026', capacities: 'Organizar ambiente; Facear no torno; Furo de centro.', knowledge: 'PRÁTICA (PRAT)', strategy: 'Tarefa: Eixo 4 Corpos. Prática de fixação e faceamento.', resources: 'Oficina de usinagem, Torno.' },
@@ -63,7 +64,7 @@ export const FUSI_SCHEDULE = [
   { id: 'f07', hours: 4, date: '09/02/2026', capacities: 'Controle de qualidade; Inspeção dimensional; Instrumentos.', knowledge: 'TEORIA (TEOR)', strategy: 'Teoria sobre Metrologia aplicada e tolerâncias ISO.', resources: 'Sala de aula, Projetor.' },
   { id: 'f08', hours: 4, date: '11/02/2026', capacities: 'Tornear superfície cilíndrica; Cortar no torno (Bedame).', knowledge: 'PRÁTICA (PRAT)', strategy: 'Tarefa: Eixo 4 Corpos. Acabamento e sangramento (corte).', resources: 'Oficina de usinagem, Torno.' },
   { id: 'f09', hours: 4, date: '12/02/2026', capacities: 'Inspeção dimensional; Refrigeração; Zelar pelo equipamento.', knowledge: 'PRÁTICA (PRAT)', strategy: 'Tarefa: Eixo 4 Corpos. Controle final e organização.', resources: 'Oficina de usinagem, Micrômetro.' },
-  // 16/02 e 17/02 Removidos (Carnaval)
+  // 16/02 e 17/02 Removidos conforme solicitado
   { id: 'f10', hours: 4, date: '18/02/2026', capacities: 'Fresagem (Rebaixos); Superfícies perpendiculares.', knowledge: 'PRÁTICA (PRAT)', strategy: 'Tarefa: Bloco Fresado. Usinagem de rebaixos e controle.', resources: 'Oficina de usinagem, Fresadora.' },
   { id: 'f11', hours: 4, date: '19/02/2026', capacities: 'Aplicar refrigeração; Fresagem (Operações avançadas).', knowledge: 'PRÁTICA (PRAT)', strategy: 'Tarefa: Bloco Fresado. Prática de acabamento em fresa.', resources: 'Oficina de usinagem, Fresadora.' },
   { id: 'f12', hours: 4, date: '23/02/2026', capacities: 'Rosqueamento (Definição, Ferramentas); Roscar com Cossinete.', knowledge: 'TEORIA (TEOR)', strategy: 'Teoria de cálculos para furação de roscas e tipos de roscas.', resources: 'Sala de aula.' },
@@ -92,8 +93,8 @@ export const FUSI_SCHEDULE = [
   { id: 'f35', hours: 4, date: '16/04/2026', capacities: 'Prática Supervisionada Avançada (Fresamento).', knowledge: 'PRÁTICA (PRAT)', strategy: 'Desafio 1: Refino dimensional do bloco fresado.', resources: 'Oficina de usinagem, Fresadora.' },
   { id: 'f36', hours: 4, date: '22/04/2026', capacities: 'Montagem de conjuntos; Elementos de máquina.', knowledge: 'PRÁTICA (PRAT)', strategy: 'Ajustagem final e montagem Manípulo/Eixo Roscado.', resources: 'Bancada.' },
   { id: 'f37', hours: 4, date: '23/04/2026', capacities: 'Controle da qualidade das peças; Inspeção dimensional.', knowledge: 'PRÁTICA (PRAT)', strategy: 'Avaliação dimensional total (Micrômetro).', resources: 'Sala de aula, Micrômetro.' },
-  // Aula 38: 25/04 como Reposição oficial do dia 20/04
-  { id: 'f38', hours: 4, date: '25/04/2026', capacities: 'Compensação: Revisão de Metrologia e Desenho Técnico. Reposição oficial da aula de 20/04.', knowledge: 'TEORIA (TEOR)', strategy: 'Aula teórica em dia letivo compensado. Reposição do dia 20/04.', resources: 'Sala de aula.' },
+  // Aula 38: 25/04 - Ajustada como compensação do conteúdo de 20/05
+  { id: 'f38', hours: 4, date: '25/04/2026', capacities: 'Ajustagem mecânica: Limagem plana. (Compensação do dia 20/05).', knowledge: 'PRÁTICA (PRAT)', strategy: 'Prática de ajustagem ao banco (precisão manual). Aula antecipada de 20/05.', resources: 'Bancada, Limas.' },
   { id: 'f39', hours: 4, date: '27/04/2026', capacities: 'Manutenção; Segurança do trabalho (NR-12).', knowledge: 'TEORIA (TEOR)', strategy: 'Teoria sobre proteções e dispositivos de emergência.', resources: 'Sala de aula.' },
   { id: 'f40', hours: 4, date: '29/04/2026', capacities: 'Tornear; Facear; Furo de centro (Novas peças).', knowledge: 'PRÁTICA (PRAT)', strategy: 'Tarefa Extra: Início de peça auxiliar (Base castanha).', resources: 'Oficina de usinagem, Torno.' },
   { id: 'f41', hours: 4, date: '30/04/2026', capacities: 'Fresar; Rebaixos; Furação (Novas peças).', knowledge: 'PRÁTICA (PRAT)', strategy: 'Tarefa Extra: Usinagem de base auxiliar (Fresadora).', resources: 'Oficina de usinagem, Fresadora.' },
@@ -103,13 +104,13 @@ export const FUSI_SCHEDULE = [
   { id: 'f45', hours: 4, date: '11/05/2026', capacities: 'Relatórios de Não Conformidade; Ações corretivas.', knowledge: 'TEORIA (TEOR)', strategy: 'Como documentar erros e recuperar peças (Teoria).', resources: 'Sala de aula.' },
   { id: 'f46', hours: 4, date: '13/05/2026', capacities: 'Cortar no torno (Bedame); Abrir canais.', knowledge: 'PRÁTICA (PRAT)', strategy: 'Operações de sangramento e canais técnicos.', resources: 'Oficina de usinagem, Torno.' },
   { id: 'f47', hours: 4, date: '14/05/2026', capacities: 'Rosquear manual com macho na bancada.', knowledge: 'PRÁTICA (PRAT)', strategy: 'Prática intensiva de roscagem em furos cegos.', resources: 'Oficina de usinagem, Bancada.' },
-  { id: 'f48', hours: 4, date: '18/05/2026', capacities: 'Elementos de fixação e transmission (Teoria).', knowledge: 'TEORIA (TEOR)', strategy: 'Estudo sobre chavetas e eixos estriados.', resources: 'Sala de aula.' },
-  { id: 'f49', hours: 4, date: '20/05/2026', capacities: 'Ajustagem mecânica: Limagem plana.', knowledge: 'PRÁTICA (PRAT)', strategy: 'Prática de ajustagem ao banco (precisão manual).', resources: 'Bancada, Limas.' },
+  { id: 'f48', hours: 4, date: '18/05/2026', capacities: 'Elementos de fixação e transmissão (Teoria).', knowledge: 'TEORIA (TEOR)', strategy: 'Estudo sobre chavetas e eixos estriados.', resources: 'Sala de aula.' },
+  // 20/05 Removido (Compensado em 25/04)
   { id: 'f50', hours: 4, date: '21/05/2026', capacities: 'Controle dimensional de conjuntos montados.', knowledge: 'PRÁTICA (PRAT)', strategy: 'Testes funcionais e ajustes de interferência.', resources: 'Oficina de usinagem.' },
   { id: 'f51', hours: 4, date: '25/05/2026', capacities: 'Gestão de Ferramental e Almoxarifado técnico.', knowledge: 'TEORIA (TEOR)', strategy: 'Organização e controle de vida útil das ferramentas.', resources: 'Sala de aula.' },
   { id: 'f52', hours: 4, date: '27/05/2026', capacities: 'Torneamento: Prática de acabamento superficial.', knowledge: 'PRÁTICA (PRAT)', strategy: 'Foco em rugosidade e brilho no torno.', resources: 'Oficina de usinagem, Torno.' },
   { id: 'f53', hours: 4, date: '28/05/2026', capacities: 'Fresagem: Prática de acabamento (Cabeçote).', knowledge: 'PRÁTICA (PRAT)', strategy: 'Foco em planeza e acabamento superficial.', resources: 'Oficina de usinagem, Fresadora.' },
-  { id: 'f54', hours: 4, date: '01/06/2026', capacities: 'Preparação para Avaliação Final (Teoria).', knowledge: 'TEORIA (TEOR)', strategy: 'Revisão integral dos conteúdos dos Prints 1, 2 e 3.', resources: 'Sala de aula.' },
+  { id: 'f54', hours: 4, date: '01/06/2026', capacities: 'Preparação para Avaliação Final (Teoria).', knowledge: 'TEORIA (TEOR)', strategy: 'Revisão integral dos conteúdos.', resources: 'Sala de aula.' },
   { id: 'f55', hours: 4, date: '03/06/2026', capacities: 'Balanceamento: Prática de Oficina Final.', knowledge: 'PRÁTICA (PRAT)', strategy: 'Conclusão de peças pendentes do semestre.', resources: 'Oficina de usinagem.' },
   { id: 'f56', hours: 4, date: '08/06/2026', capacities: 'Ética Profissional e Postura no Trabalho.', knowledge: 'TEORIA (TEOR)', strategy: 'Atitudes, responsabilidade e zelo com patrimônio.', resources: 'Sala de aula.' },
   { id: 'f57', hours: 4, date: '10/06/2026', capacities: 'Limpeza Técnica e Conservação.', knowledge: 'PRÁTICA (PRAT)', strategy: 'Limpeza profunda e lubrificação das máquinas.', resources: 'Oficina de usinagem.' },

@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { CurricularUnit, ScheduleEntry, UnitCalendar, CalendarMarking, CalendarColor } from '../types';
-import { SAMPLE_PLANS } from '../constants';
+import { SAMPLE_PLANS, SCHEDULE_VERSION } from '../constants';
 
 interface Props {
   unit: CurricularUnit;
@@ -37,6 +37,22 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
   const totalHoursSum = useMemo(() => {
     return localSchedule.reduce((sum, entry) => sum + (Number(entry.hours) || 0), 0);
   }, [localSchedule]);
+
+  const handleResetToTemplate = () => {
+    if (confirm("Deseja restaurar este cronograma para o padrão oficial da planilha? Isso apagará suas edições manuais nestas datas.")) {
+      const templatePlan = SAMPLE_PLANS[0];
+      const templateUnit = templatePlan.units.find(u => 
+        u.id.toLowerCase().includes(unit.id.split('-')[1] || 'lidt') || 
+        u.name.toUpperCase().includes(unit.name.split(' ')[0] || '')
+      );
+      
+      if (templateUnit) {
+        setLocalSchedule(templateUnit.schedule);
+        onUpdateSchedule?.(templateUnit.schedule);
+        alert("Cronograma restaurado com sucesso! Sincronizando com a nuvem...");
+      }
+    }
+  };
 
   const formatDateForCalendar = (dateStr: string) => {
     if (!dateStr || !dateStr.includes('/')) return null;
@@ -213,11 +229,19 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
             <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 border-b border-slate-100 pb-6">
               <div>
                 <h3 className="text-3xl font-[1000] text-slate-900 uppercase tracking-tighter italic leading-none">Plano de Aula</h3>
-                <p className="text-slate-500 font-black uppercase text-[10px] tracking-[0.2em] mt-2 italic">Plano de Aula Cronograma</p>
+                <p className="text-slate-500 font-black uppercase text-[10px] tracking-[0.2em] mt-2 italic">Cronograma Fiel (PDF)</p>
               </div>
-              <div className="bg-slate-900 text-white px-6 py-3 rounded-2xl flex flex-col items-center md:items-end shadow-xl border border-slate-800">
-                <span className="text-[8px] font-black text-blue-400 uppercase tracking-widest mb-1">Carga Horária Lançada</span>
-                <span className="text-2xl font-[1000] italic leading-none">{totalHoursSum} HORAS</span>
+              <div className="flex gap-3">
+                <button 
+                  onClick={handleResetToTemplate}
+                  className="bg-slate-100 text-slate-500 hover:text-red-500 border border-slate-200 px-4 py-2 rounded-xl text-[8px] font-black uppercase tracking-widest transition-all"
+                >
+                  Restaurar Padrão
+                </button>
+                <div className="bg-slate-900 text-white px-6 py-3 rounded-2xl flex flex-col items-center md:items-end shadow-xl border border-slate-800">
+                  <span className="text-[8px] font-black text-blue-400 uppercase tracking-widest mb-1">Carga Horária Lançada</span>
+                  <span className="text-2xl font-[1000] italic leading-none">{totalHoursSum} HORAS</span>
+                </div>
               </div>
             </div>
             

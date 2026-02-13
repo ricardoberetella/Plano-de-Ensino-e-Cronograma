@@ -7,16 +7,8 @@ import UnitViewer from './components/UnitViewer';
 import Login from './components/Login';
 import GeneralCalendar from './components/GeneralCalendar';
 import { TeachingPlan, ViewType, CurricularUnit, ScheduleEntry, UnitCalendar, CalendarMarking, CalendarColor } from './types';
-import { SAMPLE_PLANS } from './constants';
+import { SAMPLE_PLANS, SCHEDULE_VERSION } from './constants';
 import { FirebaseService } from './services/firebase';
-
-const COLOR_MAP: Record<string, string> = {
-  blue: '#3b82f6',
-  pink: '#ec4899',
-  green: '#22c55e',
-  red: '#ef4444',
-  orange: '#f97316'
-};
 
 const App: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -38,6 +30,7 @@ const App: React.FC = () => {
           ...template, 
           id: `plan-usinagem-${profileId}`, 
           profileId: profileId,
+          version: SCHEDULE_VERSION,
           updatedAt: new Date().toISOString()
         };
         await FirebaseService.savePlan(defaultPlan);
@@ -50,6 +43,7 @@ const App: React.FC = () => {
           const template = SAMPLE_PLANS.find(p => p.profileId === profileId) || SAMPLE_PLANS[0];
           let updated = false;
           
+          // Verificar se unidades básicas existem
           template.units.forEach(tUnit => {
             const hasUnit = plan.units.some(u => u.name === tUnit.name);
             if (!hasUnit) {
@@ -58,12 +52,14 @@ const App: React.FC = () => {
             }
           });
 
-          const fusi = plan.units.find(u => u.id.toLowerCase().includes('fusi'));
-          if (fusi && !fusi.schedule.some(s => s.id.includes('f1'))) {
-            const tFusi = template.units.find(u => u.id.toLowerCase().includes('fusi'));
+          // FORÇAR ATUALIZAÇÃO DO FUSI SE A VERSÃO FOR ANTIGA
+          const fusi = plan.units.find(u => u.id.toLowerCase().includes('fusi') || u.name.toUpperCase().includes('FUNDAMENTOS'));
+          if (fusi && (plan as any).version !== SCHEDULE_VERSION) {
+            const tFusi = template.units.find(u => u.id.toLowerCase().includes('fusi') || u.name.toUpperCase().includes('FUNDAMENTOS'));
             if (tFusi) {
               const idx = plan.units.indexOf(fusi);
-              plan.units[idx] = tFusi;
+              plan.units[idx] = { ...tFusi }; // Substitui pela versão fiel do código
+              (plan as any).version = SCHEDULE_VERSION;
               updated = true;
             }
           }
