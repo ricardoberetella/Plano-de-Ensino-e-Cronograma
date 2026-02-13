@@ -14,11 +14,50 @@ const COLOR_MAP: Record<CalendarColor, string> = {
   yellow: '#fbbf24', green: '#22c55e', blue: '#3b82f6', red: '#ef4444', cyan: '#06b6d4', orange: '#f97316', purple: '#a855f7', pink: '#ec4899', white: '#ffffff', none: 'transparent'
 };
 
+const TEXT_COLOR_MAP: Record<CalendarColor, string> = {
+  yellow: '#0f172a', green: '#ffffff', blue: '#ffffff', red: '#ffffff', cyan: '#ffffff', orange: '#ffffff', purple: '#ffffff', pink: '#ffffff', white: '#1e293b', none: 'inherit'
+};
+
 const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar, onUpdateUnit }) => {
   const [activeTab, setActiveTab] = useState<'geral' | 'sa' | 'rubricas' | 'cronograma' | 'calendario'>('geral');
   const [localSchedule, setLocalSchedule] = useState<ScheduleEntry[]>(unit.schedule);
 
+  const isCRD = unit.id.toLowerCase().includes('crd');
+  const isFUSI = unit.id.toLowerCase().includes('fusi');
+  const scheduleColor: CalendarColor = isCRD ? 'pink' : (isFUSI ? 'orange' : 'blue');
+
+  const calendar = useMemo(() => unit.calendar || {
+    startDate: '2026-01-26',
+    endDate: '2026-06-24',
+    markings: []
+  }, [unit.calendar]);
+
   useEffect(() => { setLocalSchedule(unit.schedule); }, [unit.schedule]);
+
+  const formatDateForCalendar = (dateStr: string) => {
+    if (!dateStr || !dateStr.includes('/')) return null;
+    const parts = dateStr.split('/');
+    if (parts.length === 3) {
+      const [d, m, y] = parts;
+      return `${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`;
+    }
+    // Handle "DD/MM a DD/MM/YYYY" format if needed, but standardizing to DD/MM/YYYY
+    const simpleMatch = dateStr.match(/\d{2}\/\d{2}\/\d{4}/);
+    if (simpleMatch) {
+      const [d, m, y] = simpleMatch[0].split('/');
+      return `${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`;
+    }
+    return null;
+  };
+
+  const scheduleDates = useMemo(() => {
+    const dates: Record<string, boolean> = {};
+    localSchedule.forEach(s => {
+      const formatted = formatDateForCalendar(s.date);
+      if (formatted) dates[formatted] = true;
+    });
+    return dates;
+  }, [localSchedule]);
 
   const handleRestoreDefaults = () => {
     if (!confirm("Restaurar conteúdo padrão?")) return;
@@ -28,6 +67,24 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
       window.location.reload();
     }
   };
+
+  const updateEntry = (id: string, field: keyof ScheduleEntry, value: any) => {
+    const updated = localSchedule.map(entry => entry.id === id ? { ...entry, [field]: value } : entry);
+    setLocalSchedule(updated);
+    onUpdateSchedule?.(updated);
+  };
+
+  const monthsInRange = useMemo(() => {
+    const start = new Date(calendar.startDate + 'T00:00:00');
+    const end = new Date(calendar.endDate + 'T00:00:00');
+    const months: string[] = [];
+    const current = new Date(start.getFullYear(), start.getMonth(), 1);
+    while (current <= end) {
+      months.push(current.toISOString().substring(0, 7));
+      current.setMonth(current.getMonth() + 1);
+    }
+    return months;
+  }, [calendar.startDate, calendar.endDate]);
 
   return (
     <div className="bg-white rounded-[2.5rem] shadow-2xl border border-slate-200 overflow-hidden animate-fadeIn">
@@ -42,13 +99,13 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
 
       {/* Tabs */}
       <div className="flex border-b border-slate-200 bg-slate-50 overflow-x-auto scrollbar-hide">
-        {(['geral', 'sa', 'rubricas', 'cronograma'] as const).map(tab => (
+        {(['geral', 'sa', 'rubricas', 'cronograma', 'calendario'] as const).map(tab => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
             className={`px-8 py-5 text-[10px] font-black uppercase tracking-widest transition-all border-b-4 ${activeTab === tab ? 'border-blue-600 text-blue-600 bg-white' : 'border-transparent text-slate-400 hover:bg-slate-100'}`}
           >
-            {tab === 'geral' ? 'Geral' : tab === 'sa' ? 'Situação-Problema' : tab === 'rubricas' ? 'Rubricas' : 'Plano de Aula'}
+            {tab === 'geral' ? 'Geral' : tab === 'sa' ? 'Situação-Problema' : tab === 'rubricas' ? 'Rubricas' : tab === 'cronograma' ? 'Plano de Aula' : 'Calendário'}
           </button>
         ))}
       </div>
@@ -102,7 +159,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                 {sa.expectedResults && (
                   <div className="space-y-8 px-4">
                     <div>
-                      <h4 className="text-xl font-black text-slate-900 uppercase tracking-tighter mb-2">Resultados esperados</h4>
+                      <h4 className="text-xl font-black text-slate-900 uppercase tracking-tighter mb-2 italic">Resultados esperados</h4>
                       <p className="text-slate-500 font-bold text-sm">{sa.expectedResults[0]}</p>
                     </div>
                     
@@ -125,7 +182,6 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                     </div>
                   </div>
                 )}
-                
                 <div className="h-px bg-slate-100 my-16"></div>
               </div>
             ))}
@@ -164,39 +220,111 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
             {localSchedule.map((entry, idx) => (
               <div key={entry.id} className="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-lg hover:shadow-xl transition-all">
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-                  {/* Data e Horas */}
                   <div className="lg:col-span-2 text-center lg:text-left">
                     <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">AULA {idx+1}</p>
-                    <p className="text-blue-600 font-[1000] text-xl leading-none mb-2">{entry.date}</p>
+                    <input 
+                      type="text" 
+                      value={entry.date} 
+                      onChange={(e) => updateEntry(entry.id, 'date', e.target.value)}
+                      className="text-blue-600 font-[1000] text-xl leading-none mb-2 w-full bg-transparent border-none outline-none"
+                    />
                     <span className="bg-slate-100 text-slate-500 px-3 py-1 rounded-full text-[8px] font-black uppercase">{entry.hours} HORAS</span>
                   </div>
-
-                  {/* Detalhes Pedagógicos */}
                   <div className="lg:col-span-10 grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div className="space-y-6">
                       <div>
                         <h5 className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2 border-l-2 border-blue-500 pl-2">Capacidades</h5>
-                        <p className="text-slate-700 text-xs font-bold leading-relaxed whitespace-pre-line">{entry.capacities}</p>
+                        <textarea 
+                          rows={3} 
+                          value={entry.capacities} 
+                          onChange={(e) => updateEntry(entry.id, 'capacities', e.target.value)}
+                          className="w-full bg-transparent border-none outline-none text-slate-700 text-xs font-bold leading-relaxed resize-none"
+                        />
                       </div>
                       <div>
                         <h5 className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2 border-l-2 border-red-500 pl-2">Conhecimentos</h5>
-                        <p className="text-slate-800 text-[11px] font-black uppercase leading-tight">{entry.knowledge}</p>
+                        <textarea 
+                          rows={3} 
+                          value={entry.knowledge} 
+                          onChange={(e) => updateEntry(entry.id, 'knowledge', e.target.value)}
+                          className="w-full bg-transparent border-none outline-none text-slate-800 text-[11px] font-black uppercase leading-tight resize-none"
+                        />
                       </div>
                     </div>
                     <div className="space-y-6">
                       <div>
                         <h5 className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2 border-l-2 border-orange-500 pl-2">Estratégias Docentes</h5>
-                        <p className="text-slate-600 text-xs font-medium leading-relaxed whitespace-pre-line">{entry.strategy}</p>
+                        <textarea 
+                          rows={3} 
+                          value={entry.strategy} 
+                          onChange={(e) => updateEntry(entry.id, 'strategy', e.target.value)}
+                          className="w-full bg-transparent border-none outline-none text-slate-600 text-xs font-medium leading-relaxed resize-none"
+                        />
                       </div>
                       <div>
                         <h5 className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2 border-l-2 border-green-500 pl-2">Recursos / Ambientes</h5>
-                        <p className="text-slate-500 text-[10px] font-bold italic leading-snug">{entry.resources}</p>
+                        <textarea 
+                          rows={2} 
+                          value={entry.resources} 
+                          onChange={(e) => updateEntry(entry.id, 'resources', e.target.value)}
+                          className="w-full bg-transparent border-none outline-none text-slate-500 text-[10px] font-bold italic leading-snug resize-none"
+                        />
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
             ))}
+          </div>
+        )}
+
+        {activeTab === 'calendario' && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {monthsInRange.map(monthStr => {
+              const [year, month] = monthStr.split('-').map(Number);
+              const firstDay = new Date(year, month - 1, 1);
+              const lastDay = new Date(year, month, 0);
+              const monthName = firstDay.toLocaleDateString('pt-BR', { month: 'long' });
+              const days = [];
+              for (let i = 0; i < firstDay.getDay(); i++) days.push(null);
+              for (let i = 1; i <= lastDay.getDate(); i++) {
+                const d = i < 10 ? `0${i}` : i;
+                days.push(`${monthStr}-${d}`);
+              }
+              return (
+                <div key={monthStr} className="space-y-4">
+                  <div className="bg-slate-900 text-white py-2 px-5 rounded-2xl text-center shadow-md">
+                    <h4 className="text-[10px] font-black uppercase tracking-widest italic">{monthName} {year}</h4>
+                  </div>
+                  <div className="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-lg">
+                    <div className="grid grid-cols-7 text-center bg-slate-50 border-b border-slate-100">
+                      {['D','S','T','Q','Q','S','S'].map((d, i) => (
+                        <div key={i} className={`py-3 text-[8px] font-black ${i === 0 ? 'text-red-500' : 'text-slate-400'}`}>{d}</div>
+                      ))}
+                    </div>
+                    <div className="grid grid-cols-7">
+                      {days.map((day, idx) => {
+                        if (!day) return <div key={`e-${idx}`} className="p-1 border-b border-r border-slate-50"></div>;
+                        const hasClass = scheduleDates[day];
+                        const isSunday = idx % 7 === 0;
+                        return (
+                          <div
+                            key={day}
+                            className={`p-2 h-12 md:h-14 flex items-center justify-center text-[10px] font-black border-b border-r border-slate-50`}
+                            style={{ 
+                              backgroundColor: hasClass ? COLOR_MAP[scheduleColor] : 'transparent',
+                              color: hasClass ? TEXT_COLOR_MAP[scheduleColor] : (isSunday ? '#ef4444' : '#1e293b')
+                            }}
+                          >
+                            {day.split('-')[2]}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         )}
       </div>

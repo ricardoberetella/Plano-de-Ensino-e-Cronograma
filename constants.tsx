@@ -4,29 +4,7 @@ import { TeachingPlan } from './types';
 export const SENAI_BLUE = "#005DAA";
 export const SENAI_RED = "#E30613";
 
-export const CRD_SCHEDULE = [
-  { id: 'c1', date: '27/01/2026', hours: 2, capacities: 'I. Identificar a importância da metrologia na indústria metalmecânica.', knowledge: '1. Metrologia (1.1 a 1.5)', strategy: 'Apresentação da Situação de Aprendizagem (SA). Exposição dialogada sobre a importância da metrologia, normas e terminologia.', resources: 'Sala de aula, projetor, computador, material da SA.' },
-  { id: 'c2', date: '03/02/2026', hours: 2, capacities: 'I. Identificar a importância da metrologia na indústria metalmecânica.', knowledge: '2. Erros de medição (2.1 a 2.4)', strategy: 'Discussão em grupo sobre os tipos e fontes de erro na medição. Demonstração de erros comuns (paralaxe, força excessiva).', resources: 'Sala de aula, projetor, instrumentos de medição para demonstração.' },
-  { id: 'c3', date: '10/02/2026', hours: 2, capacities: 'II. Medir peças com escala. III. Medir peças com trena.', knowledge: '3. Escala (3.1 a 3.3). 4. Trena (4.1 a 4.3)', strategy: 'Demonstração prática do uso de escalas e trenas. Exercícios práticos de medição em peças simples.', resources: 'Laboratório de Metrologia, escalas, trenas, pecas diversas.' },
-  { id: 'c4', date: '24/02/2026', hours: 2, capacities: 'IV. Medir peças com paquímetro. I. Demonstrar atenção a detalhes.', knowledge: '5. Paquímetros (5.1, 5.2)', strategy: 'Exposição dialogada sobre os tipos de paquímetros e suas características. Demonstração do manuseio correto.', resources: 'Laboratório de Metrologia, projetor, diferentes tipos de paquímetros.' },
-  { id: 'c5', date: '03/03/2026', hours: 2, capacities: 'IV. Medir peças com paquímetro. I. Demonstrar atenção a detalhes.', knowledge: '5. Paquímetros (5.3, 5.4, 5.5)', strategy: 'Demonstração e exercício prático de leitura no sistema métrico (0,05mm e 0,02mm).', resources: 'Laboratório de Metrologia, paquímetros, peças didcidas com medidas conhecidas.' },
-  { id: 'c6', date: '10/03/2026', hours: 2, capacities: 'IV. Medir peças com paquímetro. I. Demonstrar atenção a detalhes. I. Organizar o ambiente de trabalho e as atividades.', knowledge: '5. Paquímetros (5.5)', strategy: 'Exercício prático supervisionado de medição em peças variadas, com preenchimento de relatório simples.', resources: 'Laboratório de Metrologia, paquímetros, pecas, formulário de relatório.' },
-  { id: 'c7', date: '17/03/2026', hours: 2, capacities: 'V. Medir peças no sistema métrico com micrômetro. II. Zelar pelo uso de equipamentos, instrumentos, ferramentas e materiais.', knowledge: '6. Micrômetros (6.1, 6.2, 6.3)', strategy: 'Exposição sobre os tipos de micrômetros. Demonstração do manuseio, ajuste do zero e uso da catraca.', resources: 'Laboratório de Metrologia, projetor, differentes tipos de micrômetros.' },
-  { id: 'c8', date: '24/03/2026', hours: 2, capacities: 'V. Medir peças no sistema métrico com micrômetro. I. Demonstrar atenção a detalhes.', knowledge: '6. Micrômetros (6.3, 6.4, 6.5)', strategy: 'Demonstração e exercício prático de leitura no sistema métrico (0,01 mm).', resources: 'Laboratório de Metrologia, micrômetros, peças didáticas.' },
-  { id: 'c9', date: '31/03/2026', hours: 2, capacities: 'V. Medir peças no sistema métrico com micrômetro. I. Demonstrar atenção a detalhes. I. Organizar o ambiente de trabalho e as atividades.', knowledge: '6. Micrômetros (6.5)', strategy: 'Exercício prático supervisionado de medição com micrômetros e preenchimento de relatório, comparando com medidas do paquímetro.', resources: 'Laboratório de Metrologia, micrômetros, paquímetros, peças, relatório.' },
-  { id: 'c10', date: '07/04/2026', hours: 2, capacities: 'VI. Verificar dimensões e perfis com verificadores.', knowledge: '7. Verificadores (7.1, 7.2)', strategy: 'Demonstração do uso de calibradores de folga, raio e rosca. Exercício prático de verificação em peças.', resources: 'Laboratório de Metrologia, jogos de verificadores, pecas com roscas e raios.' },
-  { id: 'c11', date: '14/04/2026', hours: 2, capacities: 'VII. Medir por comparação com relógio apalpador e comparador.', knowledge: '8. Relógios comparadores e apalpadores (8.1, 8.2)', strategy: 'Exposição sobre os tipos e características dos relógios. Demonstração de montagem em suportes magnéticos.', resources: 'Laboratório de Metrologia, relógios comparadores e apalpadores, suportes.' },
-  { id: 'c12', date: '28/04/2026', hours: 2, capacities: 'VII. Medir por comparação com relógio apalpador e comparador.', knowledge: '8. Relógios comparadores e apalpadores (8.3, 8.4)', strategy: 'Exercício prático de zeragem com blocos-padrão e medição por comparação (ex: planicidade, concentricidade).', resources: 'Laboratório de Metrologia, relógios, suportes, blocos-padrão, desempeno.' },
-  { id: 'c13', date: '05/05/2026', hours: 2, capacities: 'VIII. Medir peças com goniômetro.', knowledge: '9. Goniômetro (9.1 a 9.4)', strategy: 'Demonstração do uso do goniômetro (transferidor de grau) para medição de ângulos em peças.', resources: 'Laboratório de Metrologia, goniômetros, peças com chanfros e ângulos.' },
-  { id: 'c14', date: '12/05/2026', hours: 2, capacities: 'Todas as capacidades técnicas e socioemocionais da SA.', knowledge: 'Todos os conhecimentos da SA.', strategy: 'Revisão geral de todos os instrumentos. Planejamento em grupo para a execução do desafio da SA.', resources: 'Sala de aula, projetor, material da SA, desenhos técnicos.' },
-  { id: 'c15', date: '19/05/2026', hours: 2, capacities: 'Todas as capacidades técnicas e socioemocionais da SA.', knowledge: 'Todos os conhecimentos da SA.', strategy: 'Início da Execução do Desafio: Análise do desenho técnico e início das medições do lote de "Pinos de Ancoragem".', resources: 'Laboratório de Metrologia, todos os instrumentos, lote de peças da SA, relatórios.' },
-  { id: 'c16', date: '26/05/2026', hours: 2, capacities: 'Todas as capacidades técnicas e socioemocionais da SA.', knowledge: 'Todos os conhecimentos da SA.', strategy: 'Execução do Desafio: Continuação das medições e preenchimento dos relatórios de inspeção.', resources: 'Laboratório de Metrologia, todos os instrumentos, lote de peças da SA, relatórios.' },
-  { id: 'c17', date: '02/06/2026', hours: 2, capacities: 'Todas as capacidades técnicas e socioemocionais da SA.', knowledge: 'Todos os conhecimentos da SA.', strategy: 'Execução do Desafio: Finalização das medições. Comparação dos resultados com as tolerâncias.', resources: 'Laboratório de Metrologia, todos os instrumentos, lote de peças da SA, relatórios.' },
-  { id: 'c18', date: '09/06/2026', hours: 2, capacities: 'Todas as capacidades técnicas e socioemocionais da SA.', knowledge: 'Todos os conhecimentos da SA.', strategy: 'Finalização do Desafio: Consolidação dos dados, emissão do parecer final sobre o lote e preparação da apresentação.', resources: 'Laboratório de Metrologia/Sala de aula, relatórios preenchidos, computador.' },
-  { id: 'c19', date: '16/06/2026', hours: 2, capacities: 'Todas as capacidades técnicas e socioemocionais da SA.', knowledge: 'Todos os conhecimentos da SA.', strategy: 'Apresentação dos Resultados: Grupos apresentam seus relatórios e pareceres ao "Gestor da Qualidade" (docente).', resources: 'Sala de aula, projetor, relatórios consolidados.' },
-  { id: 'c20', date: '23/06/2026', hours: 2, capacities: 'Todas as capacidades técnicas e socioemocionais da SA.', knowledge: 'Todos os conhecimentos da SA.', strategy: 'Feedback final sobre o desempenho na SA. Autoavaliação e fechamento da Unidade Curricular.', resources: 'Sala de aula, instrumentos de avaliação preenchidos.' }
-];
-
+// --- CRONOGRAMA LIDT ---
 export const LIDT_SCHEDULE = [
   { id: 'l1', date: '26/01/2026', hours: 2, capacities: 'Todas as capacidades da SA', knowledge: '1.1. Definição de Desenho Técnico', strategy: '• Exposição dialogada; • Apresentação da UC, do MSEP e da Situação de Aprendizagem "Decifrando o Projeto"; • Dinâmica de Grupo: Formação das equipes e discussão inicial sobre a importância do desenho técnico no mundo do trabalho.', resources: 'Sala de aula, projetor, computador, Plano de Ensino, material da SA.' },
   { id: 'l2', date: '02/02/2026', hours: 2, capacities: 'Interpretar desenhos técnicos de peças.', knowledge: '1.2. Normas técnicas; 1.3. Formatos de folha; 1.4. Linhas.', strategy: '• Exposição dialogada: Apresentação das normas ABNT, foramatos de papel e tipos de linhas. • Atividade prática: Análise de desenhos técnicos para identificação dos tipos de linhas e suas aplicações.', resources: 'Sala de aula, projetor, exemplos de desenhos técnicos, apostila.' },
@@ -48,6 +26,47 @@ export const LIDT_SCHEDULE = [
   { id: 'l18', date: '01/06/2026', hours: 2, capacities: 'Todas as capacidades da SA.', knowledge: 'Todos os conhecimentos da SA.', strategy: '• Apresentação dos Resultados: Equipes apresentam seus Dossiês Técnicos e explicam a análise das tolerâncias.', resources: 'Sala de aula, projetor, dossiês finalizados.' },
   { id: 'l19', date: '08/06/2026', hours: 2, capacities: 'Todas as capacidades da SA.', knowledge: 'Todos os conhecimentos da SA.', strategy: '• Feedback e Avaliação: Devolutiva do docente sobre o desempenho das equipes e autoavaliação.', resources: 'Sala de aula, fichas de avaliação.' },
   { id: 'l20', date: '15/06/2026', hours: 2, capacities: 'Todas as capacidades da SA.', knowledge: 'Todos os conhecimentos da SA.', strategy: '• Encerramento da Unidade Curricular e fechamento de notas.', resources: 'Sala de aula.' }
+];
+
+// --- CRONOGRAMA CRD ---
+export const CRD_SCHEDULE = [
+  { id: 'c1', date: '27/01/2026', hours: 2, capacities: 'I. Identificar a importância da metrologia na indústria metalmecânica.', knowledge: '1. Metrologia (1.1 a 1.5)', strategy: 'Apresentação da Situação de Aprendizagem (SA). Exposição dialogada sobre a importância da metrologia, normas e terminologia.', resources: 'Sala de aula, projetor, computador, material da SA.' },
+  { id: 'c2', date: '03/02/2026', hours: 2, capacities: 'I. Identificar a importância da metrologia na indústria metalmecânica.', knowledge: '2. Erros de medição (2.1 a 2.4)', strategy: 'Discussão em grupo sobre os tipos e fontes de erro na medição. Demonstração de erros comuns (paralaxe, força excessiva).', resources: 'Sala de aula, projetor, instrumentos de medição para demonstração.' },
+  { id: 'c3', date: '10/02/2026', hours: 2, capacities: 'II. Medir peças com escala. III. Medir peças com trena.', knowledge: '3. Escala (3.1 a 3.3). 4. Trena (4.1 a 4.3)', strategy: 'Demonstração prática do uso de escalas e trenas. Exercícios práticos de medição em peças simples.', resources: 'Laboratório de Metrologia, escalas, trenas, pecas diversas.' },
+  { id: 'c4', date: '24/02/2026', hours: 2, capacities: 'IV. Medir peças com paquímetro. I. Demonstrar atenção a detalhes.', knowledge: '5. Paquímetros (5.1, 5.2)', strategy: 'Exposição dialogada sobre os tipos de paquímetros e suas características. Demonstração do manuseio correto.', resources: 'Laboratório de Metrologia, projetor, diferentes tipos de paquímetros.' },
+  { id: 'c5', date: '03/03/2026', hours: 2, capacities: 'IV. Medir peças com paquímetro. I. Demonstrar atenção a detalhes.', knowledge: '5. Paquímetros (5.3, 5.4, 5.5)', strategy: 'Demonstração e exercício prático de leitura no sistema métrico (0,05mm e 0,02mm).', resources: 'Laboratório de Metrologia, paquímetros, peças didcidas com medidas conhecidas.' },
+  { id: 'c6', date: '10/03/2026', hours: 2, capacities: 'IV. Medir peças com paquímetro. I. Demonstrar atenção a detalhes. I. Organizar o ambiente de trabalho e as atividades.', knowledge: '5. Paquímetros (5.5)', strategy: 'Exercício prático supervisionado de medição em peças variadas, com preenchimento de relatório simples.', resources: 'Laboratório de Metrologia, paquímetros, pecas, formulário de relatório.' },
+  { id: 'c7', date: '17/03/2026', hours: 2, capacities: 'V. Medir peças no sistema métrico com micrômetro. II. Zelar pelo uso de equipamentos, instrumentos, ferramentas e materiais.', knowledge: '6. Micrômetros (6.1, 6.2, 6.3)', strategy: 'Exposição sobre os tipos de micrômetros. Demonstração do manuseio, ajuste do zero e uso da catraca.', resources: 'Laboratório de Metrologia, projetor, differentes tipos de micrômetros.' },
+  { id: 'c8', date: '24/03/2026', hours: 2, capacities: 'V. Medir peças no sistema métrico com micrômetro. I. Demonstrar atenção a detalhes.', knowledge: '6. Micrômetros (6.3, 6.4, 6.5)', strategy: 'Demonstração e exercício prático de leitura no sistema métrico (0,01 mm).', resources: 'Laboratório de Metrologia, micrômetros, peças didáticas.' },
+  { id: 'c9', date: '31/03/2026', hours: 2, capacities: 'V. Medir peças no sistema métrico com micrômetro. I. Demonstrar atenção a detalhes. I. Organizar o ambiente de trabalho e as atividades.', knowledge: '6. Micrômetros (6.5)', strategy: 'Exercício prático supervisionado de medição com micrômetros e preenchimento de relatório, comparando com medidas do paquímetro.', resources: 'Laboratório de Metrologia, micrômetros, paquímetros, peças, relatório.' },
+  { id: 'c10', date: '07/04/2026', hours: 2, capacities: 'VI. Verificar dimensões e perfis com verificadores.', knowledge: '7. Verificadores (7.1, 7.2)', strategy: 'Demonstração do uso de calibradores de folga, raio e rosca. Exercício prático de verificação em peças.', resources: 'Laboratório de Metrologia, jogos de verificadores, pecas com roscas e raios.' },
+  { id: 'c11', date: '14/04/2026', hours: 2, capacities: 'VII. Medir por comparação com relógio apalpador e comparador.', knowledge: '8. Relógios comparadores e apalpadores (8.1, 8.2)', strategy: 'Exposição sobre os tipos e características dos relógios. Demonstração de montagem em suportes magnéticos.', resources: 'Laboratório de Metrologia, relógios comparadores e apalpadores, suportes.' },
+  { id: 'c12', date: '28/04/2026', hours: 2, capacities: 'VII. Medir por comparação com relógio apalpador e comparador.', knowledge: '8. Relógios comparadores e apalpadores (8.3, 8.4)', strategy: 'Exercício prático de zeragem com blocos-padrão e medição por comparação (ex: planicidade, concentricidade).', resources: 'Laboratório de Metrologia, relógios, suportes, blocos-padrão, desempeno.' },
+  { id: 'c13', date: '05/05/2026', hours: 2, capacities: 'VIII. Medir peças com goniômetro.', knowledge: '9. Goniômetro (9.1 a 9.4)', strategy: 'Demonstração do uso do goniômetro (transferidor de grau) para medição de ângulos em peças.', resources: 'Laboratório de Metrologia, goniômetros, peças com chanfros e ângulos.' },
+  { id: 'c14', date: '12/05/2026', hours: 2, capacities: 'Todas as capacidades técnicas e socioemocionais da SA.', knowledge: 'Todos os conhecimentos da SA.', strategy: 'Revisão geral de todos os instrumentos. Planejamento em grupo para a execução do desafio da SA.', resources: 'Sala de aula, projetor, material da SA, desenhos técnicos.' },
+  { id: 'c15', date: '19/05/2026', hours: 2, capacities: 'Todas as capacidades técnicas e socioemocionais da SA.', knowledge: 'Todos os conhecimentos da SA.', strategy: 'Início da Execução do Desafio: Análise do desenho técnico e início das medições do lote de "Pinos de Ancoragem".', resources: 'Laboratório de Metrologia, todos os instrumentos, lote de peças da SA, relatórios.' },
+  { id: 'c20', date: '23/06/2026', hours: 2, capacities: 'Todas as capacidades técnicas e socioemocionais da SA.', knowledge: 'Todos os conhecimentos da SA.', strategy: 'Feedback final sobre o desempenho na SA. Autoavaliação e fechamento da Unidade Curricular.', resources: 'Sala de aula, instrumentos de avaliação preenchidos.' }
+];
+
+// --- CRONOGRAMA FUSI (TRANSCRIÇÃO LITERAL DOS PRINTS) ---
+export const FUSI_SCHEDULE = [
+  // FRESAGEM E AJUSTAGEM (Print 3)
+  { id: 'f_fresa_1', date: '28/01 a 30/01/2026', hours: 12, capacities: '- Elaborar plano de trabalho... \n - Planejar ações \n - Demonstrar responsabilidade', knowledge: '1. Elementos de máquina \n 3. Processos de fabricação \n 5. Plano de trabalho \n 8. Segurança \n 7. Melo Ambiente', strategy: '- Exposição dialogada sobre a SA. \n - Análise em grupo dos desenhos técnicos. \n - Início da elaboração do plano de trabalho (folha de processo).', resources: '- Sala de aula \n - Projetor multimídia \n - Desenhos técnicos impressos \n - Modelos de plano de trabalho' },
+  { id: 'f_fresa_2', date: '04/02 a 06/02/2026', hours: 12, capacities: '- Selecionar ferramentas... \n - Definir os parâmetros de usinagem... \n - Zelar pelo uso de equipamentos...', knowledge: '2. Ferramentas \n 8. Parâmetros de corte \n 9. Parâmetros de ferramenta \n 11. Fresagem (Tipos, Ferramentas, Acessórios)', strategy: '- Demonstração de ferramentas e acessórios da fresadora. \n - Exercícios práticos de cálculo de RPM e avanço. \n - Instrução sobre fixação de peças e ferramentas.', resources: '- Oficina de usinagem \n - Fresadora convencional \n - Ferramentas de corte e fixação \n - Calculadora, quadros' },
+  { id: 'f_fresa_3', date: '11/02 a 05/03/2026', hours: 38, capacities: '- Realizar operações de baixa complexidade em fresadora... \n - Aplicar os procedimentos de refrigeração... \n - Controlar a qualidade...', knowledge: '11. Fresagem (Operações) \n 15. Controle da qualidade \n 16. Refrigeração', strategy: '- Prática supervisionada de usinagem (faceamento, rebaixos, superfícies paralelas e perpendiculares). \n - Autoinspeção dimensional durante o processo.', resources: '- Oficina de usinagem \n - Fresadora, morsas, calços \n - Paquímetro, esquadro \n - EPIs (óculos, protetor auricular)' },
+  { id: 'f_fresa_4', date: '06/03 a 19/03/2026', hours: 20, capacities: '- Realizar operações de furação... \n - Realizar operações de rosqueamento... \n - Demonstrar visão sistêmica', knowledge: '12. Furação \n 13. Rosqueamento', strategy: '- Demonstração de furação na furadeira de coluna e fresadora. \n - Demonstração de rosqueamento manual com macho. \n - Prática supervisionada de furação e rosqueamento.', resources: '- Oficina de usinagem \n - Furadeira de coluna \n - Machos, desandador, óleo de corte \n - Brocas, escareadores' },
+  { id: 'f_fresa_5', date: '20/03 a 28/03/2026', hours: 20, capacities: '- Controlar a qualidade... \n - Planejar ações \n - Demonstrar responsabilidade \n - Zelar pelo uso de equipamentos...', knowledge: '15. Controle da qualidade \n 5. Plano de trabalho (revisão)', strategy: '- Finalização e rebarbação de todas as peças. \n - Preenchimento do relatório de controle de qualidade. \n - Apresentação do conjunto de peças finalizadas. \n - Limpeza final das máquinas e organização da oficina.', resources: '- Oficina de usinagem \n - Bancada de ajustagem \n - Instrumentos de medição \n - Relatórios impressos' },
+  
+  // TORNEAMENTO (Prints 1 e 2)
+  { id: 'f_torn_1', date: '13/03/2026', hours: 4, capacities: '- Definir os parâmetros de usinagem... \n - Demonstrar responsabilidade.', knowledge: '8. Parâmetros de corte \n 9. Parâmetros de ferramenta \n 10. Torneamento (Definição, Tipos) \n 16. Refrigeração (Definição)', strategy: 'Exposição dialogada e Estudo de caso: Apresentação da SA2 e do desafio da "AgroMaq". Discussão sobre segurança no torno. Introdução aos cálculos de parâmetros de corte.', resources: 'Sala de aula, projetor, quadro branco, calculadoras, tabelas de parâmetros de corte, desenhos técnicos das peças.' },
+  { id: 'f_torn_2', date: '18/03/2026', hours: 4, capacities: '- Realizar operações de baixa complexidade em torno... \n - Organizar o ambiente de trabalho...', knowledge: '10.3. Ferramentas (Torneamento externo) \n 10.4. Acessórios (Placa, Contraponta) \n 10.8.1. Facear no torno \n 10.8.5. Fazer furo de centro no torno', strategy: 'Demonstração e Prática Supervisionada: Demonstração das operações de fixação da peça, faceamento e furação de centro. Prática inicial dos alunos.', resources: 'Oficina de usinagem, torno convencional, ferramentas de facear e broca de centro, material bruto, EPIs.' },
+  { id: 'f_torn_3', date: '19/03 e 20/03/2026', hours: 8, capacities: '- Realizar operações de baixa complexidade em torno... \n - Controlar a qualidade das peças... \n - Aplicar os procedimentos de refrigeração...', knowledge: '10.8.2. Tornear superfície cilíndrica \n 10.8.4. Chanfrar no torno \n 15. Controle da qualidade \n 16.2. Fluidos de corte', strategy: 'Prática Supervisionada: Início da usinagem do "Eixo cilíndrico de quatro corpos". Foco no desbaste e torneamento dos diâmetros maiores, com medições constantes.', resources: 'Oficina de usinagem, torno, ferramentas de tornear, paquímetro, material bruto (aço 1020), fluido de corte, EPIs.' },
+  { id: 'f_torn_4', date: '25/03 e 26/03/2026', hours: 8, capacities: '- Realizar operações de baixa complexidade em torno... \n - Controlar a qualidade das peças... \n - Zelar pelo uso de equipamentos...', knowledge: '10.8.2. Tornear superfície cilíndrica \n 10.8.12. Cortar no torno \n 15.2. Inspeção dimensional', strategy: 'Prática Supervisionada: Continuação e finalização do "Eixo cilíndrico de quatro corpos". Foco no acabamento, nos diâmetros menores e no corte no comprimento final.', resources: 'Oficina de usinagem, torno, ferramentas de tornear e bedame, paquímetro, micrômetro, EPIs.' },
+  { id: 'f_torn_5', date: '27/03/2026', hours: 4, capacities: '- Definir os parâmetros de usinagem... \n - Realizar operações de rosqueamento... \n - Demonstrar visão sistêmica.', knowledge: '13. Rosqueamento (Definição, Ferramentas, Acessórios) \n 10.8.10. Roscar com cossinete no torno', strategy: 'Exposição dialogada e Demonstração: Apresentação do processo de rosqueamento com cossinete no torno e com macho na bancada. Início do planejamento para o "Eixo roscado" e "Manípulo".', resources: 'Sala de aula, oficina de usinagem, torno, cossinetes, porta-cossinetes, machos, desandadores.' },
+  { id: 'f_torn_6', date: '01/04 e 02/04/2026', hours: 8, capacities: '- Realizar operações de baixa complexidade em torno... \n - Realizar operações de rosqueamento... \n - Demonstrar responsabilidade.', knowledge: '10.8.2. Tornear superfície cilíndrica \n 10.8.10. Roscar com cossinete no torno \n 15.1. Inspeção visual', strategy: 'Prática Supervisionada: Usinagem do "Eixo roscado". Torneamento do diâmetro externo e execução da rosca com cossinete, garantindo o acabamento e a funcionalidade.', resources: 'Oficina de usinagem, torno, ferramentas, cossinete, paquímetro, fluido de corte, EPIs.' },
+  { id: 'f_torn_7', date: '03/04/2026', hours: 4, capacities: '- Realizar operações de furação... \n - Realizar operações de rosqueamento... \n - Organizar o ambiente de trabalho...', knowledge: '12. Furação (Definição, Tipos, Operações) \n 13.7.1. Roscar manualmente com macho na bancada', strategy: 'Demonstração e Prática Supervisionada: Usinagem do "Manípulo". Foco na furação em furadeira de bancada e na abertura de rosca manual com macho.', resources: 'Oficina de usinagem, furadeira de bancada, broca, morsa, machos, desandador, óleo de corte, EPIs.' },
+  { id: 'f_torn_8', date: '08/04/2026', hours: 4, capacities: '- Controlar a qualidade das peças... \n - Demonstrar visão sistêmica. \n - Zelar pelo uso de equipamentos...', knowledge: '15. Controle da qualidade \n 1. Elementos de máquina (Montagem)', strategy: 'Trabalho em equipe e Simulação: Montagem do conjunto "Manípulo" e "Eixo roscado". Verificação da funcionalidade. Análise de falhas caso a montagem não ocorra. Preenchimento final das fichas.', resources: 'Oficina de usinagem, bancada, peças usinadas, instrumentos de medição, fichas de processo.' },
+  { id: 'f_torn_9', date: '09/04/2026', hours: 4, capacities: '- Todas as capacidades da SA.', knowledge: 'Todos os conhecimentos da SA.', strategy: 'Revisão e Avaliação Final: Revisão geral dos processos. Avaliação final das peças produzidas e dos documentos gerados. Feedback Individual e em grupo sobre o desempenho na SA.', resources: 'Oficina de usinagem, sala de aula, todas as peças e documentos produzidos.' }
 ];
 
 export const FULL_CAPACITIES_FUSI = [
@@ -77,103 +96,13 @@ export const FULL_SOCIOEMOCIONAL_FUSI = [
 ];
 
 export const FULL_KNOWLEDGE_FUSI = [
-  { topic: '1. Elementos de máquina', subtopics: [
-    '1.1. Elementos de fixação: 1.1.1. Porcas, 1.1.2. Parafusos, 1.1.3. Arruelas, 1.1.4. Contra pino ou cupilha, 1.1.5. Rebites, 1.1.6. Pinos, 1.1.7. Cavilhas',
-    '1.2. Elementos de transmissão: 1.2.1. Chavetas, 1.2.2. Engrenagens, 1.2.3. Polias, 1.2.4. Correias, 1.2.5. Acoplamentos, 1.2.6. Roscas de Transmissão, 1.2.7. Corrente, 1.2.8. Eixos, 1.2.9. Sistemas de transmissão, 1.2.10. Redutores de velocidade, 1.2.11. Variadores de velocidade',
-    '1.3. Elementos de vedação: 1.3.1. Juntas, 1.3.2. Retentores, 1.3.3. Selos mecânicos, 1.3.4. O-Rings',
-    '1.4. Elementos de apoio: 1.4.1. Guias lineares, 1.4.2. Barramentos, 1.4.3. Mancais de deslizamento, 1.4.4. Mancais de rolamentos, 1.4.5. Buchas',
-    '1.5. Elementos de instalação: 1.5.1. Válvula, 1.5.2. Tubulação, 1.5.3. Conexão',
-    '1.6. Elementos elásticos: 1.6.1. Molas, 1.6.2. Anéis elásticos, 1.6.3. Pinos elásticos'
-  ]},
-  { topic: '2. Ferramentas', subtopics: ['2.1. Manuais', '2.2. Elétricas ou eletrônicas', '2.3. Pneumáticas', '2.4. Portáteis'] },
-  { topic: '3. Processos de fabricação', subtopics: [
-    '3.1. Definição',
-    '3.2. Injeção: 3.2.1. Metais, 3.2.2. Plásticos',
-    '3.3. Manufatura Subtrativa: 3.3.1. Torneamento, 3.3.2. Furação, 3.3.3. Fresamento, 3.3.4. Retificação',
-    '3.4. Manufatura aditiva: 3.4.1. Soldagem, 3.4.2. Impressão 3D',
-    '3.5. Conformação mecânica: 3.5.1. Laminação, 3.5.2. Trefilação, 3.5.3. Extrusão, 3.5.4. Forjamento, 3.5.5. Repuxo, 3.5.6. Dobramento, 3.5.7. Corte'
-  ]},
-  { topic: '4. Manutenção', subtopics: [
-    '4.1. Definição',
-    '4.2. Aplicação',
-    '4.3. Tipos de intervenção: 4.3.1. Corretiva, 4.3.2. Preventiva, 4.3.3. Preditiva, 4.3.4. Prescritiva, 4.3.5. Emergencial',
-    '4.4. Tipos de ocorrências: 4.4.1. Defeito, 4.4.2. Falha, 4.4.3. Documentação técnica'
-  ]},
+  { topic: '1. Elementos de máquina', subtopics: ['1.1. Elementos de fixação: Porcas, Parafusos, Arruelas, Contra pino, Rebites, Pinos, Cavilhas', '1.2. Elementos de transmissão: Chavetas, Engrenagens, Polias, Correias, Acoplamentos, Roscas, Corrente, Eixos, Redutores, Variadores'] },
+  { topic: '3. Processos de fabricação', subtopics: ['3.1. Definição', '3.3. Manufatura Subtrativa: Torneamento, Furação, Fresamento'] },
   { topic: '5. Plano de trabalho', subtopics: ['5.1. Definição', '5.2. Tipos', '5.3. Características'] },
-  { topic: '6. Segurança', subtopics: [
-    '6.1. Riscos: 6.1.1. Físicos, 6.1.2. Mecânicos, 6.1.3. Térmicos, 6.1.4. Elétricos',
-    '6.2. Equipamentos de proteção: 6.2.1. Individual, 6.2.2. Coletivo',
-    '6.3. Normas regulamentadoras',
-    '6.4. Sinalização',
-    '6.5. Análise de risco da tarefa - ART',
-    '6.6. Análise preliminar de risco - APR',
-    '6.7. Ficha de Dados de Segurança (FDS)'
-  ]},
-  { topic: '7. Meio Ambiente', subtopics: ['7.1. Definição', '7.2. Normalização', '7.3. Segregação e descarte de resíduos'] },
-  { topic: '8. Parâmetros de corte para usinagem', subtopics: ['8.1. Cálculos: 8.1.1. Rotação por minuto - RPM, 8.1.2. Velocidade de corte - Vc, 8.1.3. Avanço - f, 8.1.4. Profundidade de corte - ap'] },
-  { topic: '9. Parâmetros de ferramenta', subtopics: ['9.1. Material', '9.2. Geometria', '9.3. Número de insertos/dentes (z)', '9.4. Raio de ponta (re)'] },
-  { topic: '10. Torneamento', subtopics: [
-    '10.1. Definição',
-    '10.2. Tipos de tornos: 10.2.1. Horizontal, 10.2.2. Vertical, 10.2.3. De placa ou platô, 10.2.4. Revólver, 10.2.5. Automático, 10.2.6. Copiador, 10.2.7. A CNC',
-    '10.3. Ferramentas: 10.3.1. Alargador, 10.3.2. Bedame, 10.3.3. Broca de centro, 10.3.4. Broca helicoidal, 10.3.5. Cossinete, 10.3.6. Escareador, 10.3.7. Macho, 10.3.8. Recartilha, 10.3.9. Rosqueamento externo, 10.3.10. Rosqueamento interno, 10.3.11. Torneamento externo, 10.3.12. Torneamento interno',
-    '10.4. Acessórios: 10.4.1. Placas, 10.4.2. Contraponta, 10.4.3. Arrastador, 10.4.4. Mandril',
-    '10.5. Cálculos técnicos: 10.5.1. Recartilha, 10.5.2. Conicidade com inclinação do carro superior, 10.5.3. Rosca triangular'
-  ]},
-  { topic: '11. Fresagem', subtopics: [
-    '11.1. Definição',
-    '11.2. Tipos de fresadora: 11.2.1. Universal, 11.2.2. Ferramenteira, 11.2.3. Pantográfica, 11.2.4. Copiadora, 11.2.5. A CNC, 11.2.6. Centros de Usinagem',
-    '11.3. Ferramentas: 11.3.1. Cabeçote faceador, 11.3.2. Fresa de topo',
-    '11.4. Acessórios: 11.4.1. Morsas, 11.4.2. Cantoneiras, 11.4.3. Calços'
-  ]},
-  { topic: '12. Furação', subtopics: [
-    '12.1. Definição',
-    '12.2. Tipos de furadeira: 12.2.1. De coluna de piso, 12.2.2. De coluna de bancada, 12.2.3. Radial, 12.2.4. Portátil',
-    '12.3. Ferramentas',
-    '12.4. Acessórios: 12.4.1. Morsas, 12.4.2. Calços, 12.4.3. Bucha de redução',
-    '12.5. Parâmetros de corte: 12.5.1. Velocidade de Corte (VC), 12.5.2. Rotações por minuto (RPM), 12.5.3. Avanço (f))'
-  ]},
-  { topic: '13. Rosqueamento', subtopics: [
-    '13.1. Definição',
-    '13.2. Ferramentas: 13.2.1. Macho, 13.2.2. Cossinete',
-    '13.3. Acessórios: 13.3.1. Desandador, 13.3.2. Porta cossinete',
-    '13.4. Características: 13.4.1. Sistema de roscas, 13.4.2. Aplicação, 13.4.3. Tabelas',
-    '13.5. Máquina: 13.5.1. Rosqueadeira',
-    '13.6. Cálculos técnicos: 13.6.1. Roscas'
-  ]},
-  { topic: '14. Ajustagem', subtopics: [
-    '14.1. Definição',
-    '14.2. Ferramentas: 14.2.1. Limas, 14.2.2. Riscadores, 14.2.3. Martelos, 14.2.4. Punção',
-    '14.3. Acessórios: 14.3.1. Morsa de bancada, 14.3.2. Mordentes, 14.3.3. Cantoneira, 14.3.4. Desempeno, 14.3.5. Cepo, 14.3.6. Calibrador traçador de altura',
-    '14.4. Esmerilhamento: 14.4.1. Moto esmeril, 14.4.2. Dressadores'
-  ]},
-  { topic: '15. Controle da qualidade', subtopics: [
-    '15.1. Inspeção visual: 15.1.1. Rebarbas, 15.1.2. Oxidação, 15.1.3. Marcas, 15.1.4. Riscos',
-    '15.2. Inspeção dimensional: 15.2.1. Ficha de autoinspeção, 15.2.2. Técnicas de medição'
-  ]},
-  { topic: '16. Refrigeração', subtopics: [
-    '16.1. Definição',
-    '16.2. Fluidos de corte: 16.2.1. Aplicações, 16.2.2. Tipos, 16.2.3. Mecanismos, 16.2.4. Propriedades, 16.2.5. Procedimentos'
-  ]}
-];
-
-export const FUSI_SCHEDULE = [
-  // FRESAMENTO E AJUSTAGEM (Print 3)
-  { id: 'f_fresa_1', date: '28/01 a 30/01/2026', hours: 12, capacities: '- Elaborar plano de trabalho... - Planejar ações - Demonstrar responsabilidade', knowledge: '1. Elementos de máquina | 3. Processos de fabricação | 5. Plano de trabalho | 8. Segurança | 7. Melo Ambiente', strategy: '- Exposição dialogada sobre a SA. - Análise em grupo dos desenhos técnicos. - Início da elaboração do plano de trabalho (folha de processo).', resources: '- Sala de aula - Projetor multimídia - Desenhos técnicos impressos - Modelos de plano de trabalho.' },
-  { id: 'f_fresa_2', date: '04/02 a 06/02/2026', hours: 12, capacities: '- Selecionar ferramentas... - Definir os parâmetros de usinagem... - Zelar pelo uso de equipamentos...', knowledge: '2. Ferramentas | 8. Parâmetros de corte | 9. Parâmetros de ferramenta | 11. Fresagem (Tipos, Ferramentas, Acessórios)', strategy: '- Demonstração de ferramentas e acessórios da fresadora. - Exercícios práticos de cálculo de RPM e avanço. - Instrução sobre fixação de peças e ferramentas.', resources: '- Oficina de usinagem - Fresadora convencional - Ferramentas de corte e fixação - Calculadora, quadros' },
-  { id: 'f_fresa_3', date: '11/02 a 05/03/2026', hours: 38, capacities: '- Realizar operações de baixa complexidade em fresadora... - Aplicar os procedimentos de refrigeração... - Controlar a qualidade...', knowledge: '11. Fresagem (Operações) | 15. Controle da qualidade | 16. Refrigeração', strategy: '- Prática supervisionada de usinagem (faceamento, rebaixos, superfícies paralelas e perpendiculares). - Autoinspeção dimensional durante o processo.', resources: '- Oficina de usinagem - Fresadora, morsas, calços - Paquímetro, esquadro - EPIs (óculos, protetor auricular)' },
-  { id: 'f_fresa_4', date: '06/03 a 19/03/2026', hours: 20, capacities: '- Realizar operações de furação... - Realizar operações de rosqueamento... - Demonstrar visão sistêmica', knowledge: '12. Furação | 13. Rosqueamento', strategy: '- Demonstração de furação na furadeira de coluna e fresadora. - Demonstração de rosqueamento manual com macho. - Prática supervisionada de furação e rosqueamento.', resources: '- Oficina de usinagem - Furadeira de coluna - Machos, desandador, óleo de corte - Brocas, escareadores' },
-  { id: 'f_fresa_5', date: '20/03 a 28/03/2026', hours: 20, capacities: '- Controlar a qualidade... - Planejar ações - Demonstrar responsabilidade - Zelar pelo uso de equipamentos...', knowledge: '15. Controle da qualidade | 5. Plano de trabalho (revisão)', strategy: '- Finalização e rebarbação de todas as peças. - Preenchimento do relatório de controle de qualidade. - Apresentação do conjunto de peças finalizadas. - Limpeza final das máquinas e organização da oficina.', resources: '- Oficina de usinagem - Bancada de ajustagem - Instrumentos de medição - Relatórios impressos' },
-  
-  // TORNEAMENTO (Prints 1 e 2)
-  { id: 'f_torn_1', date: '13/03/2026', hours: 4, capacities: '- Definir os parâmetros de usinagem... - Demonstrar responsabilidade.', knowledge: '8. Parâmetros de corte | 9. Parâmetros de ferramenta | 10. Torneamento (Definição, Tipos) | 16. Refrigeração (Definição)', strategy: 'Exposição dialogada e Estudo de caso: Apresentação da SA2 e do desafio da "AgroMaq". Discussão sobre segurança no torno. Introdução aos cálculos de parâmetros de corte.', resources: 'Sala de aula, projetor, quadro branco, calculadoras, tabelas de parâmetros de corte, desenhos técnicos das peças.' },
-  { id: 'f_torn_2', date: '18/03/2026', hours: 4, capacities: '- Realizar operações de baixa complexidade em torno... - Organizar o ambiente de trabalho...', knowledge: '10.3. Ferramentas (Torneamento externo) | 10.4. Acessórios (Placa, Contraponta) | 10.8.1. Facear no torno | 10.8.5. Fazer furo de centro no torno', strategy: 'Demonstração e Prática Supervisionada: Demonstração das operações de fixação da peça, faceamento e furação de centro. Prática inicial dos alunos.', resources: 'Oficina de usinagem, torno convencional, ferramentas de facear e broca de centro, material bruto, EPIs.' },
-  { id: 'f_torn_3', date: '19/03 e 20/03/2026', hours: 8, capacities: '- Realizar operações de baixa complexidade em torno... - Controlar a qualidade das peças... - Aplicar os procedimentos de refrigeração...', knowledge: '10.8.2. Tornear superfície cilíndrica | 10.8.4. Chanfrar no torno | 15. Controle da qualidade | 16.2. Fluidos de corte', strategy: 'Prática Supervisionada: Início da usinagem do "Eixo cilíndrico de quatro corpos". Foco no desbaste e torneamento dos diâmetros maiores, com medições constantes.', resources: 'Oficina de usinagem, torno, ferramentas de tornear, paquímetro, material bruto (aço 1020), fluido de corte, EPIs.' },
-  { id: 'f_torn_4', date: '25/03 e 26/03/2026', hours: 8, capacities: '- Realizar operações de baixa complexidade em torno... - Controlar a qualidade das peças... - Zelar pelo uso de equipamentos...', knowledge: '10.8.2. Tornear superfície cilíndrica | 10.8.12. Cortar no torno | 15.2. Inspeção dimensional', strategy: 'Prática Supervisionada: Continuação e finalização do "Eixo cilíndrico de quatro corpos". Foco no acabamento, nos diâmetros menores e no corte no comprimento final.', resources: 'Oficina de usinagem, torno, ferramentas de tornear e bedame, paquímetro, micrômetro, EPIs.' },
-  { id: 'f_torn_5', date: '27/03/2026', hours: 4, capacities: '- Definir os parâmetros de usinagem... - Realizar operações de rosqueamento... - Demonstrar visão sistêmica.', knowledge: '13. Rosqueamento (Definição, Ferramentas, Acessórios) | 10.8.10. Roscar com cossinete no torno', strategy: 'Exposição dialogada e Demonstração: Apresentação do processo de rosqueamento com cossinete no torno e com macho na bancada. Início do planejamento para o "Eixo roscado" e "Manípulo".', resources: 'Sala de aula, oficina de usinagem, torno, cossinetes, porta-cossinetes, machos, desandadores.' },
-  { id: 'f_torn_6', date: '01/04 e 02/04/2026', hours: 8, capacities: '- Realizar operações de baixa complexidade em torno... - Realizar operações de rosqueamento... - Demonstrar responsabilidade.', knowledge: '10.8.2. Tornear superfície cilíndrica | 10.8.10. Roscar com cossinete no torno | 15.1. Inspeção visual', strategy: 'Prática Supervisionada: Usinagem do "Eixo roscado". Torneamento do diâmetro externo e execução da rosca com cossinete, garantindo o acabamento e a funcionalidade.', resources: 'Oficina de usinagem, torno, ferramentas, cossinete, paquímetro, fluido de corte, EPIs.' },
-  { id: 'f_torn_7', date: '03/04/2026', hours: 4, capacities: '- Realizar operações de furação... - Realizar operações de rosqueamento... - Organizar o ambiente de trabalho...', knowledge: '12. Furação (Definição, Tipos, Operações) | 13.7.1. Roscar manualmente com macho na bancada', strategy: 'Demonstração e Prática Supervisionada: Usinagem do "Manípulo". Foco na furação em furadeira de bancada e na abertura de rosca manual com macho.', resources: 'Oficina de usinagem, furadeira de bancada, broca, morsa, machos, desandador, óleo de corte, EPIs.' },
-  { id: 'f_torn_8', date: '08/04/2026', hours: 4, capacities: '- Controlar a qualidade das peças... - Demonstrar visão sistêmica... - Zelar pelo uso de equipamentos...', knowledge: '15. Controle da qualidade | 1. Elementos de máquina (Montagem)', strategy: 'Trabalho em equipe e Simulação: Montagem do conjunto "Manípulo" e "Eixo roscado". Verificação da funcionalidade. Análise de falhas caso a montagem não ocorra. Preenchimento final das fichas.', resources: 'Oficina de usinagem, bancada, peças usinadas, instrumentos de medição, fichas de processo.' },
-  { id: 'f_torn_9', date: '09/04/2026', hours: 4, capacities: '- Todas as capacidades da SA.', knowledge: 'Todos os conhecimentos da SA.', strategy: 'Revisão e Avaliação Final: Revisão geral dos processos. Avaliação final das peças produzidas e dos documentos gerados. Feedback individual e em grupo sobre o desempenho na SA.', resources: 'Oficina de usinagem, sala de aula, todas as peças e documentos produzidos.' }
+  { topic: '8. Parâmetros de corte', subtopics: ['8.1. Cálculos: RPM, Vc, f, ap'] },
+  { topic: '10. Torneamento', subtopics: ['10.1. Definição', '10.2. Tipos de tornos', '10.3. Ferramentas', '10.4. Acessórios', '10.5. Cálculos técnicos'] },
+  { topic: '11. Fresagem', subtopics: ['11.1. Definição', '11.2. Tipos de fresadora', '11.3. Ferramentas', '11.4. Acessórios'] },
+  { topic: '15. Controle da qualidade', subtopics: ['15.1. Inspeção visual', '15.2. Inspeção dimensional'] }
 ];
 
 export const COMMON_SA_FUSI = [
@@ -231,6 +160,28 @@ export const SAMPLE_PLANS: TeachingPlan[] = [
     bibliography: 'Guia de Aprendizagem Profissional SENAI: Fresamento e Torneamento. NBR 10067, NBR 8403, VIM.',
     createdAt: new Date().toISOString(),
     units: [
+      {
+        id: 'uc-lidt-beretella',
+        name: 'LEITURA E INTERPRETAÇÃO DE DESENHO TÉCNICO',
+        calendar: { startDate: '2026-01-26', endDate: '2026-06-15', markings: [] },
+        basicCapacities: ['Interpretar desenhos técnicos', 'Elaborar croquis', 'Interpretar tolerâncias'],
+        socioemocionalCapacities: ['Atenção a detalhes', 'Senso crítico'],
+        knowledge: [{ topic: '1. Desenho técnico', subtopics: ['1.1 Normas', '1.4 Linhas', '1.5 Escalas'] }],
+        learningSituations: [],
+        rubrics: [],
+        schedule: LIDT_SCHEDULE
+      },
+      {
+        id: 'uc-crd-beretella',
+        name: 'CONTROLE DIMENSIONAL',
+        calendar: { startDate: '2026-01-26', endDate: '2026-06-23', markings: [] },
+        basicCapacities: ['Medir com paquímetro', 'Medir com micrômetro'],
+        socioemocionalCapacities: ['Organização'],
+        knowledge: [{ topic: '1. Metrologia', subtopics: ['VIM', 'Erros'] }],
+        learningSituations: [],
+        rubrics: [],
+        schedule: CRD_SCHEDULE
+      },
       {
         id: 'uc-fusi-beretella',
         name: 'FUNDAMENTOS DA USINAGEM',
