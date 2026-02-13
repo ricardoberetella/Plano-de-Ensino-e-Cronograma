@@ -59,12 +59,13 @@ const App: React.FC = () => {
               hasInjected = true;
             }
           } else {
-            // DETECÇÃO DE VERSÃO MELHORADA: Se tiver o texto "TURMA A" ou se não tiver o cabeçalho unificado novo
+            // DETECÇÃO DE VERSÃO MELHORADA: Se tiver o texto "TURMA A" ou "TURMA B" nas capacidades ou conhecimentos
             const unit = plan.units[fusiIndex];
-            const hasLegacyHeader = unit.basicCapacities.some(c => c.includes('TURMA A') || c.includes('TURMA B'));
+            const hasLegacyHeaderInCapacities = unit.basicCapacities.some(c => c.includes('TURMA A') || c.includes('TURMA B'));
+            const hasLegacyHeaderInKnowledge = unit.knowledge.some(k => k.topic.includes('TURMA A') || k.topic.includes('TURMA B'));
             const hasUnifiedHeader = unit.basicCapacities.some(c => c === '### Torneamento, Fresagem, Ajustagem');
             
-            if (hasLegacyHeader || !hasUnifiedHeader) {
+            if (hasLegacyHeaderInCapacities || hasLegacyHeaderInKnowledge || !hasUnifiedHeader) {
               if (fusiTemplate) {
                 plan.units[fusiIndex] = fusiTemplate;
                 plan.updatedAt = new Date().toISOString();
