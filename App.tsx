@@ -45,7 +45,6 @@ const App: React.FC = () => {
         setCurrentPlan(refreshed[0]);
         setSelectedUnit(refreshed[0].units[0]);
       } else {
-        // Garantir que todos os planos tenham as 3 unidades do template
         const processedPlans = await Promise.all(dbPlans.map(async (plan) => {
           const template = SAMPLE_PLANS.find(p => p.profileId === profileId) || SAMPLE_PLANS[0];
           let updated = false;
@@ -58,7 +57,6 @@ const App: React.FC = () => {
             }
           });
 
-          // Forçar atualização do cronograma FUSI se for versão antiga
           const fusi = plan.units.find(u => u.id.toLowerCase().includes('fusi'));
           if (fusi && !fusi.schedule.some(s => s.id.includes('f_fresa_1'))) {
             const tFusi = template.units.find(u => u.id.toLowerCase().includes('fusi'));
@@ -145,6 +143,14 @@ const App: React.FC = () => {
     setView('dashboard');
   };
 
+  const getUnitSigla = (unit: CurricularUnit) => {
+    const name = unit.name.toUpperCase();
+    if (name.includes('LEITURA') || name.includes('DESENHO')) return 'LIDT';
+    if (name.includes('CONTROLE') || name.includes('DIMENSIONAL')) return 'CRD';
+    if (name.includes('FUNDAMENTOS') || name.includes('USINAGEM') || name.includes('FUSI')) return 'FUSI';
+    return unit.name.split(' ').map(w => w[0]).join('').toUpperCase();
+  };
+
   if (!isAuthenticated) return <Login onLogin={() => setIsAuthenticated(true)} />;
 
   return (
@@ -186,6 +192,7 @@ const App: React.FC = () => {
                   {currentPlan.units.map((unit, idx) => (
                     <button key={unit.id} onClick={() => { setSelectedUnit(unit); setView('plano-ensino'); }} className="bg-slate-800 p-8 rounded-3xl text-left hover:bg-blue-600 transition-all group relative overflow-hidden">
                       <span className="text-6xl font-black opacity-5 absolute -right-2 -bottom-2">0{idx + 1}</span>
+                      <p className="text-[9px] font-black text-blue-400 mb-2">{getUnitSigla(unit)}</p>
                       <h4 className="font-black text-lg leading-tight uppercase line-clamp-2">{unit.name}</h4>
                     </button>
                   ))}
@@ -198,8 +205,12 @@ const App: React.FC = () => {
             <div className="space-y-8 max-w-7xl mx-auto pb-20">
               <div className="flex gap-2 overflow-x-auto pb-4 scrollbar-hide px-1">
                 {currentPlan.units.map(u => (
-                  <button key={u.id} onClick={() => setSelectedUnit(u)} className={`flex-shrink-0 px-8 py-4 rounded-2xl text-[10px] font-black uppercase transition-all border-2 ${selectedUnit.id === u.id ? 'bg-blue-600 border-blue-600 text-white shadow-xl' : 'bg-white border-slate-200 text-slate-400'}`}>
-                    {u.name.split(' ').length > 2 ? u.name.split(' ').map(w => w[0]).join('') : u.name}
+                  <button 
+                    key={u.id} 
+                    onClick={() => setSelectedUnit(u)} 
+                    className={`flex-shrink-0 px-8 py-4 rounded-2xl text-[10px] font-black uppercase transition-all border-2 ${selectedUnit.id === u.id ? 'bg-blue-600 border-blue-600 text-white shadow-xl scale-105' : 'bg-white border-slate-200 text-slate-400 hover:border-blue-100'}`}
+                  >
+                    {getUnitSigla(u)}
                   </button>
                 ))}
               </div>
@@ -207,6 +218,13 @@ const App: React.FC = () => {
                 unit={selectedUnit} 
                 onUpdateSchedule={(newSched) => handleUpdateSchedule(selectedUnit.id, newSched)} 
                 onUpdateCalendar={(newCal) => handleUpdateCalendar(selectedUnit.id, newCal)}
+                onUpdateUnit={(updatedUnit) => {
+                  if (!currentPlan) return;
+                  const updatedUnits = currentPlan.units.map(u => u.id === updatedUnit.id ? updatedUnit : u);
+                  const updatedPlan = { ...currentPlan, units: updatedUnits };
+                  setCurrentPlan(updatedPlan);
+                  FirebaseService.savePlan(updatedPlan);
+                }}
               />
             </div>
           )}
