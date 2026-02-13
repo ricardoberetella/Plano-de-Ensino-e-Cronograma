@@ -59,28 +59,33 @@ const App: React.FC = () => {
               hasInjected = true;
             }
           } else {
-            // DETECÇÃO DE VERSÃO MELHORADA: Verificação literal de frases longas dos prints
+            // DETECÇÃO DE VERSÃO MELHORADA: Verificação de frases longas literais para garantir integridade pedagógica
             const unit = plan.units[fusiIndex];
             
-            // Verifica se a SA de Torneamento tem a menção literal à AgroMaq e aos 6 componentes específicos
-            const hasAgroMaqVerbatim = unit.learningSituations.some(sa => 
+            // Verifica se as Situações de Aprendizagem (AgroMaq e Fresanatec) estão presentes e completas
+            const hasAgroMaqLiteral = unit.learningSituations.some(sa => 
               sa.context.includes('AgroMaq Industrial') && 
               sa.challenge.includes('Eixo cilíndrico de quatro corpos, Eixo cilíndrico com canais, Eixo roscado, Manípulo, Eixo calibrado e Luva com dois corpos internos')
             );
 
-            // Verifica se a SA de Fresagem tem a menção literal ao Sr. Almeida e à Fresanatec
-            const hasFresanatecVerbatim = unit.learningSituations.some(sa => 
+            const hasFresanatecLiteral = unit.learningSituations.some(sa => 
               sa.context.includes('Fresanatec Soluções Industriais') && 
-              sa.context.includes('Sr. Almeida')
+              sa.challenge.includes('planejar, executar e controlar a fabricação do conjunto completo de seis componentes')
             );
 
-            // Verifica rubrica literal de Visão Sistêmica do print
-            const hasRubricaSistemicaVerbatim = unit.rubrics.some(r => 
+            // Verifica se a rubrica de Visão Sistêmica possui o texto exato do print
+            const hasRubricaSistemicaLiteral = unit.rubrics.some(r => 
               r.capacity.includes('Demonstrar visão sistêmica') && 
-              r.nsa.includes('Não consegue compreender a relação entre as peças')
+              r.nsa.includes('Não consegue compreender a relação entre as peças ou a importância da sua tarefa para o produto final')
+            );
+
+            // Verifica se a rubrica de Rosqueamento possui o texto exato do print
+            const hasRubricaRosqueamentoLiteral = unit.rubrics.some(r => 
+              r.capacity.includes('Realizar operações de rosqueamento') && 
+              r.aut.includes('selecionando o macho e a broca corretos e aplicando a técnica adequada')
             );
             
-            if (!hasAgroMaqVerbatim || !hasFresanatecVerbatim || !hasRubricaSistemicaVerbatim) {
+            if (!hasAgroMaqLiteral || !hasFresanatecLiteral || !hasRubricaSistemicaLiteral || !hasRubricaRosqueamentoLiteral) {
               if (fusiTemplate) {
                 plan.units[fusiIndex] = fusiTemplate;
                 plan.updatedAt = new Date().toISOString();
