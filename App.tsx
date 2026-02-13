@@ -59,20 +59,20 @@ const App: React.FC = () => {
               hasInjected = true;
             }
           } else {
-            // DETECÇÃO DE VERSÃO MELHORADA: Agora verifica também se as novas situações-problema estão presentes
+            // DETECÇÃO DE VERSÃO MELHORADA: Agora verifica se as novas rubricas detalhadas estão presentes
             const unit = plan.units[fusiIndex];
-            const hasLegacyCapacities = unit.basicCapacities.some(c => 
+            const hasLegacyStrings = unit.basicCapacities.some(c => 
               c.toUpperCase().includes('TURMA A') || c.toUpperCase().includes('TURMA B')
-            );
-            const hasLegacyKnowledge = unit.knowledge.some(k => 
-              k.topic.toUpperCase().includes('TURMA A') || k.topic.toUpperCase().includes('TURMA B')
             );
             const hasNewSAs = unit.learningSituations.some(sa => 
               sa.context.toUpperCase().includes('AGROMAQ') || sa.context.toUpperCase().includes('FRESANATEC')
             );
+            const hasNewRubrics = unit.rubrics.some(r => 
+              r.capacity.toUpperCase().includes('VISÃO SISTÊMICA') || r.capacity.toUpperCase().includes('PLANO DE TRABALHO')
+            );
             const hasUnifiedHeader = unit.basicCapacities.some(c => c === '### Torneamento, Fresagem, Ajustagem');
             
-            if (hasLegacyCapacities || hasLegacyKnowledge || !hasUnifiedHeader || !hasNewSAs) {
+            if (hasLegacyStrings || !hasUnifiedHeader || !hasNewSAs || !hasNewRubrics) {
               if (fusiTemplate) {
                 plan.units[fusiIndex] = fusiTemplate;
                 plan.updatedAt = new Date().toISOString();
