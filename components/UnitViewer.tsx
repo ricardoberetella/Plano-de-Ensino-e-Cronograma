@@ -95,13 +95,11 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
 
     if (unitTemplate) {
       const updatedUnit = { ...unitTemplate, id: unit.id };
-      onUpdateUnit?.(updatedUnit); // Se o pai suportar update total
-      
-      // Fallback para os métodos existentes
+      onUpdateUnit?.(updatedUnit);
       setLocalSchedule(updatedUnit.schedule);
       onUpdateSchedule?.(updatedUnit.schedule);
       alert("Conteúdo restaurado com sucesso! Clique em 'Sincronizar' para salvar na nuvem.");
-      window.location.reload(); // Recarrega para garantir o merge total
+      window.location.reload();
     }
   };
 
@@ -225,12 +223,11 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
 
   const colorOptions: CalendarColor[] = ['green', 'white'];
 
-  // Helper to render capacity items with custom numbering that skips headers
   const renderCapacities = (capacities: string[]) => {
     let itemNumber = 1;
     return capacities.map((c, i) => {
       if (c.startsWith('###')) {
-        itemNumber = 1; // Reset count for new section
+        itemNumber = 1;
         return (
           <div key={i} className="mt-8 mb-4 border-b-2 border-blue-100 pb-2 first:mt-2 animate-fadeIn">
             <h4 className="text-blue-700 font-black text-[11px] uppercase tracking-[0.25em] italic">
@@ -365,17 +362,69 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
         )}
 
         {activeTab === 'sa' && (
-          <div className="max-w-4xl mx-auto space-y-10">
+          <div className="max-w-4xl mx-auto space-y-12">
             {unit.learningSituations.map((sa) => (
-              <div key={sa.id} className="space-y-10">
-                <div className="bg-white border border-slate-200 p-6 md:p-10 rounded-[2.5rem] shadow-xl relative overflow-hidden">
+              <div key={sa.id} className="space-y-8 animate-fadeIn">
+                {/* Cabeçalho da Situação */}
+                <div className="bg-white border border-slate-200 p-8 md:p-10 rounded-[2.5rem] shadow-xl relative overflow-hidden">
                   <div className="absolute top-0 left-0 w-2 h-full bg-blue-600"></div>
-                  <h3 className="text-xl md:text-2xl font-black text-slate-900 mb-6 uppercase tracking-tighter">{sa.title}</h3>
-                  <p className="text-slate-600 text-xs md:text-sm leading-relaxed font-medium">{sa.context}</p>
+                  <div className="flex items-center gap-3 mb-6">
+                     <span className="bg-blue-50 text-blue-600 text-[9px] font-black px-3 py-1 rounded uppercase tracking-widest">Situação-Problema</span>
+                  </div>
+                  <h3 className="text-xl md:text-2xl font-black text-slate-900 mb-6 uppercase tracking-tighter leading-tight">{sa.title}</h3>
+                  <div className="space-y-4">
+                    <h4 className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em]">Contextualização</h4>
+                    <p className="text-slate-600 text-xs md:text-sm leading-relaxed font-medium whitespace-pre-line">{sa.context}</p>
+                  </div>
                 </div>
-                <div className="bg-slate-900 p-8 rounded-[2rem] text-white shadow-2xl">
+
+                {/* Desafio Proposto */}
+                <div className="bg-slate-900 p-8 md:p-10 rounded-[2rem] text-white shadow-2xl relative overflow-hidden">
+                  <div className="absolute top-0 right-0 p-4 opacity-5">
+                    <svg className="w-24 h-24" fill="currentColor" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                  </div>
                   <h4 className="font-black text-[9px] uppercase tracking-widest mb-6 text-red-500">Desafio Proposto</h4>
-                  <p className="text-slate-300 text-xs md:text-sm leading-relaxed italic">"{sa.challenge}"</p>
+                  <p className="text-slate-300 text-xs md:text-sm leading-relaxed italic whitespace-pre-line">"{sa.challenge}"</p>
+                </div>
+
+                {/* Quadro de Resultados Esperados */}
+                {sa.expectedResults && sa.expectedResults.length > 0 && (
+                  <div className="bg-white border-2 border-blue-50 p-8 md:p-10 rounded-[2rem] shadow-lg animate-fadeIn">
+                    <div className="flex items-center gap-4 mb-6">
+                      <div className="w-10 h-10 bg-blue-600 rounded-2xl flex items-center justify-center text-white shadow-blue-100 shadow-lg">
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                      </div>
+                      <h4 className="text-xl font-black text-slate-900 uppercase tracking-tighter italic">Resultados Esperados</h4>
+                    </div>
+                    
+                    <div className="space-y-6">
+                      <p className="text-slate-500 font-black text-[11px] uppercase tracking-widest border-b border-slate-100 pb-3">
+                        {sa.expectedResults[0]}
+                      </p>
+                      
+                      <div className="grid grid-cols-1 gap-4">
+                        {sa.expectedResults.slice(1).map((result, idx) => (
+                          <div key={idx} className="flex gap-5 items-start p-5 bg-slate-50 rounded-2xl border border-slate-100 group hover:border-blue-200 hover:bg-white transition-all">
+                             <div className="w-6 h-6 bg-white border border-slate-200 rounded-lg flex items-center justify-center shrink-0 shadow-sm group-hover:bg-blue-600 group-hover:text-white group-hover:border-blue-600 transition-colors">
+                               <span className="text-[10px] font-black uppercase">{result.split(')')[0]}</span>
+                             </div>
+                             <p className="text-slate-700 text-xs md:text-sm leading-relaxed font-bold">
+                               {result.split(')')[1]?.trim() || result}
+                             </p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+                
+                {/* Separador entre SAs */}
+                <div className="flex justify-center py-4">
+                   <div className="flex gap-2">
+                     <div className="w-1.5 h-1.5 bg-slate-200 rounded-full"></div>
+                     <div className="w-1.5 h-1.5 bg-slate-200 rounded-full"></div>
+                     <div className="w-1.5 h-1.5 bg-slate-200 rounded-full"></div>
+                   </div>
                 </div>
               </div>
             ))}

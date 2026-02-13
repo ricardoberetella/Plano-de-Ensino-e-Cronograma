@@ -208,83 +208,17 @@ export const COMMON_SA_FUSI = [
 ];
 
 export const FULL_RUBRICS_FUSI = [
-  { 
-    capacity: 'Realizar operações de baixa complexidade em torno convencional.', 
-    nsa: 'Não consegue executar as operações básicas no torno de forma satisfatória ou segura, mesmo com apoio e demonstrações constantes.', 
-    apo: 'Tenta operar a máquina, mas demonstra insegurança e comete erros frequentes de posicionamento e avanço, necessitando de intervenção constante.', 
-    par: 'Opera o torno e executa as operações, mas precisa de orientação pontual do docente para corrigir a técnica, ajustar a máquina ou atingir a tolerância.', 
-    aut: 'Opera o torno com autonomia e segurança, executando todas as operações (facear, tornear, chanfrar, furar) com precisão dimensional e bom acabamento.' 
-  },
-  { 
-    capacity: 'Controlar a qualidade das peças usinadas...', 
-    nsa: 'Não consegue realizar as medições de forma correta ou preencher a ficha de controle, mesmo com o apoio direto do docente.', 
-    apo: 'Tenta realizar as medições, mas demonstra dificuldade na leitura dos instrumentos e no preenchimento da ficha, exigindo acompanhamento constante.', 
-    par: 'Realiza o controle dimensional, mas necessita de auxílio pontual para manusear o micrômetro ou para interpretar alguma tolerância especificada.', 
-    aut: 'Realiza o controle dimensional com autonomia, utilizando corretamente paquímetro e micrômetro, e preenche a ficha de autoinspeção de forma completa e precisa.' 
-  },
-  { 
-    capacity: 'Zelar pelo uso de equipamentos, instrumentos, ferramentas e materiais.', 
-    nsa: 'Danifica ferramentas ou instrumentos por mau uso ou não demonstra qualquer cuidado com os recursos da oficina, mesmo após repetidas orientações.', 
-    apo: 'Manuseia os equipamentos de forma descuidada, deixando ferramentas em locais inadequados ou não realizando a limpeza, necessitando de intervenção constante.', 
-    par: 'Manuseia os equipamentos de forma adequada na maior parte do tempo, mas requer lembretes pontuais sobre a limpeza ou guarda de algum item.', 
-    aut: 'Manuseia todos os equipamentos, ferramentas e instrumentos com o máximo cuidado, limpando-os e guardando-os corretamente por iniciativa própria.' 
-  },
-  { 
-    capacity: 'Demonstrar visão sistêmica.', 
-    nsa: 'Não consegue compreender a relação entre as peças ou a importância da sua tarefa para o produto final, mesmo com o conjunto montado para análise.', 
-    apo: 'Foca apenas na execução da sua peça, demonstrando dificuldade em entender como ela irá interagir com as outras, necessitando de explicações constantes.', 
-    par: 'Compreende que as peças se montarão, mas precisa de questionamentos para relacionar a precisão dimensional com a funcionalidade do conjunto.', 
-    aut: 'Compreende e explica como a precisão de cada peça individual afeta a montagem e o funcionamento final do subconjunto, propondo melhorias no processo.' 
-  },
-  { 
-    capacity: 'Elaborar plano de trabalho...', 
-    nsa: 'Não consegue preencher o plano de trabalho, mesmo com auxílio constante, ou deixa a maior parte em branco.', 
-    apo: 'Preenche o plano de trabalho com a ajuda constante do docente, cometendo erros na sequência de operações e no cálculo de parâmetros.', 
-    par: 'Elabora o plano de trabalho com autonomia, necessitando de pequenas correções na seleção de ferramentas ou no refinamento dos parâmetros.', 
-    aut: 'Elabora o plano de trabalho de forma completa e otimizada, propondo sequências eficientes e justificando a escolha dos parâmetros.' 
-  },
-  { 
-    capacity: 'Definir as parâmetros de usinagem...', 
-    nsa: 'Não consegue realizar os cálculos de RPM ou avanço, mesmo com fórmulas e auxílio. Insere valores aleatórios ou perigosos na máquina.', 
-    apo: 'Realiza os cálculos de parâmetros de corte com a supervisão constante do docente, cometendo erros que precisam ser corrigidos.', 
-    par: 'Calcula os parâmetros de corte de forma autônoma para materiais e operações comuns, utilizando tabelas e fórmulas, necessitando de pequenos ajustes.', 
-    aut: 'Define e otimiza os parâmetros de corte para diferentes materiais e ferramentas, justificando as escolhas para obter melhor acabamento e vida útil da ferramenta.' 
-  },
-  { 
-    capacity: 'Realizar operações de baixa complexidade em fresadora...', 
-    nsa: 'Demonstra grande dificuldade em operar a máquina, apresentando riscos à sua segurança e à do equipamento, mesmo com supervisão direta.', 
-    apo: 'Realiza as operações com supervisão e intervenção constante do docente para corrigir a postura, a fixação da peça ou o manuseio dos comandos.', 
-    par: 'Opera a máquina de forma segura e executa as operações corretamente, solicitando auxílio pontual em situações específicas.', 
-    aut: 'Realiza todas as operações com autonomia, segurança e precisão, otimizando o processo para obter um bom acabamento.' 
-  },
-  { 
-    capacity: 'Realizar operações de furação...', 
-    nsa: 'Demonstra grande dificuldade em operar a furadeira, com fixação inadequada da peça e uso incorreto da ferramenta, apresentando risco à segurança.', 
-    apo: 'Realiza operações de furação com supervisão constante, necessitando de auxílio para alinhar o furo, controlar o avanço ou aplicar fluido de corte.', 
-    par: 'Executa operações de furação de forma segura e autônoma, atingindo as especificações de diâmetro e posição na maioria das vezes, com auxílio pontual.', 
-    aut: 'Realiza operações de furação (passante, cega, escareado) com autonomia, precisão e segurança, selecionando corretamente brocas e parâmetros.' 
-  },
-  { 
-    capacity: 'Realizar operações de rosqueamento...', 
-    nsa: 'Não consegue iniciar a rosca com o macho ou quebra a ferramenta com frequência, mesmo com supervisão.', 
-    apo: 'Realiza o rosqueamento manual com auxílio constante do docente para garantir o alinhamento e o movimento correto de avanço e retrocesso.', 
-    par: 'Executa o rosqueamento manual de forma autônoma, produzindo roscas funcionais, necessitando de orientação para evitar quebra de ferramenta.', 
-    aut: 'Realiza o rosqueamento manual com precisão, alinhamento e segurança, selecionando o macho e a broca corretos e aplicando a técnica adequada.' 
-  },
-  { 
-    capacity: 'Aplicar os procedimentos de refrigeração...', 
-    nsa: 'Não aplica o fluido de corte ou o faz de forma perigosa/ineficaz, mesmo quando orientado.', 
-    apo: 'Aplica o fluido de corte apenas quando lembrado pelo docente, com dificuldade em direcionar o jato para a região de corte correta.', 
-    par: 'Aplica os procedimentos de refrigeração de forma autônoma e correta durante a usinagem, garantindo a lubrificação e o resfriamento adequados.', 
-    aut: 'Aplica e ajusta a refrigeração de forma otimizada, selecionando o tipo de fluido e vazão mais adequados para a operação e material.' 
-  },
-  { 
-    capacity: 'Controlar a qualidade das peças...', 
-    nsa: 'Não consegue manusear os instrumentos de medição ou realiza leituras incorretas, mesmo após orientação.', 
-    apo: 'Realiza as medições com dificuldade, necessitando de auxílio do docente para posicionar o instrumento e interpretar os resultados.', 
-    par: 'Utiliza os instrumentos de medição de forma correta e autônoma, realizando o controle dimensional e visual das peças conforme solicitado.', 
-    aut: 'Realiza o controle de qualidade com precisão e adota medidas preventivas para garantir a conformidade dos lotes.' 
-  }
+  { capacity: 'Realizar operações de baixa complexidade em torno convencional.', nsa: 'Não consegue executar as operações básicas no torno de forma satisfatória ou segura, mesmo com apoio e demonstrações constantes.', apo: 'Tenta operar a máquina, mas demonstra insegurança e comete erros frequentes de posicionamento e avanço, necessitando de intervenção constante.', par: 'Opera o torno e executa as operações, mas precisa de orientação pontual do docente para corrigir a técnica, ajustar a máquina ou atingir a tolerância.', aut: 'Opera o torno com autonomia e segurança, executando todas as operações (facear, tornear, chanfrar, furar) com precisão dimensional e bom acabamento.' },
+  { capacity: 'Controlar a qualidade das peças usinadas (Torneamento).', nsa: 'Não consegue realizar as medições de forma correta ou preencher a ficha de controle, mesmo com o apoio direto do docente.', apo: 'Tenta realizar as medições, mas demonstra dificuldade na leitura dos instrumentos e no preenchimento da ficha, exigindo acompanhamento constante.', par: 'Realiza o controle dimensional, mas necessita de auxílio pontual para manusear o micrômetro ou para interpretar alguma tolerância especificada.', aut: 'Realiza o controle dimensional com autonomia, utilizando corretamente paquímetro e micrômetro, e preenche a ficha de autoinspeção de forma completa e precisa.' },
+  { capacity: 'Zelar pelo uso de equipamentos, instrumentos, ferramentas e materiais.', nsa: 'Danifica ferramentas ou instrumentos por mau uso or não demonstra qualquer cuidado com os recursos da oficina, mesmo após repetidas orientações.', apo: 'Manuseia os equipamentos de forma descuidada, deixando ferramentas em locais inadequados ou não realizando a limpeza, necessitando de intervenção constante.', par: 'Manuseia os equipamentos de forma adequada na maior parte do tempo, mas requer lembretes pontuais sobre a limpeza ou guarda de algum item.', aut: 'Manuseia todos os equipamentos, ferramentas e instrumentos com o máximo cuidado, limpando-os e guardando-os corretamente por iniciativa própria.' },
+  { capacity: 'Demonstrar visão sistêmica.', nsa: 'Não consegue compreender a relação entre as peças ou a importância da sua tarefa para o produto final, mesmo com o conjunto montado para análise.', apo: 'Foca apenas na execução da sua peça, demonstrando dificuldade em entender como ela irá interagir com as outras, necessitando de explicações constantes.', par: 'Compreende que as peças se montarão, mas precisa de questionamentos para relacionar a precisão dimensional com a funcionalidade do conjunto.', aut: 'Compreende e explica como a precisão de cada peça individual afeta a montagem e o funcionamento final do subconjunto, propondo melhorias no processo.' },
+  { capacity: 'Elaborar plano de trabalho.', nsa: 'Não consegue preencher o plano de trabalho, mesmo com auxílio constante, ou deixa a maior parte em branco.', apo: 'Preenche o plano de trabalho com a ajuda constante do docente, cometendo erros na sequência de operações e no cálculo de parâmetros.', par: 'Elabora o plano de trabalho com autonomia, necessitando de pequenas correções na seleção de ferramentas ou no refinamento dos parâmetros.', aut: 'Elabora o plano de trabalho de forma completa e otimizada, propondo sequências eficientes e justificando a escolha dos parâmetros.' },
+  { capacity: 'Definir as parâmetros de usinagem.', nsa: 'Não consegue realizar os cálculos de RPM ou avanço, mesmo com fórmulas e auxílio. Insere valores aleatórios ou perigosos na máquina.', apo: 'Realiza os cálculos de parâmetros de corte com a supervisão constante do docente, cometendo erros que precisam ser corrigidos.', par: 'Calcula os parâmetros de corte de forma autônoma para materiais e operações comuns, utilizando tabelas e fórmulas, necessitando de pequenos ajustes.', aut: 'Define e otimiza os parâmetros de corte para diferentes materiais e ferramentas, justificando as escolhas para obter melhor acabamento e vida útil da ferramenta.' },
+  { capacity: 'Realizar operações de baixa complexidade em fresadora.', nsa: 'Demonstra grande dificuldade em operar a máquina, apresentando riscos à sua segurança e à do equipamento, mesmo com supervisão direta.', apo: 'Realiza as operações com supervisão e intervenção constante do docente para corrigir a postura, a fixação da peça ou o manuseio dos comandos.', par: 'Opera a máquina de forma segura e executa as operações corretamente, solicitando auxílio pontual em situações específicas.', aut: 'Realiza todas as operações com autonomia, segurança e precisão, otimizando o processo para obter um bom acabamento.' },
+  { capacity: 'Realizar operações de furação.', nsa: 'Demonstra grande dificuldade em operar a furadeira, com fixação inadequada da peça e uso incorreto da ferramenta, apresentando risco à segurança.', apo: 'Realiza operações de furação com supervisão constante, necessitando de auxílio para alinhar o furo, controlar o avanço ou aplicar fluido de corte.', par: 'Executa operações de furação de forma segura e autônoma, atingindo as especificações de diâmetro e posição na maioria das vezes, com auxílio pontual.', aut: 'Realiza operações de furação (passante, cega, escareado) com autonomia, precisão e segurança, selecionando corretamente brocas e parâmetros.' },
+  { capacity: 'Realizar operações de rosqueamento.', nsa: 'Não consegue iniciar a rosca com o macho ou quebra a ferramenta com frequência, mesmo com supervisão.', apo: 'Realiza o rosqueamento manual com auxílio constante do docente para garantir o alinhamento e o movimento correto de avanço e retrocesso.', par: 'Executa o rosqueamento manual de forma autônoma, produzindo roscas funcionais, necessitando de orientação para evitar quebra de ferramenta.', aut: 'Realiza o rosqueamento manual com precisão, alinhamento e segurança, selecionando o macho e a broca corretos e aplicando a técnica adequada.' },
+  { capacity: 'Aplicar os procedimentos de refrigeração.', nsa: 'Não aplica o fluido de corte ou o faz de forma perigosa/ineficaz, mesmo quando orientado.', apo: 'Aplica o fluido de corte apenas quando lembrado pelo docente, com dificuldade em direcionar o jato para a região de corte correta.', par: 'Aplica os procedimentos de refrigeração de forma autônoma e correta durante a usinagem, garantindo a lubrificação e o resfriamento adequados.', aut: 'Aplica e ajusta a refrigeração de forma otimizada, selecionando o tipo de fluido e vazão mais adequados para a operação e material.' },
+  { capacity: 'Controlar a qualidade das peças usinadas (Fresagem/Ajustagem).', nsa: 'Não consegue manusear os instrumentos de medição ou realiza leituras incorretas, mesmo após orientação.', apo: 'Realiza as medições com dificuldade, necessitando de auxílio do docente para posicionar o instrumento e interpretar os resultados.', par: 'Utiliza os instrumentos de medição de forma correta e autônoma, realizando o controle dimensional e visual das peças conforme solicitado.', aut: 'Realiza o controle de qualidade com precisão e adota medidas preventivas para garantir a conformidade dos lotes.' }
 ];
 
 const FULL_KNOWLEDGE_CRD = [
@@ -319,7 +253,7 @@ const FULL_SOCIOEMOCIONAL_CRD = [
 const FULL_RUBRICS_CRD = [
   { capacity: 'Medir peças com paquímetro.', nsa: 'Tenta medir, mas comete erros grosseiros na leitura da escala ou no manuseio.', apo: 'Realiza a medição com auxílio, cometendo erros pontuais na leitura do nônio ou no manuseio.', par: 'Mede a peça de forma autônoma e correta, aplicando as técnicas de manuseio e leitura.', aut: 'Mede com precisão e rapidez, identificando potenciais fontes de erro (paralaxe, etc).' },
   { capacity: 'Medir peças com micrômetro.', nsa: 'Comete erros no posicionamento do instrumento ou na leitura, necessitando orientação inicial.', apo: 'Realiza a medição com auxílio do docente na soma das escalas ou no uso da catraca.', par: 'Realiza a medição de forma correta e autônoma, utilizando a catraca periodicamente.', aut: 'Argumenta sobre a adequação do micrômetro para a tolerância solicitada e identifica erros térmicos.' },
-  { capacity: 'Demonstrar atenção a detalhes.', nsa: 'O relatório de inspeção apresenta múltiplos erros de transcrição e omissões. Não identifica as peças não conformes.', apo: 'O relatório apresenta erros pontuais ou omissões. Identifica algumas, mas não todas, as peças não conformes.', par: 'Preenche o relatório de forma correta e completa, identificando todas as peças não conformes.', aut: 'Além de preencher o relatório corretamente, anota observações pertinentes sobre o acabamento da peça ou tendências de medidas que se aproximam dos limites de tolerância.' },
+  { capacity: 'Demonstrar atenção a detalhes.', nsa: 'O relatório de inspeção apresenta múltiplos erros de transcrição e omissões. Não identifica as peças não conformes.', apo: 'O relatório apresenta erros pontuais or omissões. Identifica algumas, mas não todas, as peças não conformes.', par: 'Preenche o relatório de forma correta e completa, identificando todas as peças não conformes.', aut: 'Além de preencher o relatório corretamente, anota observações pertinentes sobre o acabamento da peça ou tendências de medidas que se aproximam dos limites de tolerância.' },
   { capacity: 'Organizar o ambiente de trabalho e as atividades.', nsa: 'Deixa a bancada e os instrumentos desorganizados e sujos durante e após a atividade.', apo: 'Necessita de lembretes para organizar a bancada ou para limpar e guardar os instrumentos corretamente.', par: 'Mantém o ambiente de trabalho organizado e guarda os equipamentos corretamente ao final da tarefa, por iniciativa própria.', aut: 'Além de manter seu próprio espaço organizado, incentiva os colegas a fazerem o mesmo e propõe melhorias na disposição das ferramentas para otimizar o fluxo de trabalho.' }
 ];
 

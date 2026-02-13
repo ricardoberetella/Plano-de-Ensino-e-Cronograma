@@ -59,26 +59,25 @@ const App: React.FC = () => {
               hasInjected = true;
             }
           } else {
-            // DETECÇÃO DE VERSÃO LITERALE: Verifica se os Resultados Esperados e Rubricas batem 100% com os prints
             const unit = plan.units[fusiIndex];
             
-            // Verifica Resultados Esperados de Torneamento (Literal AgroMaq)
-            const hasAgroMaqLiteralResults = unit.learningSituations.some(sa => 
+            // Verificação Literal dos Resultados Esperados (AgroMaq)
+            const hasAgroMaqLiteral = unit.learningSituations.some(sa => 
               sa.expectedResults.some(res => res.includes('Os componentes "Eixo cilíndrico de quatro corpos", "Eixo roscado" e "Manípulo" finalizados'))
             );
 
-            // Verifica Resultados Esperados de Fresagem (Literal Fresanatec)
-            const hasFresanatecLiteralResults = unit.learningSituations.some(sa => 
+            // Verificação Literal dos Resultados Esperados (Fresanatec)
+            const hasFresanatecLiteral = unit.learningSituations.some(sa => 
               sa.expectedResults.some(res => res.includes('O conjunto de 6 (seis) componentes mecânicos (Bloco fresado, Bloco rebaixado, Castanha mole, Base para castanha, Mordente de proteção, Coletor de serragem)'))
             );
 
-            // Verifica se a rubrica de Rosqueamento possui o texto exato do print (APO)
-            const hasRubricaRosqueamentoLiteral = unit.rubrics.some(r => 
-              r.capacity.includes('Realizar operações de rosqueamento') && 
-              r.apo.includes('garantir o alinhamento e o movimento correto de avanço e retrocesso')
+            // Verificação de Rubricas literais
+            const hasSistemicaLiteral = unit.rubrics.some(r => 
+              r.capacity.includes('Demonstrar visão sistêmica') && 
+              r.nsa.includes('Não consegue compreender a relação entre as peças')
             );
             
-            if (!hasAgroMaqLiteralResults || !hasFresanatecLiteralResults || !hasRubricaRosqueamentoLiteral) {
+            if (!hasAgroMaqLiteral || !hasFresanatecLiteral || !hasSistemicaLiteral) {
               if (fusiTemplate) {
                 plan.units[fusiIndex] = fusiTemplate;
                 plan.updatedAt = new Date().toISOString();
