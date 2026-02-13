@@ -5,11 +5,11 @@ export const SENAI_BLUE = "#005DAA";
 export const SENAI_RED = "#E30613";
 
 // Versão do cronograma - Alterar esta string força o App a atualizar o banco de dados com os novos dados "fiéis"
-export const SCHEDULE_VERSION = "2026-V7-GERAL-FUSI-FULL";
+export const SCHEDULE_VERSION = "2026-V8-FUSI-FULL-TRANSCRIPT";
 
 // --- CRONOGRAMA LIDT (Revisado) ---
 export const LIDT_SCHEDULE = [
-  { id: 'l1', date: '26/01/2026', hours: 2, capacities: 'Todas as capacidades da SA', knowledge: '1.1. Definição de Desenho Técnico', strategy: '• Exposição dialogada; • Apresentação da UC, do MSEP e da Situação de Aprendizagem "Decifrando o Projeto".', resources: 'Sala de aula, projetor.' },
+  { id: 'l1', date: '26/01/2026', hours: 2, capacities: 'Todas as capacities da SA', knowledge: '1.1. Definição de Desenho Técnico', strategy: '• Exposição dialogada; • Apresentação da UC, do MSEP e da Situação de Aprendizagem "Decifrando o Projeto".', resources: 'Sala de aula, projetor.' },
   { id: 'l2', date: '02/02/2026', hours: 2, capacities: 'Interpretar desenhos técnicos de peças.', knowledge: '1.2. Normas técnicas; 1.3. Formatos de folha; 1.4. Linhas.', strategy: '• Exposição dialogada: Apresentação das normas ABNT.', resources: 'Exemplos de desenhos técnicos.' },
   { id: 'l3', date: '09/02/2026', hours: 2, capacities: 'Interpretar desenhos técnicos de peças.', knowledge: '1.5. Escalas; 1.6. Figuras e sólidos geométricos.', strategy: '• Exposição dialogada e Demonstração.', resources: 'Projetor, modelos de sólidos.' },
   { id: 'l4', date: '23/02/2026', hours: 2, capacities: 'Elaborar croquis de peças.', knowledge: '2.1. Perspectiva (isométrica, vistas)...', strategy: '• Atividade prática: Introdução à perspectiva isométrica.', resources: 'Papel, lápis.' },
@@ -23,12 +23,12 @@ export const LIDT_SCHEDULE = [
   { id: 'l12', date: '27/04/2026', hours: 2, capacities: 'Interpretar tolerância dimensional.', knowledge: '6.1. Tolerância dimensional (campos, ISO).', strategy: '• Introdução aos conceitos de tolerância e ajustes.', resources: 'Tabelas de tolerância ISO.' },
   { id: 'l13', date: '04/05/2026', hours: 2, capacities: 'Interpretar tolerância geométrica.', knowledge: '6.2. Tolerância geométrica (forma, posição).', strategy: '• Apresentação dos símbolos e significados.', resources: 'Quadro de tolerâncias geométricas.' },
   { id: 'l14', date: '11/05/2026', hours: 2, capacities: 'Interpretar acabamento superficial.', knowledge: '6.3. Acabamento superficial (rugosidade).', strategy: '• Explicação dos símbolos de acabamento.', resources: 'Tabela de símbolos.' },
-  { id: 'l15', date: '18/05/2026', hours: 2, capacities: 'Todas as capacidades da SA.', knowledge: 'Todos os conhecimentos da SA.', strategy: '• Início da elaboração dos croquis detalhados.', resources: 'Papel, instrumentos de desenho.' },
-  { id: 'l16', date: '25/05/2026', hours: 2, capacities: 'Todas as capacidades da SA.', knowledge: 'Todos os conhecimentos da SA.', strategy: '• Continuação e refinamento dos croquis.', resources: 'Dossiê em fase de conclusão.' },
-  { id: 'l17', date: '01/06/2026', hours: 2, capacities: 'Todas as capacidades da SA.', knowledge: 'Todos os conhecimentos da SA.', strategy: '• Finalização dos croquis e do dossiê técnico.', resources: 'Dossiê técnico.' },
-  { id: 'l18', date: '08/06/2026', hours: 2, capacities: 'Todas as capacidades da SA.', knowledge: 'Todos os conhecimentos da SA.', strategy: '• Apresentação dos Resultados e Dossiês.', resources: 'Projetor.' },
-  { id: 'l19', date: '15/06/2026', hours: 2, capacities: 'Todas as capacidades da SA.', knowledge: 'Todos os conhecimentos da SA.', strategy: '• Feedback e Avaliação final.', resources: 'Fichas de avaliação.' },
-  { id: 'l20', date: '22/06/2026', hours: 2, capacities: 'Todas as capacidades da SA.', knowledge: 'Fechamento de Notas.', strategy: '• Encerramento da Unidade Curricular.', resources: 'Diário de classe.' }
+  { id: 'l15', date: '18/05/2026', hours: 2, capacities: 'Todas as capacities da SA.', knowledge: 'Todos os conhecimentos da SA.', strategy: '• Início da elaboração dos croquis detalhados.', resources: 'Papel, instrumentos de desenho.' },
+  { id: 'l16', date: '25/05/2026', hours: 2, capacities: 'Todas as capacities da SA.', knowledge: 'Todos os conhecimentos da SA.', strategy: '• Continuação e refinamento dos croquis.', resources: 'Dossiê em fase de conclusão.' },
+  { id: 'l17', date: '01/06/2026', hours: 2, capacities: 'Todas as capacities da SA.', knowledge: 'Todos os conhecimentos da SA.', strategy: '• Finalização dos croquis e do dossiê técnico.', resources: 'Dossiê técnico.' },
+  { id: 'l18', date: '08/06/2026', hours: 2, capacities: 'Todas as capacities da SA.', knowledge: 'Todos os conhecimentos da SA.', strategy: '• Apresentação dos Resultados e Dossiês.', resources: 'Projetor.' },
+  { id: 'l19', date: '15/06/2026', hours: 2, capacities: 'Todas as capacities da SA.', knowledge: 'Todos os conhecimentos da SA.', strategy: '• Feedback e Avaliação final.', resources: 'Fichas de avaliação.' },
+  { id: 'l20', date: '22/06/2026', hours: 2, capacities: 'Todas as capacities da SA.', knowledge: 'Fechamento de Notas.', strategy: '• Encerramento da Unidade Curricular.', resources: 'Diário de classe.' }
 ];
 
 // --- CRONOGRAMA CRD (Revisado) ---
@@ -52,8 +52,6 @@ export const CRD_SCHEDULE = [
 ];
 
 // --- CRONOGRAMA FUSI (EFETIVO - 60 AULAS) ---
-// Removidos definitivamente: 16/02, 17/02, 20/04, 21/04.
-// Compensação: Aula do dia 20/05 movida para 25/04 (Sábado).
 export const FUSI_SCHEDULE = [
   { id: 'f01', hours: 4, date: '26/01/2026', capacities: 'Definir parâmetros; Torneamento; Parâmetros de corte/ferramenta.', knowledge: 'TEORIA (TEOR)', strategy: 'Exposição dialogada: Apresentação da SA2 e cálculos técnicos.', resources: 'Sala de aula, projetor.' },
   { id: 'f02', hours: 4, date: '28/01/2026', capacities: 'Organizar ambiente; Facear no torno; Furo de centro.', knowledge: 'PRÁTICA (PRAT)', strategy: 'Tarefa: Eixo 4 Corpos. Prática de fixação e faceamento.', resources: 'Oficina de usinagem, Torno.' },
@@ -64,7 +62,6 @@ export const FUSI_SCHEDULE = [
   { id: 'f07', hours: 4, date: '09/02/2026', capacities: 'Controle de qualidade; Inspeção dimensional; Instrumentos.', knowledge: 'TEORIA (TEOR)', strategy: 'Teoria sobre Metrologia aplicada e tolerâncias ISO.', resources: 'Sala de aula, Projetor.' },
   { id: 'f08', hours: 4, date: '11/02/2026', capacities: 'Tornear superfície cilíndrica; Cortar no torno (Bedame).', knowledge: 'PRÁTICA (PRAT)', strategy: 'Tarefa: Eixo 4 Corpos. Acabamento e sangramento (corte).', resources: 'Oficina de usinagem, Torno.' },
   { id: 'f09', hours: 4, date: '12/02/2026', capacities: 'Inspeção dimensional; Refrigeração; Zelar pelo equipamento.', knowledge: 'PRÁTICA (PRAT)', strategy: 'Tarefa: Eixo 4 Corpos. Controle final e organização.', resources: 'Oficina de usinagem, Micrômetro.' },
-  // 16/02 e 17/02 Removidos conforme solicitado
   { id: 'f10', hours: 4, date: '18/02/2026', capacities: 'Fresagem (Rebaixos); Superfícies perpendiculares.', knowledge: 'PRÁTICA (PRAT)', strategy: 'Tarefa: Bloco Fresado. Usinagem de rebaixos e controle.', resources: 'Oficina de usinagem, Fresadora.' },
   { id: 'f11', hours: 4, date: '19/02/2026', capacities: 'Aplicar refrigeração; Fresagem (Operações avançadas).', knowledge: 'PRÁTICA (PRAT)', strategy: 'Tarefa: Bloco Fresado. Prática de acabamento em fresa.', resources: 'Oficina de usinagem, Fresadora.' },
   { id: 'f12', hours: 4, date: '23/02/2026', capacities: 'Rosqueamento (Definição, Ferramentas); Roscar com Cossinete.', knowledge: 'TEORIA (TEOR)', strategy: 'Teoria de cálculos para furação de roscas e tipos de roscas.', resources: 'Sala de aula.' },
@@ -93,7 +90,6 @@ export const FUSI_SCHEDULE = [
   { id: 'f35', hours: 4, date: '16/04/2026', capacities: 'Prática Supervisionada Avançada (Fresamento).', knowledge: 'PRÁTICA (PRAT)', strategy: 'Desafio 1: Refino dimensional do bloco fresado.', resources: 'Oficina de usinagem, Fresadora.' },
   { id: 'f36', hours: 4, date: '22/04/2026', capacities: 'Montagem de conjuntos; Elementos de máquina.', knowledge: 'PRÁTICA (PRAT)', strategy: 'Ajustagem final e montagem Manípulo/Eixo Roscado.', resources: 'Bancada.' },
   { id: 'f37', hours: 4, date: '23/04/2026', capacities: 'Controle da qualidade das peças; Inspeção dimensional.', knowledge: 'PRÁTICA (PRAT)', strategy: 'Avaliação dimensional total (Micrômetro).', resources: 'Sala de aula, Micrômetro.' },
-  // Aula 38: 25/04 - Ajustada como compensação do conteúdo de 20/05
   { id: 'f38', hours: 4, date: '25/04/2026', capacities: 'Ajustagem mecânica: Limagem plana. (Compensação do dia 20/05).', knowledge: 'PRÁTICA (PRAT)', strategy: 'Prática de ajustagem ao banco (precisão manual). Aula antecipada de 20/05.', resources: 'Bancada, Limas.' },
   { id: 'f39', hours: 4, date: '27/04/2026', capacities: 'Manutenção; Segurança do trabalho (NR-12).', knowledge: 'TEORIA (TEOR)', strategy: 'Teoria sobre proteções e dispositivos de emergência.', resources: 'Sala de aula.' },
   { id: 'f40', hours: 4, date: '29/04/2026', capacities: 'Tornear; Facear; Furo de centro (Novas peças).', knowledge: 'PRÁTICA (PRAT)', strategy: 'Tarefa Extra: Início de peça auxiliar (Base castanha).', resources: 'Oficina de usinagem, Torno.' },
@@ -105,7 +101,6 @@ export const FUSI_SCHEDULE = [
   { id: 'f46', hours: 4, date: '13/05/2026', capacities: 'Cortar no torno (Bedame); Abrir canais.', knowledge: 'PRÁTICA (PRAT)', strategy: 'Operações de sangramento e canais técnicos.', resources: 'Oficina de usinagem, Torno.' },
   { id: 'f47', hours: 4, date: '14/05/2026', capacities: 'Rosquear manual com macho na bancada.', knowledge: 'PRÁTICA (PRAT)', strategy: 'Prática intensiva de roscagem em furos cegos.', resources: 'Oficina de usinagem, Bancada.' },
   { id: 'f48', hours: 4, date: '18/05/2026', capacities: 'Elementos de fixação e transmissão (Teoria).', knowledge: 'TEORIA (TEOR)', strategy: 'Estudo sobre chavetas e eixos estriados.', resources: 'Sala de aula.' },
-  // 20/05 Removido (Compensado em 25/04)
   { id: 'f50', hours: 4, date: '21/05/2026', capacities: 'Controle dimensional de conjuntos montados.', knowledge: 'PRÁTICA (PRAT)', strategy: 'Testes funcionais e ajustes de interferência.', resources: 'Oficina de usinagem.' },
   { id: 'f51', hours: 4, date: '25/05/2026', capacities: 'Gestão de Ferramental e Almoxarifado técnico.', knowledge: 'TEORIA (TEOR)', strategy: 'Organização e controle de vida útil das ferramentas.', resources: 'Sala de aula.' },
   { id: 'f52', hours: 4, date: '27/05/2026', capacities: 'Torneamento: Prática de acabamento superficial.', knowledge: 'PRÁTICA (PRAT)', strategy: 'Foco em rugosidade e brilho no torno.', resources: 'Oficina de usinagem, Torno.' },
@@ -127,10 +122,11 @@ export const FULL_CAPACITIES_FUSI = [
   '4. Elaborar plano de trabalho de acordo com normas e procedimentos de meio ambiente, de saúde e segurança no trabalho.',
   '5. Definir os parâmetros de usinagem de torneamento e fresagem convencional de acordo com as especificações técnicas.',
   '6. Realizar operações de baixa complexidade em torno convencional de acordo com as especificações, normas técnicas e de saúde e segurança no trabalho.',
-  '7. Realizar operações de furação de acordo com as especificações, normas técnicas e de saúde e segurança no trabalho.',
-  '8. Realizar operações de rosqueamento de acordo com as especificações, normas técnicas e de saúde e segurança no trabalho.',
-  '9. Controlar a qualidade das peças usinadas em tornos e fresadoras convencionais, visualmente e por meio de instrumentos de acordo com as especificações técnicas.',
-  '10. Aplicar os procedimentos de refrigeração nos processos de torneamento e fresagem convencional.'
+  '7. Realizar operações de baixa complexidade em fresadora convencional de acordo com as especificações, normas técnicas e de saúde e segurança no trabalho.',
+  '8. Realizar operações de furação de acordo com as especificações, normas técnicas e de saúde e segurança no trabalho.',
+  '9. Realizar operações de rosqueamento de acordo com as especificações, normas técnicas e de saúde e segurança no trabalho.',
+  '10. Controlar a qualidade das peças usinadas em tornos e fresadoras convencionais, visualmente e por meio de instrumentos de acordo com as especificações técnicas.',
+  '11. Aplicar os procedimentos de refrigeração nos processos de torneamento e fresagem convencional.'
 ];
 
 export const FULL_SOCIOEMOCIONAL_FUSI = [
@@ -181,14 +177,7 @@ export const FULL_KNOWLEDGE_FUSI = [
       '4.4. Tipos de ocorrências: 4.4.1. Defeito, 4.4.2. Falha, 4.4.3. Documentação técnica'
     ]
   },
-  { 
-    topic: '5. Plano de trabalho', 
-    subtopics: [
-      '5.1. Definição', 
-      '5.2. Tipos', 
-      '5.3. Características'
-    ] 
-  },
+  { topic: '5. Plano de trabalho', subtopics: ['5.1. Definição', '5.2. Tipos', '5.3. Características'] },
   {
     topic: '6. Segurança',
     subtopics: [
@@ -201,29 +190,9 @@ export const FULL_KNOWLEDGE_FUSI = [
       '6.7. Ficha de Dados de Segurança (FDS)'
     ]
   },
-  {
-    topic: '7. Meio Ambiente',
-    subtopics: [
-      '7.1. Definição',
-      '7.2. Normalização',
-      '7.3. Segregação e descarte de resíduos'
-    ]
-  },
-  { 
-    topic: '8. Parâmetros de corte para usinagem', 
-    subtopics: [
-      '8.1. Cálculos: 8.1.1. Rotação por minuto - RPM, 8.1.2. Velocidade de corte - Vc, 8.1.3. Avanço - f, 8.1.4. Profundidade de corte - ap'
-    ] 
-  },
-  {
-    topic: '9. Parâmetros de ferramenta',
-    subtopics: [
-      '9.1. Material',
-      '9.2. Geometria',
-      '9.3. Número de insertos/dentes (z)',
-      '9.4. Raio de ponta (rε)'
-    ]
-  },
+  { topic: '7. Meio Ambiente', subtopics: ['7.1. Definição', '7.2. Normalização', '7.3. Segregação e descarte de resíduos'] },
+  { topic: '8. Parâmetros de corte para usinagem', subtopics: ['8.1. Cálculos: 8.1.1. Rotação por minuto - RPM, 8.1.2. Velocidade de corte - Vc, 8.1.3. Avanço - f, 8.1.4. Profundidade de corte - ap'] },
+  { topic: '9. Parâmetros de ferramenta', subtopics: ['9.1. Material', '9.2. Geometria', '9.3. Número de insertos/dentes (z)', '9.4. Raio de ponta (rε)'] },
   { 
     topic: '10. Torneamento', 
     subtopics: [
@@ -233,6 +202,15 @@ export const FULL_KNOWLEDGE_FUSI = [
       '10.4. Acessórios: 10.4.1. Placas, 10.4.2. Contraponta, 10.4.3. Arrastador, 10.4.4. Mandril',
       '10.5. Cálculos técnicos: 10.5.1. Recartilha, 10.5.2. Conicidade com inclinação do carro superior, 10.5.3. Rosca triangular'
     ] 
+  },
+  {
+    topic: '11. Fresagem',
+    subtopics: [
+      '11.1. Definição',
+      '11.2. Tipos de fresadora: 10.5.4. Universal, 10.5.5. Ferramenteira, 10.5.6. Pantográfica, 10.5.7. Copiadora, 10.5.8. A CNC, 10.5.9. Centros de Usinagem',
+      '11.3. Ferramentas: 10.5.10. Cabeçote faceador, 10.5.11. Fresa de topo',
+      '11.4. Acessórios: 10.5.12. Morsas, 10.5.13. Cantoneiras, 10.5.14. Calços'
+    ]
   },
   {
     topic: '12. Furação',
@@ -255,11 +233,22 @@ export const FULL_KNOWLEDGE_FUSI = [
       '13.6. Cálculos técnicos: 13.6.1. Roscas'
     ]
   },
+  {
+    topic: '14. Ajustagem',
+    subtopics: [
+      '14.1. Definição',
+      '14.2. Ferramentas: 14.2.1. Limas, 14.2.2. Riscadores, 14.2.3. Martelos, 14.2.4. Punção',
+      '14.3. Acessórios: 14.3.1. Morsa de bancada, 14.3.2. Mordentes, 14.3.3. Cantoneira, 14.3.4. Desempeno, 14.3.5. Cepo, 14.3.6. Calibrador traçador de altura',
+      '14.4. Esmerilhamento: 14.4.1. Moto esmeril, 14.4.2. Dressadores'
+    ]
+  },
   { 
     topic: '15. Controle da qualidade', 
     subtopics: [
-      '15.1. Inspeção visual: 15.1.1. Rebarbas, 15.1.2. Oxidação, 15.1.3. Marcas, 15.1.4. Riscos', 
-      '15.2. Inspeção dimensional: 15.2.1. Ficha de autoinspeção, 15.2.2. Técnicas de medição'
+      '15.1. Inspeção visual (Torno): 15.1.1. Rebarbas, 15.1.2. Oxidação, 15.1.3. Marcas, 15.1.4. Riscos', 
+      '15.2. Inspeção dimensional (Torno): 15.2.1. Ficha de autoinspeção, 15.2.2. Técnicas de medição',
+      '15.3. Inspeção visual (Fresa): 15.3.1. Rebarbas, 15.3.2. Oxidação, 15.3.3. Marcas, 15.3.4. Riscos',
+      '15.4. Inspeção dimensional (Fresa): 15.4.1. Ficha de autoinspeção, 15.4.2. Técnicas de medição'
     ] 
   },
   {
