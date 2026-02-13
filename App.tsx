@@ -59,10 +59,14 @@ const App: React.FC = () => {
               hasInjected = true;
             }
           } else {
-            // DETECÇÃO DE VERSÃO MELHORADA: Se tiver o texto "TURMA A" ou "TURMA B" nas capacidades ou conhecimentos
+            // DETECÇÃO DE VERSÃO MELHORADA: Agora insensível a maiúsculas/minúsculas para garantir a limpeza
             const unit = plan.units[fusiIndex];
-            const hasLegacyHeaderInCapacities = unit.basicCapacities.some(c => c.includes('TURMA A') || c.includes('TURMA B'));
-            const hasLegacyHeaderInKnowledge = unit.knowledge.some(k => k.topic.includes('TURMA A') || k.topic.includes('TURMA B'));
+            const hasLegacyHeaderInCapacities = unit.basicCapacities.some(c => 
+              c.toUpperCase().includes('TURMA A') || c.toUpperCase().includes('TURMA B')
+            );
+            const hasLegacyHeaderInKnowledge = unit.knowledge.some(k => 
+              k.topic.toUpperCase().includes('TURMA A') || k.topic.toUpperCase().includes('TURMA B')
+            );
             const hasUnifiedHeader = unit.basicCapacities.some(c => c === '### Torneamento, Fresagem, Ajustagem');
             
             if (hasLegacyHeaderInCapacities || hasLegacyHeaderInKnowledge || !hasUnifiedHeader) {
