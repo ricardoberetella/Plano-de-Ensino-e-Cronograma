@@ -5,7 +5,7 @@ export const SENAI_BLUE = "#005DAA";
 export const SENAI_RED = "#E30613";
 
 // Versão do cronograma - Alterar esta string força o App a atualizar o banco de dados com os novos dados "fiéis"
-export const SCHEDULE_VERSION = "2026-V6-DIAS-SEMANA";
+export const SCHEDULE_VERSION = "2026-V7-GERAL-FUSI-FULL";
 
 // --- CRONOGRAMA LIDT (Revisado) ---
 export const LIDT_SCHEDULE = [
@@ -121,21 +121,16 @@ export const FUSI_SCHEDULE = [
 ];
 
 export const FULL_CAPACITIES_FUSI = [
-  '### Torneamento, Fresagem, Ajustagem',
-  '1. Definir os parâmetros de usinagem de torneamento convencional de acordo com as especificações técnicas.',
-  '2. Realizar operações de baixa complexidade em torno convencional de acordo com as especificações, normas técnicas e de saúde e segurança no trabalho.',
-  '3. Realizar operações de torneamento externo e interno conforme desenho técnico.',
-  '4. Definir os parâmetros de usinagem de fresagem convencional de acordo com as especificações técnicas.',
-  '5. Realizar operações de baixa complexidade em fresadora convencional de acordo com as especificações, normas técnicas e de saúde e segurança no trabalho.',
-  '6. Realizar operações de fresagem de superfícies planas e esquadrejamento.',
-  '7. Selecionar ferramentas aplicadas na montagem e desmontagem de elementos de máquina.',
-  '8. Relacionar os processos de fabricação à sua aplicação na indústria.',
-  '9. Relacionar os tipos de manutenção à sua aplicação na indústria.',
-  '10. Elaborar plano de trabalho de acordo com normas e procedures de meio ambiente, de saúde e segurança no trabalho.',
-  '11. Realizar operações de furação de acordo com as especificações, normas técnicas e de saúde e segurança no trabalho.',
-  '12. Realizar operações de rosqueamento de acordo com as especificações, normas técnicas e de saúde e segurança no trabalho.',
-  '13. Controlar a qualidade das peças usinadas, visualmente e por meio de instrumentos de acordo com as especificações técnicas.',
-  '14. Aplicar os procedimentos de refrigeração nos processos de usinagem convencional.'
+  '1. Selecionar ferramentas aplicadas na montagem e desmontagem de elementos de máquina.',
+  '2. Relacionar os processos de fabricação à sua aplicação na indústria.',
+  '3. Relacionar os tipos de manutenção à sua aplicação na indústria.',
+  '4. Elaborar plano de trabalho de acordo com normas e procedimentos de meio ambiente, de saúde e segurança no trabalho.',
+  '5. Definir os parâmetros de usinagem de torneamento e fresagem convencional de acordo com as especificações técnicas.',
+  '6. Realizar operações de baixa complexidade em torno convencional de acordo com as especificações, normas técnicas e de saúde e segurança no trabalho.',
+  '7. Realizar operações de furação de acordo com as especificações, normas técnicas e de saúde e segurança no trabalho.',
+  '8. Realizar operações de rosqueamento de acordo com as especificações, normas técnicas e de saúde e segurança no trabalho.',
+  '9. Controlar a qualidade das peças usinadas em tornos e fresadoras convencionais, visualmente e por meio de instrumentos de acordo com as especificações técnicas.',
+  '10. Aplicar os procedimentos de refrigeração nos processos de torneamento e fresagem convencional.'
 ];
 
 export const FULL_SOCIOEMOCIONAL_FUSI = [
@@ -147,13 +142,133 @@ export const FULL_SOCIOEMOCIONAL_FUSI = [
 ];
 
 export const FULL_KNOWLEDGE_FUSI = [
-  { topic: '1. Elementos de máquina', subtopics: ['1.1. Elementos de fixação: Porcas, Parafusos, Arruelas, Contra pino, Rebites, Pinos, Cavilhas', '1.2. Elementos de transmissão: Chavetas, Engrenagens, Polias, Correias, Acoplamentos, Roscas, Corrente, Eixos, Redutores, Variadores'] },
-  { topic: '3. Processos de fabricação', subtopics: ['3.1. Definição', '3.3. Manufatura Subtrativa: Torneamento, Furação, Fresamento'] },
-  { topic: '5. Plano de trabalho', subtopics: ['5.1. Definição', '5.2. Tipos', '5.3. Características'] },
-  { topic: '8. Parâmetros de corte', subtopics: ['8.1. Cálculos: RPM, Vc, f, ap'] },
-  { topic: '10. Torneamento', subtopics: ['10.1. Definição', '10.2. Tipos de tornos', '10.3. Ferramentas', '10.4. Acessórios', '10.5. Cálculos técnicos'] },
-  { topic: '11. Fresagem', subtopics: ['11.1. Definição', '11.2. Tipos de fresadora', '11.3. Ferramentas', '11.4. Acessórios'] },
-  { topic: '15. Controle da qualidade', subtopics: ['15.1. Inspeção visual', '15.2. Inspeção dimensional'] }
+  { 
+    topic: '1. Elementos de máquina', 
+    subtopics: [
+      '1.1. Elementos de fixação: 1.1.1. Porcas, 1.1.2. Parafusos, 1.1.3. Arruelas, 1.1.4. Contra pino ou cupilha, 1.1.5. Rebites, 1.1.6. Pinos, 1.1.7. Cavilhas',
+      '1.2. Elementos de transmissão: 1.2.1. Chavetas, 1.2.2. Engrenagens, 1.2.3. Polias, 1.2.4. Correias, 1.2.5. Acoplamentos, 1.2.6. Roscas de Transmissão, 1.2.7. Corrente, 1.2.8. Eixos, 1.2.9. Sistemas de transmissão, 1.2.10. Redutores de velocidade, 1.2.11. Variadores de velocidade',
+      '1.3. Elementos de vedação: 1.3.1. Juntas, 1.3.2. Retentores, 1.3.3. Selos mecânicos, 1.3.4. O-Rings',
+      '1.4. Elementos de apoio: 1.4.1. Guias lineares, 1.4.2. Barramentos, 1.4.3. Mancais de deslizamento, 1.4.4. Mancais de rolamentos, 1.4.5. Buchas',
+      '1.5. Elementos de instalação: 1.5.1. Válvula, 1.5.2. Tubulação, 1.5.3. Conexão',
+      '1.6. Elementos elásticos: 1.6.1. Molas, 1.6.2. Anéis elásticos, 1.6.3. Pinos elásticos'
+    ] 
+  },
+  {
+    topic: '2. Ferramentas',
+    subtopics: [
+      '2.1. Manuais',
+      '2.2. Elétricas ou eletrônicas',
+      '2.3. Pneumáticas',
+      '2.4. Portáteis'
+    ]
+  },
+  { 
+    topic: '3. Processos de fabricação', 
+    subtopics: [
+      '3.1. Definição',
+      '3.2. Injeção: 3.2.1. Metais, 3.2.2. Plásticos',
+      '3.3. Manufatura Subtrativa: 3.3.1. Torneamento, 3.3.2. Furação, 3.3.3. Fresamento, 3.3.4. Retificação',
+      '3.4. Manufatura aditiva: 3.4.1. Soldagem, 3.4.2. Impressão 3D',
+      '3.5. Conformação mecânica: 3.5.1. Laminação, 3.5.2. Trefilação, 3.5.3. Extrusão, 3.5.4. Forjamento, 3.5.5. Repuxo, 3.5.6. Dobramento, 3.5.7. Corte'
+    ] 
+  },
+  {
+    topic: '4. Manutenção',
+    subtopics: [
+      '4.1. Definição',
+      '4.2. Aplicação',
+      '4.3. Tipos de intervenção: 4.3.1. Corretiva, 4.3.2. Preventiva, 4.3.3. Preditiva, 4.3.4. Prescritiva, 4.3.5. Emergencial',
+      '4.4. Tipos de ocorrências: 4.4.1. Defeito, 4.4.2. Falha, 4.4.3. Documentação técnica'
+    ]
+  },
+  { 
+    topic: '5. Plano de trabalho', 
+    subtopics: [
+      '5.1. Definição', 
+      '5.2. Tipos', 
+      '5.3. Características'
+    ] 
+  },
+  {
+    topic: '6. Segurança',
+    subtopics: [
+      '6.1. Riscos: 6.1.1. Físicos, 6.1.2. Mecânicos, 6.1.3. Térmicos, 6.1.4. Elétricos',
+      '6.2. Equipamentos de proteção: 6.2.1. Individual, 6.2.2. Coletivo',
+      '6.3. Normas regulamentadoras',
+      '6.4. Sinalização',
+      '6.5. Análise de risco da tarefa - ART',
+      '6.6. Análise preliminar de risco - APR',
+      '6.7. Ficha de Dados de Segurança (FDS)'
+    ]
+  },
+  {
+    topic: '7. Meio Ambiente',
+    subtopics: [
+      '7.1. Definição',
+      '7.2. Normalização',
+      '7.3. Segregação e descarte de resíduos'
+    ]
+  },
+  { 
+    topic: '8. Parâmetros de corte para usinagem', 
+    subtopics: [
+      '8.1. Cálculos: 8.1.1. Rotação por minuto - RPM, 8.1.2. Velocidade de corte - Vc, 8.1.3. Avanço - f, 8.1.4. Profundidade de corte - ap'
+    ] 
+  },
+  {
+    topic: '9. Parâmetros de ferramenta',
+    subtopics: [
+      '9.1. Material',
+      '9.2. Geometria',
+      '9.3. Número de insertos/dentes (z)',
+      '9.4. Raio de ponta (rε)'
+    ]
+  },
+  { 
+    topic: '10. Torneamento', 
+    subtopics: [
+      '10.1. Definição', 
+      '10.2. Tipos de tornos: 10.2.1. Horizontal, 10.2.2. Vertical, 10.2.3. De placa ou platô, 10.2.4. Revólver, 10.2.5. Automático, 10.2.6. Copiador, 10.2.7. A CNC', 
+      '10.3. Ferramentas: 10.3.1. Alargador, 10.3.2. Bedame, 10.3.3. Broca de centro, 10.3.4. Broca helicoidal, 10.3.5. Cossinete, 10.3.6. Escareador, 10.3.7. Macho, 10.3.8. Recartilha, 10.3.9. Rosqueamento externo, 10.3.10. Rosqueamento interno, 10.3.11. Torneamento externo, 10.3.12. Torneamento interno', 
+      '10.4. Acessórios: 10.4.1. Placas, 10.4.2. Contraponta, 10.4.3. Arrastador, 10.4.4. Mandril',
+      '10.5. Cálculos técnicos: 10.5.1. Recartilha, 10.5.2. Conicidade com inclinação do carro superior, 10.5.3. Rosca triangular'
+    ] 
+  },
+  {
+    topic: '12. Furação',
+    subtopics: [
+      '12.1. Definição',
+      '12.2. Tipos de furadeira: 12.2.1. De coluna de piso, 12.2.2. De coluna de bancada, 12.2.3. Radial, 12.2.4. Portátil',
+      '12.3. Ferramentas',
+      '12.4. Acessórios: 12.4.1. Morsas, 12.4.2. Calços, 12.4.3. Bucha de redução',
+      '12.5. Parâmetros de corte: 12.5.1. Velocidade de Corte (VC), 12.5.2. Rotações por minuto (RPM), 12.5.3. Avanço (f)'
+    ]
+  },
+  {
+    topic: '13. Rosqueamento',
+    subtopics: [
+      '13.1. Definição',
+      '13.2. Ferramentas: 13.2.1. Macho, 13.2.2. Cossinete',
+      '13.3. Acessórios: 13.3.1. Desandador, 13.3.2. Porta cossinete',
+      '13.4. Características: 13.4.1. Sistema de roscas, 13.4.2. Aplicação, 13.4.3. Tabelas',
+      '13.5. Máquina: 13.5.1. Rosqueadeira',
+      '13.6. Cálculos técnicos: 13.6.1. Roscas'
+    ]
+  },
+  { 
+    topic: '15. Controle da qualidade', 
+    subtopics: [
+      '15.1. Inspeção visual: 15.1.1. Rebarbas, 15.1.2. Oxidação, 15.1.3. Marcas, 15.1.4. Riscos', 
+      '15.2. Inspeção dimensional: 15.2.1. Ficha de autoinspeção, 15.2.2. Técnicas de medição'
+    ] 
+  },
+  {
+    topic: '16. Refrigeração',
+    subtopics: [
+      '16.1. Definição',
+      '16.2. Fluidos de corte: 16.2.1. Aplicações, 16.2.2. Tipos, 16.2.3. Mecanismos, 16.2.4. Propriedades, 16.2.5. Procedimentos'
+    ]
+  }
 ];
 
 export const COMMON_SA_FUSI = [
