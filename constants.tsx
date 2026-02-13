@@ -51,6 +51,7 @@ export const LIDT_SCHEDULE = [
 ];
 
 export const FULL_CAPACITIES_FUSI = [
+  '--- TURMA A - TORNEAMENTO ---',
   '1. Selecionar ferramentas aplicadas na montagem e desmontagem de elementos de máquina.',
   '2. Relacionar os processos de fabricação à sua aplicação na indústria.',
   '3. Relacionar os tipos de manutenção à sua aplicação na indústria.',
@@ -58,6 +59,17 @@ export const FULL_CAPACITIES_FUSI = [
   '5. Definir os parâmetros de usinagem de torneamento e fresagem convencional de acordo com as especificações técnicas.',
   '6. Realizar operações de baixa complexidade em torno convencional de acordo com as especificações, normas técnicas e de saúde e segurança no trabalho.',
   '7. Realizar operações de furação de acordo com as especificações, normas técnicas e de saúde e segurança no trabalho.',
+  '8. Realizar operações de rosqueamento de acordo com as especificações, normas técnicas e de saúde e segurança no trabalho.',
+  '9. Controlar a qualidade das peças usinadas em tornos e fresadoras convencionais, visualmente e por meio de instrumentos de acordo com as especificações técnicas.',
+  '10. Aplicar os procedimentos de refrigeração nos processos de torneamento e fresagem convencional.',
+  '--- TURMA B - FRESAGEM ---',
+  '1. Selecionar ferramentas aplicadas na montagem e desmontagem de elementos de máquina.',
+  '2. Relacionar os processos de fabricação à sua aplicação na indústria.',
+  '3. Relacionar os tipos de manutenção à sua aplicação na indústria.',
+  '4. Elaborar plano de trabalho de acordo com normas e procedimentos de meio ambiente, de saúde e segurança no trabalho.',
+  '5. Definir os parâmetros de usinagem de torneamento e fresagem convencional de acordo com as especificações técnicas.',
+  '6. Realizar operações de furação de acordo com as especificações, normas técnicas e de saúde e segurança no trabalho.',
+  '7. Realizar operações de baixa complexidade em fresadora convencional de acordo com as especificações, normas técnicas e de saúde e segurança no trabalho.',
   '8. Realizar operações de rosqueamento de acordo com as especificações, normas técnicas e de saúde e segurança no trabalho.',
   '9. Controlar a qualidade das peças usinadas em tornos e fresadoras convencionais, visualmente e por meio de instrumentos de acordo com as especificações técnicas.',
   '10. Aplicar os procedimentos de refrigeração nos processos de torneamento e fresagem convencional.'
@@ -107,13 +119,19 @@ export const FULL_KNOWLEDGE_FUSI = [
   { topic: '7. Meio Ambiente', subtopics: ['7.1. Definição', '7.2. Normalização', '7.3. Segregação e descarte de resíduos'] },
   { topic: '8. Parâmetros de corte para usinagem', subtopics: ['8.1. Cálculos: 8.1.1. Rotação por minuto - RPM, 8.1.2. Velocidade de corte - Vc, 8.1.3. Avanço - f, 8.1.4. Profundidade de corte - ap'] },
   { topic: '9. Parâmetros de ferramenta', subtopics: ['9.1. Material', '9.2. Geometria', '9.3. Número de insertos/dentes (z)', '9.4. Raio de ponta (re)'] },
-  { topic: '10. Torneamento', subtopics: [
+  { topic: '10. Torneamento (Turma A)', subtopics: [
     '10.1. Definição',
     '10.2. Tipos de tornos: 10.2.1. Horizontal, 10.2.2. Vertical, 10.2.3. De placa ou platô, 10.2.4. Revólver, 10.2.5. Automático, 10.2.6. Copiador, 10.2.7. A CNC',
     '10.3. Ferramentas: 10.3.1. Alargador, 10.3.2. Bedame, 10.3.3. Broca de centro, 10.3.4. Broca helicoidal, 10.3.5. Cossinete, 10.3.6. Escareador, 10.3.7. Macho, 10.3.8. Recartilha, 10.3.9. Rosqueamento externo, 10.3.10. Rosqueamento interno, 10.3.11. Torneamento externo, 10.3.12. Torneamento interno',
-    '10.4. Acessórios: 10.4.1. Placas, 10.4.2. Contraponta, 10.4.3. Arrastador, 10.4.4. Mandril'
+    '10.4. Acessórios: 10.4.1. Placas, 10.4.2. Contraponta, 10.4.3. Arrastador, 10.4.4. Mandril',
+    '10.5. Cálculos técnicos: 10.5.1. Recartilha, 10.5.2. Conicidade com inclinação do carro superior, 10.5.3. Rosca triangular'
   ]},
-  { topic: '10.5. Cálculos técnicos', subtopics: ['10.5.1. Recartilha', '10.5.2. Conicidade com inclinação do carro superior', '10.5.3. Rosca triangular'] },
+  { topic: '10. Fresagem (Turma B)', subtopics: [
+    '10.1. Definição',
+    '10.2. Tipos de fresadora: 10.5.4. Universal, 10.5.5. Ferramenteira, 10.5.6. Pantográfica, 10.5.7. Copiadora, 10.5.8. A CNC, 10.5.9. Centros de Usinagem',
+    '10.3. Ferramentas: 10.5.10. Cabeçote faceador, 10.5.11. Fresa de topo',
+    '10.4. Acessórios: 10.5.12. Morsas, 10.5.13. Cantoneiras, 10.5.14. Calços'
+  ]},
   { topic: '12. Furação', subtopics: [
     '12.1. Definição',
     '12.2. Tipos de furadeira: 12.2.1. De coluna de piso, 12.2.2. De coluna de bancada, 12.2.3. Radial, 12.2.4. Portátil',
@@ -128,6 +146,12 @@ export const FULL_KNOWLEDGE_FUSI = [
     '13.4. Características: 13.4.1. Sistema de roscas, 13.4.2. Aplicação, 13.4.3. Tabelas',
     '13.5. Máquina: 13.5.1. Rosqueadeira',
     '13.6. Cálculos técnicos: 13.6.1. Roscas'
+  ]},
+  { topic: '14. Ajustagem', subtopics: [
+    '14.1. Definição',
+    '14.2. Ferramentas: 14.2.1. Limas, 14.2.2. Riscadores, 14.2.3. Martelos, 14.2.4. Punção',
+    '14.3. Acessórios: 14.3.1. Morsa de bancada, 14.3.2. Mordentes, 14.3.3. Cantoneira, 14.3.4. Desempeno, 14.3.5. Cepo, 14.3.6. Calibrador traçador de altura',
+    '14.4. Esmerilhamento: 14.4.1. Moto esmeril, 14.4.2. Dressadores'
   ]},
   { topic: '15. Controle da qualidade', subtopics: [
     '15.1. Inspeção visual: 15.1.1. Rebarbas, 15.1.2. Oxidação, 15.1.3. Marcas, 15.1.4. Riscos',

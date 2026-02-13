@@ -58,13 +58,19 @@ const App: React.FC = () => {
               await FirebaseService.savePlan(plan);
               hasInjected = true;
             }
-          } else if (plan.units[fusiIndex].basicCapacities.length < 10) {
-            // DETECÇÃO DE VERSÃO ANTIGA: Se tiver menos que 10 itens, atualiza para o novo conteúdo das imagens
-            if (fusiTemplate) {
-              plan.units[fusiIndex] = fusiTemplate;
-              plan.updatedAt = new Date().toISOString();
-              await FirebaseService.savePlan(plan);
-              hasInjected = true;
+          } else {
+            // DETECÇÃO DE VERSÃO: Se não tiver a palavra "Fresagem" ou "Ajustagem", atualiza para o novo conteúdo das imagens
+            const unit = plan.units[fusiIndex];
+            const hasFresa = unit.basicCapacities.some(c => c.includes('FRESAGEM'));
+            const hasAjustagem = unit.knowledge.some(k => k.topic.includes('Ajustagem'));
+            
+            if (!hasFresa || !hasAjustagem) {
+              if (fusiTemplate) {
+                plan.units[fusiIndex] = fusiTemplate;
+                plan.updatedAt = new Date().toISOString();
+                await FirebaseService.savePlan(plan);
+                hasInjected = true;
+              }
             }
           }
           return plan;
