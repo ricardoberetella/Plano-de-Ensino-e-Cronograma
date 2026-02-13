@@ -31,8 +31,8 @@ export const LIDT_SCHEDULE = [
   { id: 'l1', date: '26/01/2026', hours: 2, capacities: 'Todas as capacidades da SA', knowledge: '1.1. Definição de Desenho Técnico', strategy: '• Exposição dialogada; • Apresentação da UC, do MSEP e da Situação de Aprendizagem "Decifrando o Projeto"; • Dinâmica de Grupo: Formação das equipes e discussão inicial sobre a importância do desenho técnico no mundo do trabalho.', resources: 'Sala de aula, projetor, computador, Plano de Ensino, material da SA.' },
   { id: 'l2', date: '02/02/2026', hours: 2, capacities: 'Interpretar desenhos técnicos de peças.', knowledge: '1.2. Normas técnicas; 1.3. Formatos de folha; 1.4. Linhas.', strategy: '• Exposição dialogada: Apresentação das normas ABNT, formatos de papel e tipos de linhas. • Atividade prática: Análise de desenhos técnicos para identificação dos tipos de linhas e suas aplicações.', resources: 'Sala de aula, projetor, exemplos de desenhos técnicos, apostila.' },
   { id: 'l3', date: '09/02/2026', hours: 2, capacities: 'Interpretar desenhos técnicos de peças.', knowledge: '1.5. Escalas; 1.6. Figuras e sólidos geométricos.', strategy: '• Exposição dialogada e Demonstração: Explicação sobre escalas (natural, redução, ampliação). • Apresentação de figuras e sólidos geométricos.', resources: 'Projetor, modelos de sólidos geométricos, desenhos com diferentes escalas.' },
-  { id: 'l4', date: '16/02/2026', hours: 2, capacities: 'Elaborar croquis de peças.', knowledge: '2.1. Perspectiva (isométrica, vistas)...', strategy: '• Atividade prática: Introdução à perspectiva isométrica. Exercícios de esboço à mão livre de sólidos geométricos simples em perspectiva.', resources: 'Sala de aula, papel, lápis, borracha, modelos de sólidos.' },
-  { id: 'l5', date: '23/02/2026', hours: 2, capacities: 'Elaborar croquis de peças.', knowledge: '2.2. Projeção ortogonal (vistas, supressão de vistas).', strategy: '• Atividade prática: Desenho das 3 vistas principais (frontal, superior, lateral) a partir de modelos sólidos simples. Discussão sobre supressão de vistas.', resources: 'Sala de aula, papel, lápis, borracha, modelos de peças simples.' },
+  { id: 'l4', date: '16/02/2026', hours: 2, capacities: 'Elaborar croquis de peças.', knowledge: '2.1. Perspectiva (isométrica, vistas)...', strategy: '• Atividade prática: Introdução à perspectiva isométrica. Exercícios de esboço à mão livre de sólidos geométricos simples em perspectiva.', resources: 'Sala de aula, papel, lps, borracha, modelos de sólidos.' },
+  { id: 'l5', date: '23/02/2026', hours: 2, capacities: 'Elaborar croquis de peças.', knowledge: '2.2. Projeção ortogonal (vistas, supressão de vistas).', strategy: '• Atividade prática: Desenho das 3 vistas principais (frontal, superior, lateral) a partir de modelos sólidos simples. Discussão sobre supressão de vistas.', resources: 'Sala de aula, papel, lps, borracha, modelos de peças simples.' },
   { id: 'l6', date: '02/03/2026', hours: 2, capacities: 'Elaborar croquis de peças.', knowledge: '2.5. Cotagem (vistas únicas, face de referência, eixo de simetria).', strategy: '• Exposição dialogada e Prática: Apresentação das regras de cotagem. Exercícios de cotagem de vistas ortogonais.', resources: 'Projetor, exemplos de desenhos cotados, exercícios impressos.' },
   { id: 'l7', date: '09/03/2026', hours: 2, capacities: 'Interpretar desenhos técnicos de peças.', knowledge: '3.1. Cortes... 3.2. Meio corte.', strategy: '• Exposição dialogada e Demonstração: Explicação da necessidade e representação de cortes. Análise de desenhos com corte total e meio corte.', resources: 'Projetor, desenhos técnicos com cortes, peças seccionadas (se disponível).' },
   { id: 'l8', date: '16/03/2026', hours: 2, capacities: 'Interpretar desenhos técnicos de peças.', knowledge: '3.3 a 3.7. Outros tipos de corte (composto, parcial, seção, omissão, encurtamento).', strategy: '• Estudo de caso: As equipes analisam desenhos complexos e identificam os diferentes tipos de cortes e seções, discutindo sua aplicação.', resources: 'Projetor, conjunto de desenhos técnicos variados.' },
@@ -51,26 +51,26 @@ export const LIDT_SCHEDULE = [
 ];
 
 export const FUSI_SCHEDULE = [
-  { id: 'f1', date: '28/01/2026', hours: 2, capacities: 'Atuar em conformidade com normas de saúde e segurança no trabalho.', knowledge: '1. Segurança no Trabalho; 2. Higiene Industrial.', strategy: 'Apresentação da SA e das normas de segurança da oficina. Visita orientada aos ambientes de trabalho.', resources: 'Oficina, EPIs, roteiro de segurança.' },
-  { id: 'f2', date: '04/02/2026', hours: 2, capacities: 'Preparar o ambiente de trabalho conforme a atividade.', knowledge: '3. Máquinas e Ferramentas; 4. Materiais de fabricação.', strategy: 'Apresentação das máquinas operatrizes e ferramentas manuais. Identificação de materiais ferrosos e não ferrosos.', resources: 'Oficina, catálogo de máquinas, amostras de materiais.' },
-  { id: 'f3', date: '11/02/2026', hours: 2, capacities: 'Operar furadeira de bancada e coluna.', knowledge: '5. Processo de Furação (5.1, 5.2).', strategy: 'Demonstração de furação em chapas de aço. Cálculos básicos de RPM para furação.', resources: 'Furadeira, brocas, fluido de corte, tabelas de RPM.' },
-  { id: 'f4', date: '25/02/2026', hours: 2, capacities: 'Realizar serramento e limagem manual.', knowledge: '6. Processos manuais (6.1, 6.2).', strategy: 'Atividade prática: Serramento de tarugos e limagem de superfícies planas conforme desenho técnico.', resources: 'Arcos de serra, limas bastardas e murças, morsa.' },
-  { id: 'f5', date: '04/03/2026', hours: 2, capacities: 'Realizar roscagem manual com machos e cossinetes.', knowledge: '7. Roscagem (7.1, 7.2).', strategy: 'Demonstração e prática de abertura de roscas internas e externas em aço carbono.', resources: 'Jogos de machos, vira-machos, cossinetes, porta-cossinetes.' },
-  { id: 'f6', date: '11/03/2026', hours: 2, capacities: 'Zelar pela conservação e manutenção de ferramentas.', knowledge: '8. Manutenção básica e lubrificação.', strategy: 'Prática de limpeza de máquinas e aplicação de óleos protetivos. Organização do armário de ferramentas.', resources: 'Panos, óleos, graxas, ferramentas diversas.' },
-  { id: 'f7', date: '18/03/2026', hours: 2, capacities: 'Executar afiação de ferramentas simples.', knowledge: '9. Afiação de brocas (9.1).', strategy: 'Demonstração de afiação de brocas helicoidais no esmeril, observando ângulos de corte.', resources: 'Esmeril, brocas rombas, gabarito de afiação.' },
-  { id: 'f8', date: '25/03/2026', hours: 2, capacities: 'Executar traçagem de peças.', knowledge: '10. Traçagem (10.1, 10.2).', strategy: 'Prática de traçagem em chapas utilizando graminho, escala e riscador.', resources: 'Graminho, desempeno de granito, riscador, tinta de traçar.' },
-  { id: 'f9', date: '01/04/2026', hours: 2, capacities: 'Realizar montagem de componentes simples.', knowledge: '11. Elementos de fixação (11.1).', strategy: 'Atividade de montagem utilizando parafusos, porcas e arruelas seguindo ordem lógica.', resources: 'Parafusos diversos, chaves de aperto.' },
-  { id: 'f10', date: '08/04/2026', hours: 2, capacities: 'Executar todas as capacidades práticas da SA.', knowledge: 'Revisão dos fundamentos de usinagem.', strategy: 'Início da fabricação do "Dispositivo Guia": Serramento e desbaste inicial da base.', resources: 'Material bruto, oficina mecânica.' },
-  { id: 'f11', date: '15/04/2026', hours: 2, capacities: 'Executar todas as capacidades práticas da SA.', knowledge: 'Furação e Rebaixamento.', strategy: 'Furação da base e execução de rebaixos para parafusos Allen.', resources: 'Furadeira, brocas, fresas de rebaixar.' },
-  { id: 'f12', date: '29/04/2026', hours: 2, capacities: 'Executar todas as capacidades práticas da SA.', knowledge: 'Roscagem e Acabamento.', strategy: 'Execução de roscas M8 e acabamento fino com lima e lixa.', resources: 'Machos M8, limas finas, lixas metálicas.' },
-  { id: 'f13', date: '06/05/2026', hours: 2, capacities: 'Executar todas as capacidades práticas da SA.', knowledge: 'Montagem final.', strategy: 'Montagem do conjunto e verificação de ajustes manuais.', resources: 'Componentes fabricados, ferramentas de aperto.' },
-  { id: 'f14', date: '13/05/2026', hours: 2, capacities: 'Executar todas as capacidades práticas da SA.', knowledge: 'Controle de Qualidade Final.', strategy: 'Verificação funcional do dispositivo e limpeza das superfícies.', resources: 'Instrumentos de medição, solventes.' },
-  { id: 'f15', date: '20/05/2026', hours: 2, capacities: 'Executar todas as capacidades práticas da SA.', knowledge: 'Apresentação do protótipo.', strategy: 'Exposição dos dispositivos finalizados e feedback coletivo.', resources: 'Dispositivos montados.' },
-  { id: 'f16', date: '27/05/2026', hours: 2, capacities: 'Manter a organização do ambiente.', knowledge: '5S na Oficina.', strategy: 'Grande mutirão de organização e inventário de ferramentas da turma.', resources: 'Material de limpeza, listas de inventário.' },
-  { id: 'f17', date: '03/06/2026', hours: 2, capacities: 'Avaliar processos de usinagem.', knowledge: 'Produtividade e Qualidade.', strategy: 'Debate sobre erros comuns na fabricação e como evitá-los.', resources: 'Peças com defeitos para análise.' },
-  { id: 'f18', date: '10/06/2026', hours: 2, capacities: 'Consolidar conhecimentos técnicos.', knowledge: 'Revisão Geral.', strategy: 'Quiz técnico sobre ferramentas e processos manuais.', resources: 'Computador/Celular.' },
-  { id: 'f19', date: '17/06/2026', hours: 2, capacities: 'Finalizar documentação técnica.', knowledge: 'Relatório de Oficina.', strategy: 'Escrita do relatório técnico individual sobre a prática.', resources: 'Caderno, formulários.' },
-  { id: 'f20', date: '24/06/2026', hours: 2, capacities: 'Autoavaliação e encerramento.', knowledge: 'Fechamento da UC.', strategy: 'Feedback individual sobre evolução técnica e comportamental.', resources: 'Fichas de avaliação.' }
+  { id: 'f1', date: '28/01/2026', hours: 2, capacities: '1. Selecionar ferramentas aplicadas na montagem e desmontagem.', knowledge: '1. Elementos de máquina (1.1 a 1.2).', strategy: 'Apresentação da SA e dos Elementos de Máquina. Identificação de ferramentas manuais.', resources: 'Oficina, catálogo de máquinas, mostruário de fixadores.' },
+  { id: 'f2', date: '04/02/2026', hours: 2, capacities: '2. Relacionar os processos de fabricação à sua aplicação.', knowledge: '3. Processos de fabricação (3.1 a 3.3).', strategy: 'Exposição dialogada sobre processos de injeção e manufatura subtrativa.', resources: 'Oficina, projetor, amostras de peças usinadas.' },
+  { id: 'f3', date: '11/02/2026', hours: 2, capacities: '7. Realizar operações de furação.', knowledge: '12. Furação (12.1 a 12.5).', strategy: 'Prática de furação em furadeira de bancada observando parâmetros de corte.', resources: 'Furadeira, brocas, fluido de corte, tabelas de RPM.' },
+  { id: 'f4', date: '25/02/2026', hours: 2, capacities: '4. Elaborar plano de trabalho.', knowledge: '5. Plano de trabalho; 6. Segurança (6.1 a 6.7).', strategy: 'Elaboração de ART e APR para atividades de oficina. Planejamento de sequência operacional.', resources: 'Formulários de segurança, oficina.' },
+  { id: 'f5', date: '04/03/2026', hours: 2, capacities: '6. Realizar operações de baixa complexidade em torno.', knowledge: '10. Torneamento (10.1 a 10.3).', strategy: 'Introdução ao torno horizontal. Operações de faceamento e cilindragem simples.', resources: 'Torno convencional, ferramentas de corte.' },
+  { id: 'f6', date: '11/03/2026', hours: 2, capacities: '5. Definir os parâmetros de usinagem.', knowledge: '8. Parâmetros de corte (8.1).', strategy: 'Cálculos de RPM, Vc e avanço para torneamento externo.', resources: 'Calculadora, tabelas de fabricantes.' },
+  { id: 'f7', date: '18/03/2026', capacities: '8. Realizar operações de rosqueamento.', knowledge: '13. Rosqueamento (13.1 a 13.6).', hours: 2, strategy: 'Demonstração de rosqueamento manual e em máquina. Cálculos técnicos de roscas.', resources: 'Machos, cossinetes, rosqueadeira.' },
+  { id: 'f8', date: '25/03/2026', capacities: '3. Relacionar os tipos de manutenção.', knowledge: '4. Manutenção (4.1 a 4.4).', hours: 2, strategy: 'Identificação de falhas e defeitos. Diferenciação entre corretiva e preventiva.', resources: 'Máquinas da oficina, documentação técnica.' },
+  { id: 'f9', date: '01/04/2026', capacities: '10. Aplicar procedimentos de refrigeração.', knowledge: '16. Refrigeração (16.1 a 16.2).', hours: 2, strategy: 'Aplicação de fluidos de corte conforme o material e processo.', resources: 'Fluidos de corte, borrifadores.' },
+  { id: 'f10', date: '08/04/2026', capacities: '9. Controlar a qualidade das peças usinadas.', knowledge: '15. Controle da qualidade (15.1 a 15.2).', hours: 2, strategy: 'Inspeção visual e dimensional de lotes produzidos. Preenchimento de ficha de autoinspeção.', resources: 'Instrumentos de medição, lupas.' },
+  { id: 'f11', date: '15/04/2026', capacities: '6. Realizar operações de baixa complexidade em torno.', knowledge: '10. Torneamento (10.4 a 10.5).', hours: 2, strategy: 'Uso de acessórios do torno: placa de 3 castanhas e contraponta.', resources: 'Torno, acessórios.' },
+  { id: 'f12', date: '29/04/2026', capacities: 'Todas as capacidades práticas.', knowledge: 'Conceitos integradores.', hours: 2, strategy: 'Início do projeto de torneamento de componente guia.', resources: 'Material SAE 1020, torno.' },
+  { id: 'f13', date: '06/05/2026', capacities: 'Todas as capacidades práticas.', knowledge: 'Conceitos integradores.', hours: 2, strategy: 'Continuação do torneamento externo e furação de centro.', resources: 'Torno, broca de centro.' },
+  { id: 'f14', date: '13/05/2026', capacities: 'Todas as capacidades práticas.', knowledge: 'Conceitos integradores.', hours: 2, strategy: 'Execução de chanfros e sangria (uso de bedame).', resources: 'Bedame, ferramentas de chanfrar.' },
+  { id: 'f15', date: '20/05/2026', capacities: 'Todas as capacidades práticas.', knowledge: 'Conceitos integradores.', hours: 2, strategy: 'Rosqueamento no torno e acabamento final.', resources: 'Torno, cossinete.' },
+  { id: 'f16', date: '27/05/2026', capacities: '9. Controlar a qualidade.', knowledge: '15. Controle da qualidade.', hours: 2, strategy: 'Inspeção final das peças do projeto integrador.', resources: 'Relatório de inspeção.' },
+  { id: 'f17', date: '03/06/2026', capacities: '4. Elaborar plano de trabalho.', knowledge: '5. Plano de trabalho.', hours: 2, strategy: 'Revisão de fluxogramas de fabricação industrial.', resources: 'Papel, computador.' },
+  { id: 'f18', date: '10/06/2026', capacities: '2. Relacionar processos.', knowledge: '3. Processos de fabricação.', hours: 2, strategy: 'Estudo dirigido sobre conformação mecânica (forjamento, trefilação).', resources: 'Apostila, vídeos técnicos.' },
+  { id: 'f19', date: '17/06/2026', capacities: 'Todas as capacidades.', knowledge: 'Consolidação teórica.', hours: 2, strategy: 'Simulado técnico preparatório para encerramento.', resources: 'Quiz.' },
+  { id: 'f20', date: '24/06/2026', capacities: 'Autoavaliação.', knowledge: 'Encerramento.', hours: 2, strategy: 'Feedback e fechamento de registros.', resources: 'Fichas SENAI.' }
 ];
 
 const FULL_KNOWLEDGE_CRD = [
@@ -275,27 +275,93 @@ const FULL_RUBRICS_LIDT = [
   }
 ];
 
-const FULL_CAPACITIES_FUSI = [
-  '1. Atuar em conformidade com normas de saúde e segurança no trabalho.',
-  '2. Preparar o ambiente de trabalho conforme a atividade e o processo de fabricação.',
-  '3. Operar furadeira de bancada e coluna.',
-  '4. Realizar serramento e limagem manual seguindo desenhos técnicos.',
-  '5. Realizar roscagem manual com machos e cossinetes.',
-  '6. Zelar pela conservação e manutenção de ferramentas e máquinas operatrizes.'
+export const FULL_CAPACITIES_FUSI = [
+  '1. Selecionar ferramentas aplicadas na montagem e desmontagem de elementos de máquina.',
+  '2. Relacionar os processos de fabricação à sua aplicação na indústria.',
+  '3. Relacionar os tipos de manutenção à sua aplicação na indústria.',
+  '4. Elaborar plano de trabalho de acordo com normas e procedimentos de meio ambiente, de saúde e segurança no trabalho.',
+  '5. Definir os parâmetros de usinagem de torneamento e fresagem convencional de acordo com as especificações técnicas.',
+  '6. Realizar operações de baixa complexidade em torno convencional de acordo com as especificações, normas técnicas e de saúde e segurança no trabalho.',
+  '7. Realizar operações de furação de acordo com as especificações, normas técnicas e de saúde e segurança no trabalho.',
+  '8. Realizar operações de rosqueamento de acordo com as especificações, normas técnicas e de saúde e segurança no trabalho.',
+  '9. Controlar a qualidade das peças usinadas em tornos e fresadoras convencionais, visualmente e por meio de instrumentos de acordo com as especificações técnicas.',
+  '10. Aplicar os procedimentos de refrigeração nos processos de torneamento e fresagem convencional.'
 ];
 
-const FULL_SOCIOEMOCIONAL_FUSI = [
-  'Autogestão: 1. Organizar o ambiente de trabalho',
-  'Autogestão: 2. Zelar pela conservação dos equipamentos',
-  'Pensamento analítico: 1. Demonstrar atenção a detalhes na fabricação'
+export const FULL_SOCIOEMOCIONAL_FUSI = [
+  'Autogestão: 1. Planejar ações',
+  'Autogestão: 2. Organizar o ambiente de trabalho e as atividades',
+  'Autogestão: 3. Zelar pelo uso de equipamentos, instrumentos, ferramentas e materiais',
+  'Autogestão: 4. Demonstrar responsabilidade',
+  'Pensamento analítico: 5. Demonstrar visão sistêmica'
 ];
 
-const FULL_KNOWLEDGE_FUSI = [
-  { topic: '1. Segurança no Trabalho', subtopics: ['EPIs e EPCs', 'Normas Regulamentadoras (NR-12)'] },
-  { topic: '2. Materiais', subtopics: ['Metais Ferrosos e Não Ferrosos', 'Propriedades Mecânicas Básicas'] },
-  { topic: '3. Processos Manuais', subtopics: ['Serramento', 'Limagem', 'Traçagem'] },
-  { topic: '4. Furação', subtopics: ['Máquinas de furar', 'Tipos de Brocas', 'Cálculo de RPM'] },
-  { topic: '5. Roscagem Manual', subtopics: ['Machos e Cossinetes', 'Diâmetros de Furação para Rosca'] }
+export const FULL_KNOWLEDGE_FUSI = [
+  { topic: '1. Elementos de máquina', subtopics: [
+    '1.1. Elementos de fixação (1.1.1. Porcas, 1.1.2. Parafusos, 1.1.3. Arruelas, 1.1.4. Contra pino ou cupilha, 1.1.5. Rebites, 1.1.6. Pinos, 1.1.7. Cavilhas)',
+    '1.2. Elementos de transmissão (1.2.1. Chavetas, 1.2.2. Engrenagens, 1.2.3. Polias, 1.2.4. Correias, 1.2.5. Acoplamentos, 1.2.6. Roscas de Transmissão, 1.2.7. Corrente, 1.2.8. Eixos, 1.2.9. Sistemas de transmissão, 1.2.10. Redutores de velocidade, 1.2.11. Variadores de velocidade)',
+    '1.3. Elementos de vedação (1.3.1. Juntas, 1.3.2. Retentores, 1.3.3. Selos mecânicos, 1.3.4. O-Rings)',
+    '1.4. Elementos de apoio (1.4.1. Guias lineares, 1.4.2. Barramentos, 1.4.3. Mancais de deslizamento, 1.4.4. Mancais de rolamentos, 1.4.5. Buchas)',
+    '1.5. Elementos de instalação (1.5.1. Válvula, 1.5.2. Tubulação, 1.5.3. Conexão)',
+    '1.6. Elementos elásticos (1.6.1. Molas, 1.6.2. Anéis elásticos, 1.6.3. Pinos elásticos)'
+  ]},
+  { topic: '2. Ferramentas', subtopics: ['2.1. Manuais', '2.2. Elétricas ou eletrônicas', '2.3. Pneumáticas', '2.4. Portáteis'] },
+  { topic: '3. Processos de fabricação', subtopics: [
+    '3.1. Definição',
+    '3.2. Injeção (3.2.1. Metais, 3.2.2. Plásticos)',
+    '3.3. Manufatura Subtrativa (3.3.1. Torneamento, 3.3.2. Furação, 3.3.3. Fresamento, 3.3.4. Retificação)',
+    '3.4. Manufatura aditiva (3.4.1. Soldagem, 3.4.2. Impressão 3D)',
+    '3.5. Conformação mecânica (3.5.1. Laminação, 3.5.2. Trefilação, 3.5.3. Extrusão, 3.5.4. Forjamento, 3.5.5. Repuxo, 3.5.6. Dobramento, 3.5.7. Corte)'
+  ]},
+  { topic: '4. Manutenção', subtopics: [
+    '4.1. Definição',
+    '4.2. Aplicação',
+    '4.3. Tipos de intervenção (4.3.1. Corretiva, 4.3.2. Preventiva, 4.3.3. Preditiva, 4.3.4. Prescritiva, 4.3.5. Emergencial)',
+    '4.4. Tipos de ocorrências (4.4.1. Defeito, 4.4.2. Falha, 4.4.3. Documentação técnica)'
+  ]},
+  { topic: '5. Plano de trabalho', subtopics: ['5.1. Definição', '5.2. Tipos', '5.3. Características'] },
+  { topic: '6. Segurança', subtopics: [
+    '6.1. Riscos (6.1.1. Físicos, 6.1.2. Mecânicos, 6.1.3. Térmicos, 6.1.4. Elétricos)',
+    '6.2. Equipamentos de proteção (6.2.1. Individual, 6.2.2. Coletivo)',
+    '6.3. Normas regulamentadoras',
+    '6.4. Sinalização',
+    '6.5. Análise de risco da tarefa – ART',
+    '6.6. Análise preliminar de risco – APR',
+    '6.7. Ficha de Dados de Segurança (FDS)'
+  ]},
+  { topic: '7. Meio Ambiente', subtopics: ['7.1. Definição', '7.2. Normalização', '7.3. Segregação e descarte de resíduos'] },
+  { topic: '8. Parâmetros de corte para usinagem', subtopics: ['8.1. Cálculos (8.1.1. Rotação por minuto – RPM, 8.1.2. Velocidade de corte – Vc, 8.1.3. Avanço – f, 8.1.4. Profundidade de corte – ap)'] },
+  { topic: '9. Parâmetros de ferramenta', subtopics: ['9.1. Material', '9.2. Geometria', '9.3. Número de insertos/dentes (z)', '9.4. Raio de ponta (rε)'] },
+  { topic: '10. Torneamento', subtopics: [
+    '10.1. Definição',
+    '10.2. Tipos de tornos (10.2.1. Horizontal, 10.2.2. Vertical, 10.2.3. De placa ou platô, 10.2.4. Revólver, 10.2.5. Automático, 10.2.6. Copiador, 10.2.7. A CNC)',
+    '10.3. Ferramentas (10.3.1. Alargador, 10.3.2. Bedame, 10.3.3. Broca de centro, 10.3.4. Broca helicoidal, 10.3.5. Cossinete, 10.3.6. Escareador, 10.3.7. Macho, 10.3.8. Recartilha, 10.3.9. Rosqueamento externo, 10.3.10. Rosqueamento interno, 10.3.11. Torneamento externo, 10.3.12. Torneamento interno)',
+    '10.4. Acessórios (10.4.1. Placas, 10.4.2. Contraponta, 10.4.3. Arrastador, 10.4.4. Mandril)',
+    '10.5. Cálculos técnicos (10.5.1. Recartilha, 10.5.2. Conicidade com inclinação do carro superior, 10.5.3. Rosca triangular)'
+  ]},
+  { topic: '12. Furação', subtopics: [
+    '12.1. Definição',
+    '12.2. Tipos de furadeira (12.2.1. De coluna de piso, 12.2.2. De coluna de bancada, 12.2.3. Radial, 12.2.4. Portátil)',
+    '12.3. Ferramentas',
+    '12.4. Acessórios (12.4.1. Morsas, 12.4.2. Calços, 12.4.3. Bucha de redução)',
+    '12.5. Parâmetros de corte (12.5.1. Velocidade de Corte (VC), 12.5.2. Rotações por minuto (RPM), 12.5.3. Avanço (f))'
+  ]},
+  { topic: '13. Rosqueamento', subtopics: [
+    '13.1. Definição',
+    '13.2. Ferramentas (13.2.1.Macho, 13.2.2. Cossinete)',
+    '13.3. Acessórios (13.3.1.Desandador, 13.3.2. Porta cossinete)',
+    '13.4. Características (13.4.1.Sistema de roscas, 13.4.2. Aplicação, 13.4.3. Tabelas)',
+    '13.5. Máquina (13.5.1.Rosqueadeira)',
+    '13.6. Cálculos técnicos (13.6.1.Roscas)'
+  ]},
+  { topic: '15. Controle da qualidade', subtopics: [
+    '15.1. Inspeção visual (15.1.1. Rebarbas, 15.1.2.Oxidação, 15.1.3.Marcas, 15.1.4. Riscos)',
+    '15.2. Inspeção dimensional (15.2.1.Ficha de autoinspeção, 15.2.2. Técnicas de medição)'
+  ]},
+  { topic: '16. Refrigeração', subtopics: [
+    '16.1. Definição',
+    '16.2. Fluidos de corte (16.2.1. Aplicações, 16.2.2.Tipos, 16.2.3.Mecanismos, 16.2.4.Propriedades, 16.2.5.Procedimentos)'
+  ]}
 ];
 
 const COMMON_SA_FUSI = [
