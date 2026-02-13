@@ -51,23 +51,21 @@ export const LIDT_SCHEDULE = [
 ];
 
 export const FULL_CAPACITIES_FUSI = [
-  '### TORNEAMENTO',
+  '### Torneamento, Fresagem, Ajustagem',
   '1. Definir os parâmetros de usinagem de torneamento convencional de acordo com as especificações técnicas.',
   '2. Realizar operações de baixa complexidade em torno convencional de acordo com as especificações, normas técnicas e de saúde e segurança no trabalho.',
   '3. Realizar operações de torneamento externo e interno conforme desenho técnico.',
-  '### FRESAGEM',
-  '1. Definir os parâmetros de usinagem de fresagem convencional de acordo com as especificações técnicas.',
-  '2. Realizar operações de baixa complexidade em fresadora convencional de acordo com as especificações, normas técnicas e de saúde e segurança no trabalho.',
-  '3. Realizar operações de fresagem de superfícies planas e esquadrejamento.',
-  '### AJUSTAGEM',
-  '1. Selecionar ferramentas aplicadas na montagem e desmontagem de elementos de máquina.',
-  '2. Relacionar os processos de fabricação à sua aplicação na indústria.',
-  '3. Relacionar os tipos de manutenção à sua aplicação na indústria.',
-  '4. Elaborar plano de trabalho de acordo com normas e procedimentos de meio ambiente, de saúde e segurança no trabalho.',
-  '5. Realizar operações de furação de acordo com as especificações, normas técnicas e de saúde e segurança no trabalho.',
-  '6. Realizar operações de rosqueamento de acordo com as especificações, normas técnicas e de saúde e segurança no trabalho.',
-  '7. Controlar a qualidade das peças usinadas, visualmente e por meio de instrumentos de acordo com as especificações técnicas.',
-  '8. Aplicar os procedimentos de refrigeração nos processos de usinagem convencional.'
+  '4. Definir os parâmetros de usinagem de fresagem convencional de acordo com as especificações técnicas.',
+  '5. Realizar operações de baixa complexidade em fresadora convencional de acordo com as especificações, normas técnicas e de saúde e segurança no trabalho.',
+  '6. Realizar operações de fresagem de superfícies planas e esquadrejamento.',
+  '7. Selecionar ferramentas aplicadas na montagem e desmontagem de elementos de máquina.',
+  '8. Relacionar os processos de fabricação à sua aplicação na indústria.',
+  '9. Relacionar os tipos de manutenção à sua aplicação na indústria.',
+  '10. Elaborar plano de trabalho de acordo com normas e procedimentos de meio ambiente, de saúde e segurança no trabalho.',
+  '11. Realizar operações de furação de acordo com as especificações, normas técnicas e de saúde e segurança no trabalho.',
+  '12. Realizar operações de rosqueamento de acordo com as especificações, normas técnicas e de saúde e segurança no trabalho.',
+  '13. Controlar a qualidade das peças usinadas, visualmente e por meio de instrumentos de acordo com as especificações técnicas.',
+  '14. Aplicar os procedimentos de refrigeração nos processos de usinagem convencional.'
 ];
 
 export const FULL_SOCIOEMOCIONAL_FUSI = [
@@ -170,14 +168,14 @@ export const FUSI_SCHEDULE = [
   { id: 'f9', date: '01/04/2026', capacities: '10. Aplicar procedimentos de refrigeração.', knowledge: '16. Refrigeração (16.1 a 16.2).', hours: 2, strategy: 'Aplicação de fluidos de corte conforme o material e processo.', resources: 'Fluidos de corte, borrifadores.' },
   { id: 'f10', date: '08/04/2026', capacities: '9. Controlar a qualidade das peças usinadas.', knowledge: '15. Controle da qualidade (15.1 a 15.2).', hours: 2, strategy: 'Inspeção visual e dimensional de lotes produzidos. Preenchimento de ficha de autoinspeção.', resources: 'Instrumentos de medição, lupas.' },
   { id: 'f11', date: '15/04/2026', capacities: '6. Realizar operações de baixa complexidade em torno.', knowledge: '10. Torneamento (10.4 a 10.5).', hours: 2, strategy: 'Uso de acessórios do torno: placa de 3 castanhas e contraponta.', resources: 'Torno, acessórios.' },
-  { id: 'f12', date: '29/04/2026', capacities: 'Todas as capacidades práticas.', knowledge: 'Conceitos integradores.', hours: 2, strategy: 'Início do projeto de torneamento de componente guia.', resources: 'Material SAE 1020, torno.' },
-  { id: 'f13', date: '06/05/2026', capacities: 'Todas as capacidades práticas.', knowledge: 'Conceitos integradores.', hours: 2, strategy: 'Continuação do torneamento externo e furação de centro.', resources: 'Torno, broca de centro.' },
-  { id: 'f14', date: '13/05/2026', capacities: 'Todas as capacidades práticas.', knowledge: 'Conceitos integradores.', hours: 2, strategy: 'Execução de chanfros e sangria (uso de bedame).', resources: 'Bedame, ferramentas de chanfrar.' },
-  { id: 'f15', date: '20/05/2026', capacities: 'Todas as capacidades práticas.', knowledge: 'Conceitos integradores.', hours: 2, strategy: 'Rosqueamento no torno e acabamento final.', resources: 'Torno, cossinete.' },
+  { id: 'f12', date: '29/04/2026', capacities: 'Todas as capacities práticas.', knowledge: 'Conceitos integradores.', hours: 2, strategy: 'Início do projeto de torneamento de componente guia.', resources: 'Material SAE 1020, torno.' },
+  { id: 'f13', date: '06/05/2026', capacities: 'Todas as capacities práticas.', knowledge: 'Conceitos integradores.', hours: 2, strategy: 'Continuação do torneamento externo e furação de centro.', resources: 'Torno, broca de centro.' },
+  { id: 'f14', date: '13/05/2026', capacities: 'Todas as capacities práticas.', knowledge: 'Conceitos integradores.', hours: 2, strategy: 'Execução de chanfros e sangria (uso de bedame).', resources: 'Bedame, ferramentas de chanfrar.' },
+  { id: 'f15', date: '20/05/2026', capacities: 'Todas as capacities práticas.', knowledge: 'Conceitos integradores.', hours: 2, strategy: 'Rosqueamento no torno e acabamento final.', resources: 'Torno, cossinete.' },
   { id: 'f16', date: '27/05/2026', capacities: '9. Controlar a qualidade.', knowledge: '15. Controle da qualidade.', hours: 2, strategy: 'Inspeção final das peças do projeto integrador.', resources: 'Relatório de inspeção.' },
   { id: 'f17', date: '03/06/2026', capacities: '4. Elaborar plano de trabalho.', knowledge: '5. Plano de trabalho.', hours: 2, strategy: 'Revisão de fluxogramas de fabricação industrial.', resources: 'Papel, computador.' },
   { id: 'f18', date: '10/06/2026', capacities: '2. Relacionar processos.', knowledge: '3. Processos de fabricação.', hours: 2, strategy: 'Estudo dirigido sobre conformação mecânica (forjamento, trefilação).', resources: 'Apostila, vídeos técnicos.' },
-  { id: 'f19', date: '17/06/2026', capacities: 'Todas as capacidades.', knowledge: 'Consolidação teórica.', hours: 2, strategy: 'Simulado técnico preparatório para encerramento.', resources: 'Quiz.' },
+  { id: 'f19', date: '17/06/2026', capacities: 'Todas as capacities.', knowledge: 'Consolidação teórica.', hours: 2, strategy: 'Simulado técnico preparatório para encerramento.', resources: 'Quiz.' },
   { id: 'f20', date: '24/06/2026', capacities: 'Autoavaliação.', knowledge: 'Encerramento.', hours: 2, strategy: 'Feedback e fechamento de registros.', resources: 'Fichas SENAI.' }
 ];
 
