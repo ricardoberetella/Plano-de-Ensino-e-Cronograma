@@ -5,6 +5,7 @@ import Dashboard from './components/Dashboard';
 import PlanForm from './components/PlanForm';
 import UnitViewer from './components/UnitViewer';
 import Login from './components/Login';
+import GeneralCalendar from './components/GeneralCalendar';
 import { TeachingPlan, ViewType, CurricularUnit, ScheduleEntry, UnitCalendar, CalendarMarking, CalendarColor } from './types';
 import { SAMPLE_PLANS } from './constants';
 import { FirebaseService } from './services/firebase';
@@ -230,7 +231,7 @@ const App: React.FC = () => {
             </div>
           )}
 
-          {view === 'calendario' && <div className="text-center py-20 text-slate-400 font-black uppercase text-xs">Calendário Geral em Construção. Utilize o calendário individual nas Unidades Curriculares.</div>}
+          {view === 'calendario' && currentPlan && <GeneralCalendar plan={currentPlan} />}
 
           {view === 'editor' && <PlanForm initialPlan={currentPlan || undefined} onSave={handleSave} onCancel={() => setView('dashboard')} />}
         </>
