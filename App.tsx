@@ -58,7 +58,7 @@ const App: React.FC = () => {
           });
 
           const fusi = plan.units.find(u => u.id.toLowerCase().includes('fusi'));
-          if (fusi && !fusi.schedule.some(s => s.id.includes('f_fresa_1'))) {
+          if (fusi && !fusi.schedule.some(s => s.id.includes('f1'))) {
             const tFusi = template.units.find(u => u.id.toLowerCase().includes('fusi'));
             if (tFusi) {
               const idx = plan.units.indexOf(fusi);
@@ -145,9 +145,10 @@ const App: React.FC = () => {
 
   const getUnitSigla = (unit: CurricularUnit) => {
     const name = unit.name.toUpperCase();
-    if (name.includes('LEITURA') || name.includes('DESENHO')) return 'LIDT';
-    if (name.includes('CONTROLE') || name.includes('DIMENSIONAL')) return 'CRD';
-    if (name.includes('FUNDAMENTOS') || name.includes('USINAGEM') || name.includes('FUSI')) return 'FUSI';
+    const id = unit.id.toLowerCase();
+    if (name.includes('LEITURA') || name.includes('DESENHO') || id.includes('lidt')) return 'LIDT';
+    if (name.includes('CONTROLE') || name.includes('DIMENSIONAL') || id.includes('crd')) return 'CRD';
+    if (name.includes('FUNDAMENTOS') || name.includes('USINAGEM') || id.includes('fusi')) return 'FUSI';
     return unit.name.split(' ').map(w => w[0]).join('').toUpperCase();
   };
 
