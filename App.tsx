@@ -59,17 +59,20 @@ const App: React.FC = () => {
               hasInjected = true;
             }
           } else {
-            // DETECÇÃO DE VERSÃO MELHORADA: Agora insensível a maiúsculas/minúsculas para garantir a limpeza
+            // DETECÇÃO DE VERSÃO MELHORADA: Agora verifica também se as novas situações-problema estão presentes
             const unit = plan.units[fusiIndex];
-            const hasLegacyHeaderInCapacities = unit.basicCapacities.some(c => 
+            const hasLegacyCapacities = unit.basicCapacities.some(c => 
               c.toUpperCase().includes('TURMA A') || c.toUpperCase().includes('TURMA B')
             );
-            const hasLegacyHeaderInKnowledge = unit.knowledge.some(k => 
+            const hasLegacyKnowledge = unit.knowledge.some(k => 
               k.topic.toUpperCase().includes('TURMA A') || k.topic.toUpperCase().includes('TURMA B')
+            );
+            const hasNewSAs = unit.learningSituations.some(sa => 
+              sa.context.toUpperCase().includes('AGROMAQ') || sa.context.toUpperCase().includes('FRESANATEC')
             );
             const hasUnifiedHeader = unit.basicCapacities.some(c => c === '### Torneamento, Fresagem, Ajustagem');
             
-            if (hasLegacyHeaderInCapacities || hasLegacyHeaderInKnowledge || !hasUnifiedHeader) {
+            if (hasLegacyCapacities || hasLegacyKnowledge || !hasUnifiedHeader || !hasNewSAs) {
               if (fusiTemplate) {
                 plan.units[fusiIndex] = fusiTemplate;
                 plan.updatedAt = new Date().toISOString();
