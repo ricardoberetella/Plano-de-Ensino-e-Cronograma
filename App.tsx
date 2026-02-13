@@ -59,12 +59,12 @@ const App: React.FC = () => {
               hasInjected = true;
             }
           } else {
-            // DETECÇÃO DE VERSÃO: Se não tiver a palavra "Fresagem" ou "Ajustagem", atualiza para o novo conteúdo das imagens
+            // DETECÇÃO DE VERSÃO MELHORADA: Se tiver o texto "TURMA A" ou "TURMA B" nas capacidades, atualiza para o novo cabeçalho limpo
             const unit = plan.units[fusiIndex];
-            const hasFresa = unit.basicCapacities.some(c => c.includes('FRESAGEM'));
-            const hasAjustagem = unit.knowledge.some(k => k.topic.includes('Ajustagem'));
+            const hasLegacyHeader = unit.basicCapacities.some(c => c.includes('TURMA A') || c.includes('TURMA B'));
+            const hasFresaHeader = unit.basicCapacities.some(c => c === '### FRESAGEM');
             
-            if (!hasFresa || !hasAjustagem) {
+            if (hasLegacyHeader || !hasFresaHeader) {
               if (fusiTemplate) {
                 plan.units[fusiIndex] = fusiTemplate;
                 plan.updatedAt = new Date().toISOString();
