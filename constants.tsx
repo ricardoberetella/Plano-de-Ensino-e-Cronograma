@@ -5,14 +5,14 @@ export const SENAI_BLUE = "#005DAA";
 export const SENAI_RED = "#E30613";
 
 // Versão do cronograma - Alterar esta string força o App a atualizar o banco de dados com os novos dados "fiéis"
-export const SCHEDULE_VERSION = "2026-V10-SA-FUSI-FULL";
+export const SCHEDULE_VERSION = "2026-V11-GEA-FULL";
 
 // --- CRONOGRAMA LIDT (Revisado) ---
 export const LIDT_SCHEDULE = [
   { id: 'l1', date: '26/01/2026', hours: 2, capacities: 'Todas as capacities da SA', knowledge: '1.1. Definição de Desenho Técnico', strategy: '• Exposição dialogada; • Apresentação da UC, do MSEP e da Situação de Aprendizagem "Decifrando o Projeto".', resources: 'Sala de aula, projetor.' },
   { id: 'l2', date: '02/02/2026', hours: 2, capacities: 'Interpretar desenhos técnicos de peças.', knowledge: '1.2. Normas técnicas; 1.3. Formatos de folha; 1.4. Linhas.', strategy: '• Exposição dialogada: Apresentação das normas ABNT.', resources: 'Exemplos de desenhos técnicos.' },
   { id: 'l3', date: '09/02/2026', hours: 2, capacities: 'Interpretar desenhos técnicos de peças.', knowledge: '1.5. Escalas; 1.6. Figuras e sólidos geométricos.', strategy: '• Exposição dialogada e Demonstração.', resources: 'Projetor, models de sólidos.' },
-  { id: 'l4', date: '23/02/2026', hours: 2, capacities: 'Elaborar croquis de peças.', knowledge: '2.1. Perspectiva (isométrica, vistas)...', strategy: '• Atividade prática: Introdução à perspectiva isométrica.', resources: 'Papel, lápis.' },
+  { id: 'l4', date: '23/02/2026', hours: 2, capacities: 'Elaborar croquis de peças.', knowledge: '2.1. Perspectiva (isométrica, vistas)...', strategy: '• Atividade prática: Introdução à perspectiva isométrica.', resources: 'Papel, lpis.' },
   { id: 'l5', date: '02/03/2026', hours: 2, capacities: 'Elaborar croquis de peças.', knowledge: '2.2. Projeção ortogonal (vistas, supressão de vistas).', strategy: '• Atividade prática: Desenho das 3 vistas principais.', resources: 'Modelos de peças simples.' },
   { id: 'l6', date: '09/03/2026', hours: 2, capacities: 'Elaborar croquis de peças.', knowledge: '2.5. Cotagem (vistas únicas, face de referência).', strategy: '• Exercícios de cotagem de vistas ortogonais.', resources: 'Exercícios impressos.' },
   { id: 'l7', date: '16/03/2026', hours: 2, capacities: 'Interpretar desenhos técnicos de peças.', knowledge: '3.1. Cortes... 3.2. Meio corte.', strategy: '• Exposição dialogada e Demonstração de cortes.', resources: 'Desenhos técnicos com cortes.' },
@@ -51,7 +51,71 @@ export const CRD_SCHEDULE = [
   { id: 'c16', date: '23/06/2026', hours: 2, capacities: 'Finalização.', knowledge: 'Autoavaliação.', strategy: 'Feedback e encerramento da UC.', resources: 'Fichas preenchidas.' }
 ];
 
-// --- CRONOGRAMA FUSI (EFETIVO - 60 AULAS) ---
+// --- CRONOGRAMA FUSI (EFETIVO - 60 AULAS - PERFIL RICARDO GEA) ---
+export const FUSI_SCHEDULE_GEA = [
+  { id: 'g01', hours: 4, date: '26/01/2026', capacities: 'Organizar ambiente; Facear no torno; Furo de centro.', knowledge: 'PRÁTICA (PRAT)', strategy: 'Tarefa: Eixo 4 Corpos. Prática de fixação e faceamento.', resources: 'Oficina de usinagem, Torno.' },
+  { id: 'g02', hours: 4, date: '27/01/2026', capacities: 'Tornear superfície cilíndrica; Chanfrar; Fluidos de corte.', knowledge: 'PRÁTICA (PRAT)', strategy: 'Tarefa: Eixo 4 Corpos. Prática de desbaste e medição.', resources: 'Oficina de usinagem, Torno, Paquímetro.' },
+  { id: 'g03', hours: 4, date: '28/01/2026', capacities: 'Definir parâmetros; Torneamento; Parâmetros de corte/ferramenta.', knowledge: 'TEORIA (TEOR)', strategy: 'Exposição dialogada: Apresentação da SA2 e cálculos técnicos.', resources: 'Sala de aula, projetor.' },
+  { id: 'g04', hours: 4, date: '02/02/2026', capacities: 'Selecionar ferramentas; Fresagem; Parâmetros de corte.', knowledge: 'PRÁTICA (PRAT)', strategy: 'Tarefa: Bloco Fresado. Setup da fresadora e cálculos de RPM.', resources: 'Oficina de usinagem, Fresadora.' },
+  { id: 'g05', hours: 4, date: '03/02/2026', capacities: 'Fresagem (Operações); Facear; Superfícies paralelas.', knowledge: 'PRÁTICA (PRAT)', strategy: 'Tarefa: Bloco Fresado. Esquadrejamento e faceamento.', resources: 'Oficina de usinagem, Fresadora.' },
+  { id: 'g06', hours: 4, date: '04/02/2026', capacities: 'Elaborar plano de trabalho; Processos; Segurança; Meio Ambiente.', knowledge: 'TEORIA (TEOR)', strategy: 'Análise de desenhos técnicos e folhas de processo (Fresagem).', resources: 'Sala de aula.' },
+  { id: 'g07', hours: 4, date: '09/02/2026', capacities: 'Tornear superfície cilíndrica; Cortar no torno (Bedame).', knowledge: 'PRÁTICA (PRAT)', strategy: 'Tarefa: Eixo 4 Corpos. Acabamento e sangramento (corte).', resources: 'Oficina de usinagem, Torno.' },
+  { id: 'g08', hours: 4, date: '10/02/2026', capacities: 'Inspeção dimensional; Refrigeração; Zelar pelo equipamento.', knowledge: 'PRÁTICA (PRAT)', strategy: 'Tarefa: Eixo 4 Corpos. Controle final e organização.', resources: 'Oficina de usinagem, Micrômetro.' },
+  { id: 'g09', hours: 4, date: '11/02/2026', capacities: 'Controle de qualidade; Inspeção dimensional; Instrumentos.', knowledge: 'TEORIA (TEOR)', strategy: 'Teoria sobre Metrologia aplicada e tolerâncias ISO.', resources: 'Sala de aula, Projetor.' },
+  { id: 'g10', hours: 4, date: '16/02/2026', capacities: 'Fresagem (Rebaixos); Superfícies perpendiculares.', knowledge: 'PRÁTICA (PRAT)', strategy: 'Tarefa: Bloco Fresado. Usinagem de rebaixos e controle.', resources: 'Oficina de usinagem, Fresadora.' },
+  { id: 'g11', hours: 4, date: '17/02/2026', capacities: 'Aplicar refrigeração; Fresagem (Operações avançadas).', knowledge: 'PRÁTICA (PRAT)', strategy: 'Tarefa: Bloco Fresado. Prática de acabamento em fresa.', resources: 'Oficina de usinagem, Fresadora.' },
+  { id: 'g12', hours: 4, date: '18/02/2026', capacities: 'Rosqueamento (Definição, Ferramentas); Roscar com Cossinete.', knowledge: 'TEORIA (TEOR)', strategy: 'Teoria de cálculos para furação de roscas e tipos de roscas.', resources: 'Sala de aula.' },
+  { id: 'g13', hours: 4, date: '23/02/2026', capacities: 'Tornear cilíndrica; Roscar com cossinete no torno.', knowledge: 'PRÁTICA (PRAT)', strategy: 'Tarefa: Eixo Roscado. Tornear diâmetro e executar roscagem.', resources: 'Oficina de usinagem, Torno, Cossinete.' },
+  { id: 'g14', hours: 4, date: '24/02/2026', capacities: 'Furação; Roscar manualmente com macho na bancada.', knowledge: 'PRÁTICA (PRAT)', strategy: 'Tarefa: Manípulo. Furação em furadeira e rosca manual.', resources: 'Oficina de usinagem, Bancada, Machos.' },
+  { id: 'g15', hours: 4, date: '25/02/2026', capacities: 'Elementos de máquina; Visão sistêmica; Planejar ações.', knowledge: 'TEORIA (TEOR)', strategy: 'Desafio 1: Planejamento do Calculador de Usinagem.', resources: 'Sala de aula.' },
+  { id: 'g16', hours: 4, date: '02/03/2026', capacities: 'Parâmetros de usinagem; Tornear superfície cilíndrica; Facear.', knowledge: 'PRÁTICA (PRAT)', strategy: 'Desafio 1: Início da base cilíndrica (Torno).', resources: 'Oficina de usinagem, Torno.' },
+  { id: 'g17', hours: 4, date: '03/03/2026', capacities: 'Fresagem de superfícies planas e esquadrejamento.', knowledge: 'PRÁTICA (PRAT)', strategy: 'Desafio 1: Preparação do bloco principal (Fresadora).', resources: 'Oficina de usinagem, Fresadora.' },
+  { id: 'g18', hours: 4, date: '04/03/2026', capacities: 'Revisão de tolerâncias; Ajustagem mecânica (Definição).', knowledge: 'TEORIA (TEOR)', strategy: 'Estudo de ajustes e folgas para montagem do Desafio 1.', resources: 'Sala de aula.' },
+  { id: 'g19', hours: 4, date: '09/03/2026', capacities: 'Tornear cilíndrica; Furo de centro; Chanfrar.', knowledge: 'PRÁTICA (PRAT)', strategy: 'Desafio 1: Usinagem de eixos internos e pinos (Torno).', resources: 'Oficina de usinagem, Torno.' },
+  { id: 'g20', hours: 4, date: '10/03/2026', capacities: 'Fresagem de rebaixos e canais com fresa de topo.', knowledge: 'PRÁTICA (PRAT)', strategy: 'Desafio 1: Detalhes do corpo principal (Fresadora).', resources: 'Oficina de usinagem, Fresadora.' },
+  { id: 'g21', hours: 4, date: '11/03/2026', capacities: 'Processos de furação e rosqueamento (Normas).', knowledge: 'TEORIA (TEOR)', strategy: 'Estudo técnico sobre furação coordenada e tabelas de roscas.', resources: 'Sala de aula.' },
+  { id: 'g22', hours: 4, date: '16/03/2026', capacities: 'Furação; Rosqueamento manual e no torno.', knowledge: 'PRÁTICA (PRAT)', strategy: 'Desafio 1: Furação e rosqueamento de componentes.', resources: 'Oficina de usinagem.' },
+  { id: 'g23', hours: 4, date: '17/03/2026', capacities: 'Furação em fresadora; Controle de qualidade.', knowledge: 'PRÁTICA (PRAT)', strategy: 'Desafio 1: Furação coordenada do corpo do calculador.', resources: 'Oficina de usinagem, Fresadora.' },
+  { id: 'g24', hours: 4, date: '18/03/2026', capacities: 'Manutenção preventiva; Segurança e Meio Ambiente.', knowledge: 'TEORIA (TEOR)', strategy: 'Teoria sobre descarte de resíduos e lubrificação de máquinas.', resources: 'Sala de aula.' },
+  { id: 'g25', hours: 4, date: '23/03/2026', capacities: 'Tornear cilíndrica; Inspeção com micrômetro.', knowledge: 'PRÁTICA (PRAT)', strategy: 'Desafio 1: Acabamento de diâmetros críticos (Torno).', resources: 'Oficina de usinagem, Torno.' },
+  { id: 'g26', hours: 4, date: '24/03/2026', capacities: 'Fresagem; Superfícies paralelas e perpendiculares.', knowledge: 'PRÁTICA (PRAT)', strategy: 'Desafio 1: Acabamento final das faces do bloco.', resources: 'Oficina de usinagem, Fresadora.' },
+  { id: 'g27', hours: 4, date: '25/03/2026', capacities: 'Relatórios técnicos; Controle de processos; Organização.', knowledge: 'TEORIA (TEOR)', strategy: 'Documentação de controle de qualidade (Teoria).', resources: 'Sala de aula.' },
+  { id: 'g28', hours: 4, date: '30/03/2026', capacities: 'Ajustagem manual; Rebarbação; Limagem técnica.', knowledge: 'PRÁTICA (PRAT)', strategy: 'Desafio 1: Ajustagem manual das peças para encaixe.', resources: 'Bancada, Limas.' },
+  { id: 'g29', hours: 4, date: '31/03/2026', capacities: 'Inspeção visual; Verificação funcional de conjuntos.', knowledge: 'PRÁTICA (PRAT)', strategy: 'Desafio 1: Pré-montagem e detecção de interferências.', resources: 'Bancada.' },
+  { id: 'g30', hours: 4, date: '01/04/2026', capacities: 'Revisão Geral: Torneamento Convencional.', knowledge: 'TEORIA (TEOR)', strategy: 'Debate técnico: Soluções para problemas em torneamento.', resources: 'Sala de aula.' },
+  { id: 'g31', hours: 4, date: '06/04/2026', capacities: 'Tornear; Chanfrar; Roscar com cossinete.', knowledge: 'PRÁTICA (PRAT)', strategy: 'Tarefa Reforço: Repetição do Eixo Roscado.', resources: 'Oficina de usinagem, Torno.' },
+  { id: 'g32', hours: 4, date: '07/04/2026', capacities: 'Fresar; Furação de precisão; Qualidade.', knowledge: 'PRÁTICA (PRAT)', strategy: 'Tarefa Reforço: Ajuste de blocos paralelos.', resources: 'Oficina de usinagem, Fresadora.' },
+  { id: 'g33', hours: 4, date: '08/04/2026', capacities: 'Revisão Geral: Fresamento e Ajustagem.', knowledge: 'TEORIA (TEOR)', strategy: 'Debate técnico: Otimização de tempo no setup de máquinas.', resources: 'Sala de aula.' },
+  { id: 'g34', hours: 4, date: '13/04/2026', capacities: 'Prática Supervisionada Avançada (Torneamento).', knowledge: 'PRÁTICA (PRAT)', strategy: 'Desafio 1: Refino dimensional das peças cilíndricas.', resources: 'Oficina de usinagem, Torno.' },
+  { id: 'g35', hours: 4, date: '14/04/2026', capacities: 'Prática Supervisionada Avançada (Fresamento).', knowledge: 'PRÁTICA (PRAT)', strategy: 'Desafio 1: Refino dimensional do bloco fresado.', resources: 'Oficina de usinagem, Fresadora.' },
+  { id: 'g36', hours: 4, date: '15/04/2026', capacities: 'Gestão de Ferramental e Almoxarifado técnico.', knowledge: 'TEORIA (TEOR)', strategy: 'Organização e controle de vida útil das ferramentas.', resources: 'Sala de aula.' },
+  { id: 'g37', hours: 4, date: '22/04/2026', capacities: 'Montagem de conjuntos; Elementos de máquina.', knowledge: 'TEORIA (TEOR)', strategy: 'Teoria de montagem e tipos de ajustes (Prensado/Folga).', resources: 'Sala de aula.' },
+  { id: 'g38', hours: 4, date: '27/04/2026', capacities: 'Controle da qualidade das peças; Inspeção dimensional.', knowledge: 'PRÁTICA (PRAT)', strategy: 'Avaliação dimensional total (Micrômetro).', resources: 'Sala de aula, Micrômetro.' },
+  { id: 'g39', hours: 4, date: '28/04/2026', capacities: 'Tornear; Facear; Furo de centro (Novas peças).', knowledge: 'PRÁTICA (PRAT)', strategy: 'Tarefa Extra: Início de peça auxiliar (Base castanha).', resources: 'Oficina de usinagem, Torno.' },
+  { id: 'g40', hours: 4, date: '29/04/2026', capacities: 'Manutenção; Segurança do trabalho (NR-12).', knowledge: 'TEORIA (TEOR)', strategy: 'Teoria sobre proteções e dispositivos de emergência.', resources: 'Sala de aula.' },
+  { id: 'g41', hours: 4, date: '04/05/2026', capacities: 'Fresar; Rebaixos; Furação (Novas peças).', knowledge: 'PRÁTICA (PRAT)', strategy: 'Tarefa Extra: Usinagem de base auxiliar (Fresadora).', resources: 'Oficina de usinagem, Fresadora.' },
+  { id: 'g42', hours: 4, date: '05/05/2026', capacities: 'Tornear cilíndrica; Roscar com cossinete.', knowledge: 'PRÁTICA (PRAT)', strategy: 'Prática de roscagem em diferentes diâmetros.', resources: 'Oficina de usinagem, Torno.' },
+  { id: 'g43', hours: 4, date: '06/05/2026', capacities: 'Parâmetros avançados (Materiais especiais).', knowledge: 'TEORIA (TEOR)', strategy: 'Estudo de tabelas para Aço Inox e Bronze (Teoria).', resources: 'Sala de aula.' },
+  { id: 'g44', hours: 4, date: '11/05/2026', capacities: 'Fresagem de superfícies perpendiculares.', knowledge: 'PRÁTICA (PRAT)', strategy: 'Prática de esquadrejamento de precisão.', resources: 'Oficina de usinagem, Fresadora.' },
+  { id: 'g45', hours: 4, date: '12/05/2026', capacities: 'Cortar no torno (Bedame); Abrir canais.', knowledge: 'PRÁTICA (PRAT)', strategy: 'Operações de sangramento e canais técnicos.', resources: 'Oficina de usinagem, Torno.' },
+  { id: 'g46', hours: 4, date: '13/05/2026', capacities: 'Relatórios de Não Conformidade; Ações corretivas.', knowledge: 'TEORIA (TEOR)', strategy: 'Como documentar erros e recuperar peças (Teoria).', resources: 'Sala de aula.' },
+  { id: 'g47', hours: 4, date: '18/05/2026', capacities: 'Rosquear manual com macho na bancada.', knowledge: 'PRÁTICA (PRAT)', strategy: 'Prática intensiva de roscagem em furos cegos.', resources: 'Oficina de usinagem, Bancada.' },
+  { id: 'g48', hours: 4, date: '19/05/2026', capacities: 'Ajustagem mecânica: Limagem plana.', knowledge: 'PRÁTICA (PRAT)', strategy: 'Prática de ajustagem ao banco (precisão manual).', resources: 'Bancada, Limas.' },
+  { id: 'g49', hours: 4, date: '20/05/2026', capacities: 'Elementos de fixação e transmissão (Teoria).', knowledge: 'TEORIA (TEOR)', strategy: 'Estudo sobre chavetas e eixos estriados.', resources: 'Sala de aula.' },
+  { id: 'g50', hours: 4, date: '25/05/2026', capacities: 'Controle dimensional de conjuntos montados.', knowledge: 'PRÁTICA (PRAT)', strategy: 'Testes funcionais e ajustes de interferência.', resources: 'Oficina de usinagem.' },
+  { id: 'g51', hours: 4, date: '26/05/2026', capacities: 'Torneamento: Prática de acabamento superficial.', knowledge: 'PRÁTICA (PRAT)', strategy: 'Foco em rugosidade e brilho no torno.', resources: 'Oficina de usinagem, Torno.' },
+  { id: 'g52', hours: 4, date: '27/05/2026', capacities: 'Preparação para Avaliação Final (Teoria).', knowledge: 'TEORIA (TEOR)', strategy: 'Revisão integral dos conteúdos dos Prints 1, 2 e 3.', resources: 'Sala de aula.' },
+  { id: 'g53', hours: 4, date: '01/06/2026', capacities: 'Fresagem: Prática de acabamento (Cabeçote).', knowledge: 'PRÁTICA (PRAT)', strategy: 'Foco em planeza e acabamento superficial.', resources: 'Oficina de usinagem, Fresadora.' },
+  { id: 'g54', hours: 4, date: '02/06/2026', capacities: 'Conclusão de peças pendentes do semestre.', knowledge: 'PRÁTICA (PRAT)', strategy: 'Prática de Oficina Final (Arremates).', resources: 'Oficina de usinagem.' },
+  { id: 'g55', hours: 4, date: '03/06/2026', capacities: 'Ética Profissional e Postura no Trabalho.', knowledge: 'TEORIA (TEOR)', strategy: 'Atitudes, responsabilidade e zelo com patrimônio.', resources: 'Sala de aula.' },
+  { id: 'g56', hours: 4, date: '08/06/2026', capacities: 'Limpeza Técnica e Conservação.', knowledge: 'PRÁTICA (PRAT)', strategy: 'Limpeza profunda e lubrificação das máquinas.', resources: 'Oficina de usinagem.' },
+  { id: 'g57', hours: 4, date: '09/06/2026', capacities: 'Organização do ambiente (5S).', knowledge: 'PRÁTICA (PRAT)', strategy: 'Organização de armários e entrega de ferramentas.', resources: 'Oficina de usinagem.' },
+  { id: 'g58', hours: 4, date: '10/06/2026', capacities: 'Revisão Geral de Processos e Documentação.', knowledge: 'TEORIA (TEOR)', strategy: 'Conferência de diários e fichas técnicas.', resources: 'Sala de aula.' },
+  { id: 'g59', hours: 4, date: '17/06/2026', capacities: 'Feedback Final e Divulgação de Notas.', knowledge: 'TEORIA (TEOR)', strategy: 'Encerramento letivo em sala de aula.', resources: 'Sala de aula.' },
+  { id: 'g60', hours: 4, date: '22/06/2026', capacities: 'Entrega Final das Peças e Avaliação de Resultados.', knowledge: 'PRÁTICA (PRAT)', strategy: 'Finalização de todas as atividades de oficina.', resources: 'Oficina de usinagem.' }
+];
+
+// --- CRONOGRAMA FUSI (PADRÃO BERETELLA) ---
 export const FUSI_SCHEDULE = [
   { id: 'f01', hours: 4, date: '26/01/2026', capacities: 'Definir parâmetros; Torneamento; Parâmetros de corte/ferramenta.', knowledge: 'TEORIA (TEOR)', strategy: 'Exposição dialogada: Apresentação da SA2 e cálculos técnicos.', resources: 'Sala de aula, projetor.' },
   { id: 'f02', hours: 4, date: '28/01/2026', capacities: 'Organizar ambiente; Facear no torno; Furo de centro.', knowledge: 'PRÁTICA (PRAT)', strategy: 'Tarefa: Eixo 4 Corpos. Prática de fixação e faceamento.', resources: 'Oficina de usinagem, Torno.' },
@@ -313,7 +377,7 @@ export const FULL_RUBRICS_FUSI = [
   {
     capacity: 'Elaborar plano de trabalho.',
     nsa: 'Não consegue preencher o plano de trabalho, mesmo com auxílio constante, ou deixa a maior parte em branco.',
-    apo: 'Preenche o plano de trabalho com a ajuda constante do docente, cometendo erros na sequência de operações e no cálculo de parâmetros.',
+    apo: 'Preenche o plano de trabalho with a ajuda constante do docente, cometendo erros na sequência de operações e no cálculo de parâmetros.',
     par: 'Elabora o plano de trabalho com autonomia, necessitando de pequenas correções na seleção de ferramentas ou no refinamento dos parâmetros.',
     aut: 'Elabora o plano de trabalho de forma completa e otimizada, propondo sequências eficientes e justificando a escolha dos parâmetros.'
   },
@@ -406,6 +470,53 @@ export const SAMPLE_PLANS: TeachingPlan[] = [
         learningSituations: COMMON_SA_FUSI,
         rubrics: FULL_RUBRICS_FUSI,
         schedule: FUSI_SCHEDULE
+      }
+    ]
+  },
+  {
+    id: 'plan-usinagem-gea',
+    profileId: 'gea',
+    courseName: 'SMO - Mecânico de Usinagem Convencional',
+    modality: 'Presencial',
+    totalHours: 400,
+    objective: 'Desenvolver capacidades técnicas e socioemocionais relativas aos elementos de máquina, ferramentas, processos de fabricação, manutenção e usinagem convencional seguindo normas de saúde e segurança.',
+    methodology: 'Metodologia SENAI de Educação Profissional (MSEP). Uso de situações de aprendizagem realistas através do Cronograma Integradror.',
+    evaluation: 'Contínua baseada em rubricas de desempenho e qualidade das peças usinadas.',
+    bibliography: 'Guia de Aprendizagem Profissional SENAI: Fresamento e Torneamento. NBR 10067, NBR 8403, VIM.',
+    createdAt: new Date().toISOString(),
+    units: [
+      {
+        id: 'uc-lidt-gea',
+        name: 'LEITURA E INTERPRETAÇÃO DE DESENHO TÉCNICO',
+        calendar: { startDate: '2026-01-26', endDate: '2026-06-22', markings: [] },
+        basicCapacities: ['Interpretar desenhos técnicos', 'Elaborar croquis', 'Interpretar tolerâncias'],
+        socioemocionalCapacities: ['Atenção a detalhes', 'Senso crítico'],
+        knowledge: [{ topic: '1. Desenho técnico', subtopics: ['1.1 Normas', '1.4 Linhas', '1.5 Escalas'] }],
+        learningSituations: [],
+        rubrics: [],
+        schedule: LIDT_SCHEDULE
+      },
+      {
+        id: 'uc-crd-gea',
+        name: 'CONTROLE DIMENSIONAL',
+        calendar: { startDate: '2026-01-26', endDate: '2026-06-23', markings: [] },
+        basicCapacities: ['Medir com paquímetro', 'Medir com micrômetro'],
+        socioemocionalCapacities: ['Organização'],
+        knowledge: [{ topic: '1. Metrologia', subtopics: ['VIM', 'Erros'] }],
+        learningSituations: [],
+        rubrics: [],
+        schedule: CRD_SCHEDULE
+      },
+      {
+        id: 'uc-fusi-gea',
+        name: 'FUNDAMENTOS DA USINAGEM',
+        calendar: { startDate: '2026-01-26', endDate: '2026-06-22', markings: [] },
+        basicCapacities: FULL_CAPACITIES_FUSI,
+        socioemocionalCapacities: FULL_SOCIOEMOCIONAL_FUSI,
+        knowledge: FULL_KNOWLEDGE_FUSI,
+        learningSituations: COMMON_SA_FUSI,
+        rubrics: FULL_RUBRICS_FUSI,
+        schedule: FUSI_SCHEDULE_GEA
       }
     ]
   }
