@@ -286,7 +286,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
         )}
 
         {activeTab === 'calendario' && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {monthsInRange.map(monthStr => {
               const [year, month] = monthStr.split('-').map(Number);
               const firstDay = new Date(year, month - 1, 1);
@@ -299,25 +299,25 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                 days.push(`${monthStr}-${d}`);
               }
               return (
-                <div key={monthStr} className="space-y-4">
-                  <div className="bg-slate-900 text-white py-2 px-5 rounded-2xl text-center shadow-md">
-                    <h4 className="text-[10px] font-black uppercase tracking-widest italic">{monthName} {year}</h4>
+                <div key={monthStr} className="space-y-3">
+                  <div className="bg-slate-900 text-white py-2 px-4 rounded-xl text-center shadow-md">
+                    <h4 className="text-[9px] font-black uppercase tracking-widest italic">{monthName} {year}</h4>
                   </div>
-                  <div className="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-lg">
+                  <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-lg">
                     <div className="grid grid-cols-7 text-center bg-slate-50 border-b border-slate-100">
                       {['D','S','T','Q','Q','S','S'].map((d, i) => (
-                        <div key={i} className={`py-3 text-[8px] font-black ${i === 0 ? 'text-red-500' : 'text-slate-400'}`}>{d}</div>
+                        <div key={i} className={`py-2 text-[8px] font-black ${i === 0 ? 'text-red-500' : 'text-slate-400'}`}>{d}</div>
                       ))}
                     </div>
                     <div className="grid grid-cols-7">
                       {days.map((day, idx) => {
-                        if (!day) return <div key={`e-${idx}`} className="p-1 border-b border-r border-slate-50"></div>;
+                        if (!day) return <div key={`e-${idx}`} className="p-1 border-b border-r border-slate-50 h-8 md:h-10"></div>;
                         const hasClass = scheduleDates[day];
                         const isSunday = idx % 7 === 0;
                         return (
                           <div
                             key={day}
-                            className={`p-2 h-12 md:h-14 flex items-center justify-center text-[10px] font-black border-b border-r border-slate-50`}
+                            className={`p-1 h-8 md:h-10 flex items-center justify-center text-[9px] font-black border-b border-r border-slate-50`}
                             style={{ 
                               backgroundColor: hasClass ? COLOR_MAP[scheduleColor] : 'transparent',
                               color: hasClass ? TEXT_COLOR_MAP[scheduleColor] : (isSunday ? '#ef4444' : '#1e293b')
