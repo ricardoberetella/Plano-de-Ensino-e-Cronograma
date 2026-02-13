@@ -225,7 +225,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
               {localSchedule.map((entry, idx) => (
                 <div key={entry.id} className="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-lg hover:shadow-xl transition-all">
                   <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-                    <div className="lg:col-span-3 xl:col-span-4 text-center lg:text-left flex flex-col items-center lg:items-start min-w-0">
+                    <div className="lg:col-span-4 xl:col-span-4 text-center lg:text-left flex flex-col items-center lg:items-start min-w-0">
                       <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">AULA {idx+1}</p>
                       <input 
                         type="text" 
@@ -236,7 +236,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                       />
                       <span className="bg-slate-100 text-slate-500 px-3 py-1 rounded-full text-[8px] font-black uppercase whitespace-nowrap">{entry.hours} HORAS</span>
                     </div>
-                    <div className="lg:col-span-9 xl:col-span-8 grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div className="lg:col-span-8 xl:col-span-8 grid grid-cols-1 md:grid-cols-2 gap-8">
                       <div className="space-y-6">
                         <div>
                           <h5 className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2 border-l-2 border-blue-500 pl-2">Capacidades</h5>
