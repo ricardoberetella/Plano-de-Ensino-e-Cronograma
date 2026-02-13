@@ -61,6 +61,12 @@ const App: React.FC = () => {
           } else {
             const unit = plan.units[fusiIndex];
             
+            // Verificação Literal do Cronograma (Novo Check para os prints detalhados)
+            const hasNewDetailedSchedule = unit.schedule.some(s => 
+              s.strategy.includes('Apresentação da SA2 e do desafio da "AgroMaq"') ||
+              s.knowledge.includes('7. Melo Ambiente')
+            );
+
             // Verificação Literal dos Resultados Esperados (AgroMaq)
             const hasAgroMaqLiteral = unit.learningSituations.some(sa => 
               sa.expectedResults.some(res => res.includes('Os componentes "Eixo cilíndrico de quatro corpos", "Eixo roscado" e "Manípulo" finalizados'))
@@ -71,13 +77,7 @@ const App: React.FC = () => {
               sa.expectedResults.some(res => res.includes('O conjunto de 6 (seis) componentes mecânicos (Bloco fresado, Bloco rebaixado, Castanha mole, Base para castanha, Mordente de proteção, Coletor de serragem)'))
             );
 
-            // Verificação de Rubricas literais
-            const hasSistemicaLiteral = unit.rubrics.some(r => 
-              r.capacity.includes('Demonstrar visão sistêmica') && 
-              r.nsa.includes('Não consegue compreender a relação entre as peças')
-            );
-            
-            if (!hasAgroMaqLiteral || !hasFresanatecLiteral || !hasSistemicaLiteral) {
+            if (!hasNewDetailedSchedule || !hasAgroMaqLiteral || !hasFresanatecLiteral) {
               if (fusiTemplate) {
                 plan.units[fusiIndex] = fusiTemplate;
                 plan.updatedAt = new Date().toISOString();

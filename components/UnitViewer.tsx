@@ -17,7 +17,6 @@ const COLOR_MAP: Record<CalendarColor, string> = {
 const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar, onUpdateUnit }) => {
   const [activeTab, setActiveTab] = useState<'geral' | 'sa' | 'rubricas' | 'cronograma' | 'calendario'>('geral');
   const [localSchedule, setLocalSchedule] = useState<ScheduleEntry[]>(unit.schedule);
-  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => { setLocalSchedule(unit.schedule); }, [unit.schedule]);
 
@@ -54,7 +53,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
         ))}
       </div>
 
-      <div className="p-10 max-h-[75vh] overflow-y-auto custom-scrollbar bg-[#FDFDFD]">
+      <div className="p-6 md:p-10 max-h-[75vh] overflow-y-auto custom-scrollbar bg-[#FDFDFD]">
         {activeTab === 'geral' && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
             <section>
@@ -100,7 +99,6 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                   </div>
                 </div>
 
-                {/* QUADRO DE RESULTADOS ESPERADOS - SEGUINDO PRINT FIELMENTE */}
                 {sa.expectedResults && (
                   <div className="space-y-8 px-4">
                     <div>
@@ -110,7 +108,8 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                     
                     <div className="space-y-4">
                       {sa.expectedResults.slice(1).map((res, idx) => {
-                        const letter = res.match(/^[a-z]\)/i)?.[0].toUpperCase().replace(')', '') || String.fromCharCode(65 + idx);
+                        const letterMatch = res.match(/^[a-z]\)/i);
+                        const letter = letterMatch ? letterMatch[0].toUpperCase().replace(')', '') : String.fromCharCode(65 + idx);
                         const text = res.replace(/^[a-z]\)\s*/i, '');
                         return (
                           <div key={idx} className="bg-slate-50/50 border border-slate-100 p-6 rounded-[1.5rem] flex items-center gap-6 hover:bg-white hover:shadow-lg transition-all group">
@@ -161,16 +160,40 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
         )}
 
         {activeTab === 'cronograma' && (
-          <div className="space-y-4">
+          <div className="space-y-6">
             {localSchedule.map((entry, idx) => (
-              <div key={entry.id} className="bg-white p-8 rounded-[2rem] border border-slate-100 shadow-sm flex gap-10 items-center">
-                <div className="text-center w-24 shrink-0">
-                  <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">AULA {idx+1}</p>
-                  <p className="text-blue-600 font-black text-lg leading-none">{entry.date}</p>
-                </div>
-                <div className="flex-1 space-y-2">
-                  <p className="font-black text-slate-800 text-sm uppercase">{entry.knowledge}</p>
-                  <p className="text-slate-500 text-xs font-medium leading-relaxed">{entry.strategy}</p>
+              <div key={entry.id} className="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-lg hover:shadow-xl transition-all">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                  {/* Data e Horas */}
+                  <div className="lg:col-span-2 text-center lg:text-left">
+                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">AULA {idx+1}</p>
+                    <p className="text-blue-600 font-[1000] text-xl leading-none mb-2">{entry.date}</p>
+                    <span className="bg-slate-100 text-slate-500 px-3 py-1 rounded-full text-[8px] font-black uppercase">{entry.hours} HORAS</span>
+                  </div>
+
+                  {/* Detalhes Pedagógicos */}
+                  <div className="lg:col-span-10 grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div className="space-y-6">
+                      <div>
+                        <h5 className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2 border-l-2 border-blue-500 pl-2">Capacidades</h5>
+                        <p className="text-slate-700 text-xs font-bold leading-relaxed whitespace-pre-line">{entry.capacities}</p>
+                      </div>
+                      <div>
+                        <h5 className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2 border-l-2 border-red-500 pl-2">Conhecimentos</h5>
+                        <p className="text-slate-800 text-[11px] font-black uppercase leading-tight">{entry.knowledge}</p>
+                      </div>
+                    </div>
+                    <div className="space-y-6">
+                      <div>
+                        <h5 className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2 border-l-2 border-orange-500 pl-2">Estratégias Docentes</h5>
+                        <p className="text-slate-600 text-xs font-medium leading-relaxed whitespace-pre-line">{entry.strategy}</p>
+                      </div>
+                      <div>
+                        <h5 className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2 border-l-2 border-green-500 pl-2">Recursos / Ambientes</h5>
+                        <p className="text-slate-500 text-[10px] font-bold italic leading-snug">{entry.resources}</p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             ))}
