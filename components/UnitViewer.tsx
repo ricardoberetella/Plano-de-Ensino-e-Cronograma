@@ -54,16 +54,19 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
     }
   };
 
+  const getDayOfWeek = (dateStr: string) => {
+    if (!dateStr || !dateStr.includes('/')) return "";
+    const [d, m, y] = dateStr.split('/').map(Number);
+    const date = new Date(y, m - 1, d);
+    if (isNaN(date.getTime())) return "";
+    return new Intl.DateTimeFormat('pt-BR', { weekday: 'long' }).format(date);
+  };
+
   const formatDateForCalendar = (dateStr: string) => {
     if (!dateStr || !dateStr.includes('/')) return null;
     const parts = dateStr.split('/');
     if (parts.length === 3) {
       const [d, m, y] = parts;
-      return `${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`;
-    }
-    const simpleMatch = dateStr.match(/\d{2}\/\d{2}\/\d{4}/);
-    if (simpleMatch) {
-      const [d, m, y] = simpleMatch[0].split('/');
       return `${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`;
     }
     return null;
@@ -112,9 +115,22 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`px-8 py-5 text-[10px] font-black uppercase tracking-widest transition-all border-b-4 ${activeTab === tab ? 'border-blue-600 text-blue-600 bg-white' : 'border-transparent text-slate-400 hover:bg-slate-100'}`}
+            className={`px-8 py-5 transition-all border-b-4 ${activeTab === tab ? 'border-blue-600 bg-white' : 'border-transparent text-slate-400 hover:bg-slate-100'}`}
           >
-            {tab === 'geral' ? 'Geral' : tab === 'sa' ? 'Situação-Problema' : tab === 'rubricas' ? 'Rubricas' : tab === 'cronograma' ? 'Plano de Aula' : 'Calendário'}
+            {tab === 'geral' ? (
+               <span className="text-[10px] font-black uppercase tracking-widest block">Geral</span>
+            ) : tab === 'sa' ? (
+               <span className="text-[10px] font-black uppercase tracking-widest block">Situação-Problema</span>
+            ) : tab === 'rubricas' ? (
+               <span className="text-[10px] font-black uppercase tracking-widest block">Rubricas</span>
+            ) : tab === 'cronograma' ? (
+               <div className="flex flex-col items-center leading-tight">
+                  <span className="text-[10px] font-black uppercase tracking-widest text-blue-600">Plano de Aula</span>
+                  <span className="text-[8px] font-bold uppercase tracking-widest text-slate-400">Cronograma</span>
+               </div>
+            ) : (
+               <span className="text-[10px] font-black uppercase tracking-widest block">Calendário</span>
+            )}
           </button>
         ))}
       </div>
@@ -251,13 +267,18 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                   <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
                     <div className="lg:col-span-4 xl:col-span-4 text-center lg:text-left flex flex-col items-center lg:items-start min-w-0">
                       <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">AULA {idx+1}</p>
-                      <input 
-                        type="text" 
-                        value={entry.date} 
-                        onChange={(e) => updateEntry(entry.id, 'date', e.target.value)}
-                        className="text-blue-600 font-[1000] text-lg md:text-xl leading-none mb-3 w-full bg-transparent border-none outline-none focus:ring-1 focus:ring-blue-100 rounded text-center lg:text-left whitespace-nowrap overflow-visible"
-                        placeholder="Data"
-                      />
+                      <div className="flex flex-col items-center lg:items-start">
+                        <input 
+                          type="text" 
+                          value={entry.date} 
+                          onChange={(e) => updateEntry(entry.id, 'date', e.target.value)}
+                          className="text-blue-600 font-[1000] text-lg md:text-xl leading-none w-full bg-transparent border-none outline-none focus:ring-1 focus:ring-blue-100 rounded text-center lg:text-left whitespace-nowrap overflow-visible"
+                          placeholder="Data"
+                        />
+                        <span className="text-[10px] font-black uppercase text-slate-400 tracking-wider mt-1 mb-3 italic">
+                          {getDayOfWeek(entry.date)}
+                        </span>
+                      </div>
                       <span className="bg-slate-100 text-slate-500 px-3 py-1 rounded-full text-[8px] font-black uppercase whitespace-nowrap">{entry.hours} HORAS</span>
                     </div>
                     <div className="lg:col-span-8 xl:col-span-8 grid grid-cols-1 md:grid-cols-2 gap-8">
