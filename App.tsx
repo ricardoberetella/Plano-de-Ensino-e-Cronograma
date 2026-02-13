@@ -59,20 +59,28 @@ const App: React.FC = () => {
               hasInjected = true;
             }
           } else {
-            // DETECÇÃO DE VERSÃO MELHORADA: Agora verifica se as novas rubricas detalhadas estão presentes
+            // DETECÇÃO DE VERSÃO MELHORADA: Verificação literal de frases longas dos prints
             const unit = plan.units[fusiIndex];
-            const hasLegacyStrings = unit.basicCapacities.some(c => 
-              c.toUpperCase().includes('TURMA A') || c.toUpperCase().includes('TURMA B')
-            );
-            const hasNewSAs = unit.learningSituations.some(sa => 
-              sa.context.toUpperCase().includes('AGROMAQ') || sa.context.toUpperCase().includes('FRESANATEC')
-            );
-            const hasNewRubrics = unit.rubrics.some(r => 
-              r.capacity.toUpperCase().includes('VISÃO SISTÊMICA') || r.capacity.toUpperCase().includes('PLANO DE TRABALHO')
-            );
-            const hasUnifiedHeader = unit.basicCapacities.some(c => c === '### Torneamento, Fresagem, Ajustagem');
             
-            if (hasLegacyStrings || !hasUnifiedHeader || !hasNewSAs || !hasNewRubrics) {
+            // Verifica se a SA de Torneamento tem a menção literal à AgroMaq e aos 6 componentes específicos
+            const hasAgroMaqVerbatim = unit.learningSituations.some(sa => 
+              sa.context.includes('AgroMaq Industrial') && 
+              sa.challenge.includes('Eixo cilíndrico de quatro corpos, Eixo cilíndrico com canais, Eixo roscado, Manípulo, Eixo calibrado e Luva com dois corpos internos')
+            );
+
+            // Verifica se a SA de Fresagem tem a menção literal ao Sr. Almeida e à Fresanatec
+            const hasFresanatecVerbatim = unit.learningSituations.some(sa => 
+              sa.context.includes('Fresanatec Soluções Industriais') && 
+              sa.context.includes('Sr. Almeida')
+            );
+
+            // Verifica rubrica literal de Visão Sistêmica do print
+            const hasRubricaSistemicaVerbatim = unit.rubrics.some(r => 
+              r.capacity.includes('Demonstrar visão sistêmica') && 
+              r.nsa.includes('Não consegue compreender a relação entre as peças')
+            );
+            
+            if (!hasAgroMaqVerbatim || !hasFresanatecVerbatim || !hasRubricaSistemicaVerbatim) {
               if (fusiTemplate) {
                 plan.units[fusiIndex] = fusiTemplate;
                 plan.updatedAt = new Date().toISOString();
