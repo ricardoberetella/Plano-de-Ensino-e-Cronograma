@@ -5,7 +5,7 @@ export const SENAI_BLUE = "#005DAA";
 export const SENAI_RED = "#E30613";
 
 // Versão do cronograma - Alterar esta string força o App a atualizar o banco de dados com os novos dados "fiéis"
-export const SCHEDULE_VERSION = "2026-V3-LIMPEZA-TOTAL";
+export const SCHEDULE_VERSION = "2026-V4-REPO-FIDELIDADE";
 
 // --- CRONOGRAMA LIDT (Ajustado para não ter aulas em feriados) ---
 export const LIDT_SCHEDULE = [
@@ -92,8 +92,8 @@ export const FUSI_SCHEDULE = [
   { id: 'f35', hours: 4, date: '16/04/2026', capacities: 'Prática Supervisionada Avançada (Fresamento).', knowledge: 'PRÁTICA (PRAT)', strategy: 'Desafio 1: Refino dimensional do bloco fresado.', resources: 'Oficina de usinagem, Fresadora.' },
   { id: 'f36', hours: 4, date: '22/04/2026', capacities: 'Montagem de conjuntos; Elementos de máquina.', knowledge: 'PRÁTICA (PRAT)', strategy: 'Ajustagem final e montagem Manípulo/Eixo Roscado.', resources: 'Bancada.' },
   { id: 'f37', hours: 4, date: '23/04/2026', capacities: 'Controle da qualidade das peças; Inspeção dimensional.', knowledge: 'PRÁTICA (PRAT)', strategy: 'Avaliação dimensional total (Micrômetro).', resources: 'Sala de aula, Micrômetro.' },
-  // Aula 38: 25/04 como Reposição de 20/04
-  { id: 'f38', hours: 4, date: '25/04/2026', capacities: 'Compensação: Revisão de Metrologia e Desenho Técnico. Reposição do dia 20/04.', knowledge: 'TEORIA (TEOR)', strategy: 'Aula teórica em dia letivo compensado (Reposição oficial).', resources: 'Sala de aula.' },
+  // Aula 38: 25/04 como Reposição oficial do dia 20/04
+  { id: 'f38', hours: 4, date: '25/04/2026', capacities: 'Compensação: Revisão de Metrologia e Desenho Técnico. Reposição oficial da aula de 20/04.', knowledge: 'TEORIA (TEOR)', strategy: 'Aula teórica em dia letivo compensado. Reposição do dia 20/04.', resources: 'Sala de aula.' },
   { id: 'f39', hours: 4, date: '27/04/2026', capacities: 'Manutenção; Segurança do trabalho (NR-12).', knowledge: 'TEORIA (TEOR)', strategy: 'Teoria sobre proteções e dispositivos de emergência.', resources: 'Sala de aula.' },
   { id: 'f40', hours: 4, date: '29/04/2026', capacities: 'Tornear; Facear; Furo de centro (Novas peças).', knowledge: 'PRÁTICA (PRAT)', strategy: 'Tarefa Extra: Início de peça auxiliar (Base castanha).', resources: 'Oficina de usinagem, Torno.' },
   { id: 'f41', hours: 4, date: '30/04/2026', capacities: 'Fresar; Rebaixos; Furação (Novas peças).', knowledge: 'PRÁTICA (PRAT)', strategy: 'Tarefa Extra: Usinagem de base auxiliar (Fresadora).', resources: 'Oficina de usinagem, Fresadora.' },
@@ -103,7 +103,7 @@ export const FUSI_SCHEDULE = [
   { id: 'f45', hours: 4, date: '11/05/2026', capacities: 'Relatórios de Não Conformidade; Ações corretivas.', knowledge: 'TEORIA (TEOR)', strategy: 'Como documentar erros e recuperar peças (Teoria).', resources: 'Sala de aula.' },
   { id: 'f46', hours: 4, date: '13/05/2026', capacities: 'Cortar no torno (Bedame); Abrir canais.', knowledge: 'PRÁTICA (PRAT)', strategy: 'Operações de sangramento e canais técnicos.', resources: 'Oficina de usinagem, Torno.' },
   { id: 'f47', hours: 4, date: '14/05/2026', capacities: 'Rosquear manual com macho na bancada.', knowledge: 'PRÁTICA (PRAT)', strategy: 'Prática intensiva de roscagem em furos cegos.', resources: 'Oficina de usinagem, Bancada.' },
-  { id: 'f48', hours: 4, date: '18/05/2026', capacities: 'Elementos de fixação e transmissão (Teoria).', knowledge: 'TEORIA (TEOR)', strategy: 'Estudo sobre chavetas e eixos estriados.', resources: 'Sala de aula.' },
+  { id: 'f48', hours: 4, date: '18/05/2026', capacities: 'Elementos de fixação e transmission (Teoria).', knowledge: 'TEORIA (TEOR)', strategy: 'Estudo sobre chavetas e eixos estriados.', resources: 'Sala de aula.' },
   { id: 'f49', hours: 4, date: '20/05/2026', capacities: 'Ajustagem mecânica: Limagem plana.', knowledge: 'PRÁTICA (PRAT)', strategy: 'Prática de ajustagem ao banco (precisão manual).', resources: 'Bancada, Limas.' },
   { id: 'f50', hours: 4, date: '21/05/2026', capacities: 'Controle dimensional de conjuntos montados.', knowledge: 'PRÁTICA (PRAT)', strategy: 'Testes funcionais e ajustes de interferência.', resources: 'Oficina de usinagem.' },
   { id: 'f51', hours: 4, date: '25/05/2026', capacities: 'Gestão de Ferramental e Almoxarifado técnico.', knowledge: 'TEORIA (TEOR)', strategy: 'Organização e controle de vida útil das ferramentas.', resources: 'Sala de aula.' },
