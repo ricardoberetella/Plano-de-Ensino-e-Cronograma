@@ -68,21 +68,21 @@ const GeneralCalendar: React.FC<GeneralCalendarProps> = ({ plan }) => {
   const months = ['2026-01', '2026-02', '2026-03', '2026-04', '2026-05', '2026-06'];
 
   return (
-    <div className="space-y-10 animate-fadeIn max-w-7xl mx-auto pb-20">
+    <div className="space-y-6 animate-fadeIn max-w-7xl mx-auto pb-20">
       {/* Legenda */}
-      <div className="bg-white p-6 rounded-[2rem] border border-slate-200 shadow-xl flex flex-wrap gap-6 items-center justify-center">
-        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mr-4">Legenda de Unidades:</p>
+      <div className="bg-white p-4 rounded-3xl border border-slate-200 shadow-xl flex flex-wrap gap-4 items-center justify-center">
+        <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mr-2">Legenda:</p>
         {unitsWithMeta.map(u => (
-          <div key={u.id} className="flex items-center gap-3">
-            <div className="w-4 h-4 rounded-full shadow-sm" style={{ backgroundColor: COLOR_MAP[u.meta.color] }}></div>
-            <span className="text-[11px] font-black text-slate-700 uppercase tracking-tight">{u.meta.sigla}</span>
-            <span className="text-[9px] font-bold text-slate-400 hidden md:block">| {u.name}</span>
+          <div key={u.id} className="flex items-center gap-2">
+            <div className="w-3 h-3 rounded-full shadow-sm" style={{ backgroundColor: COLOR_MAP[u.meta.color] }}></div>
+            <span className="text-[10px] font-black text-slate-700 uppercase tracking-tight">{u.meta.sigla}</span>
+            <span className="text-[8px] font-bold text-slate-400 hidden lg:block">| {u.name}</span>
           </div>
         ))}
       </div>
 
-      {/* Grid de Meses */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      {/* Grid de Meses Compacto */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {months.map(monthStr => {
           const [year, month] = monthStr.split('-').map(Number);
           const firstDay = new Date(year, month - 1, 1);
@@ -97,21 +97,21 @@ const GeneralCalendar: React.FC<GeneralCalendarProps> = ({ plan }) => {
           }
 
           return (
-            <div key={monthStr} className="space-y-4">
-              <div className="bg-slate-900 text-white py-3 px-6 rounded-2xl text-center shadow-lg border border-slate-800">
-                <h4 className="text-[11px] font-black uppercase tracking-[0.2em] italic">{monthName} {year}</h4>
+            <div key={monthStr} className="space-y-3">
+              <div className="bg-slate-900 text-white py-2 px-4 rounded-xl text-center shadow-lg border border-slate-800">
+                <h4 className="text-[10px] font-black uppercase tracking-[0.1em] italic">{monthName} {year}</h4>
               </div>
               
-              <div className="bg-white border border-slate-200 rounded-[2.5rem] overflow-hidden shadow-xl">
+              <div className="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-xl">
                 <div className="grid grid-cols-7 text-center bg-slate-50 border-b border-slate-100">
                   {['D','S','T','Q','Q','S','S'].map((d, i) => (
-                    <div key={i} className={`py-4 text-[9px] font-black ${i === 0 ? 'text-red-500' : 'text-slate-400'}`}>{d}</div>
+                    <div key={i} className={`py-2 text-[8px] font-black ${i === 0 ? 'text-red-500' : 'text-slate-400'}`}>{d}</div>
                   ))}
                 </div>
                 
                 <div className="grid grid-cols-7">
                   {days.map((day, idx) => {
-                    if (!day) return <div key={`empty-${idx}`} className="p-1 border-b border-r border-slate-50 h-14 md:h-20"></div>;
+                    if (!day) return <div key={`empty-${idx}`} className="p-1 border-b border-r border-slate-50 h-10 md:h-14"></div>;
                     
                     const dayColors = calendarData[day] || [];
                     const isSunday = idx % 7 === 0;
@@ -120,18 +120,18 @@ const GeneralCalendar: React.FC<GeneralCalendarProps> = ({ plan }) => {
                     return (
                       <div
                         key={day}
-                        className="relative p-1 h-14 md:h-20 border-b border-r border-slate-50 group hover:bg-slate-50 transition-colors"
+                        className="relative p-0.5 h-10 md:h-14 border-b border-r border-slate-50 group hover:bg-slate-50 transition-colors"
                       >
-                        <span className={`absolute top-2 left-2 text-[10px] font-black z-10 ${dayColors.length > 0 ? 'text-white drop-shadow-md' : (isSunday ? 'text-red-500' : 'text-slate-400')}`}>
+                        <span className={`absolute top-1 left-1 text-[9px] font-black z-10 drop-shadow-sm ${dayColors.length > 0 ? 'text-white' : (isSunday ? 'text-red-500' : 'text-slate-400')}`}>
                           {dayNum}
                         </span>
                         
-                        {/* Indicadores de cores */}
-                        <div className="absolute inset-0 flex flex-col">
+                        {/* Indicadores de cores - DIVISÃO VERTICAL (SIDE-BY-SIDE) */}
+                        <div className="absolute inset-0 flex flex-row">
                           {dayColors.map((color, cIdx) => (
                             <div 
                               key={cIdx} 
-                              className="flex-1 w-full opacity-80"
+                              className="flex-1 h-full opacity-90 transition-all hover:opacity-100"
                               style={{ backgroundColor: COLOR_MAP[color] }}
                             />
                           ))}
