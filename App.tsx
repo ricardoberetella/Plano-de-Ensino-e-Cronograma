@@ -32,7 +32,6 @@ const App: React.FC = () => {
       const dbPlans = await FirebaseService.getPlans(profileId);
       
       if (!dbPlans || dbPlans.length === 0) {
-        // Se não existir nada mesmo, cria o inicial do template
         const template = SAMPLE_PLANS.find(p => p.profileId === profileId) || SAMPLE_PLANS[0];
         const defaultPlan = { 
           ...template, 
@@ -46,15 +45,23 @@ const App: React.FC = () => {
         setCurrentPlan(refreshed[0]);
         setSelectedUnit(refreshed[0].units[0]);
       } else {
-        // LÓGICA SEGURA: Se o plano existe, verifica se a unidade FUSI falta
         let hasInjected = false;
         const processedPlans = await Promise.all(dbPlans.map(async (plan) => {
-          const hasFusi = plan.units.some(u => u.id.toLowerCase().includes('fusi'));
-          if (!hasFusi) {
-            const template = SAMPLE_PLANS.find(p => p.profileId === profileId) || SAMPLE_PLANS[0];
-            const fusiTemplate = template.units.find(u => u.id.toLowerCase().includes('fusi'));
+          const fusiIndex = plan.units.findIndex(u => u.id.toLowerCase().includes('fusi'));
+          const template = SAMPLE_PLANS.find(p => p.profileId === profileId) || SAMPLE_PLANS[0];
+          const fusiTemplate = template.units.find(u => u.id.toLowerCase().includes('fusi'));
+
+          if (fusiIndex === -1) {
             if (fusiTemplate) {
               plan.units.push(fusiTemplate);
+              plan.updatedAt = new Date().toISOString();
+              await FirebaseService.savePlan(plan);
+              hasInjected = true;
+            }
+          } else if (plan.units[fusiIndex].basicCapacities.length < 10) {
+            // DETECÇÃO DE VERSÃO ANTIGA: Se tiver menos que 10 itens, atualiza para o novo conteúdo das imagens
+            if (fusiTemplate) {
+              plan.units[fusiIndex] = fusiTemplate;
               plan.updatedAt = new Date().toISOString();
               await FirebaseService.savePlan(plan);
               hasInjected = true;

@@ -1,12 +1,13 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { CurricularUnit, ScheduleEntry, UnitCalendar, CalendarMarking, CalendarColor } from '../types';
-import { LIDT_SCHEDULE, CRD_SCHEDULE, FUSI_SCHEDULE } from '../constants';
+import { LIDT_SCHEDULE, CRD_SCHEDULE, FUSI_SCHEDULE, SAMPLE_PLANS } from '../constants';
 
 interface Props {
   unit: CurricularUnit;
   onUpdateSchedule?: (newSchedule: ScheduleEntry[]) => void;
   onUpdateCalendar?: (newCalendar: UnitCalendar) => void;
+  onUpdateUnit?: (updatedUnit: CurricularUnit) => void;
 }
 
 const COLOR_MAP: Record<CalendarColor, string> = {
@@ -48,7 +49,7 @@ const SOLID_COLOR_MAP: Record<CalendarColor, string> = {
   none: 'transparent'
 };
 
-const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar }) => {
+const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar, onUpdateUnit }) => {
   const [activeTab, setActiveTab] = useState<'geral' | 'sa' | 'rubricas' | 'cronograma' | 'calendario'>('geral');
   const [localSchedule, setLocalSchedule] = useState<ScheduleEntry[]>(unit.schedule);
   const [isSaving, setIsSaving] = useState(false);
@@ -83,15 +84,25 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar 
   }, [unit.calendar]);
 
   const handleRestoreDefaults = async () => {
-    if (!confirm("Isso irá resetar todas as datas desta unidade para o padrão SENAI 2026. Deseja continuar?")) return;
+    if (!confirm("Isso irá resetar TODO o conteúdo desta unidade para o padrão SENAI 2026 (Capacidades, Conhecimentos e Cronograma). Deseja continuar?")) return;
     
-    let defaultSched = LIDT_SCHEDULE;
-    if (isCRD) defaultSched = CRD_SCHEDULE;
-    if (isFUSI) defaultSched = FUSI_SCHEDULE;
+    const template = SAMPLE_PLANS[0];
+    const unitTemplate = template.units.find(u => 
+      (isCRD && u.id.toLowerCase().includes('crd')) || 
+      (isFUSI && u.id.toLowerCase().includes('fusi')) ||
+      (!isCRD && !isFUSI && u.id.toLowerCase().includes('lidt'))
+    );
 
-    setLocalSchedule(defaultSched);
-    onUpdateSchedule?.(defaultSched);
-    alert("Datas restauradas com sucesso! Clique em 'Sincronizar' para salvar na nuvem.");
+    if (unitTemplate) {
+      const updatedUnit = { ...unitTemplate, id: unit.id };
+      onUpdateUnit?.(updatedUnit); // Se o pai suportar update total
+      
+      // Fallback para os métodos existentes
+      setLocalSchedule(updatedUnit.schedule);
+      onUpdateSchedule?.(updatedUnit.schedule);
+      alert("Conteúdo restaurado com sucesso! Clique em 'Sincronizar' para salvar na nuvem.");
+      window.location.reload(); // Recarrega para garantir o merge total
+    }
   };
 
   const formatDateForCalendar = (dateStr: string) => {
@@ -225,7 +236,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar 
                 className="text-[8px] font-black uppercase text-red-400 border border-red-900/50 px-2 py-0.5 rounded hover:bg-red-900/30 transition-all flex items-center gap-1"
              >
                 <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-                Restaurar Datas Padrão
+                Restaurar Conteúdo Padrão
              </button>
           </div>
           <h2 className="text-xl md:text-3xl font-black tracking-tight uppercase">{unit.name}</h2>
@@ -288,6 +299,23 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar 
                     ))}
                   </div>
                 </section>
+
+                {unit.socioemocionalCapacities && unit.socioemocionalCapacities.length > 0 && (
+                  <section>
+                    <h3 className="text-[10px] md:text-[11px] font-black text-slate-400 mb-6 uppercase tracking-[0.3em] flex items-center gap-3">
+                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                      Capacidades Socioemocionais
+                    </h3>
+                    <div className="space-y-4">
+                      {unit.socioemocionalCapacities.map((c, i) => (
+                        <div key={i} className="flex gap-4 items-start group bg-white p-4 rounded-2xl border border-slate-100 shadow-sm hover:border-green-200 transition-all">
+                          <span className="bg-slate-100 text-slate-400 w-5 h-5 rounded-md flex items-center justify-center text-[9px] font-black flex-shrink-0">{i+1}</span>
+                          <p className="text-slate-700 text-xs md:text-sm leading-relaxed font-bold">{c}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </section>
+                )}
               </div>
 
               <div className="lg:col-span-6 space-y-10">
