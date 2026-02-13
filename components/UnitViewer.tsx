@@ -22,8 +22,8 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
   const [activeTab, setActiveTab] = useState<'geral' | 'sa' | 'rubricas' | 'cronograma' | 'calendario'>('geral');
   const [localSchedule, setLocalSchedule] = useState<ScheduleEntry[]>(unit.schedule);
 
-  const isCRD = unit.id.toLowerCase().includes('crd');
-  const isFUSI = unit.id.toLowerCase().includes('fusi');
+  const isCRD = unit.id.toLowerCase().includes('crd') || unit.name.toLowerCase().includes('dimensional');
+  const isFUSI = unit.id.toLowerCase().includes('fusi') || unit.name.toLowerCase().includes('usinagem');
   const scheduleColor: CalendarColor = isCRD ? 'pink' : (isFUSI ? 'orange' : 'blue');
 
   const calendar = useMemo(() => unit.calendar || {
@@ -41,7 +41,6 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
       const [d, m, y] = parts;
       return `${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`;
     }
-    // Handle "DD/MM a DD/MM/YYYY" format if needed, but standardizing to DD/MM/YYYY
     const simpleMatch = dateStr.match(/\d{2}\/\d{2}\/\d{4}/);
     if (simpleMatch) {
       const [d, m, y] = simpleMatch[0].split('/');
@@ -58,15 +57,6 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
     });
     return dates;
   }, [localSchedule]);
-
-  const handleRestoreDefaults = () => {
-    if (!confirm("Restaurar conteúdo padrão?")) return;
-    const template = SAMPLE_PLANS[0].units.find(u => u.name === unit.name);
-    if (template) {
-      onUpdateUnit?.({ ...template, id: unit.id });
-      window.location.reload();
-    }
-  };
 
   const updateEntry = (id: string, field: keyof ScheduleEntry, value: any) => {
     const updated = localSchedule.map(entry => entry.id === id ? { ...entry, [field]: value } : entry);
@@ -94,7 +84,6 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
           <span className="bg-blue-600 px-3 py-1 rounded text-[9px] font-black uppercase tracking-widest mb-2 inline-block">MSEP - Unidade Curricular</span>
           <h2 className="text-3xl font-black tracking-tighter uppercase leading-none">{unit.name}</h2>
         </div>
-        <button onClick={handleRestoreDefaults} className="text-red-400 text-[10px] font-black uppercase tracking-widest border border-red-900/50 px-4 py-2 rounded-xl hover:bg-red-900/20">Restaurar Padrão</button>
       </div>
 
       {/* Tabs */}
@@ -216,65 +205,73 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
         )}
 
         {activeTab === 'cronograma' && (
-          <div className="space-y-6">
-            {localSchedule.map((entry, idx) => (
-              <div key={entry.id} className="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-lg hover:shadow-xl transition-all">
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-                  <div className="lg:col-span-2 text-center lg:text-left">
-                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">AULA {idx+1}</p>
-                    <input 
-                      type="text" 
-                      value={entry.date} 
-                      onChange={(e) => updateEntry(entry.id, 'date', e.target.value)}
-                      className="text-blue-600 font-[1000] text-xl leading-none mb-2 w-full bg-transparent border-none outline-none"
-                    />
-                    <span className="bg-slate-100 text-slate-500 px-3 py-1 rounded-full text-[8px] font-black uppercase">{entry.hours} HORAS</span>
-                  </div>
-                  <div className="lg:col-span-10 grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div className="space-y-6">
-                      <div>
-                        <h5 className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2 border-l-2 border-blue-500 pl-2">Capacidades</h5>
-                        <textarea 
-                          rows={3} 
-                          value={entry.capacities} 
-                          onChange={(e) => updateEntry(entry.id, 'capacities', e.target.value)}
-                          className="w-full bg-transparent border-none outline-none text-slate-700 text-xs font-bold leading-relaxed resize-none"
-                        />
-                      </div>
-                      <div>
-                        <h5 className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2 border-l-2 border-red-500 pl-2">Conhecimentos</h5>
-                        <textarea 
-                          rows={3} 
-                          value={entry.knowledge} 
-                          onChange={(e) => updateEntry(entry.id, 'knowledge', e.target.value)}
-                          className="w-full bg-transparent border-none outline-none text-slate-800 text-[11px] font-black uppercase leading-tight resize-none"
-                        />
-                      </div>
+          <div className="space-y-8">
+            <div className="mb-4">
+              <h3 className="text-3xl font-[1000] text-slate-900 uppercase tracking-tighter italic leading-none">Plano de Aula</h3>
+              <p className="text-slate-500 font-black uppercase text-[10px] tracking-[0.2em] mt-2 italic">Plano de Aula Cronograma</p>
+            </div>
+            
+            <div className="space-y-6">
+              {localSchedule.map((entry, idx) => (
+                <div key={entry.id} className="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-lg hover:shadow-xl transition-all">
+                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                    <div className="lg:col-span-3 xl:col-span-4 text-center lg:text-left flex flex-col items-center lg:items-start min-w-0">
+                      <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">AULA {idx+1}</p>
+                      <input 
+                        type="text" 
+                        value={entry.date} 
+                        onChange={(e) => updateEntry(entry.id, 'date', e.target.value)}
+                        className="text-blue-600 font-[1000] text-lg md:text-xl leading-none mb-3 w-full bg-transparent border-none outline-none focus:ring-1 focus:ring-blue-100 rounded text-center lg:text-left whitespace-nowrap overflow-visible"
+                        placeholder="Data"
+                      />
+                      <span className="bg-slate-100 text-slate-500 px-3 py-1 rounded-full text-[8px] font-black uppercase whitespace-nowrap">{entry.hours} HORAS</span>
                     </div>
-                    <div className="space-y-6">
-                      <div>
-                        <h5 className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2 border-l-2 border-orange-500 pl-2">Estratégias Docentes</h5>
-                        <textarea 
-                          rows={3} 
-                          value={entry.strategy} 
-                          onChange={(e) => updateEntry(entry.id, 'strategy', e.target.value)}
-                          className="w-full bg-transparent border-none outline-none text-slate-600 text-xs font-medium leading-relaxed resize-none"
-                        />
+                    <div className="lg:col-span-9 xl:col-span-8 grid grid-cols-1 md:grid-cols-2 gap-8">
+                      <div className="space-y-6">
+                        <div>
+                          <h5 className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2 border-l-2 border-blue-500 pl-2">Capacidades</h5>
+                          <textarea 
+                            rows={4} 
+                            value={entry.capacities} 
+                            onChange={(e) => updateEntry(entry.id, 'capacities', e.target.value)}
+                            className="w-full bg-transparent border-none outline-none text-slate-700 text-xs font-bold leading-relaxed resize-none whitespace-pre-line"
+                          />
+                        </div>
+                        <div>
+                          <h5 className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2 border-l-2 border-red-500 pl-2">Conhecimentos</h5>
+                          <textarea 
+                            rows={4} 
+                            value={entry.knowledge} 
+                            onChange={(e) => updateEntry(entry.id, 'knowledge', e.target.value)}
+                            className="w-full bg-transparent border-none outline-none text-slate-800 text-[11px] font-black uppercase leading-tight resize-none whitespace-pre-line"
+                          />
+                        </div>
                       </div>
-                      <div>
-                        <h5 className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2 border-l-2 border-green-500 pl-2">Recursos / Ambientes</h5>
-                        <textarea 
-                          rows={2} 
-                          value={entry.resources} 
-                          onChange={(e) => updateEntry(entry.id, 'resources', e.target.value)}
-                          className="w-full bg-transparent border-none outline-none text-slate-500 text-[10px] font-bold italic leading-snug resize-none"
-                        />
+                      <div className="space-y-6">
+                        <div>
+                          <h5 className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2 border-l-2 border-orange-500 pl-2">Estratégias Docentes</h5>
+                          <textarea 
+                            rows={4} 
+                            value={entry.strategy} 
+                            onChange={(e) => updateEntry(entry.id, 'strategy', e.target.value)}
+                            className="w-full bg-transparent border-none outline-none text-slate-600 text-xs font-medium leading-relaxed resize-none whitespace-pre-line"
+                          />
+                        </div>
+                        <div>
+                          <h5 className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2 border-l-2 border-green-500 pl-2">Recursos / Ambientes</h5>
+                          <textarea 
+                            rows={3} 
+                            value={entry.resources} 
+                            onChange={(e) => updateEntry(entry.id, 'resources', e.target.value)}
+                            className="w-full bg-transparent border-none outline-none text-slate-500 text-[10px] font-bold italic leading-snug resize-none whitespace-pre-line"
+                          />
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         )}
 
