@@ -225,6 +225,33 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
 
   const colorOptions: CalendarColor[] = ['green', 'white'];
 
+  // Helper to render capacity items with custom numbering that skips headers
+  const renderCapacities = (capacities: string[]) => {
+    let itemNumber = 1;
+    return capacities.map((c, i) => {
+      if (c.startsWith('###')) {
+        itemNumber = 1; // Reset count for new section
+        return (
+          <div key={i} className="mt-8 mb-4 border-b-2 border-blue-100 pb-2 first:mt-2 animate-fadeIn">
+            <h4 className="text-blue-700 font-black text-[11px] uppercase tracking-[0.25em] italic">
+              {c.replace('### ', '')}
+            </h4>
+          </div>
+        );
+      }
+      
+      const currentIdx = itemNumber++;
+      return (
+        <div key={i} className="flex gap-4 items-start group bg-white p-4 rounded-2xl border border-slate-100 shadow-sm hover:border-blue-200 transition-all animate-fadeIn">
+          <span className="bg-slate-100 text-slate-400 w-5 h-5 rounded-md flex items-center justify-center text-[9px] font-black flex-shrink-0">
+            {currentIdx}
+          </span>
+          <p className="text-slate-700 text-xs md:text-sm leading-relaxed font-bold">{c}</p>
+        </div>
+      );
+    });
+  };
+
   return (
     <div className="bg-white rounded-2xl md:rounded-3xl shadow-xl border border-slate-200 overflow-hidden animate-fadeIn">
       <div className="bg-slate-900 p-5 md:p-8 text-white flex justify-between items-center">
@@ -291,12 +318,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                     Capacidades Técnicas
                   </h3>
                   <div className="space-y-4">
-                    {unit.basicCapacities.map((c, i) => (
-                      <div key={i} className="flex gap-4 items-start group bg-white p-4 rounded-2xl border border-slate-100 shadow-sm hover:border-blue-200 transition-all">
-                        <span className="bg-slate-100 text-slate-400 w-5 h-5 rounded-md flex items-center justify-center text-[9px] font-black flex-shrink-0">{i+1}</span>
-                        <p className="text-slate-700 text-xs md:text-sm leading-relaxed font-bold">{c}</p>
-                      </div>
-                    ))}
+                    {renderCapacities(unit.basicCapacities)}
                   </div>
                 </section>
 

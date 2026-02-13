@@ -7,7 +7,7 @@ export const SENAI_RED = "#E30613";
 export const CRD_SCHEDULE = [
   { id: 'c1', date: '27/01/2026', hours: 2, capacities: 'I. Identificar a importância da metrologia na indústria metalmecânica.', knowledge: '1. Metrologia (1.1 a 1.5)', strategy: 'Apresentação da Situação de Aprendizagem (SA). Exposição dialogada sobre a importância da metrologia, normas e terminologia.', resources: 'Sala de aula, projetor, computador, material da SA.' },
   { id: 'c2', date: '03/02/2026', hours: 2, capacities: 'I. Identificar a importância da metrologia na indústria metalmecânica.', knowledge: '2. Erros de medição (2.1 a 2.4)', strategy: 'Discussão em grupo sobre os tipos e fontes de erro na medição. Demonstração de erros comuns (paralaxe, força excessiva).', resources: 'Sala de aula, projetor, instrumentos de medição para demonstração.' },
-  { id: 'c3', date: '10/02/2026', hours: 2, capacities: 'II. Medir peças com escala. III. Medir peças com trena.', knowledge: '3. Escala (3.1 a 3.3). 4. Trena (4.1 a 4.3)', strategy: 'Demonstração prática do uso de escalas e trenas. Exercícios práticos de medição em peças simples.', resources: 'Laboratório de Metrologia, escalas, trenas, peças diversas.' },
+  { id: 'c3', date: '10/02/2026', hours: 2, capacities: 'II. Medir peças com escala. III. Medir peças com trena.', knowledge: '3. Escala (3.1 a 3.3). 4. Trena (4.1 a 4.3)', strategy: 'Demonstração prática do uso de escalas e trenas. Exercícios práticos de medição em peças simples.', resources: 'Laboratório de Metrologia, escalas, trenas, pecas diversas.' },
   { id: 'c4', date: '24/02/2026', hours: 2, capacities: 'IV. Medir peças com paquímetro. I. Demonstrar atenção a detalhes.', knowledge: '5. Paquímetros (5.1, 5.2)', strategy: 'Exposição dialogada sobre os tipos de paquímetros e suas características. Demonstração do manuseio correto.', resources: 'Laboratório de Metrologia, projetor, diferentes tipos de paquímetros.' },
   { id: 'c5', date: '03/03/2026', hours: 2, capacities: 'IV. Medir peças com paquímetro. I. Demonstrar atenção a detalhes.', knowledge: '5. Paquímetros (5.3, 5.4, 5.5)', strategy: 'Demonstração e exercício prático de leitura no sistema métrico (0,05mm e 0,02mm).', resources: 'Laboratório de Metrologia, paquímetros, peças didcidas com medidas conhecidas.' },
   { id: 'c6', date: '10/03/2026', hours: 2, capacities: 'IV. Medir peças com paquímetro. I. Demonstrar atenção a detalhes. I. Organizar o ambiente de trabalho e as atividades.', knowledge: '5. Paquímetros (5.5)', strategy: 'Exercício prático supervisionado de medição em peças variadas, com preenchimento de relatório simples.', resources: 'Laboratório de Metrologia, paquímetros, peças, formulário de relatório.' },
@@ -51,28 +51,23 @@ export const LIDT_SCHEDULE = [
 ];
 
 export const FULL_CAPACITIES_FUSI = [
-  '--- TURMA A - TORNEAMENTO ---',
+  '### TORNEAMENTO',
+  '1. Definir os parâmetros de usinagem de torneamento convencional de acordo com as especificações técnicas.',
+  '2. Realizar operações de baixa complexidade em torno convencional de acordo com as especificações, normas técnicas e de saúde e segurança no trabalho.',
+  '3. Realizar operações de torneamento externo e interno conforme desenho técnico.',
+  '### FRESAGEM',
+  '1. Definir os parâmetros de usinagem de fresagem convencional de acordo com as especificações técnicas.',
+  '2. Realizar operações de baixa complexidade em fresadora convencional de acordo com as especificações, normas técnicas e de saúde e segurança no trabalho.',
+  '3. Realizar operações de fresagem de superfícies planas e esquadrejamento.',
+  '### AJUSTAGEM (BANCADA E GERAL)',
   '1. Selecionar ferramentas aplicadas na montagem e desmontagem de elementos de máquina.',
   '2. Relacionar os processos de fabricação à sua aplicação na indústria.',
   '3. Relacionar os tipos de manutenção à sua aplicação na indústria.',
   '4. Elaborar plano de trabalho de acordo com normas e procedimentos de meio ambiente, de saúde e segurança no trabalho.',
-  '5. Definir os parâmetros de usinagem de torneamento e fresagem convencional de acordo com as especificações técnicas.',
-  '6. Realizar operações de baixa complexidade em torno convencional de acordo com as especificações, normas técnicas e de saúde e segurança no trabalho.',
-  '7. Realizar operações de furação de acordo com as especificações, normas técnicas e de saúde e segurança no trabalho.',
-  '8. Realizar operações de rosqueamento de acordo com as especificações, normas técnicas e de saúde e segurança no trabalho.',
-  '9. Controlar a qualidade das peças usinadas em tornos e fresadoras convencionais, visualmente e por meio de instrumentos de acordo com as especificações técnicas.',
-  '10. Aplicar os procedimentos de refrigeração nos processos de torneamento e fresagem convencional.',
-  '--- TURMA B - FRESAGEM ---',
-  '1. Selecionar ferramentas aplicadas na montagem e desmontagem de elementos de máquina.',
-  '2. Relacionar os processos de fabricação à sua aplicação na indústria.',
-  '3. Relacionar os tipos de manutenção à sua aplicação na indústria.',
-  '4. Elaborar plano de trabalho de acordo com normas e procedimentos de meio ambiente, de saúde e segurança no trabalho.',
-  '5. Definir os parâmetros de usinagem de torneamento e fresagem convencional de acordo com as especificações técnicas.',
-  '6. Realizar operações de furação de acordo com as especificações, normas técnicas e de saúde e segurança no trabalho.',
-  '7. Realizar operações de baixa complexidade em fresadora convencional de acordo com as especificações, normas técnicas e de saúde e segurança no trabalho.',
-  '8. Realizar operações de rosqueamento de acordo com as especificações, normas técnicas e de saúde e segurança no trabalho.',
-  '9. Controlar a qualidade das peças usinadas em tornos e fresadoras convencionais, visualmente e por meio de instrumentos de acordo com as especificações técnicas.',
-  '10. Aplicar os procedimentos de refrigeração nos processos de torneamento e fresagem convencional.'
+  '5. Realizar operações de furação de acordo com as especificações, normas técnicas e de saúde e segurança no trabalho.',
+  '6. Realizar operações de rosqueamento de acordo com as especificações, normas técnicas e de saúde e segurança no trabalho.',
+  '7. Controlar a qualidade das peças usinadas, visualmente e por meio de instrumentos de acordo com as especificações técnicas.',
+  '8. Aplicar os procedimentos de refrigeração nos processos de usinagem convencional.'
 ];
 
 export const FULL_SOCIOEMOCIONAL_FUSI = [
@@ -368,7 +363,7 @@ const FULL_RUBRICS_LIDT = [
   {
     capacity: 'Demonstrar atenção a detalhes',
     nsa: 'Omite informações (cotas, símbolos, hachuras) no croqui e no relatório.',
-    apo: 'O trabalho apresenta algumas omissões ou erros de representação que necessitam de correção e revisão.',
+    apo: 'O trabalho apresenta algumas omissões ou erros de representação que necessitam de correção e revision.',
     par: 'O trabalho é entregue de forma completa e precisa, com pouquíssimos ou nenhum erro, demonstrando cuidado na execução.',
     aut: 'Além de entregar um trabalho preciso, identifica inconsistências ou informações faltantes no próprio desenho técnico fornecido.'
   },
