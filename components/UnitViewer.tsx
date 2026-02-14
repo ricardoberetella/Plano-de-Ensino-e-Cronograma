@@ -94,7 +94,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
         @media print {
           @page {
             size: A4 portrait;
-            margin: 0.8cm !important;
+            margin: 1.0cm !important;
           }
 
           aside, header, nav, .tabs-header, .no-print, button {
@@ -124,35 +124,35 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
             justify-content: space-between !important;
             align-items: center !important;
             border-bottom: 2pt solid #E30613 !important;
-            padding-bottom: 8pt !important;
-            margin-bottom: 12pt !important;
+            padding-bottom: 10pt !important;
+            margin-bottom: 15pt !important;
           }
           .logo-box {
             background: #E30613 !important;
             color: white !important;
             padding: 10pt 20pt !important;
-            font-size: 22pt !important;
+            font-size: 24pt !important;
             font-weight: 900 !important;
             font-style: italic !important;
             -webkit-print-color-adjust: exact;
             print-color-adjust: exact;
           }
           .info-box { text-align: right !important; color: #000 !important; }
-          .info-box h1 { font-size: 9.5pt !important; font-weight: 900 !important; margin: 0 !important; text-transform: uppercase !important; }
+          .info-box h1 { font-size: 10pt !important; font-weight: 900 !important; margin: 0 !important; text-transform: uppercase !important; }
           .info-box p { font-size: 8pt !important; margin: 2pt 0 0 0 !important; font-weight: bold !important; }
 
           .doc-main-title { 
             text-align: center !important; 
             font-weight: 900 !important; 
-            font-size: 13pt !important; 
+            font-size: 14pt !important; 
             text-transform: uppercase !important; 
-            margin: 12pt 0 !important; 
+            margin: 15pt 0 !important; 
             border-bottom: 1pt solid #000 !important; 
             padding-bottom: 5pt !important;
             color: #000 !important;
           }
 
-          /* TABELA DE CRONOGRAMA - RESTAURADA EXATAMENTE COMO VOCÊ PEDIU */
+          /* TABELA DE CRONOGRAMA - RESTAURADA ORIGINAL */
           .tech-table { width: 100% !important; border-collapse: collapse !important; margin-top: 10pt !important; }
           .tech-table th { 
             background: #f8fafc !important; 
@@ -178,56 +178,57 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
 
           /* SITUAÇÕES DE APRENDIZAGEM - QUEBRA DE PÁGINA */
           .sa-print-block {
-            margin-bottom: 15pt !important;
+            margin-bottom: 20pt !important;
             page-break-inside: auto !important;
           }
           
-          /* FORÇA A SA2 (PROJETO OFICINA LIMPA) PARA A PÁGINA 2 */
+          /* FORÇA A SA2 (PROJETO OFICINA LIMPA) PARA A PÁGINA 2 EXATAMENTE COMO NO PRINT */
           .force-next-page {
             page-break-before: always !important;
             break-before: page !important;
+            margin-top: 1.5cm !important;
           }
 
           .sa-print-title {
             font-weight: 900 !important;
-            font-size: 11.5pt !important;
+            font-size: 12pt !important;
             border-bottom: 2pt solid #E30613 !important;
-            margin-bottom: 10pt !important;
-            padding: 5pt 0 !important;
+            margin-bottom: 12pt !important;
+            padding: 6pt 0 !important;
             text-transform: uppercase !important;
             color: #000 !important;
           }
           .sa-print-section {
-            margin-bottom: 10pt !important;
+            margin-bottom: 12pt !important;
             border: 0.5pt solid #000 !important;
-            padding: 10pt !important;
+            padding: 12pt !important;
           }
           .sa-print-section-title {
             font-weight: 900 !important;
-            font-size: 8.5pt !important;
+            font-size: 9pt !important;
             text-transform: uppercase !important;
             color: #E30613 !important;
-            margin-bottom: 5pt !important;
+            margin-bottom: 6pt !important;
           }
           .sa-print-text {
-            font-size: 9pt !important;
-            line-height: 1.4 !important;
+            font-size: 9.5pt !important;
+            line-height: 1.5 !important;
             color: #000 !important;
             text-align: justify !important;
           }
           .sa-print-results {
-            padding-left: 15pt !important;
+            padding-left: 18pt !important;
           }
           .sa-print-results li {
-            font-size: 9pt !important;
-            margin-bottom: 3pt !important;
+            font-size: 9.5pt !important;
+            margin-bottom: 4pt !important;
             list-style-type: decimal !important;
             color: #000 !important;
           }
         }
       `}</style>
 
-      {/* VISÃO WEB - SEM ALTERAÇÕES */}
+      {/* VISÃO WEB */}
       <div className="bg-slate-900 p-8 text-white flex justify-between items-center no-print">
         <div>
           <span className="bg-blue-600 px-3 py-1 rounded text-[9px] font-black uppercase tracking-widest mb-2 inline-block">MSEP - Unidade Curricular</span>
