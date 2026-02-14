@@ -95,7 +95,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
           /* 1. CONFIGURAÇÕES GERAIS DE PÁGINA */
           @page {
             size: A4 portrait;
-            margin: 1.0cm !important;
+            margin: 0.8cm !important;
           }
 
           /* 2. LIMPEZA TOTAL DA INTERFACE WEB */
@@ -138,32 +138,32 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
             justify-content: space-between !important;
             align-items: center !important;
             border-bottom: 2pt solid #E30613 !important;
-            padding-bottom: 10pt !important;
-            margin-bottom: 10pt !important;
+            padding-bottom: 8pt !important;
+            margin-bottom: 8pt !important;
           }
           .logo-box {
             background: #E30613 !important;
             color: white !important;
-            padding: 8pt 20pt !important;
-            font-size: 24pt !important;
+            padding: 8pt 18pt !important;
+            font-size: 22pt !important;
             font-weight: 900 !important;
             font-style: italic !important;
             -webkit-print-color-adjust: exact;
             print-color-adjust: exact;
           }
           .info-box { text-align: right !important; color: #000 !important; }
-          .info-box h1 { font-size: 10pt !important; font-weight: 900 !important; margin: 0 !important; text-transform: uppercase !important; }
-          .info-box p { font-size: 8pt !important; margin: 2pt 0 0 0 !important; font-weight: bold !important; }
+          .info-box h1 { font-size: 9.5pt !important; font-weight: 900 !important; margin: 0 !important; text-transform: uppercase !important; }
+          .info-box p { font-size: 7.5pt !important; margin: 2pt 0 0 0 !important; font-weight: bold !important; }
 
           /* 6. TÍTULOS DO DOCUMENTO */
           .doc-main-title { 
             text-align: center !important; 
             font-weight: 900 !important; 
-            font-size: 14pt !important; 
+            font-size: 13pt !important; 
             text-transform: uppercase !important; 
-            margin: 10pt 0 !important; 
+            margin: 8pt 0 !important; 
             border-bottom: 1pt solid #000 !important; 
-            padding-bottom: 5pt !important; 
+            padding-bottom: 4pt !important; 
             color: #000 !important;
             page-break-after: avoid !important;
           }
@@ -171,18 +171,22 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
           /* 7. ESTILOS DAS SITUAÇÕES DE APRENDIZAGEM NO PDF */
           .sa-print-block {
             margin-bottom: 15pt !important;
-            border: 0.5pt solid #000 !important;
-            padding: 12pt !important;
-            /* Permite que o bloco quebre entre páginas para evitar espaços vazios */
+            padding: 0 !important;
             page-break-inside: auto !important; 
             display: block !important;
+            width: 100% !important;
           }
+          /* Forçar a segunda SA para a página 2 se for FUSI ou se houver mais de uma */
+          .sa-print-block:nth-of-type(2) {
+            page-break-before: always !important;
+          }
+
           .sa-print-title {
             font-weight: 900 !important;
             font-size: 11pt !important;
             border-bottom: 1pt solid #E30613 !important;
             margin-bottom: 8pt !important;
-            padding-bottom: 3pt !important;
+            padding: 4pt 0 !important;
             text-transform: uppercase !important;
             color: #000 !important;
             page-break-after: avoid !important;
@@ -190,13 +194,15 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
           .sa-print-section {
             margin-bottom: 10pt !important;
             page-break-inside: auto !important;
+            border: 0.5pt solid #000 !important;
+            padding: 10pt !important;
           }
           .sa-print-section-title {
             font-weight: 900 !important;
             font-size: 7.5pt !important;
             text-transform: uppercase !important;
             color: #E30613 !important;
-            margin-bottom: 3pt !important;
+            margin-bottom: 4pt !important;
             page-break-after: avoid !important;
           }
           .sa-print-text {
@@ -223,7 +229,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
           }
           .tech-table th, .tech-table td {
             border: 0.5pt solid #000 !important;
-            padding: 6pt !important;
+            padding: 5pt !important;
             font-size: 8pt !important;
             vertical-align: top !important;
             color: #000 !important;
@@ -384,7 +390,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                     </div>
 
                     <div className="border-t border-slate-100 pt-8">
-                      <p className="text-[10px] font-black text-blue-600 uppercase tracking-widest mb-4">III. Resultados Esperados</p>
+                      <p className="text-[10px) font-black text-blue-600 uppercase tracking-widest mb-4">III. Resultados Esperados</p>
                       <ul className="space-y-3">
                         {sa.expectedResults.map((result, rIdx) => (
                           <li key={rIdx} className="flex gap-4 group">
@@ -410,7 +416,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
               </div>
               
               <h2 className="doc-main-title">Situações de Aprendizagem</h2>
-              <div style={{ marginBottom: '10pt', fontSize: '10pt', fontWeight: 'bold', color: '#000' }}>
+              <div style={{ marginBottom: '8pt', fontSize: '9pt', fontWeight: 'bold', color: '#000' }}>
                 Unidade Curricular: {unit.name.toUpperCase()}
               </div>
 
@@ -423,7 +429,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                     <div className="sa-print-text">{sa.context}</div>
                   </div>
 
-                  <div className="sa-print-section" style={{ background: '#fcfcfc', padding: '8pt', border: '0.25pt dashed #ccc' }}>
+                  <div className="sa-print-section" style={{ background: '#fcfcfc' }}>
                     <div className="sa-print-section-title">II. Desafio Proposto</div>
                     <div className="sa-print-text" style={{ fontStyle: 'italic', fontWeight: 'bold' }}>{sa.challenge}</div>
                   </div>
@@ -439,7 +445,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                 </div>
               ))}
               
-              <div style={{ marginTop: '15pt', fontSize: '7pt', color: '#999', textAlign: 'right', borderTop: '0.25pt solid #eee', paddingTop: '5pt' }}>
+              <div style={{ marginTop: '10pt', fontSize: '7pt', color: '#999', textAlign: 'right', borderTop: '0.25pt solid #eee', paddingTop: '4pt' }}>
                 Relatório Pedagógico SENAI - Gerado em {new Date().toLocaleString('pt-BR')}
               </div>
             </div>
