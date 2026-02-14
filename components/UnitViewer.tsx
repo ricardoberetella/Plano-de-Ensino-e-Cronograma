@@ -97,16 +97,18 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
             margin: 1.0cm !important;
           }
 
-          /* GARANTE VISIBILIDADE TOTAL E REMOVE CORTES */
+          /* CRITICAL: RESET ALL HEIGHT LIMITS */
           html, body, #root, main, .printable-unit-module, .content-area {
             display: block !important;
             height: auto !important;
+            min-height: auto !important;
+            max-height: none !important;
             overflow: visible !important;
             position: static !important;
+            background: white !important;
             margin: 0 !important;
             padding: 0 !important;
             box-shadow: none !important;
-            max-height: none !important;
           }
 
           aside, header, nav, .tabs-header, .no-print, button {
@@ -119,44 +121,44 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
           [data-active-tab="cronograma"] .report-document { display: block !important; }
           [data-active-tab="sa"] .report-document-sa { display: block !important; }
 
-          /* CABEÇALHO SENAI */
+          /* SENAI HEADER */
           .report-header {
             display: flex !important;
             justify-content: space-between !important;
             align-items: center !important;
             border-bottom: 2pt solid #E30613 !important;
-            padding-bottom: 8pt !important;
-            margin-bottom: 12pt !important;
+            padding-bottom: 10pt !important;
+            margin-bottom: 15pt !important;
           }
           .logo-box {
             background: #E30613 !important;
             color: white !important;
-            padding: 8pt 16pt !important;
-            font-size: 20pt !important;
+            padding: 10pt 20pt !important;
+            font-size: 24pt !important;
             font-weight: 900 !important;
             font-style: italic !important;
             -webkit-print-color-adjust: exact;
             print-color-adjust: exact;
           }
           .info-box { text-align: right !important; color: #000 !important; }
-          .info-box h1 { font-size: 9pt !important; font-weight: 900 !important; margin: 0 !important; text-transform: uppercase !important; }
-          .info-box p { font-size: 7.5pt !important; margin: 1pt 0 0 0 !important; font-weight: bold !important; }
+          .info-box h1 { font-size: 10pt !important; font-weight: 900 !important; margin: 0 !important; text-transform: uppercase !important; }
+          .info-box p { font-size: 8pt !important; margin: 2pt 0 0 0 !important; font-weight: bold !important; }
 
           .doc-main-title { 
             text-align: center !important; 
             font-weight: 900 !important; 
             font-size: 14pt !important; 
             text-transform: uppercase !important; 
-            margin: 10pt 0 !important; 
+            margin: 15pt 0 !important; 
             border-bottom: 1pt solid #000 !important; 
             padding-bottom: 5pt !important;
             color: #000 !important;
           }
 
-          /* TABELA CRONOGRAMA - RESTAURADA ORIGINAL */
+          /* SCHEDULE TABLE FORM */
           .tech-table { width: 100% !important; border-collapse: collapse !important; margin-top: 10pt !important; }
-          .tech-table th { background: #f8fafc !important; color: #64748b !important; font-size: 7pt !important; font-weight: 900 !important; text-transform: uppercase !important; padding: 6pt !important; border: 0.5pt solid #e2e8f0 !important; text-align: left !important; -webkit-print-color-adjust: exact; }
-          .tech-table td { padding: 8pt !important; border: 0.5pt solid #e2e8f0 !important; font-size: 8.5pt !important; vertical-align: top !important; color: #1e293b !important; }
+          .tech-table th { background: #f8fafc !important; color: #64748b !important; font-size: 7.5pt !important; font-weight: 900 !important; text-transform: uppercase !important; padding: 8pt !important; border: 0.5pt solid #e2e8f0 !important; text-align: left !important; -webkit-print-color-adjust: exact; }
+          .tech-table td { padding: 10pt !important; border: 0.5pt solid #e2e8f0 !important; font-size: 8.5pt !important; vertical-align: top !important; color: #1e293b !important; }
           
           .p-label {
             display: block !important;
@@ -167,14 +169,15 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
             margin-bottom: 3pt !important;
           }
 
-          /* SITUAÇÕES DE APRENDIZAGEM - QUEBRA DE PÁGINA */
+          /* LEARNING SITUATIONS - MULTI-PAGE FLOW */
           .sa-print-block {
             display: block !important;
-            margin-bottom: 20pt !important;
+            margin-bottom: 30pt !important;
             page-break-inside: auto !important;
+            width: 100% !important;
           }
           
-          /* FORÇA A SA2 (PROJETO OFICINA LIMPA) PARA A PÁGINA 2 EXATAMENTE COMO SOLICITADO */
+          /* FORCE SA2 TO START ON PAGE 2 */
           .force-next-page {
             page-break-before: always !important;
             break-before: page !important;
@@ -185,33 +188,32 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
             font-weight: 900 !important;
             font-size: 12pt !important;
             border-bottom: 2pt solid #E30613 !important;
-            margin-bottom: 10pt !important;
+            margin-bottom: 12pt !important;
             padding: 6pt 0 !important;
             text-transform: uppercase !important;
             color: #000 !important;
           }
           .sa-print-section {
-            margin-bottom: 10pt !important;
+            margin-bottom: 12pt !important;
             border: 0.5pt solid #000 !important;
-            padding: 10pt !important;
+            padding: 12pt !important;
             page-break-inside: avoid !important;
           }
           .sa-print-section-title {
             font-weight: 900 !important;
-            font-size: 8.5pt !important;
+            font-size: 9pt !important;
             text-transform: uppercase !important;
             color: #E30613 !important;
-            margin-bottom: 5pt !important;
+            margin-bottom: 6pt !important;
           }
           .sa-print-text {
             font-size: 9.5pt !important;
-            line-height: 1.4 !important;
+            line-height: 1.5 !important;
             color: #000 !important;
             text-align: justify !important;
           }
           .sa-print-results {
-            padding-left: 15pt !important;
-            margin-top: 4pt !important;
+            padding-left: 18pt !important;
           }
           .sa-print-results li {
             font-size: 9.5pt !important;
@@ -222,7 +224,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
         }
       `}</style>
 
-      {/* VISÃO WEB */}
+      {/* WEB VIEW */}
       <div className="bg-slate-900 p-8 text-white flex justify-between items-center no-print">
         <div>
           <span className="bg-blue-600 px-3 py-1 rounded text-[9px] font-black uppercase tracking-widest mb-2 inline-block">MSEP - Unidade Curricular</span>
@@ -296,7 +298,9 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                   <p>Plano de Aula e Cronograma - Sistema MSEP</p>
                 </div>
               </div>
+              
               <h2 className="doc-main-title">Cronograma de Atividades Pedagógicas</h2>
+              
               <table className="tech-table">
                 <thead>
                   <tr>
@@ -381,6 +385,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
               ))}
             </div>
 
+            {/* PRINTABLE DOCUMENT - LEARNING SITUATIONS */}
             <div className="hidden report-document-sa">
               <div className="report-header">
                 <div className="logo-box">SENAI</div>
@@ -427,7 +432,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
           </div>
         )}
 
-        {/* OUTROS MENUS - SEM ALTERAÇÕES */}
+        {/* OTHER TABS REMAIN UNCHANGED */}
         {activeTab === 'geral' && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 no-print">
             <section>
