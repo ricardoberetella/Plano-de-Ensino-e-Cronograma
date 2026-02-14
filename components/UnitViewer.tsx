@@ -94,22 +94,23 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
         @media print {
           @page {
             size: A4 portrait;
-            margin: 1.0cm !important;
+            margin: 1.2cm 1.0cm !important;
+          }
+
+          /* GARANTE QUE O CONTEÚDO NÃO SEJA CORTADO */
+          html, body, #root, main, .printable-unit-module, .content-area, .max-w-4xl {
+            display: block !important;
+            height: auto !important;
+            overflow: visible !important;
+            position: static !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            box-shadow: none !important;
+            max-height: none !important;
           }
 
           aside, header, nav, .tabs-header, .no-print, button {
             display: none !important;
-          }
-
-          html, body, #root, main, .printable-unit-module, .content-area {
-            display: block !important;
-            height: auto !important;
-            overflow: visible !important;
-            background: white !important;
-            margin: 0 !important;
-            padding: 0 !important;
-            box-shadow: none !important;
-            position: static !important;
           }
 
           .report-document, .report-document-sa {
@@ -118,14 +119,14 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
           [data-active-tab="cronograma"] .report-document { display: block !important; }
           [data-active-tab="sa"] .report-document-sa { display: block !important; }
 
-          /* CABEÇALHO SENAI - IDÊNTICO AO ORIGINAL */
+          /* CABEÇALHO SENAI */
           .report-header {
             display: flex !important;
             justify-content: space-between !important;
             align-items: center !important;
             border-bottom: 2pt solid #E30613 !important;
-            padding-bottom: 10pt !important;
-            margin-bottom: 15pt !important;
+            padding-bottom: 8pt !important;
+            margin-bottom: 12pt !important;
           }
           .logo-box {
             background: #E30613 !important;
@@ -144,57 +145,48 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
           .doc-main-title { 
             text-align: center !important; 
             font-weight: 900 !important; 
-            font-size: 14pt !important; 
+            font-size: 15pt !important; 
             text-transform: uppercase !important; 
             margin: 15pt 0 !important; 
             border-bottom: 1pt solid #000 !important; 
-            padding-bottom: 5pt !important;
+            padding-bottom: 6pt !important;
             color: #000 !important;
           }
 
-          /* TABELA DE CRONOGRAMA - RESTAURADA ORIGINAL */
+          /* FORMATAÇÃO CRONOGRAMA */
           .tech-table { width: 100% !important; border-collapse: collapse !important; margin-top: 10pt !important; }
-          .tech-table th { 
-            background: #f8fafc !important; 
-            color: #64748b !important; 
-            font-size: 7.5pt !important; 
-            font-weight: 900 !important; 
-            text-transform: uppercase !important; 
-            padding: 8pt !important; 
-            border: 0.5pt solid #e2e8f0 !important; 
-            text-align: left !important; 
-            -webkit-print-color-adjust: exact; 
-          }
-          .tech-table td { padding: 10pt !important; border: 0.5pt solid #e2e8f0 !important; font-size: 8.5pt !important; vertical-align: top !important; color: #1e293b !important; }
+          .tech-table th { background: #f8fafc !important; color: #64748b !important; font-size: 7.5pt !important; font-weight: 900 !important; text-transform: uppercase !important; padding: 8pt !important; border: 0.5pt solid #e2e8f0 !important; text-align: left !important; -webkit-print-color-adjust: exact; }
+          .tech-table td { padding: 10pt !important; border: 0.5pt solid #e2e8f0 !important; font-size: 9pt !important; vertical-align: top !important; color: #1e293b !important; }
           
           .p-label {
             display: block !important;
-            font-size: 7pt !important;
+            font-size: 7.5pt !important;
             font-weight: 900 !important;
             text-transform: uppercase !important;
             color: #E30613 !important;
-            margin-bottom: 3pt !important;
+            margin-bottom: 4pt !important;
           }
 
-          /* SITUAÇÕES DE APRENDIZAGEM - QUEBRA DE PÁGINA */
+          /* FORMATAÇÃO SITUAÇÃO DE APRENDIZAGEM (SA) */
           .sa-print-block {
-            margin-bottom: 20pt !important;
+            margin-bottom: 25pt !important;
             page-break-inside: auto !important;
+            display: block !important;
           }
           
-          /* FORÇA A SA2 (PROJETO OFICINA LIMPA) PARA A PÁGINA 2 EXATAMENTE COMO NO PRINT */
-          .force-next-page {
+          /* FORÇA A SA2 (PROJETO OFICINA LIMPA) PARA A PÁGINA 2 */
+          .sa-print-block:nth-child(2), .force-next-page {
             page-break-before: always !important;
             break-before: page !important;
-            margin-top: 1.5cm !important;
+            margin-top: 20pt !important;
           }
 
           .sa-print-title {
             font-weight: 900 !important;
-            font-size: 12pt !important;
-            border-bottom: 2pt solid #E30613 !important;
-            margin-bottom: 12pt !important;
-            padding: 6pt 0 !important;
+            font-size: 12.5pt !important;
+            border-bottom: 2.5pt solid #E30613 !important;
+            margin-bottom: 15pt !important;
+            padding: 8pt 0 !important;
             text-transform: uppercase !important;
             color: #000 !important;
           }
@@ -202,33 +194,35 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
             margin-bottom: 12pt !important;
             border: 0.5pt solid #000 !important;
             padding: 12pt !important;
+            page-break-inside: avoid !important; /* Evita que uma seção se quebre ao meio se possível */
           }
           .sa-print-section-title {
             font-weight: 900 !important;
             font-size: 9pt !important;
             text-transform: uppercase !important;
             color: #E30613 !important;
-            margin-bottom: 6pt !important;
+            margin-bottom: 8pt !important;
           }
           .sa-print-text {
-            font-size: 9.5pt !important;
+            font-size: 10pt !important;
             line-height: 1.5 !important;
             color: #000 !important;
             text-align: justify !important;
           }
           .sa-print-results {
-            padding-left: 18pt !important;
+            padding-left: 15pt !important;
+            margin-top: 5pt !important;
           }
           .sa-print-results li {
-            font-size: 9.5pt !important;
-            margin-bottom: 4pt !important;
+            font-size: 10pt !important;
+            margin-bottom: 5pt !important;
             list-style-type: decimal !important;
             color: #000 !important;
           }
         }
       `}</style>
 
-      {/* VISÃO WEB */}
+      {/* VISÃO WEB - INALTERADA */}
       <div className="bg-slate-900 p-8 text-white flex justify-between items-center no-print">
         <div>
           <span className="bg-blue-600 px-3 py-1 rounded text-[9px] font-black uppercase tracking-widest mb-2 inline-block">MSEP - Unidade Curricular</span>
@@ -265,6 +259,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
               </div>
             </div>
 
+            {/* TABELAS WEB */}
             <div className="no-print space-y-6">
               {localSchedule.map((entry, idx) => (
                 <div key={entry.id} className="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-lg grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -294,6 +289,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
               ))}
             </div>
 
+            {/* DOCUMENTO IMPRESSO CRONOGRAMA */}
             <div className="hidden report-document">
               <div className="report-header">
                 <div className="logo-box">SENAI</div>
@@ -394,7 +390,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
               ))}
             </div>
 
-            {/* DOCUMENTO DE IMPRESSÃO DAS SITUAÇÕES DE APRENDIZAGEM */}
+            {/* DOCUMENTO IMPRESSO SITUAÇÕES DE APRENDIZAGEM (CORRIGIDO) */}
             <div className="hidden report-document-sa">
               <div className="report-header">
                 <div className="logo-box">SENAI</div>
@@ -405,12 +401,12 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
               </div>
               
               <h2 className="doc-main-title">Situações de Aprendizagem</h2>
-              <div style={{ marginBottom: '10pt', fontSize: '10pt', fontWeight: 'bold' }}>
+              <div style={{ marginBottom: '15pt', fontSize: '11pt', fontWeight: 'bold', color: '#1e293b' }}>
                 Unidade Curricular: {unit.name.toUpperCase()}
               </div>
 
               {unit.learningSituations.map((sa, sIdx) => (
-                <div key={sa.id} className={`sa-print-block ${sIdx === 1 ? 'force-next-page' : ''}`}>
+                <div key={sa.id} className="sa-print-block">
                   <div className="sa-print-title">{sa.title}</div>
                   
                   <div className="sa-print-section">
@@ -418,7 +414,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                     <div className="sa-print-text">{sa.context}</div>
                   </div>
 
-                  <div className="sa-print-section" style={{ background: '#fcfcfc' }}>
+                  <div className="sa-print-section" style={{ background: '#f8fafc' }}>
                     <div className="sa-print-section-title">II. Desafio Proposto</div>
                     <div className="sa-print-text" style={{ fontStyle: 'italic', fontWeight: 'bold' }}>{sa.challenge}</div>
                   </div>
@@ -434,14 +430,14 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                 </div>
               ))}
               
-              <div style={{ marginTop: '20pt', fontSize: '8pt', color: '#94a3b8', textAlign: 'right' }}>
+              <div style={{ marginTop: '30pt', fontSize: '9pt', color: '#94a3b8', textAlign: 'right', fontStyle: 'italic' }}>
                 Relatório Pedagógico SENAI - Gerado em {new Date().toLocaleString('pt-BR')}
               </div>
             </div>
           </div>
         )}
 
-        {/* OUTROS MENUS - SEM ALTERAÇÃO */}
+        {/* OUTROS MENUS - SEM ALTERAÇÕES */}
         {activeTab === 'geral' && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 no-print">
             <section>
