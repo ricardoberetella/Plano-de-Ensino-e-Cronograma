@@ -89,43 +89,45 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
   }, [calendar.startDate, calendar.endDate]);
 
   return (
-    <div className="bg-white rounded-[2.5rem] shadow-2xl border border-slate-200 overflow-hidden animate-fadeIn main-printable-wrapper">
+    <div className="bg-white rounded-[2.5rem] shadow-2xl border border-slate-200 overflow-hidden animate-fadeIn main-printable-container">
       <style>{`
         @media print {
-          /* 1. RESET RADICAL DE PÁGINA */
-          @page { 
-            size: A4 portrait; 
-            margin: 1.5cm 1cm; 
-          }
-
-          /* 2. DESTRUIÇÃO DE RESTRIÇÕES DE ALTURA E SCROLL */
-          html, body, #root, main, .flex-1, .bg-slate-50, .max-w-7xl, .main-printable-wrapper, .content-area {
+          /* 1. DESTRAVAMENTO ABSOLUTO DE CONTEXTO */
+          html, body, #root, main, .flex-1, .bg-slate-50, .max-w-7xl, 
+          .main-printable-container, .content-area, .printable-component {
+            display: block !important;
+            overflow: visible !important;
             height: auto !important;
             min-height: auto !important;
             max-height: none !important;
-            overflow: visible !important;
-            display: block !important;
+            position: relative !important;
             margin: 0 !important;
             padding: 0 !important;
             border: none !important;
             box-shadow: none !important;
             background: white !important;
             width: 100% !important;
-            position: relative !important;
           }
 
-          /* 3. LIMPEZA DE INTERFACE WEB */
+          /* 2. CONFIGURAÇÃO DE PÁGINA A4 */
+          @page {
+            size: A4 portrait;
+            margin: 1.5cm 1cm;
+          }
+
+          /* 3. LIMPEZA DE UI WEB */
           .no-print, header, aside, .tabs-header, button, nav, .bg-slate-900 { 
             display: none !important; 
           }
 
-          /* 4. ÁREA DO DOCUMENTO REAL */
+          /* 4. DOCUMENTO DE RELATÓRIO */
           .report-document {
             display: block !important;
             visibility: visible !important;
             width: 100% !important;
-            margin: 0 !important;
-            padding: 0 !important;
+            color: black !important;
+            background: white !important;
+            font-family: 'Inter', sans-serif !important;
           }
 
           /* 5. CABEÇALHO TÉCNICO SENAI */
@@ -133,30 +135,30 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
             display: flex !important;
             justify-content: space-between !important;
             align-items: center !important;
-            border-bottom: 3pt solid #E30613 !important;
-            padding-bottom: 10pt !important;
-            margin-bottom: 20pt !important;
+            border-bottom: 2pt solid #E30613 !important;
+            padding-bottom: 12pt !important;
+            margin-bottom: 25pt !important;
           }
-          .logo-box {
+          .logo-senai {
             background: #E30613 !important;
             color: white !important;
-            padding: 8pt 22pt !important;
-            font-size: 24pt !important;
+            padding: 6pt 20pt !important;
+            font-size: 26pt !important;
             font-weight: 900 !important;
             font-style: italic !important;
             -webkit-print-color-adjust: exact;
             print-color-adjust: exact;
           }
-          .info-box { text-align: right !important; }
-          .info-box h1 { font-size: 11pt !important; font-weight: 900 !important; margin: 0 !important; text-transform: uppercase !important; }
-          .info-box p { font-size: 8.5pt !important; margin: 2pt 0 0 0 !important; font-weight: bold !important; color: #333 !important; }
+          .header-info { text-align: right !important; }
+          .header-info h1 { font-size: 11pt !important; font-weight: 900 !important; margin: 0 !important; text-transform: uppercase !important; }
+          .header-info p { font-size: 8.5pt !important; margin: 2pt 0 0 0 !important; font-weight: bold !important; color: #333 !important; }
 
-          /* 6. TABELA PROFISSIONAL SEM CORTES */
+          /* 6. TABELA TÉCNICA (O CORAÇÃO DO DOCUMENTO) */
           .tech-table {
             width: 100% !important;
             border-collapse: collapse !important;
-            margin-top: 5pt !important;
-            table-layout: fixed !important; /* Mantém colunas fixas para não quebrar */
+            table-layout: fixed !important;
+            margin-top: 10pt !important;
           }
           .tech-table th, .tech-table td {
             border: 1pt solid #000 !important;
@@ -164,7 +166,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
             font-size: 8.5pt !important;
             vertical-align: top !important;
             word-wrap: break-word !important;
-            line-height: 1.4 !important;
+            line-height: 1.3 !important;
           }
           .tech-table th {
             background: #f0f0f0 !important;
@@ -173,30 +175,29 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
             text-align: center !important;
             -webkit-print-color-adjust: exact;
           }
-          /* Impede quebras dentro da mesma aula */
+          /* Garante que o navegador quebre páginas corretamente entre as aulas */
           .tech-table tr {
             page-break-inside: avoid !important;
           }
-
-          /* 7. QUADROS DE SITUAÇÃO DE APRENDIZAGEM */
-          .sa-block {
-            border: 2pt solid #000 !important;
-            margin-bottom: 30pt !important;
-            page-break-inside: avoid !important;
-          }
-          .sa-block-header {
-            background: #000 !important;
-            color: white !important;
-            padding: 8pt 15pt !important;
-            font-weight: 900 !important;
-            font-size: 11pt !important;
-            text-transform: uppercase !important;
-            -webkit-print-color-adjust: exact;
-          }
-          .sa-block-content { padding: 12pt !important; }
           
-          .label-prof { color: #E30613 !important; font-weight: 900 !important; font-size: 7.5pt !important; text-transform: uppercase !important; margin-bottom: 4pt !important; display: block !important; }
-          .doc-title { text-align: center !important; font-weight: 900 !important; font-size: 16pt !important; text-transform: uppercase !important; margin: 20pt 0 !important; }
+          /* 7. FORMATAÇÃO DE TEXTO TÉCNICO */
+          .label-red { 
+            color: #E30613 !important; 
+            font-weight: 900 !important; 
+            font-size: 7.5pt !important; 
+            text-transform: uppercase !important; 
+            margin-bottom: 3pt !important; 
+            display: block !important; 
+          }
+          .doc-title { 
+            text-align: center !important; 
+            font-weight: 900 !important; 
+            font-size: 16pt !important; 
+            text-transform: uppercase !important; 
+            margin: 20pt 0 !important;
+            border-bottom: 1pt solid black !important;
+            padding-bottom: 5pt !important;
+          }
         }
       `}</style>
 
@@ -224,13 +225,13 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
 
       <div className="p-6 md:p-10 max-h-[75vh] overflow-y-auto custom-scrollbar bg-[#FDFDFD] content-area">
         
-        {/* VIEW: SITUAÇÃO DE APRENDIZAGEM */}
+        {/* VIEW: SITUAÇÕES DE APRENDIZAGEM */}
         {activeTab === 'sa' && (
           <div className="max-w-4xl mx-auto">
             <div className="flex justify-end mb-10 no-print">
               <button onClick={handlePrint} className="bg-red-600 text-white px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl flex items-center gap-3 hover:bg-slate-900 transition-all">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
-                Imprimir Situações de Aprendizagem
+                Imprimir Situações-Problema
               </button>
             </div>
 
@@ -247,25 +248,25 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
               ))}
             </div>
 
-            {/* RELATÓRIO DE IMPRESSÃO SA */}
+            {/* IMPRESSÃO REAL: RELATÓRIO SA */}
             <div className="hidden report-document">
               <div className="report-header">
-                <div className="logo-box">SENAI</div>
-                <div className="info-box">
+                <div className="logo-senai">SENAI</div>
+                <div className="header-info">
                   <h1>Mecânico de Usinagem Convencional</h1>
                   <p>Unidade Curricular: {unit.name}</p>
                 </div>
               </div>
-              <h2 className="doc-title">Relatório Técnico de Situações de Aprendizagem</h2>
+              <h2 className="doc-title">Relatório de Situações de Aprendizagem</h2>
               {unit.learningSituations.map((sa) => (
-                <div key={sa.id} className="sa-block">
-                  <div className="sa-block-header">{sa.title}</div>
-                  <div className="sa-block-content">
-                    <span className="label-prof">Contexto e Justificativa Profissional</span>
-                    <p style={{fontSize: '9.5pt', marginBottom: '15pt', textAlign: 'justify'}}>{sa.context}</p>
-                    <div style={{background: '#f8f8f8', padding: '12pt', border: '1pt dashed #999'}}>
-                      <span className="label-prof">O Desafio do Aluno</span>
-                      <p style={{fontSize: '10pt', fontWeight: 'bold', fontStyle: 'italic'}}>{sa.challenge}</p>
+                <div key={sa.id} style={{ border: '2pt solid black', marginBottom: '20pt', pageBreakInside: 'avoid' }}>
+                  <div style={{ background: 'black', color: 'white', padding: '8pt 12pt', fontWeight: '900', fontSize: '10pt', textTransform: 'uppercase' }}>{sa.title}</div>
+                  <div style={{ padding: '12pt' }}>
+                    <span className="label-red">Contexto Profissional</span>
+                    <p style={{ fontSize: '9pt', textAlign: 'justify', marginBottom: '12pt' }}>{sa.context}</p>
+                    <div style={{ background: '#f5f5f5', padding: '10pt', border: '1pt dashed #666' }}>
+                      <span className="label-red">Desafio Prático</span>
+                      <p style={{ fontSize: '9pt', fontWeight: 'bold', fontStyle: 'italic' }}>{sa.challenge}</p>
                     </div>
                   </div>
                 </div>
@@ -288,7 +289,6 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
               </div>
             </div>
 
-            {/* WEB VIEW */}
             <div className="no-print space-y-6">
               {localSchedule.map((entry, idx) => (
                 <div key={entry.id} className="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-lg grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -318,67 +318,69 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
               ))}
             </div>
 
-            {/* IMPRESSÃO REAL: DOCUMENTO TÉCNICO COMPLETO */}
+            {/* IMPRESSÃO REAL: DOCUMENTO TÉCNICO MULTIPÁGINAS */}
             <div className="hidden report-document">
               <div className="report-header">
-                <div className="logo-box">SENAI</div>
-                <div className="info-box">
+                <div className="logo-senai">SENAI</div>
+                <div className="header-info">
                   <h1>Mecânico de Usinagem Convencional</h1>
-                  <p>Plano de Aula e Cronograma Integrado - MSEP</p>
+                  <p>Cronograma e Plano de Aula - MSEP</p>
                 </div>
               </div>
               
               <h2 className="doc-title">Cronograma de Atividades e Plano de Aula</h2>
-              <div style={{marginBottom: '15pt', fontSize: '10pt', fontWeight: 'bold'}}>Unidade Curricular: {unit.name}</div>
+              <div style={{ marginBottom: '12pt', fontSize: '10pt' }}>
+                <strong>Unidade Curricular:</strong> {unit.name.toUpperCase()}
+              </div>
               
               <table className="tech-table">
                 <thead>
                   <tr>
-                    <th style={{width: '15%'}}>DATA / AULA</th>
-                    <th style={{width: '42.5%'}}>CONHECIMENTOS E CAPACIDADES</th>
-                    <th style={{width: '42.5%'}}>ESTRATÉGIAS DOCENTES E RECURSOS</th>
+                    <th style={{ width: '15%' }}>DATA / AULA</th>
+                    <th style={{ width: '42.5%' }}>CONHECIMENTOS E CAPACIDADES</th>
+                    <th style={{ width: '42.5%' }}>ESTRATÉGIAS DOCENTES E RECURSOS</th>
                   </tr>
                 </thead>
                 <tbody>
                   {localSchedule.map((entry, idx) => (
                     <tr key={entry.id}>
-                      <td style={{textAlign: 'center', fontWeight: 'bold'}}>
-                        <div style={{fontSize: '9.5pt', marginBottom: '3pt'}}>{entry.date}</div>
-                        <div style={{fontSize: '7.5pt', textTransform: 'capitalize', color: '#666'}}>{getDayOfWeek(entry.date)}</div>
-                        <div style={{fontSize: '7pt', marginTop: '6pt', background: '#eee', padding: '2pt 0'}}>Aula {idx+1} ({entry.hours}h)</div>
+                      <td style={{ textAlign: 'center', fontWeight: 'bold' }}>
+                        <div style={{ fontSize: '9pt' }}>{entry.date}</div>
+                        <div style={{ fontSize: '7pt', textTransform: 'capitalize', color: '#555' }}>{getDayOfWeek(entry.date)}</div>
+                        <div style={{ fontSize: '7pt', marginTop: '6pt', background: '#f0f0f0', padding: '2pt' }}>Aula {idx+1} ({entry.hours}h)</div>
                       </td>
                       <td>
-                        <div style={{marginBottom: '8pt'}}>
-                          <span className="label-prof">Conhecimentos Técnicos</span>
-                          <div style={{fontWeight: 'bold', fontSize: '9pt'}}>{entry.knowledge}</div>
+                        <div style={{ marginBottom: '6pt' }}>
+                          <span className="label-red">Conhecimentos</span>
+                          <div style={{ fontWeight: 'bold', fontSize: '8.5pt' }}>{entry.knowledge}</div>
                         </div>
                         <div>
-                          <span className="label-prof">Capacidades e Habilidades</span>
-                          <div style={{fontSize: '8.5pt'}}>{entry.capacities}</div>
+                          <span className="label-red">Capacidades Habilitadas</span>
+                          <div style={{ fontSize: '8.5pt' }}>{entry.capacities}</div>
                         </div>
                       </td>
                       <td>
-                        <div style={{marginBottom: '8pt'}}>
-                          <span className="label-prof">Estratégia de Ensino</span>
-                          <div style={{fontWeight: '500', fontSize: '9pt'}}>{entry.strategy}</div>
+                        <div style={{ marginBottom: '6pt' }}>
+                          <span className="label-red">Estratégias Docentes</span>
+                          <div style={{ fontWeight: '500', fontSize: '8.5pt' }}>{entry.strategy}</div>
                         </div>
                         <div>
-                          <span className="label-prof">Recursos e Ambientes</span>
-                          <div style={{fontStyle: 'italic', color: '#555', fontSize: '8.5pt'}}>{entry.resources}</div>
+                          <span className="label-red">Recursos e Ambientes</span>
+                          <div style={{ fontStyle: 'italic', color: '#666', fontSize: '8pt' }}>{entry.resources}</div>
                         </div>
                       </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
-              <div style={{marginTop: '30pt', fontSize: '7.5pt', color: '#888', textAlign: 'right', borderTop: '0.5pt solid #ccc', paddingTop: '6pt'}}>
-                Página Gerada pelo Sistema MSEP SENAI - Autenticidade Digital Garantida - Impresso em {new Date().toLocaleString('pt-BR')}
+              <div style={{ marginTop: '20pt', fontSize: '7pt', color: '#888', textAlign: 'right', borderTop: '0.5pt solid #ddd', paddingTop: '5pt' }}>
+                Gerado eletronicamente pelo Sistema de Gestão SENAI MSEP - Impresso em {new Date().toLocaleString('pt-BR')}
               </div>
             </div>
           </div>
         )}
 
-        {/* OUTROS TABS (APENAS WEB) */}
+        {/* OUTROS TABS (WEB ONLY) */}
         {activeTab === 'geral' && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 no-print">
             <section>
