@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useMemo } from 'react';
 import { CurricularUnit, ScheduleEntry, UnitCalendar, CalendarMarking, CalendarColor } from '../types';
 import { SAMPLE_PLANS, SCHEDULE_VERSION } from '../constants';
@@ -93,7 +94,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
         @media print {
           @page {
             size: A4 portrait;
-            margin: 1.0cm !important;
+            margin: 0.8cm !important;
           }
 
           aside, header, nav, .tabs-header, .no-print, button {
@@ -117,43 +118,53 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
           [data-active-tab="cronograma"] .report-document { display: block !important; }
           [data-active-tab="sa"] .report-document-sa { display: block !important; }
 
-          /* CABEÇALHO PADRÃO */
+          /* CABEÇALHO SENAI - IDÊNTICO AO ORIGINAL */
           .report-header {
             display: flex !important;
             justify-content: space-between !important;
             align-items: center !important;
             border-bottom: 2pt solid #E30613 !important;
-            padding-bottom: 10pt !important;
-            margin-bottom: 15pt !important;
+            padding-bottom: 8pt !important;
+            margin-bottom: 12pt !important;
           }
           .logo-box {
             background: #E30613 !important;
             color: white !important;
             padding: 10pt 20pt !important;
-            font-size: 24pt !important;
+            font-size: 22pt !important;
             font-weight: 900 !important;
             font-style: italic !important;
             -webkit-print-color-adjust: exact;
             print-color-adjust: exact;
           }
           .info-box { text-align: right !important; color: #000 !important; }
-          .info-box h1 { font-size: 10pt !important; font-weight: 900 !important; margin: 0 !important; text-transform: uppercase !important; }
+          .info-box h1 { font-size: 9.5pt !important; font-weight: 900 !important; margin: 0 !important; text-transform: uppercase !important; }
           .info-box p { font-size: 8pt !important; margin: 2pt 0 0 0 !important; font-weight: bold !important; }
 
           .doc-main-title { 
             text-align: center !important; 
             font-weight: 900 !important; 
-            font-size: 14pt !important; 
+            font-size: 13pt !important; 
             text-transform: uppercase !important; 
-            margin: 15pt 0 !important; 
+            margin: 12pt 0 !important; 
             border-bottom: 1pt solid #000 !important; 
             padding-bottom: 5pt !important;
             color: #000 !important;
           }
 
-          /* FORMATAÇÃO DA TABELA DO CRONOGRAMA */
+          /* TABELA DE CRONOGRAMA - RESTAURADA EXATAMENTE COMO VOCÊ PEDIU */
           .tech-table { width: 100% !important; border-collapse: collapse !important; margin-top: 10pt !important; }
-          .tech-table th { background: #f8fafc !important; color: #64748b !important; font-size: 7pt !important; font-weight: 900 !important; text-transform: uppercase !important; padding: 8pt !important; border: 0.5pt solid #e2e8f0 !important; text-align: left !important; -webkit-print-color-adjust: exact; }
+          .tech-table th { 
+            background: #f8fafc !important; 
+            color: #64748b !important; 
+            font-size: 7.5pt !important; 
+            font-weight: 900 !important; 
+            text-transform: uppercase !important; 
+            padding: 8pt !important; 
+            border: 0.5pt solid #e2e8f0 !important; 
+            text-align: left !important; 
+            -webkit-print-color-adjust: exact; 
+          }
           .tech-table td { padding: 10pt !important; border: 0.5pt solid #e2e8f0 !important; font-size: 8.5pt !important; vertical-align: top !important; color: #1e293b !important; }
           
           .p-label {
@@ -165,22 +176,21 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
             margin-bottom: 3pt !important;
           }
 
-          /* REGRAS DAS SITUAÇÕES DE APRENDIZAGEM */
+          /* SITUAÇÕES DE APRENDIZAGEM - QUEBRA DE PÁGINA */
           .sa-print-block {
-            margin-bottom: 20pt !important;
-            page-break-inside: avoid !important;
-            break-inside: avoid !important;
+            margin-bottom: 15pt !important;
+            page-break-inside: auto !important;
           }
           
-          /* FORÇA A SITUAÇÃO PROBLEMA A IR PARA PÁGINA 2 */
-          .sa-print-block {
+          /* FORÇA A SA2 (PROJETO OFICINA LIMPA) PARA A PÁGINA 2 */
+          .force-next-page {
             page-break-before: always !important;
             break-before: page !important;
           }
 
           .sa-print-title {
             font-weight: 900 !important;
-            font-size: 12pt !important;
+            font-size: 11.5pt !important;
             border-bottom: 2pt solid #E30613 !important;
             margin-bottom: 10pt !important;
             padding: 5pt 0 !important;
@@ -188,9 +198,9 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
             color: #000 !important;
           }
           .sa-print-section {
-            margin-bottom: 12pt !important;
+            margin-bottom: 10pt !important;
             border: 0.5pt solid #000 !important;
-            padding: 12pt !important;
+            padding: 10pt !important;
           }
           .sa-print-section-title {
             font-weight: 900 !important;
@@ -200,9 +210,10 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
             margin-bottom: 5pt !important;
           }
           .sa-print-text {
-            font-size: 9.5pt !important;
+            font-size: 9pt !important;
             line-height: 1.4 !important;
             color: #000 !important;
+            text-align: justify !important;
           }
           .sa-print-results {
             padding-left: 15pt !important;
@@ -211,11 +222,12 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
             font-size: 9pt !important;
             margin-bottom: 3pt !important;
             list-style-type: decimal !important;
+            color: #000 !important;
           }
         }
       `}</style>
 
-      {/* VISÃO WEB */}
+      {/* VISÃO WEB - SEM ALTERAÇÕES */}
       <div className="bg-slate-900 p-8 text-white flex justify-between items-center no-print">
         <div>
           <span className="bg-blue-600 px-3 py-1 rounded text-[9px] font-black uppercase tracking-widest mb-2 inline-block">MSEP - Unidade Curricular</span>
@@ -396,8 +408,8 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                 Unidade Curricular: {unit.name.toUpperCase()}
               </div>
 
-              {unit.learningSituations.map((sa) => (
-                <div key={sa.id} className="sa-print-block print:break-before-page print:break-inside-avoid">
+              {unit.learningSituations.map((sa, sIdx) => (
+                <div key={sa.id} className={`sa-print-block ${sIdx === 1 ? 'force-next-page' : ''}`}>
                   <div className="sa-print-title">{sa.title}</div>
                   
                   <div className="sa-print-section">
@@ -405,7 +417,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                     <div className="sa-print-text">{sa.context}</div>
                   </div>
 
-                  <div className="sa-print-section">
+                  <div className="sa-print-section" style={{ background: '#fcfcfc' }}>
                     <div className="sa-print-section-title">II. Desafio Proposto</div>
                     <div className="sa-print-text" style={{ fontStyle: 'italic', fontWeight: 'bold' }}>{sa.challenge}</div>
                   </div>
@@ -428,6 +440,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
           </div>
         )}
 
+        {/* OUTROS MENUS - SEM ALTERAÇÃO */}
         {activeTab === 'geral' && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 no-print">
             <section>
