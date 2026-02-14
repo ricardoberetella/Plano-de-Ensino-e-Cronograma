@@ -92,55 +92,50 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
     <div className="bg-white rounded-[2.5rem] shadow-2xl border border-slate-200 overflow-hidden animate-fadeIn printable-unit-module">
       <style>{`
         @media print {
-          /* 1. RESET RADICAL DO SISTEMA DE CORES E MARGENS */
+          /* 1. RESET DE PÁGINA: REMOVE MARGENS DO SISTEMA (TOP/BOTTOM) */
           @page {
             size: A4 portrait;
-            margin: 1cm 1.5cm !important; /* Margem de segurança padrão impressora */
+            margin: 0 !important; 
           }
 
-          /* 2. REMOVER O ESPAÇO EM BRANCO (GAP) DO TOPO */
-          html, body, #root, main, .printable-unit-module, .content-area {
-            margin: 0 !important;
-            padding: 0 !important;
+          /* 2. FORÇAR EXIBIÇÃO: PREVINE TELA EM BRANCO */
+          html, body, #root, main, .flex, .flex-1, .h-screen, .printable-unit-module, .content-area {
+            display: block !important;
             height: auto !important;
             min-height: auto !important;
-            display: block !important;
             overflow: visible !important;
             position: static !important;
+            margin: 0 !important;
+            padding: 0 !important;
             background: white !important;
+            box-shadow: none !important;
+            border: none !important;
           }
 
-          /* 3. OCULTAR TODOS OS ELEMENTOS DA WEB QUE NÃO SÃO O RELATÓRIO */
+          /* 3. OCULTAR INTERFACE WEB */
           .no-print, header, aside, .tabs-header, button, nav { 
             display: none !important; 
-            height: 0 !important;
-            margin: 0 !important;
-            padding: 0 !important;
-          }
-          
-          /* Esconder conteúdo web dentro do viewer */
-          .no-print-content, .bg-slate-900, .bg-slate-50 {
-            display: none !important;
           }
 
-          /* 4. MOSTRAR APENAS O DOCUMENTO TÉCNICO */
+          /* 4. DOCUMENTO DE IMPRESSÃO: ENCOSTA NO TOPO E GERA PÁGINAS */
           .report-document {
             display: block !important;
-            visibility: visible !important;
-            position: static !important;
             width: 100% !important;
-            margin: 0 !important;
-            padding: 0 !important;
+            padding: 1.2cm 1.5cm !important; /* Margem interna para o conteúdo no papel */
+            box-sizing: border-box !important;
+            background: white !important;
+            position: relative !important;
+            z-index: 9999 !important;
           }
 
-          /* 5. CABEÇALHO SENAI - LOGO VERMELHO */
+          /* 5. CABEÇALHO TÉCNICO - LOGO VERMELHO SENAI */
           .report-header {
             display: flex !important;
             justify-content: space-between !important;
             align-items: center !important;
             border-bottom: 2.5pt solid #E30613 !important;
             padding-bottom: 12pt !important;
-            margin-bottom: 20pt !important;
+            margin-bottom: 15pt !important;
           }
           .logo-box {
             background: #E30613 !important;
@@ -153,14 +148,15 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
             print-color-adjust: exact;
           }
           .info-box { text-align: right !important; }
-          .info-box h1 { font-size: 12pt !important; font-weight: 900 !important; margin: 0 !important; text-transform: uppercase !important; color: #000 !important; }
-          .info-box p { font-size: 9pt !important; margin: 4pt 0 0 0 !important; font-weight: bold !important; color: #000 !important; }
+          .info-box h1 { font-size: 11.5pt !important; font-weight: 900 !important; margin: 0 !important; text-transform: uppercase !important; color: #000 !important; }
+          .info-box p { font-size: 8.5pt !important; margin: 3pt 0 0 0 !important; font-weight: bold !important; color: #000 !important; }
 
-          /* 6. TABELA - TUDO PRETO SÓLIDO */
+          /* 6. TABELA TÉCNICA - TUDO PRETO SÓLIDO */
           .tech-table {
             width: 100% !important;
             border-collapse: collapse !important;
             table-layout: fixed !important;
+            margin-top: 10pt !important;
           }
           .tech-table th, .tech-table td {
             border: 1pt solid #000 !important;
@@ -168,18 +164,14 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
             font-size: 8.5pt !important;
             vertical-align: top !important;
             color: #000 !important;
-            line-height: 1.3 !important;
           }
           .tech-table th {
-            background: #f4f4f4 !important;
+            background: #f2f2f2 !important;
             font-weight: 900 !important;
             text-transform: uppercase !important;
             text-align: center !important;
             -webkit-print-color-adjust: exact;
-            print-color-adjust: exact;
           }
-          
-          /* Garantir que a tabela não quebre no meio de uma linha de aula */
           .tech-table tr {
             page-break-inside: avoid !important;
           }
@@ -189,31 +181,24 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
             font-weight: 900 !important; 
             font-size: 7.5pt !important; 
             text-transform: uppercase !important; 
-            margin-bottom: 4pt !important; 
+            margin-bottom: 3pt !important; 
             display: block !important; 
           }
           
           .doc-main-title { 
             text-align: center !important; 
             font-weight: 900 !important; 
-            font-size: 16pt !important; 
+            font-size: 15pt !important; 
             text-transform: uppercase !important; 
             margin: 15pt 0 !important; 
-            border-bottom: 2pt solid #000 !important; 
-            padding-bottom: 8pt !important; 
-            color: #000 !important;
-          }
-
-          .unit-header-info {
-            margin-bottom: 12pt !important;
-            font-size: 10.5pt !important;
-            font-weight: bold !important;
+            border-bottom: 1.5pt solid #000 !important; 
+            padding-bottom: 6pt !important; 
             color: #000 !important;
           }
         }
       `}</style>
 
-      {/* UI WEB (Ocultada no print) */}
+      {/* UI WEB */}
       <div className="bg-slate-900 p-8 text-white flex justify-between items-center no-print">
         <div>
           <span className="bg-blue-600 px-3 py-1 rounded text-[9px] font-black uppercase tracking-widest mb-2 inline-block">MSEP - Unidade Curricular</span>
@@ -237,7 +222,6 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
 
       <div className="p-6 md:p-10 max-h-[75vh] overflow-y-auto custom-scrollbar bg-[#FDFDFD] content-area">
         
-        {/* TABS: CRONOGRAMA */}
         {activeTab === 'cronograma' && (
           <div className="space-y-8">
             <div className="flex justify-between items-center gap-6 border-b border-slate-100 pb-8 no-print">
@@ -280,7 +264,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
               ))}
             </div>
 
-            {/* RELATÓRIO TÉCNICO DE IMPRESSÃO - ESTE É O QUE SAI NO PDF */}
+            {/* RELATÓRIO TÉCNICO DE IMPRESSÃO */}
             <div className="hidden report-document">
               <div className="report-header">
                 <div className="logo-box">SENAI</div>
@@ -291,7 +275,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
               </div>
               
               <h2 className="doc-main-title">Cronograma de Atividades Pedagógicas</h2>
-              <div className="unit-header-info">
+              <div style={{ marginBottom: '12pt', fontSize: '10.5pt', fontWeight: 'bold', color: '#000' }}>
                 Unidade Curricular: {unit.name.toUpperCase()}
               </div>
               
@@ -335,8 +319,8 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                   ))}
                 </tbody>
               </table>
-              <div style={{ marginTop: '25pt', fontSize: '7pt', color: '#000', textAlign: 'right', borderTop: '0.5pt solid #000', paddingTop: '5pt' }}>
-                Relatório Oficial de Planejamento Pedagógico SENAI - Gerado em {new Date().toLocaleString('pt-BR')}
+              <div style={{ marginTop: '30pt', fontSize: '7.5pt', color: '#000', textAlign: 'right', borderTop: '0.5pt solid #000', paddingTop: '8pt' }}>
+                Documento de Planejamento Pedagógico SENAI - Gerado em {new Date().toLocaleString('pt-BR')}
               </div>
             </div>
           </div>
