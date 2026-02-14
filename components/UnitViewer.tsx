@@ -92,22 +92,19 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
     <div className="bg-white rounded-[2.5rem] shadow-2xl border border-slate-200 overflow-hidden animate-fadeIn printable-unit-module" data-active-tab={activeTab}>
       <style>{`
         @media print {
-          /* 1. CONFIGURAÇÕES GERAIS DE PÁGINA */
+          /* CONFIGURAÇÃO DE PÁGINA */
           @page {
             size: A4 portrait;
-            margin: 0.8cm !important;
+            margin: 1.0cm !important;
           }
 
-          /* 2. LIMPEZA TOTAL DA INTERFACE WEB */
-          aside, header, nav, .tabs-header, .no-print, button, .bg-slate-900:not(.logo-box) {
+          /* RESET DE INTERFACE PARA IMPRESSÃO */
+          aside, header, nav, .tabs-header, .no-print, button {
             display: none !important;
-            height: 0 !important;
-            margin: 0 !important;
-            padding: 0 !important;
           }
 
-          /* 3. RESET DE ESTILOS VISUAIS PARA IMPRESSÃO */
-          html, body, #root, main, .flex-1, .h-screen, .printable-unit-module, .content-area {
+          /* GARANTIR QUE OS CONTAINERS NÃO USEM FLEX PARA RESPEITAR QUEBRAS */
+          html, body, #root, main, .printable-unit-module, .content-area, .report-document-sa {
             display: block !important;
             height: auto !important;
             min-height: auto !important;
@@ -119,112 +116,105 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
             box-shadow: none !important;
           }
 
-          /* 4. SELEÇÃO DO DOCUMENTO */
+          /* SELEÇÃO DO CONTEÚDO IMPRIMÍVEL */
           .report-document, .report-document-sa {
             display: none !important;
           }
           [data-active-tab="cronograma"] .report-document { display: block !important; }
           [data-active-tab="sa"] .report-document-sa { display: block !important; }
 
-          /* 5. CABEÇALHO SENAI COMPACTO PARA CABER MAIS CONTEÚDO NA PÁG 1 */
+          /* CABEÇALHO SENAI */
           .report-header {
             display: flex !important;
+            flex-direction: row !important;
             justify-content: space-between !important;
             align-items: center !important;
             border-bottom: 2pt solid #E30613 !important;
-            padding-bottom: 6pt !important;
-            margin-bottom: 6pt !important;
+            padding-bottom: 8pt !important;
+            margin-bottom: 10pt !important;
+            width: 100% !important;
           }
           .logo-box {
             background: #E30613 !important;
             color: white !important;
-            padding: 6pt 15pt !important;
-            font-size: 20pt !important;
+            padding: 8pt 18pt !important;
+            font-size: 22pt !important;
             font-weight: 900 !important;
             font-style: italic !important;
             -webkit-print-color-adjust: exact;
             print-color-adjust: exact;
           }
           .info-box { text-align: right !important; color: #000 !important; }
-          .info-box h1 { font-size: 8.5pt !important; font-weight: 900 !important; margin: 0 !important; text-transform: uppercase !important; }
-          .info-box p { font-size: 7pt !important; margin: 1pt 0 0 0 !important; font-weight: bold !important; }
+          .info-box h1 { font-size: 9.5pt !important; font-weight: 900 !important; margin: 0 !important; text-transform: uppercase !important; }
+          .info-box p { font-size: 7.5pt !important; margin: 2pt 0 0 0 !important; font-weight: bold !important; }
 
-          /* 6. TÍTULOS DO DOCUMENTO COMPACTOS */
+          /* TÍTULO PRINCIPAL */
           .doc-main-title { 
             text-align: center !important; 
             font-weight: 900 !important; 
-            font-size: 11pt !important; 
+            font-size: 13pt !important; 
             text-transform: uppercase !important; 
-            margin: 6pt 0 !important; 
+            margin: 10pt 0 !important; 
             border-bottom: 1pt solid #000 !important; 
-            padding-bottom: 3pt !important; 
+            padding-bottom: 4pt !important; 
             color: #000 !important;
-            page-break-after: avoid !important;
           }
 
-          /* 7. ESTILOS DAS SITUAÇÕES DE APRENDIZAGEM */
+          /* ESTILOS DAS SITUAÇÕES DE APRENDIZAGEM */
           .sa-print-block {
-            margin-bottom: 10pt !important;
-            page-break-inside: auto !important; 
+            margin-bottom: 15pt !important;
             display: block !important;
             width: 100% !important;
+            page-break-inside: auto !important;
           }
           
-          /* OBRIGAR A PRIMEIRA SA A FICAR NA PÁGINA 1 */
-          .sa-print-block:first-of-type {
-            page-break-before: avoid !important;
-          }
-
-          /* OBRIGAR A SEGUNDA SA A IR PARA A PÁGINA 2 */
-          .sa-print-block:nth-of-type(2) {
+          /* REGRA CRÍTICA: SEGUNDA SA PARA A PÁGINA 2 */
+          .sa-print-block:nth-of-type(n+2) {
+            break-before: page !important;
             page-break-before: always !important;
-            margin-top: 10pt !important;
+            margin-top: 20pt !important;
           }
 
           .sa-print-title {
             font-weight: 900 !important;
-            font-size: 10pt !important;
-            border-bottom: 1pt solid #E30613 !important;
-            margin-bottom: 6pt !important;
-            padding: 3pt 0 !important;
+            font-size: 11pt !important;
+            border-bottom: 1.5pt solid #E30613 !important;
+            margin-bottom: 8pt !important;
+            padding: 4pt 0 !important;
             text-transform: uppercase !important;
             color: #000 !important;
             page-break-after: avoid !important;
           }
           .sa-print-section {
-            margin-bottom: 8pt !important;
+            margin-bottom: 10pt !important;
             page-break-inside: auto !important;
             border: 0.5pt solid #000 !important;
-            padding: 8pt !important;
+            padding: 10pt !important;
           }
           .sa-print-section-title {
             font-weight: 900 !important;
-            font-size: 7.5pt !important;
+            font-size: 8pt !important;
             text-transform: uppercase !important;
             color: #E30613 !important;
-            margin-bottom: 3pt !important;
+            margin-bottom: 4pt !important;
             page-break-after: avoid !important;
           }
           .sa-print-text {
-            font-size: 8.5pt !important;
-            line-height: 1.2 !important;
+            font-size: 9pt !important;
+            line-height: 1.3 !important;
             color: #000 !important;
             text-align: justify !important;
           }
           .sa-print-results {
             padding-left: 12pt !important;
-            margin-top: 3pt !important;
+            margin-top: 4pt !important;
           }
           .sa-print-results li {
-            font-size: 8pt !important;
-            margin-bottom: 1pt !important;
+            font-size: 9pt !important;
+            margin-bottom: 2pt !important;
             list-style-type: decimal !important;
             color: #000 !important;
           }
-
-          /* 8. CRONOGRAMA */
-          .tech-table { width: 100% !important; border-collapse: collapse !important; }
-          .tech-table th, .tech-table td { border: 0.5pt solid #000 !important; padding: 4pt !important; font-size: 8pt !important; color: #000 !important; }
         }
       `}</style>
 
@@ -405,7 +395,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
               </div>
               
               <h2 className="doc-main-title">Situações de Aprendizagem</h2>
-              <div style={{ marginBottom: '6pt', fontSize: '9pt', fontWeight: 'bold', color: '#000' }}>
+              <div style={{ marginBottom: '10pt', fontSize: '9.5pt', fontWeight: 'bold', color: '#000' }}>
                 Unidade Curricular: {unit.name.toUpperCase()}
               </div>
 
@@ -434,7 +424,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                 </div>
               ))}
               
-              <div style={{ marginTop: '10pt', fontSize: '7pt', color: '#999', textAlign: 'right', borderTop: '0.25pt solid #eee', paddingTop: '4pt' }}>
+              <div style={{ marginTop: '15pt', fontSize: '7.5pt', color: '#666', textAlign: 'right', borderTop: '0.5pt solid #eee', paddingTop: '8pt' }}>
                 Relatório Pedagógico SENAI - Gerado em {new Date().toLocaleString('pt-BR')}
               </div>
             </div>
