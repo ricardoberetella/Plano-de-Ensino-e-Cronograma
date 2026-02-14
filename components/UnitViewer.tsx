@@ -317,17 +317,41 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
 
         {activeTab === 'sa' && (
           <div className="max-w-4xl mx-auto no-print">
-            <div className="space-y-12">
+            <div className="space-y-12 pb-10">
               {unit.learningSituations.map((sa) => (
-                <div key={sa.id} className="p-10 bg-white border border-slate-200 rounded-[3rem] shadow-xl relative overflow-hidden">
+                <div key={sa.id} className="p-10 bg-white border border-slate-200 rounded-[3rem] shadow-xl relative overflow-hidden transition-all hover:border-blue-200">
                   <div className="absolute top-0 left-0 w-2 h-full bg-blue-600"></div>
-                  <h3 className="text-2xl font-black text-slate-900 mb-6 uppercase">{sa.title}</h3>
-                  <div className="space-y-6">
-                    <div><p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Contextualização</p><p className="text-slate-600 text-sm leading-relaxed">{sa.context}</p></div>
-                    <div className="bg-slate-900 p-8 rounded-[2rem] text-white"><p className="text-[10px] font-black text-red-500 uppercase mb-3">Desafio Proposto</p><p className="text-slate-300 text-sm italic">"{sa.challenge}"</p></div>
+                  <h3 className="text-2xl font-black text-slate-900 mb-6 uppercase tracking-tight leading-none italic">{sa.title}</h3>
+                  <div className="space-y-8">
+                    <div className="border-l-2 border-slate-100 pl-6">
+                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">I. Contextualização</p>
+                      <p className="text-slate-600 text-sm leading-relaxed font-medium">{sa.context}</p>
+                    </div>
+                    
+                    <div className="bg-slate-900 p-8 rounded-[2.5rem] text-white shadow-lg">
+                      <p className="text-[10px] font-black text-red-500 uppercase mb-4 tracking-widest">II. Desafio Proposto</p>
+                      <p className="text-slate-200 text-sm italic font-medium leading-relaxed">"{sa.challenge}"</p>
+                    </div>
+
+                    <div className="border-t border-slate-100 pt-8">
+                      <p className="text-[10px] font-black text-blue-600 uppercase tracking-widest mb-4">III. Resultados Esperados</p>
+                      <ul className="space-y-3">
+                        {sa.expectedResults.map((result, rIdx) => (
+                          <li key={rIdx} className="flex gap-4 group">
+                            <span className="w-6 h-6 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center shrink-0 text-[10px] font-black transition-all group-hover:bg-blue-600 group-hover:text-white">{rIdx + 1}</span>
+                            <p className="text-slate-600 text-sm font-bold leading-tight pt-0.5">{result}</p>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
                   </div>
                 </div>
               ))}
+              {unit.learningSituations.length === 0 && (
+                <div className="text-center py-20 bg-slate-50 rounded-[3rem] border border-dashed border-slate-200">
+                  <p className="text-slate-400 font-black uppercase text-xs tracking-widest">Nenhuma situação de aprendizagem cadastrada.</p>
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -338,8 +362,8 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
               <h3 className="text-[11px] font-black text-slate-400 mb-6 uppercase tracking-[0.3em]">Capacidades Técnicas</h3>
               <div className="space-y-3">
                 {unit.basicCapacities.map((c, i) => (
-                  <div key={i} className="p-4 bg-white border border-slate-100 rounded-2xl shadow-sm font-bold text-sm text-slate-700 flex gap-4">
-                    <span className="text-blue-500 font-black">{i+1}.</span>{c}
+                  <div key={i} className="p-4 bg-white border border-slate-100 rounded-2xl shadow-sm font-bold text-sm text-slate-700 flex gap-4 transition-all hover:bg-blue-50">
+                    <span className="text-blue-500 font-black shrink-0">{i+1}.</span>{c}
                   </div>
                 ))}
               </div>
@@ -348,9 +372,11 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
               <h3 className="text-[11px] font-black text-slate-400 mb-6 uppercase tracking-[0.3em]">Conhecimentos</h3>
               <div className="space-y-4">
                 {unit.knowledge.map((k, i) => (
-                  <div key={i} className="p-5 bg-slate-50 border-l-4 border-blue-600 rounded-r-2xl">
-                    <p className="font-black text-slate-900 text-xs uppercase mb-2">{k.topic}</p>
-                    {k.subtopics.map((s, si) => <p key={si} className="text-slate-500 text-[10px] font-medium">• {s}</p>)}
+                  <div key={i} className="p-5 bg-slate-50 border-l-4 border-blue-600 rounded-r-2xl shadow-sm transition-all hover:bg-white">
+                    <p className="font-black text-slate-900 text-xs uppercase mb-2 tracking-tight">{k.topic}</p>
+                    <div className="space-y-1.5">
+                      {k.subtopics.map((s, si) => <p key={si} className="text-slate-500 text-[10px] font-medium leading-tight">• {s}</p>)}
+                    </div>
                   </div>
                 ))}
               </div>
@@ -400,7 +426,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
               }
               return (
                 <div key={monthStr} className="space-y-3">
-                  <div className="bg-slate-900 text-white py-2 px-4 rounded-xl text-center shadow-lg">
+                  <div className="bg-slate-900 text-white py-2 px-4 rounded-xl text-center shadow-lg border border-slate-800">
                     <h4 className="text-[10px] font-black uppercase tracking-widest italic">{monthName} {year}</h4>
                   </div>
                   <div className="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-xl">
@@ -415,7 +441,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                         const hasClass = scheduleDates[day];
                         const isSunday = idx % 7 === 0;
                         return (
-                          <div key={day} className={`p-1 h-10 md:h-12 flex items-center justify-center text-[10px] font-black border-b border-r border-slate-50`} style={{ backgroundColor: hasClass ? COLOR_MAP[scheduleColor] : 'transparent', color: hasClass ? TEXT_COLOR_MAP[scheduleColor] : (isSunday ? '#ef4444' : '#1e293b') }}>
+                          <div key={day} className={`p-1 h-10 md:h-12 flex items-center justify-center text-[10px] font-black border-b border-r border-slate-50 transition-colors hover:bg-slate-50`} style={{ backgroundColor: hasClass ? COLOR_MAP[scheduleColor] : 'transparent', color: hasClass ? TEXT_COLOR_MAP[scheduleColor] : (isSunday ? '#ef4444' : '#1e293b') }}>
                             {day.split('-')[2]}
                           </div>
                         );
