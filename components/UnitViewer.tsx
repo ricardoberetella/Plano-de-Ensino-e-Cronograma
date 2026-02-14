@@ -98,7 +98,15 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
             margin: 1.0cm !important;
           }
 
-          /* 2. LIMPEZA TOTAL DA INTERFACE */
+          /* 2. REMOÇÃO DE TODAS AS SOMBRAS E EFEITOS */
+          * {
+            box-shadow: none !important;
+            text-shadow: none !important;
+            filter: none !important;
+            -webkit-filter: none !important;
+          }
+
+          /* 3. LIMPEZA TOTAL DA INTERFACE WEB */
           aside, header, nav, .tabs-header, .no-print, button, .bg-slate-900:not(.logo-box) {
             display: none !important;
             height: 0 !important;
@@ -106,7 +114,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
             padding: 0 !important;
           }
 
-          /* 3. DESTRAVAR CONSTRUTORES DE PÁGINA */
+          /* 4. DESTRAVAR CONSTRUTORES DE PÁGINA */
           html, body, #root, main, .flex-1, .h-screen, .printable-unit-module, .content-area {
             display: block !important;
             height: auto !important;
@@ -116,9 +124,10 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
             background: white !important;
             margin: 0 !important;
             padding: 0 !important;
+            box-shadow: none !important;
           }
 
-          /* 4. O DOCUMENTO TÉCNICO (SÓ ELE APARECE) */
+          /* 5. O DOCUMENTO TÉCNICO */
           .report-document {
             display: block !important;
             visibility: visible !important;
@@ -127,7 +136,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
             margin: 0 !important;
           }
 
-          /* 5. CABEÇALHO SENAI OFICIAL */
+          /* 6. CABEÇALHO SENAI OFICIAL */
           .report-header {
             display: flex !important;
             justify-content: space-between !important;
@@ -150,7 +159,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
           .info-box h1 { font-size: 11pt !important; font-weight: 900 !important; margin: 0 !important; text-transform: uppercase !important; }
           .info-box p { font-size: 8.5pt !important; margin: 3pt 0 0 0 !important; font-weight: bold !important; }
 
-          /* 6. TABELA TÉCNICA COM QUEBRAS */
+          /* 7. TABELA TÉCNICA */
           .tech-table {
             width: 100% !important;
             border-collapse: collapse !important;
@@ -245,7 +254,6 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
               ))}
             </div>
 
-            {/* DOCUMENTO FINAL DE IMPRESSÃO - TERMINA ONDE A TABELA TERMINA */}
             <div className="hidden report-document">
               <div className="report-header">
                 <div className="logo-box">SENAI</div>
@@ -307,7 +315,6 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
           </div>
         )}
 
-        {/* OUTROS TABS - OCULTOS NO PDF */}
         {activeTab === 'sa' && (
           <div className="max-w-4xl mx-auto no-print">
             <div className="space-y-12">
