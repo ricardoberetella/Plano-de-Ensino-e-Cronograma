@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo } from 'react';
 import { CurricularUnit, ScheduleEntry, UnitCalendar, CalendarMarking, CalendarColor } from '../types';
 import { SAMPLE_PLANS, SCHEDULE_VERSION } from '../constants';
@@ -169,11 +168,12 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
           /* REGRAS DAS SITUAÇÕES DE APRENDIZAGEM */
           .sa-print-block {
             margin-bottom: 20pt !important;
-            page-break-inside: auto !important;
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
           }
           
-          /* OBRIGA A SEGUNDA SA (OFICINA LIMPA) A IR PARA PÁGINA 2 */
-          .sa-print-block:nth-of-type(2) {
+          /* FORÇA A SITUAÇÃO PROBLEMA A IR PARA PÁGINA 2 */
+          .sa-print-block {
             page-break-before: always !important;
             break-before: page !important;
           }
@@ -397,7 +397,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
               </div>
 
               {unit.learningSituations.map((sa) => (
-                <div key={sa.id} className="sa-print-block">
+                <div key={sa.id} className="sa-print-block print:break-before-page print:break-inside-avoid">
                   <div className="sa-print-title">{sa.title}</div>
                   
                   <div className="sa-print-section">
