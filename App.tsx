@@ -43,7 +43,6 @@ const App: React.FC = () => {
           const template = SAMPLE_PLANS.find(p => p.profileId === profileId) || SAMPLE_PLANS[0];
           let updated = false;
           
-          // Verificar se unidades básicas existem
           template.units.forEach(tUnit => {
             const hasUnit = plan.units.some(u => u.name === tUnit.name);
             if (!hasUnit) {
@@ -52,13 +51,12 @@ const App: React.FC = () => {
             }
           });
 
-          // FORÇAR ATUALIZAÇÃO DO FUSI SE A VERSÃO FOR ANTIGA
           const fusi = plan.units.find(u => u.id.toLowerCase().includes('fusi') || u.name.toUpperCase().includes('FUNDAMENTOS'));
           if (fusi && (plan as any).version !== SCHEDULE_VERSION) {
             const tFusi = template.units.find(u => u.id.toLowerCase().includes('fusi') || u.name.toUpperCase().includes('FUNDAMENTOS'));
             if (tFusi) {
               const idx = plan.units.indexOf(fusi);
-              plan.units[idx] = { ...tFusi }; // Substitui pela versão fiel do código
+              plan.units[idx] = { ...tFusi };
               (plan as any).version = SCHEDULE_VERSION;
               updated = true;
             }
@@ -149,10 +147,6 @@ const App: React.FC = () => {
     return unit.name.split(' ').map(w => w[0]).join('').toUpperCase();
   };
 
-  const handlePrint = () => {
-    window.print();
-  };
-
   if (!isAuthenticated) return <Login onLogin={() => setIsAuthenticated(true)} />;
 
   return (
@@ -181,13 +175,6 @@ const App: React.FC = () => {
                     <span className="bg-slate-900 text-white px-3 py-1 rounded text-[10px] font-black uppercase tracking-[0.2em] mb-4 inline-block">MSEP - Modelo SENAI</span>
                     <h2 className="text-3xl md:text-5xl font-[1000] text-slate-900 tracking-tighter uppercase leading-[0.9]">{currentPlan.courseName}</h2>
                   </div>
-                  <button 
-                    onClick={handlePrint}
-                    className="p-4 bg-blue-600 text-white rounded-2xl shadow-xl hover:bg-slate-900 transition-all flex items-center gap-3 group"
-                  >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
-                    <span className="text-[10px] font-black uppercase tracking-widest hidden md:block">Gerar Relatório PDF</span>
-                  </button>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
                   <div className="p-6 bg-slate-50 rounded-3xl border border-slate-100"><p className="text-[9px] font-black text-slate-400 uppercase mb-2">Carga Total</p><p className="text-2xl font-black text-slate-800 italic">{currentPlan.totalHours} HORAS</p></div>
@@ -241,96 +228,6 @@ const App: React.FC = () => {
           {view === 'calendario' && currentPlan && <GeneralCalendar plan={currentPlan} />}
 
           {view === 'editor' && <PlanForm initialPlan={currentPlan || undefined} onSave={handleSave} onCancel={() => setView('dashboard')} />}
-
-          {/* ÁREA DE IMPRESSÃO OCULTA */}
-          <div className="hidden print:block print:bg-white print:text-black">
-            <style>{`
-              @media print {
-                body { background: white !important; }
-                header, aside, .no-print, button { display: none !important; }
-                .print-page { page-break-after: always; padding: 2cm; }
-                .print-title { border-bottom: 4px solid #E30613; padding-bottom: 10px; margin-bottom: 20px; }
-                table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-                th, td { border: 1px solid #ddd; padding: 8px; text-align: left; font-size: 10px; }
-                th { background-color: #f2f2f2; font-weight: bold; text-transform: uppercase; }
-                h1, h2, h3 { color: #000; text-transform: uppercase; }
-              }
-            `}</style>
-            
-            {currentPlan && (
-              <div className="p-10">
-                {/* Capa */}
-                <div className="print-page">
-                  <div className="print-title">
-                    <h1 style={{fontSize: '24pt', fontWeight: '900'}}>{currentPlan.courseName}</h1>
-                    <p style={{fontSize: '12pt', fontWeight: 'bold', color: '#666'}}>Plano de Ensino e Cronograma Integrado - MSEP</p>
-                  </div>
-                  <div style={{marginTop: '20px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px'}}>
-                    <div><strong>Modalidade:</strong> {currentPlan.modality}</div>
-                    <div><strong>Carga Horária Total:</strong> {currentPlan.totalHours}h</div>
-                  </div>
-                  <div style={{marginTop: '40px'}}>
-                    <h2 style={{fontSize: '14pt', borderBottom: '1px solid #ccc', paddingBottom: '5px'}}>I. Perfil de Conclusão (Objetivo)</h2>
-                    <p style={{fontSize: '11pt', marginTop: '10px', lineHeight: '1.5'}}>{currentPlan.objective}</p>
-                  </div>
-                </div>
-
-                {/* Detalhes por Unidade */}
-                {currentPlan.units.map((unit) => (
-                  <div key={unit.id} className="print-page">
-                    <h2 style={{fontSize: '18pt', fontWeight: '900', borderLeft: '8px solid #005DAA', paddingLeft: '15px', marginBottom: '20px'}}>
-                      UC: {unit.name}
-                    </h2>
-                    
-                    <section style={{marginBottom: '30px'}}>
-                      <h3 style={{fontSize: '12pt', fontWeight: 'bold', marginBottom: '10px'}}>Capacidades Técnicas</h3>
-                      <ul style={{fontSize: '10pt', marginLeft: '20px'}}>
-                        {unit.basicCapacities.map((c, i) => <li key={i} style={{marginBottom: '5px'}}>{c}</li>)}
-                      </ul>
-                    </section>
-
-                    {unit.learningSituations.length > 0 && (
-                      <section style={{marginBottom: '30px', background: '#f9f9f9', padding: '15px', borderRadius: '5px', border: '1px solid #eee'}}>
-                        <h3 style={{fontSize: '12pt', fontWeight: 'bold', marginBottom: '10px'}}>Situação de Aprendizagem</h3>
-                        <p style={{fontSize: '10pt', fontWeight: 'bold'}}>Título: {unit.learningSituations[0].title}</p>
-                        <p style={{fontSize: '9pt', marginTop: '10px', whiteSpace: 'pre-wrap'}}>{unit.learningSituations[0].context}</p>
-                        <div style={{marginTop: '10px', padding: '10px', border: '1px dashed #ccc'}}>
-                          <p style={{fontSize: '9pt', fontStyle: 'italic'}}><strong>Desafio:</strong> {unit.learningSituations[0].challenge}</p>
-                        </div>
-                      </section>
-                    )}
-
-                    <section>
-                      <h3 style={{fontSize: '12pt', fontWeight: 'bold', marginBottom: '10px'}}>Cronograma / Plano de Aula</h3>
-                      <table>
-                        <thead>
-                          <tr>
-                            <th style={{width: '60px'}}>Data</th>
-                            <th style={{width: '40px'}}>H/A</th>
-                            <th>Conhecimentos / Capacidades</th>
-                            <th>Estratégia Docente</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {unit.schedule.map((entry) => (
-                            <tr key={entry.id}>
-                              <td>{entry.date}</td>
-                              <td>{entry.hours}h</td>
-                              <td style={{fontSize: '9px'}}>
-                                <strong>{entry.knowledge}</strong><br/>
-                                <span style={{color: '#666'}}>{entry.capacities}</span>
-                              </td>
-                              <td style={{fontSize: '9px'}}>{entry.strategy}</td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </section>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
         </>
       )}
     </Layout>
