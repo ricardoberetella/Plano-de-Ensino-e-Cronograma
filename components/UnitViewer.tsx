@@ -109,6 +109,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
             margin: 0 !important;
             padding: 0 !important;
             box-shadow: none !important;
+            position: static !important;
           }
 
           .report-document, .report-document-sa {
@@ -117,7 +118,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
           [data-active-tab="cronograma"] .report-document { display: block !important; }
           [data-active-tab="sa"] .report-document-sa { display: block !important; }
 
-          /* CABEÇALHO PADRÃO RESTAURADO */
+          /* CABEÇALHO PADRÃO */
           .report-header {
             display: flex !important;
             justify-content: space-between !important;
@@ -151,12 +152,11 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
             color: #000 !important;
           }
 
-          /* FORMATAÇÃO DA TABELA DO CRONOGRAMA (RESTAURADA) */
+          /* FORMATAÇÃO DA TABELA DO CRONOGRAMA */
           .tech-table { width: 100% !important; border-collapse: collapse !important; margin-top: 10pt !important; }
           .tech-table th { background: #f8fafc !important; color: #64748b !important; font-size: 7pt !important; font-weight: 900 !important; text-transform: uppercase !important; padding: 8pt !important; border: 0.5pt solid #e2e8f0 !important; text-align: left !important; -webkit-print-color-adjust: exact; }
           .tech-table td { padding: 10pt !important; border: 0.5pt solid #e2e8f0 !important; font-size: 8.5pt !important; vertical-align: top !important; color: #1e293b !important; }
           
-          /* RESTAURAÇÃO DOS LABELS VERMELHOS (CASA DOS CONHECIMENTOS) */
           .p-label {
             display: block !important;
             font-size: 7pt !important;
@@ -166,15 +166,16 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
             margin-bottom: 3pt !important;
           }
 
-          /* REGRAS DAS SITUAÇÕES DE APRENDIZAGEM (AJUSTADAS) */
+          /* REGRAS DAS SITUAÇÕES DE APRENDIZAGEM */
           .sa-print-block {
             margin-bottom: 20pt !important;
             page-break-inside: auto !important;
           }
           
-          /* OBRIGA A SEGUNDA SA A IR PARA PÁGINA 2 */
+          /* OBRIGA A SEGUNDA SA (OFICINA LIMPA) A IR PARA PÁGINA 2 */
           .sa-print-block:nth-of-type(2) {
             page-break-before: always !important;
+            break-before: page !important;
           }
 
           .sa-print-title {
