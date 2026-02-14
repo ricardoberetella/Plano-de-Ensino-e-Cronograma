@@ -89,7 +89,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
   }, [calendar.startDate, calendar.endDate]);
 
   return (
-    <div className="bg-white rounded-[2.5rem] shadow-2xl border border-slate-200 overflow-hidden animate-fadeIn printable-unit-module">
+    <div className="bg-white rounded-[2.5rem] shadow-2xl border border-slate-200 overflow-hidden animate-fadeIn printable-unit-module" data-active-tab={activeTab}>
       <style>{`
         @media print {
           /* 1. MARGENS TÉCNICAS 1.0cm */
@@ -127,13 +127,17 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
             box-shadow: none !important;
           }
 
-          /* 5. O DOCUMENTO TÉCNICO */
-          .report-document {
+          /* 5. SELEÇÃO DO DOCUMENTO CORRETO BASEADO NA ABA ATIVA */
+          .report-document, .report-document-sa {
+            display: none !important;
+          }
+
+          [data-active-tab="cronograma"] .report-document {
             display: block !important;
-            visibility: visible !important;
-            width: 100% !important;
-            padding: 0 !important;
-            margin: 0 !important;
+          }
+
+          [data-active-tab="sa"] .report-document-sa {
+            display: block !important;
           }
 
           /* 6. CABEÇALHO SENAI OFICIAL */
@@ -185,6 +189,48 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
           
           .p-label { color: #000 !important; font-weight: 900 !important; font-size: 7.5pt !important; text-transform: uppercase !important; margin-bottom: 3pt !important; display: block !important; }
           .doc-main-title { text-align: center !important; font-weight: 900 !important; font-size: 15pt !important; text-transform: uppercase !important; margin: 15pt 0 !important; border-bottom: 1.5pt solid #000 !important; padding-bottom: 6pt !important; color: #000 !important; }
+          
+          /* Estilo para Situações de Aprendizagem no PDF */
+          .sa-print-block {
+            margin-bottom: 25pt !important;
+            page-break-inside: avoid !important;
+            border: 1pt solid #000 !important;
+            padding: 15pt !important;
+          }
+          .sa-print-title {
+            font-weight: 900 !important;
+            font-size: 12pt !important;
+            border-bottom: 1.5pt solid #E30613 !important;
+            margin-bottom: 10pt !important;
+            padding-bottom: 4pt !important;
+            text-transform: uppercase !important;
+            color: #000 !important;
+          }
+          .sa-print-section {
+            margin-bottom: 12pt !important;
+          }
+          .sa-print-section-title {
+            font-weight: 900 !important;
+            font-size: 8pt !important;
+            text-transform: uppercase !important;
+            color: #E30613 !important;
+            margin-bottom: 4pt !important;
+          }
+          .sa-print-text {
+            font-size: 9pt !important;
+            line-height: 1.4 !important;
+            color: #000 !important;
+          }
+          .sa-print-results {
+            padding-left: 15pt !important;
+            margin-top: 5pt !important;
+          }
+          .sa-print-results li {
+            font-size: 9pt !important;
+            margin-bottom: 3pt !important;
+            list-style-type: decimal !important;
+            color: #000 !important;
+          }
         }
       `}</style>
 
@@ -316,8 +362,16 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
         )}
 
         {activeTab === 'sa' && (
-          <div className="max-w-4xl mx-auto no-print">
-            <div className="space-y-12 pb-10">
+          <div className="max-w-4xl mx-auto">
+            <div className="flex justify-between items-center gap-6 border-b border-slate-100 pb-8 mb-10 no-print">
+              <h3 className="text-3xl font-[1000] text-slate-900 uppercase italic">Situações de Aprendizagem</h3>
+              <button onClick={handlePrint} className="bg-red-600 text-white px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl flex items-center gap-3 hover:bg-slate-900 transition-all">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+                Imprimir Situações
+              </button>
+            </div>
+
+            <div className="space-y-12 pb-10 no-print">
               {unit.learningSituations.map((sa) => (
                 <div key={sa.id} className="p-10 bg-white border border-slate-200 rounded-[3rem] shadow-xl relative overflow-hidden transition-all hover:border-blue-200">
                   <div className="absolute top-0 left-0 w-2 h-full bg-blue-600"></div>
@@ -352,6 +406,51 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                   <p className="text-slate-400 font-black uppercase text-xs tracking-widest">Nenhuma situação de aprendizagem cadastrada.</p>
                 </div>
               )}
+            </div>
+
+            {/* DOCUMENTO DE IMPRESSÃO DAS SITUAÇÕES DE APRENDIZAGEM */}
+            <div className="hidden report-document-sa">
+              <div className="report-header">
+                <div className="logo-box">SENAI</div>
+                <div className="info-box">
+                  <h1>Mecânico de Usinagem Convencional</h1>
+                  <p>Guia de Situações de Aprendizagem - Sistema MSEP</p>
+                </div>
+              </div>
+              
+              <h2 className="doc-main-title">Situações de Aprendizagem</h2>
+              <div style={{ marginBottom: '15pt', fontSize: '11pt', fontWeight: 'bold', color: '#000' }}>
+                Unidade Curricular: {unit.name.toUpperCase()}
+              </div>
+
+              {unit.learningSituations.map((sa) => (
+                <div key={sa.id} className="sa-print-block">
+                  <div className="sa-print-title">{sa.title}</div>
+                  
+                  <div className="sa-print-section">
+                    <div className="sa-print-section-title">I. Contextualização / Situação-Problema</div>
+                    <div className="sa-print-text">{sa.context}</div>
+                  </div>
+
+                  <div className="sa-print-section" style={{ background: '#f9f9f9', padding: '10pt', border: '0.5pt dashed #000' }}>
+                    <div className="sa-print-section-title">II. Desafio Proposto</div>
+                    <div className="sa-print-text" style={{ fontStyle: 'italic' }}>{sa.challenge}</div>
+                  </div>
+
+                  <div className="sa-print-section">
+                    <div className="sa-print-section-title">III. Resultados Esperados / Entregas</div>
+                    <ul className="sa-print-results">
+                      {sa.expectedResults.map((result, rIdx) => (
+                        <li key={rIdx}>{result}</li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              ))}
+              
+              <div style={{ marginTop: '20pt', fontSize: '8pt', color: '#666', textAlign: 'right', borderTop: '0.5pt solid #000', paddingTop: '8pt' }}>
+                Relatório de Planejamento Pedagógico SENAI - Gerado em {new Date().toLocaleString('pt-BR')}
+              </div>
             </div>
           </div>
         )}
