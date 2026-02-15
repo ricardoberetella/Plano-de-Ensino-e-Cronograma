@@ -134,7 +134,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
             className={`px-8 py-5 transition-all border-b-4 ${activeTab === tab ? 'border-blue-600 bg-white' : 'border-transparent text-slate-400 hover:bg-slate-100'}`}
           >
             <span className="text-[10px] font-black uppercase tracking-widest block">
-              {tab === 'geral' ? 'Geral' : tab === 'sa' ? 'Situação-Problema' : tab === 'rubricas' ? 'Rubricas' : tab === 'cronograma' ? 'Plano de Aula' : 'Calendário'}
+              {tab === 'geral' ? 'Geral' : tab === 'sa' ? 'Situação-Problema' : tab === 'rubricas' ? 'Rubricas' : tab === 'cronograma' ? 'Plano de Aula / Cronograma' : 'Calendário'}
             </span>
           </button>
         ))}
@@ -230,7 +230,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                         <div style={{ fontSize: '12px', lineHeight: '1.5', color: 'black', fontStyle: 'italic', fontWeight: '600' }}>{sa.challenge}</div>
                       </div>
                       
-                      {/* BLOCO III - RESULTADOS (REMOÇÃO DOS NÚMEROS 1-5) */}
+                      {/* BLOCO III - RESULTADOS */}
                       <div style={{ border: '1pt solid #000', padding: '15px', display: 'flex', flexDirection: 'column' }}>
                         <div style={{ fontWeight: '900', fontSize: '10px', color: '#E30613', textTransform: 'uppercase', marginBottom: '8px' }}>III. Resultados Esperados / Entregas</div>
                         <ul style={{ paddingLeft: '0px', marginTop: '4px', listStyleType: 'none' }}>
@@ -255,7 +255,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
           <div className="space-y-8">
             <div className="flex justify-between items-center gap-6 border-b border-slate-100 pb-8">
               <div>
-                <h3 className="text-3xl font-[1000] text-slate-900 uppercase italic">Plano de Aula</h3>
+                <h3 className="text-3xl font-[1000] text-slate-900 uppercase italic">Plano de Aula / Cronograma</h3>
                 <p className="text-slate-400 text-[10px] font-black uppercase tracking-widest">{localSchedule.length} Aulas Registradas</p>
               </div>
               <button 
@@ -281,11 +281,11 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                     <p className="text-[10px] font-black uppercase text-slate-400 mt-1 italic">{getDayOfWeek(entry.date)}</p>
                   </div>
                   <div className="lg:col-span-9 grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div className="text-[11px] font-bold text-slate-800">
+                    <div className="text-sm font-black text-black">
                       <p className="text-blue-600 uppercase mb-2 text-[9px] tracking-widest">Conhecimentos e Capacidades</p>
                       <p><strong>{formatType(entry.knowledge)}:</strong> {entry.capacities}</p>
                     </div>
-                    <div className="text-[11px] font-medium italic text-slate-500">
+                    <div className="text-sm font-bold italic text-slate-900">
                        <p className="text-orange-600 uppercase mb-2 text-[9px] tracking-widest not-italic">Estratégias e Recursos</p>
                        <p>{entry.strategy}</p>
                     </div>
@@ -302,7 +302,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                       <div style={{ background: '#E30613', color: 'white', padding: '10px 15px', fontSize: '22px', fontWeight: '900', fontStyle: 'italic' }}>SENAI</div>
                       <div style={{ textAlign: 'right', color: 'black' }}>
                         <h1 style={{ fontSize: '11px', fontWeight: '900', margin: 0, textTransform: 'uppercase' }}>Mecânico de Usinagem Convencional</h1>
-                        <p style={{ fontSize: '9px', margin: '3px 0 0 0', fontWeight: 'bold' }}>Plano de Aula e Cronograma - MSEP (Pág {pIndex + 1})</p>
+                        <p style={{ fontSize: '9px', margin: '3px 0 0 0', fontWeight: 'bold' }}>Plano de Aula / Cronograma - MSEP (Pág {pIndex + 1})</p>
                       </div>
                     </div>
                     
@@ -322,14 +322,14 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                           const realIdx = (pIndex * 18) + idx;
                           return (
                             <tr key={entry.id}>
-                              <td style={{ border: '1pt solid #000', padding: '6px', textAlign: 'center', fontSize: '9px', fontWeight: 'bold' }}>
-                                {entry.date}<br/><span style={{ fontSize: '8px', color: '#666' }}>AULA {realIdx + 1}</span>
+                              <td style={{ border: '1pt solid #000', padding: '6px', textAlign: 'center', fontSize: '10px', fontWeight: '900', color: '#000' }}>
+                                {entry.date}<br/><span style={{ fontSize: '8px', color: '#333' }}>AULA {realIdx + 1}</span>
                               </td>
-                              <td style={{ border: '1pt solid #000', padding: '6px', fontSize: '10px' }}>
-                                <div style={{ fontWeight: 'bold', marginBottom: '4px', color: '#005DAA' }}>{formatType(entry.knowledge)}</div>
-                                <div style={{ fontSize: '9px', color: '#000' }}>{entry.capacities}</div>
+                              <td style={{ border: '1pt solid #000', padding: '8px', fontSize: '11px', color: '#000' }}>
+                                <div style={{ fontWeight: '900', marginBottom: '4px', color: '#005DAA' }}>{formatType(entry.knowledge)}</div>
+                                <div style={{ fontWeight: '900' }}>{entry.capacities}</div>
                               </td>
-                              <td style={{ border: '1pt solid #000', padding: '6px', fontSize: '9px', fontStyle: 'italic', color: '#333' }}>
+                              <td style={{ border: '1pt solid #000', padding: '8px', fontSize: '11px', fontStyle: 'italic', color: '#000', fontWeight: '700' }}>
                                 {entry.strategy}
                               </td>
                             </tr>
