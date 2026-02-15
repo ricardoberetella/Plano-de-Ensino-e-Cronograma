@@ -127,7 +127,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
     return months;
   }, [calendar.startDate, calendar.endDate]);
 
-  // Reduzido para 12 itens por página para garantir que nada seja cortado com as fontes grandes e negritadas
+  // Mantido em 12 itens por página para folga visual
   const chunkedSchedule = useMemo(() => {
     const chunks: ScheduleEntry[][] = [];
     for (let i = 0; i < localSchedule.length; i += 12) {
@@ -211,7 +211,6 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
               ))}
             </div>
 
-            {/* CONTAINER OCULTO PARA PDF - PIXEL PERFECT A4 (DPI 96) */}
             <div style={{ position: 'absolute', left: '-9999px', top: 0 }}>
               <div ref={saContainerRef}>
                 {unit.learningSituations.map((sa, index) => (
@@ -230,10 +229,8 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                         <div style={{ textAlign: 'right', color: '#666', fontSize: '8px', fontWeight: 'bold' }}>UC: {unit.name.toUpperCase()}</div>
                       </div>
                     )}
-                    
                     <h2 style={{ textAlign: 'center', fontWeight: '900', fontSize: '13px', textTransform: 'uppercase', margin: '5px 0', borderBottom: '1pt solid #ccc', paddingBottom: '5px', color: 'black' }}>Guia do Estudante (MSEP)</h2>
                     <div style={{ fontSize: '13px', fontWeight: '900', borderBottom: '1.5pt solid #E30613', marginBottom: '15px', padding: '5px 0', textTransform: 'uppercase', color: 'black' }}>{sa.title}</div>
-                    
                     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '15px' }}>
                       <div style={{ border: '1pt solid #000', padding: '15px', minHeight: '180px', display: 'flex', flexDirection: 'column' }}>
                         <div style={{ fontWeight: '900', fontSize: '10px', color: '#E30613', textTransform: 'uppercase', marginBottom: '8px' }}>I. Contextualização / Situação-Problema</div>
@@ -251,9 +248,6 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                           ))}
                         </ul>
                       </div>
-                    </div>
-                    <div style={{ marginTop: '15px', fontSize: '8.5px', color: '#999', textAlign: 'right', fontStyle: 'italic' }}>
-                      Sistema MSEP-SENAI | Página {index+1} | Gerado em {new Date().toLocaleDateString('pt-BR')}
                     </div>
                   </div>
                 ))}
@@ -275,11 +269,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                   disabled={isSaving}
                   className="bg-blue-600 text-white px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl flex items-center gap-3 hover:scale-105 transition-all disabled:bg-slate-400"
                 >
-                  {isSaving ? (
-                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                  ) : (
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"/></svg>
-                  )}
+                  {isSaving ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div> : <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"/></svg>}
                   {isSaving ? 'Salvando...' : 'Salvar Alterações'}
                 </button>
                 <button 
@@ -287,12 +277,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                   disabled={isGenerating}
                   className="bg-[#005DAA] text-white px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl flex items-center gap-3 hover:scale-105 transition-all disabled:bg-slate-400"
                 >
-                  {isGenerating ? 'Gerando...' : (
-                    <>
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-                      Baixar PDF
-                    </>
-                  )}
+                  {isGenerating ? 'Gerando...' : <><svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg> Baixar PDF</>}
                 </button>
               </div>
             </div>
@@ -302,38 +287,18 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                 <div key={entry.id} className="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-lg grid grid-cols-1 lg:grid-cols-12 gap-8 hover:border-blue-200 transition-all">
                   <div className="lg:col-span-3">
                     <p className="text-[9px] font-black text-slate-400 uppercase mb-1">AULA {idx+1}</p>
-                    <input 
-                      type="text"
-                      value={entry.date}
-                      onChange={(e) => handleScheduleUpdate(entry.id, 'date', e.target.value)}
-                      className="text-blue-600 font-[1000] text-xl uppercase tracking-tighter w-full bg-transparent border-b border-transparent focus:border-blue-300 outline-none"
-                    />
+                    <input type="text" value={entry.date} onChange={(e) => handleScheduleUpdate(entry.id, 'date', e.target.value)} className="text-blue-600 font-[1000] text-xl uppercase tracking-tighter w-full bg-transparent border-b border-transparent focus:border-blue-300 outline-none" />
                     <p className="text-[10px] font-black uppercase text-slate-400 mt-1 italic">{getDayOfWeek(entry.date)}</p>
                   </div>
                   <div className="lg:col-span-9 grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div className="space-y-2">
                       <p className="text-blue-600 uppercase mb-2 text-[9px] font-black tracking-widest">Conhecimentos e Capacidades</p>
-                      <input 
-                        type="text"
-                        value={entry.knowledge}
-                        onChange={(e) => handleScheduleUpdate(entry.id, 'knowledge', e.target.value)}
-                        className="w-full font-black text-sm uppercase text-black bg-transparent border-b border-slate-100 focus:border-blue-300 outline-none mb-1"
-                      />
-                      <textarea 
-                        value={entry.capacities}
-                        rows={3}
-                        onChange={(e) => handleScheduleUpdate(entry.id, 'capacities', e.target.value)}
-                        className="w-full font-black text-[15px] text-black bg-slate-50 p-3 rounded-xl border border-transparent focus:border-blue-200 outline-none resize-none leading-relaxed"
-                      />
+                      <input type="text" value={entry.knowledge} onChange={(e) => handleScheduleUpdate(entry.id, 'knowledge', e.target.value)} className="w-full font-bold text-sm uppercase text-black bg-transparent border-b border-slate-100 focus:border-blue-300 outline-none mb-1" />
+                      <textarea value={entry.capacities} rows={3} onChange={(e) => handleScheduleUpdate(entry.id, 'capacities', e.target.value)} className="w-full font-medium text-[15px] text-black bg-slate-50 p-3 rounded-xl border border-transparent focus:border-blue-200 outline-none resize-none leading-relaxed" />
                     </div>
                     <div className="space-y-2">
                        <p className="text-orange-600 uppercase mb-2 text-[9px] font-black tracking-widest">Estratégias e Recursos</p>
-                       <textarea 
-                        value={entry.strategy}
-                        rows={5}
-                        onChange={(e) => handleScheduleUpdate(entry.id, 'strategy', e.target.value)}
-                        className="w-full font-bold italic text-[15px] text-black bg-slate-50 p-3 rounded-xl border border-transparent focus:border-orange-200 outline-none resize-none leading-relaxed"
-                      />
+                       <textarea value={entry.strategy} rows={5} onChange={(e) => handleScheduleUpdate(entry.id, 'strategy', e.target.value)} className="w-full font-medium italic text-[15px] text-black bg-slate-50 p-3 rounded-xl border border-transparent focus:border-orange-200 outline-none resize-none leading-relaxed" />
                     </div>
                   </div>
                 </div>
@@ -343,49 +308,48 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
             <div style={{ position: 'absolute', left: '-9999px', top: 0 }}>
               <div ref={cronogramaContainerRef}>
                 {chunkedSchedule.map((chunk, pIndex) => (
-                  <div key={pIndex} style={{ width: '794px', height: '1123px', padding: '45px 50px', backgroundColor: 'white', display: 'flex', flexDirection: 'column', boxSizing: 'border-box' }}>
-                    {/* Cabeçalho SENAI apenas na página 1 */}
+                  <div key={pIndex} style={{ width: '794px', height: '1123px', padding: '40px 50px 60px 50px', backgroundColor: 'white', display: 'flex', flexDirection: 'column', boxSizing: 'border-box', position: 'relative' }}>
                     {pIndex === 0 ? (
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '3pt solid #E30613', paddingBottom: '12px', marginBottom: '15px' }}>
-                        <div style={{ background: '#E30613', color: 'white', padding: '10px 15px', fontSize: '22px', fontWeight: '900', fontStyle: 'italic' }}>SENAI</div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '2.5pt solid #E30613', paddingBottom: '10px', marginBottom: '15px' }}>
+                        <div style={{ background: '#E30613', color: 'white', padding: '8px 12px', fontSize: '20px', fontWeight: '800', fontStyle: 'italic' }}>SENAI</div>
                         <div style={{ textAlign: 'right', color: 'black' }}>
-                          <h1 style={{ fontSize: '11px', fontWeight: '900', margin: 0, textTransform: 'uppercase' }}>Mecânico de Usinagem Convencional</h1>
-                          <p style={{ fontSize: '9px', margin: '3px 0 0 0', fontWeight: 'bold' }}>Plano de Aula / Cronograma - MSEP</p>
+                          <h1 style={{ fontSize: '10px', fontWeight: '700', margin: 0, textTransform: 'uppercase' }}>Mecânico de Usinagem Convencional</h1>
+                          <p style={{ fontSize: '8px', margin: '2px 0 0 0', fontWeight: '500' }}>Plano de Aula / Cronograma - MSEP</p>
                         </div>
                       </div>
                     ) : (
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '2pt solid #000', paddingBottom: '6px', marginBottom: '15px' }}>
-                        <div style={{ fontSize: '10px', fontWeight: '900', textTransform: 'uppercase', color: 'black' }}>Plano de Aula / Cronograma - Continuação</div>
-                        <div style={{ fontSize: '9px', fontWeight: 'bold', color: '#666' }}>Mecânico de Usinagem Convencional | Pág {pIndex + 1}</div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1.5pt solid #000', paddingBottom: '5px', marginBottom: '15px' }}>
+                        <div style={{ fontSize: '9px', fontWeight: '700', textTransform: 'uppercase', color: 'black' }}>Plano de Aula / Cronograma - Continuação</div>
+                        <div style={{ fontSize: '8px', fontWeight: '500', color: '#666' }}>Pág {pIndex + 1}</div>
                       </div>
                     )}
                     
-                    {pIndex === 0 && <h2 style={{ textAlign: 'center', fontWeight: '900', fontSize: '15px', textTransform: 'uppercase', margin: '5px 0', borderBottom: '2pt solid #000', paddingBottom: '8px', color: 'black' }}>Planejamento Pedagógico</h2>}
-                    <div style={{ marginBottom: '10px', fontSize: '11px', fontWeight: '900', color: 'black' }}>UC: {unit.name.toUpperCase()}</div>
+                    {pIndex === 0 && <h2 style={{ textAlign: 'center', fontWeight: '700', fontSize: '14px', textTransform: 'uppercase', margin: '5px 0', borderBottom: '1.5pt solid #000', paddingBottom: '5px', color: 'black' }}>Planejamento Pedagógico</h2>}
+                    <div style={{ marginBottom: '8px', fontSize: '10px', fontWeight: '700', color: 'black' }}>UC: {unit.name.toUpperCase()}</div>
                     
-                    {/* Tabela com borda sólida de 2pt em volta para garantir o fechamento da grade */}
-                    <div style={{ flex: 1 }}>
-                      <table style={{ width: '100%', borderCollapse: 'collapse', border: '2pt solid #000', marginBottom: '10px' }}>
+                    <div style={{ border: '1.5pt solid #000', flex: 1, display: 'flex', flexDirection: 'column', backgroundColor: 'white' }}>
+                      <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                         <thead>
-                          <tr style={{ background: '#eee' }}>
-                            <th style={{ border: '1pt solid #000', padding: '10px', fontSize: '10px', textTransform: 'uppercase', width: '18%' }}>Aula/Data</th>
-                            <th style={{ border: '1pt solid #000', padding: '10px', fontSize: '10px', textTransform: 'uppercase', width: '41%' }}>Conhecimentos/Capacidades</th>
-                            <th style={{ border: '1pt solid #000', padding: '10px', fontSize: '10px', textTransform: 'uppercase', width: '41%' }}>Estratégias</th>
+                          <tr style={{ background: '#f5f5f5', borderBottom: '1.5pt solid #000' }}>
+                            <th style={{ borderRight: '1pt solid #000', padding: '8px', fontSize: '9px', textTransform: 'uppercase', width: '18%', fontWeight: '700' }}>Aula/Data</th>
+                            <th style={{ borderRight: '1pt solid #000', padding: '8px', fontSize: '9px', textTransform: 'uppercase', width: '41%', fontWeight: '700' }}>Conhecimentos/Capacidades</th>
+                            <th style={{ padding: '8px', fontSize: '9px', textTransform: 'uppercase', width: '41%', fontWeight: '700' }}>Estratégias</th>
                           </tr>
                         </thead>
                         <tbody>
                           {chunk.map((entry, idx) => {
                             const realIdx = (pIndex * 12) + idx;
+                            const isLastRow = idx === chunk.length - 1;
                             return (
-                              <tr key={entry.id}>
-                                <td style={{ border: '1pt solid #000', padding: '8px', textAlign: 'center', fontSize: '12px', fontWeight: '900', color: '#000' }}>
-                                  {entry.date}<br/><span style={{ fontSize: '9px', color: '#333' }}>AULA {realIdx + 1}</span>
+                              <tr key={entry.id} style={{ borderBottom: isLastRow ? 'none' : '1pt solid #000' }}>
+                                <td style={{ borderRight: '1pt solid #000', padding: '6px', textAlign: 'center', fontSize: '11px', fontWeight: '700', color: '#000' }}>
+                                  {entry.date}<br/><span style={{ fontSize: '8px', color: '#444', fontWeight: '500' }}>AULA {realIdx + 1}</span>
                                 </td>
-                                <td style={{ border: '1pt solid #000', padding: '10px', fontSize: '12pt', color: '#000' }}>
-                                  <div style={{ fontWeight: '900', marginBottom: '4px', color: '#005DAA', fontSize: '10px' }}>{formatType(entry.knowledge)}</div>
-                                  <div style={{ fontWeight: '900' }}>{entry.capacities}</div>
+                                <td style={{ borderRight: '1pt solid #000', padding: '8px', fontSize: '12pt', color: '#000', fontWeight: '500', lineHeight: '1.3' }}>
+                                  <div style={{ fontWeight: '700', marginBottom: '2px', color: '#005DAA', fontSize: '9px' }}>{formatType(entry.knowledge)}</div>
+                                  <div style={{ fontWeight: '500' }}>{entry.capacities}</div>
                                 </td>
-                                <td style={{ border: '1pt solid #000', padding: '10px', fontSize: '12pt', fontStyle: 'italic', color: '#000', fontWeight: '800' }}>
+                                <td style={{ padding: '8px', fontSize: '12pt', fontStyle: 'italic', color: '#000', fontWeight: '500', lineHeight: '1.3' }}>
                                   {entry.strategy}
                                 </td>
                               </tr>
@@ -394,8 +358,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                         </tbody>
                       </table>
                     </div>
-                    
-                    <div style={{ marginTop: '20px', paddingBottom: '5px', fontSize: '10px', color: '#666', textAlign: 'right', borderTop: '1pt solid #ccc' }}>
+                    <div style={{ marginTop: '15px', fontSize: '9px', color: '#666', textAlign: 'right', fontStyle: 'italic' }}>
                       Sistema MSEP-SENAI | Gerado em {new Date().toLocaleDateString('pt-BR')} | Página {pIndex + 1}
                     </div>
                   </div>
@@ -423,9 +386,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                 {unit.knowledge.map((k, i) => (
                   <div key={i} className="p-5 bg-slate-50 border-l-4 border-blue-600 rounded-r-2xl shadow-sm">
                     <p className="font-black text-slate-900 text-xs uppercase mb-2 tracking-tight">{k.topic}</p>
-                    <div className="space-y-1.5">
-                      {k.subtopics.map((s, si) => <p key={si} className="text-slate-500 text-[10px] font-medium leading-tight">• {s}</p>)}
-                    </div>
+                    <div className="space-y-1.5">{k.subtopics.map((s, si) => <p key={si} className="text-slate-500 text-[10px] font-medium leading-tight">• {s}</p>)}</div>
                   </div>
                 ))}
               </div>
