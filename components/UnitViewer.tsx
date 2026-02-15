@@ -1,6 +1,8 @@
 
-import React, { useState, useEffect, useMemo } from 'react';
-import { CurricularUnit, ScheduleEntry, UnitCalendar, CalendarMarking, CalendarColor } from '../types';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
+import { CurricularUnit, ScheduleEntry, UnitCalendar, CalendarColor } from '../types';
+import { jsPDF } from 'jspdf';
+import html2canvas from 'html2canvas';
 
 interface Props {
   unit: CurricularUnit;
@@ -20,6 +22,10 @@ const TEXT_COLOR_MAP: Record<CalendarColor, string> = {
 const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar, onUpdateUnit }) => {
   const [activeTab, setActiveTab] = useState<'geral' | 'sa' | 'rubricas' | 'cronograma' | 'calendario'>('geral');
   const [localSchedule, setLocalSchedule] = useState<ScheduleEntry[]>(unit.schedule);
+  const [isGenerating, setIsGenerating] = useState(false);
+  
+  const saContainerRef = useRef<HTMLDivElement>(null);
+  const cronogramaContainerRef = useRef<HTMLDivElement>(null);
 
   const isCRD = unit.id.toLowerCase().includes('crd') || unit.name.toLowerCase().includes('dimensional');
   const isFUSI = unit.id.toLowerCase().includes('fusi') || unit.name.toLowerCase().includes('usinagem');
@@ -40,14 +46,36 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
     return isNaN(date.getTime()) ? "" : new Intl.DateTimeFormat('pt-BR', { weekday: 'long' }).format(date);
   };
 
-  const updateEntry = (id: string, field: keyof ScheduleEntry, value: any) => {
-    const updated = localSchedule.map(entry => entry.id === id ? { ...entry, [field]: value } : entry);
-    setLocalSchedule(updated);
-    onUpdateSchedule?.(updated);
-  };
+  const downloadPDF = async (ref: React.RefObject<HTMLDivElement | null>, filename: string) => {
+    if (!ref.current) return;
+    setIsGenerating(true);
+    
+    try {
+      const element = ref.current;
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pages = element.children;
 
-  const handlePrint = () => {
-    window.print();
+      for (let i = 0; i < pages.length; i++) {
+        const page = pages[i] as HTMLElement;
+        const canvas = await html2canvas(page, {
+          scale: 2,
+          useCORS: true,
+          logging: false,
+          backgroundColor: '#ffffff'
+        });
+        
+        const imgData = canvas.toDataURL('image/png');
+        if (i > 0) pdf.addPage();
+        pdf.addImage(imgData, 'PNG', 0, 0, 210, 297);
+      }
+      
+      pdf.save(filename);
+    } catch (err) {
+      console.error("Erro ao gerar PDF:", err);
+      alert("Houve um erro ao gerar o arquivo. Tente novamente.");
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   const scheduleDates = useMemo(() => {
@@ -74,165 +102,16 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
   }, [calendar.startDate, calendar.endDate]);
 
   return (
-    <div className="bg-white rounded-[2.5rem] shadow-2xl border border-slate-200 overflow-hidden animate-fadeIn printable-unit-module" data-active-tab={activeTab}>
-      <style>{`
-        @media print {
-          /* 1. CONFIGURAÇÃO DE PÁGINA E RESET DE TELA BRANCA */
-          @page {
-            size: A4 portrait;
-            margin: 0 !important;
-          }
-
-          html, body {
-            height: auto !important;
-            overflow: visible !important;
-            margin: 0 !important;
-            padding: 0 !important;
-            background: white !important;
-          }
-
-          #root, main, .printable-unit-module, .content-area {
-            height: auto !important;
-            overflow: visible !important;
-            display: block !important;
-            position: static !important;
-            padding: 0 !important;
-            margin: 0 !important;
-          }
-
-          /* Ocultar elementos da interface web */
-          aside, header, nav, .tabs-header, .no-print, button, .bg-slate-900.p-8 {
-            display: none !important;
-          }
-
-          /* Garantir visibilidade do documento de impressão */
-          .report-document, .report-document-sa {
-            display: none;
-            width: 100% !important;
-            padding: 1.5cm 2cm !important;
-            box-sizing: border-box !important;
-          }
-
-          [data-active-tab="cronograma"] .report-document { display: block !important; }
-          [data-active-tab="sa"] .report-document-sa { display: block !important; }
-
-          /* 2. ESTILO DO CABEÇALHO SENAI */
-          .report-header {
-            display: flex !important;
-            justify-content: space-between !important;
-            align-items: center !important;
-            border-bottom: 3pt solid #E30613 !important;
-            padding-bottom: 10pt !important;
-            margin-bottom: 15pt !important;
-          }
-          .logo-box {
-            background: #E30613 !important;
-            color: white !important;
-            padding: 10pt 15pt !important;
-            font-size: 20pt !important;
-            font-weight: 900 !important;
-            font-style: italic !important;
-          }
-          .info-box { text-align: right !important; color: black !important; }
-          .info-box h1 { font-size: 10pt !important; font-weight: 900 !important; margin: 0 !important; text-transform: uppercase !important; }
-          .info-box p { font-size: 9pt !important; margin: 2pt 0 0 0 !important; font-weight: bold !important; }
-
-          .doc-main-title { 
-            text-align: center !important; 
-            font-weight: 900 !important; 
-            font-size: 14pt !important; 
-            text-transform: uppercase !important; 
-            margin: 10pt 0 !important; 
-            border-bottom: 2pt solid #000 !important; 
-            padding-bottom: 6pt !important;
-            color: #000 !important;
-          }
-
-          /* 3. SITUAÇÕES DE APRENDIZAGEM - 2 PÁGINAS FIXAS */
-          .sa-print-block {
-            display: block !important;
-            width: 100% !important;
-            page-break-after: always !important;
-            height: auto !important;
-            min-height: 25cm !important; /* Força preenchimento da página */
-          }
-
-          .sa-print-title {
-            font-weight: 900 !important;
-            font-size: 13pt !important;
-            border-bottom: 2pt solid #E30613 !important;
-            margin: 10pt 0 12pt 0 !important;
-            padding: 6pt 0 !important;
-            text-transform: uppercase !important;
-            color: #000 !important;
-          }
-          
-          /* Os 3 blocos por página */
-          .sa-print-section {
-            margin-bottom: 15pt !important;
-            border: 1.5pt solid #000 !important;
-            padding: 15pt !important;
-            page-break-inside: avoid !important;
-            min-height: 6.5cm !important; /* Garante que os 3 blocos juntos preencham a folha */
-            display: flex !important;
-            flex-direction: column !important;
-          }
-
-          .sa-print-section-title {
-            font-weight: 900 !important;
-            font-size: 11pt !important;
-            text-transform: uppercase !important;
-            color: #E30613 !important;
-            margin-bottom: 8pt !important;
-          }
-          .sa-print-text {
-            font-size: 13pt !important;
-            line-height: 1.8 !important;
-            color: #000 !important;
-            text-align: justify !important;
-          }
-          .sa-print-results {
-            padding-left: 20pt !important;
-            margin-top: 5pt !important;
-          }
-          .sa-print-results li {
-            font-size: 13pt !important;
-            margin-bottom: 8pt !important;
-            list-style-type: decimal !important;
-            color: #000 !important;
-          }
-
-          /* 4. CRONOGRAMA */
-          .tech-table { 
-            width: 100% !important; 
-            border-collapse: collapse !important; 
-            border: 1.5pt solid #000 !important;
-          }
-          .tech-table th { 
-            background: #eee !important; 
-            font-size: 8pt !important; 
-            padding: 8pt !important; 
-            border: 1pt solid #000 !important; 
-            color: black !important;
-          }
-          .tech-table td { 
-            padding: 8pt !important; 
-            border: 1pt solid #000 !important; 
-            font-size: 9pt !important; 
-            color: black !important;
-          }
-        }
-      `}</style>
-
-      {/* WEB VIEW */}
-      <div className="bg-slate-900 p-8 text-white flex justify-between items-center no-print">
+    <div className="bg-white rounded-[2.5rem] shadow-2xl border border-slate-200 overflow-hidden animate-fadeIn">
+      {/* CABEÇALHO WEB */}
+      <div className="bg-slate-900 p-8 text-white flex justify-between items-center">
         <div>
           <span className="bg-blue-600 px-3 py-1 rounded text-[9px] font-black uppercase tracking-widest mb-2 inline-block">MSEP - Unidade Curricular</span>
           <h2 className="text-3xl font-black tracking-tighter uppercase leading-none">{unit.name}</h2>
         </div>
       </div>
 
-      <div className="flex border-b border-slate-200 bg-slate-50 overflow-x-auto scrollbar-hide no-print tabs-header">
+      <div className="flex border-b border-slate-200 bg-slate-50 overflow-x-auto scrollbar-hide tabs-header">
         {(['geral', 'sa', 'rubricas', 'cronograma', 'calendario'] as const).map(tab => (
           <button
             key={tab}
@@ -246,64 +125,31 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
         ))}
       </div>
 
-      <div className="p-6 md:p-10 max-h-[75vh] overflow-y-auto custom-scrollbar bg-[#FDFDFD] content-area">
+      <div className="p-6 md:p-10 max-h-[75vh] overflow-y-auto custom-scrollbar bg-[#FDFDFD]">
         
         {activeTab === 'sa' && (
           <div className="max-w-4xl mx-auto">
-            <div className="flex justify-between items-center gap-6 border-b border-slate-100 pb-8 mb-10 no-print">
-              <h3 className="text-3xl font-[1000] text-slate-900 uppercase italic">Situações de Aprendizagem</h3>
+            <div className="flex justify-between items-center gap-6 border-b border-slate-100 pb-8 mb-10">
+              <div>
+                <h3 className="text-3xl font-[1000] text-slate-900 uppercase italic">Situações de Aprendizagem</h3>
+                <p className="text-slate-400 text-[10px] font-black uppercase tracking-widest">Geração de Guia em 2 Páginas (3 blocos/pág)</p>
+              </div>
               <button 
-                onClick={handlePrint} 
-                className="bg-[#E30613] text-white px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl flex items-center gap-3 hover:scale-105 transition-all"
+                onClick={() => downloadPDF(saContainerRef, `SA_${unit.name}.pdf`)} 
+                disabled={isGenerating}
+                className="bg-[#E30613] text-white px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl flex items-center gap-3 hover:scale-105 transition-all disabled:bg-slate-400"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                Imprimir (2 Páginas)
+                {isGenerating ? 'Gerando Arquivo...' : (
+                  <>
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                    Baixar PDF Oficial
+                  </>
+                )}
               </button>
             </div>
 
-            {/* RELATÓRIO PDF - SA1 na Página 1, SA2 na Página 2 */}
-            <div className="report-document-sa">
-              {unit.learningSituations.map((sa, index) => (
-                <div key={sa.id} className="sa-print-block">
-                  <div className="report-header">
-                    <div className="logo-box">SENAI</div>
-                    <div className="info-box">
-                      <h1>Mecânico de Usinagem Convencional</h1>
-                      <p>Guia de Situações de Aprendizagem - MSEP</p>
-                    </div>
-                  </div>
-                  
-                  <h2 className="doc-main-title">Situação de Aprendizagem 0{index + 1}</h2>
-                  <div style={{ marginBottom: '8pt', fontSize: '10pt', fontWeight: '900', color: 'black' }}>
-                    UNIDADE CURRICULAR: {unit.name.toUpperCase()}
-                  </div>
-
-                  <div className="sa-print-title">{sa.title}</div>
-                  
-                  <div className="sa-print-section">
-                    <div className="sa-print-section-title">I. Contextualização / Situação-Problema</div>
-                    <div className="sa-print-text">{sa.context}</div>
-                  </div>
-
-                  <div className="sa-print-section" style={{ background: '#f8f8f8' }}>
-                    <div className="sa-print-section-title">II. Desafio Proposto</div>
-                    <div className="sa-print-text" style={{ fontStyle: 'italic', fontWeight: 'bold' }}>{sa.challenge}</div>
-                  </div>
-
-                  <div className="sa-print-section">
-                    <div className="sa-print-section-title">III. Resultados Esperados / Entregas</div>
-                    <ul className="sa-print-results">
-                      {sa.expectedResults.map((result, rIdx) => (
-                        <li key={rIdx}>{result}</li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* WEB PREVIEW (O QUE VOCE VE NA TELA) */}
-            <div className="space-y-12 pb-10 no-print">
+            {/* PREVIEW WEB */}
+            <div className="space-y-12 pb-10">
               {unit.learningSituations.map((sa) => (
                 <div key={sa.id} className="p-10 bg-white border border-slate-200 rounded-[3rem] shadow-xl relative overflow-hidden">
                   <div className="absolute top-0 left-0 w-2 h-full bg-blue-600"></div>
@@ -332,75 +178,130 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                 </div>
               ))}
             </div>
+
+            {/* CONTAINER OCULTO PARA PDF (A4 PIXEL PERFECT) */}
+            <div style={{ position: 'absolute', left: '-9999px', top: 0 }}>
+              <div ref={saContainerRef}>
+                {unit.learningSituations.map((sa, index) => (
+                  <div key={sa.id} style={{ width: '794px', height: '1123px', padding: '50px', backgroundColor: 'white', display: 'flex', flexDirection: 'column' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '4pt solid #E30613', paddingBottom: '15px', marginBottom: '20px' }}>
+                      <div style={{ background: '#E30613', color: 'white', padding: '10px 20px', fontSize: '24px', fontWeight: '900', fontStyle: 'italic' }}>SENAI</div>
+                      <div style={{ textAlign: 'right', color: 'black' }}>
+                        <h1 style={{ fontSize: '12px', fontWeight: '900', margin: 0, textTransform: 'uppercase' }}>Mecânico de Usinagem Convencional</h1>
+                        <p style={{ fontSize: '10px', margin: '4px 0 0 0', fontWeight: 'bold' }}>Guia de Situações de Aprendizagem 0{index+1}</p>
+                      </div>
+                    </div>
+                    <h2 style={{ textAlign: 'center', fontWeight: '900', fontSize: '16px', textTransform: 'uppercase', margin: '15px 0', borderBottom: '2pt solid #000', paddingBottom: '8px', color: 'black' }}>Situação de Aprendizagem</h2>
+                    <div style={{ marginBottom: '15px', fontSize: '12px', fontWeight: '900', color: 'black' }}>UC: {unit.name.toUpperCase()}</div>
+                    <div style={{ fontSize: '14px', fontWeight: '900', borderBottom: '2pt solid #E30613', marginBottom: '20px', padding: '8px 0', textTransform: 'uppercase', color: 'black' }}>{sa.title}</div>
+                    
+                    {/* OS 3 BLOCOS COM BORDAS */}
+                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                      <div style={{ border: '1.5pt solid #000', padding: '20px', flex: 1 }}>
+                        <div style={{ fontWeight: '900', fontSize: '11px', color: '#E30613', textTransform: 'uppercase', marginBottom: '10px' }}>I. Contextualização / Situação-Problema</div>
+                        <div style={{ fontSize: '14px', lineHeight: '1.8', color: 'black', textAlign: 'justify' }}>{sa.context}</div>
+                      </div>
+                      <div style={{ border: '1.5pt solid #000', padding: '20px', flex: 1, background: '#f9f9f9' }}>
+                        <div style={{ fontWeight: '900', fontSize: '11px', color: '#E30613', textTransform: 'uppercase', marginBottom: '10px' }}>II. Desafio Proposto</div>
+                        <div style={{ fontSize: '14px', lineHeight: '1.8', color: 'black', fontStyle: 'italic', fontWeight: 'bold' }}>{sa.challenge}</div>
+                      </div>
+                      <div style={{ border: '1.5pt solid #000', padding: '20px', flex: 1 }}>
+                        <div style={{ fontWeight: '900', fontSize: '11px', color: '#E30613', textTransform: 'uppercase', marginBottom: '10px' }}>III. Resultados Esperados / Entregas</div>
+                        <ul style={{ paddingLeft: '25px', marginTop: '10px' }}>
+                          {sa.expectedResults.map((res, ri) => (
+                            <li key={ri} style={{ fontSize: '14px', marginBottom: '12px', listStyleType: 'decimal', color: 'black', lineHeight: '1.6' }}>{res}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+                    <div style={{ marginTop: '20px', fontSize: '10px', color: '#666', textAlign: 'right', fontStyle: 'italic' }}>Sistema MSEP-SENAI | Gerado em {new Date().toLocaleDateString('pt-BR')}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         )}
 
         {activeTab === 'cronograma' && (
           <div className="space-y-8">
-            <div className="flex justify-between items-center gap-6 border-b border-slate-100 pb-8 no-print">
+            <div className="flex justify-between items-center gap-6 border-b border-slate-100 pb-8">
               <h3 className="text-3xl font-[1000] text-slate-900 uppercase italic">Plano de Aula</h3>
               <button 
-                onClick={handlePrint} 
-                className="bg-[#005DAA] text-white px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl flex items-center gap-3 hover:scale-105 transition-all"
+                onClick={() => downloadPDF(cronogramaContainerRef, `PlanoAula_${unit.name}.pdf`)} 
+                disabled={isGenerating}
+                className="bg-[#005DAA] text-white px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl flex items-center gap-3 hover:scale-105 transition-all disabled:bg-slate-400"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                Exportar (PDF)
+                {isGenerating ? 'Gerando...' : (
+                  <>
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                    Baixar Cronograma PDF
+                  </>
+                )}
               </button>
             </div>
 
-            <div className="report-document">
-              <div className="report-header">
-                <div className="logo-box">SENAI</div>
-                <div className="info-box">
-                  <h1>Mecânico de Usinagem Convencional</h1>
-                  <p>Plano de Aula e Cronograma - MSEP</p>
-                </div>
-              </div>
-              <table className="tech-table">
-                <thead>
-                  <tr>
-                    <th>DATA / AULA</th>
-                    <th>CONHECIMENTOS E CAPACIDADES</th>
-                    <th>ESTRATÉGIAS E RECURSOS</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {localSchedule.map((entry, idx) => (
-                    <tr key={entry.id}>
-                      <td style={{ textAlign: 'center' }}>
-                        <div style={{ fontWeight: 'bold' }}>{entry.date}</div>
-                        <div>AULA {idx+1}</div>
-                      </td>
-                      <td>
-                        <strong>{entry.knowledge}</strong><br/>
-                        <span style={{ fontSize: '8pt' }}>{entry.capacities}</span>
-                      </td>
-                      <td>{entry.strategy}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            <div className="no-print space-y-6">
+            <div className="space-y-6">
               {localSchedule.map((entry, idx) => (
                 <div key={entry.id} className="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-lg grid grid-cols-1 lg:grid-cols-12 gap-8">
                   <div className="lg:col-span-3">
                     <p className="text-[9px] font-black text-slate-400 uppercase mb-1">AULA {idx+1}</p>
-                    <input type="text" value={entry.date} onChange={(e) => updateEntry(entry.id, 'date', e.target.value)} className="text-blue-600 font-[1000] text-xl w-full bg-transparent border-none outline-none" />
+                    <div className="text-blue-600 font-[1000] text-xl uppercase tracking-tighter">{entry.date}</div>
+                    <p className="text-[10px] font-black uppercase text-slate-400 mt-1 italic">{getDayOfWeek(entry.date)}</p>
                   </div>
                   <div className="lg:col-span-9 grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div className="text-[10px] font-bold"><p><strong>C:</strong> {entry.knowledge}</p><p><strong>Cap:</strong> {entry.capacities}</p></div>
-                    <div className="text-[10px] font-medium italic"><p>{entry.strategy}</p></div>
+                    <div className="text-[11px] font-bold text-slate-800"><p><strong>C:</strong> {entry.knowledge}</p><p className="mt-2"><strong>Cap:</strong> {entry.capacities}</p></div>
+                    <div className="text-[11px] font-medium italic text-slate-500"><p>{entry.strategy}</p></div>
                   </div>
                 </div>
               ))}
             </div>
+
+            {/* CONTAINER OCULTO PARA CRONOGRAMA PDF */}
+            <div style={{ position: 'absolute', left: '-9999px', top: 0 }}>
+              <div ref={cronogramaContainerRef}>
+                <div style={{ width: '794px', height: '1123px', padding: '40px', backgroundColor: 'white' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '3pt solid #E30613', paddingBottom: '12px', marginBottom: '20px' }}>
+                    <div style={{ background: '#E30613', color: 'white', padding: '10px 15px', fontSize: '22px', fontWeight: '900', fontStyle: 'italic' }}>SENAI</div>
+                    <div style={{ textAlign: 'right', color: 'black' }}>
+                      <h1 style={{ fontSize: '11px', fontWeight: '900', margin: 0, textTransform: 'uppercase' }}>Mecânico de Usinagem Convencional</h1>
+                      <p style={{ fontSize: '9px', margin: '3px 0 0 0', fontWeight: 'bold' }}>Plano de Aula e Cronograma - MSEP</p>
+                    </div>
+                  </div>
+                  <h2 style={{ textAlign: 'center', fontWeight: '900', fontSize: '15px', textTransform: 'uppercase', margin: '15px 0', borderBottom: '2pt solid #000', paddingBottom: '8px', color: 'black' }}>Planejamento Pedagógico</h2>
+                  <div style={{ marginBottom: '15px', fontSize: '11px', fontWeight: '900', color: 'black' }}>UC: {unit.name.toUpperCase()}</div>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', border: '2pt solid #000' }}>
+                    <thead>
+                      <tr style={{ background: '#eee' }}>
+                        <th style={{ border: '1pt solid #000', padding: '10px', fontSize: '9px', textTransform: 'uppercase' }}>Aula/Data</th>
+                        <th style={{ border: '1pt solid #000', padding: '10px', fontSize: '9px', textTransform: 'uppercase' }}>Conhecimentos/Capacidades</th>
+                        <th style={{ border: '1pt solid #000', padding: '10px', fontSize: '9px', textTransform: 'uppercase' }}>Estratégias</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {localSchedule.slice(0, 12).map((entry, idx) => (
+                        <tr key={entry.id}>
+                          <td style={{ border: '1pt solid #000', padding: '10px', textAlign: 'center', fontSize: '10px', fontWeight: 'bold' }}>
+                            {entry.date}<br/>AULA {idx+1}
+                          </td>
+                          <td style={{ border: '1pt solid #000', padding: '10px', fontSize: '10px' }}>
+                            <div style={{ fontWeight: 'bold', marginBottom: '4px' }}>{entry.knowledge}</div>
+                            <div style={{ fontSize: '9px', color: '#444' }}>{entry.capacities}</div>
+                          </td>
+                          <td style={{ border: '1pt solid #000', padding: '10px', fontSize: '10px', fontStyle: 'italic' }}>{entry.strategy}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                {/* Se houver mais aulas, o jsPDF processaria as páginas seguintes no loop, mas aqui o container precisa de todas */}
+              </div>
+            </div>
           </div>
         )}
 
+        {/* OUTRAS TABS (WEB ONLY) */}
         {activeTab === 'geral' && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 no-print">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
             <section>
               <h3 className="text-[11px] font-black text-slate-400 mb-6 uppercase tracking-[0.3em]">Capacidades Técnicas</h3>
               <div className="space-y-3">
@@ -428,7 +329,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
         )}
 
         {activeTab === 'rubricas' && (
-          <div className="overflow-x-auto rounded-[2rem] border border-slate-200 bg-white p-2 no-print">
+          <div className="overflow-x-auto rounded-[2rem] border border-slate-200 bg-white p-2">
             <table className="w-full text-left border-collapse min-w-[800px]">
               <thead>
                 <tr className="bg-slate-900 text-white">
@@ -455,7 +356,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
         )}
 
         {activeTab === 'calendario' && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 no-print">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {monthsInRange.map(monthStr => {
               const [year, month] = monthStr.split('-').map(Number);
               const firstDay = new Date(year, month - 1, 1);
