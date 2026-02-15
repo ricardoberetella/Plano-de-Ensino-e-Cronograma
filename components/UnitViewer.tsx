@@ -152,7 +152,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
             className={`px-8 py-5 transition-all border-b-4 ${activeTab === tab ? 'border-blue-600 bg-white' : 'border-transparent text-slate-400 hover:bg-slate-100'}`}
           >
             <span className="text-[10px] font-black uppercase tracking-widest block">
-              {tab === 'geral' ? 'Geral' : tab === 'sa' ? 'Situação-Problema' : tab === 'rubricas' ? 'Rubricas' : tab === 'cronograma' ? 'Plano de Aula / Cronograma' : 'Calendário'}
+              {tab === 'geral' ? 'Geral' : tab === 'sa' ? 'Situação-Problema' : tab === 'rubricas' ? 'Rubricas' : tab === 'cronograma' ? 'Plano de Ensino / Cronograma' : 'Calendário'}
             </span>
           </button>
         ))}
@@ -272,7 +272,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                   {isSaving ? 'Salvando...' : 'Salvar Alterações'}
                 </button>
                 <button 
-                  onClick={() => downloadPDF(cronogramaContainerRef, `PlanoAula_${unit.name}.pdf`)} 
+                  onClick={() => downloadPDF(cronogramaContainerRef, `PlanoEnsino_${unit.name}.pdf`)} 
                   disabled={isGenerating}
                   className="bg-[#005DAA] text-white px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl flex items-center gap-3 hover:scale-105 transition-all disabled:bg-slate-400"
                 >
@@ -399,7 +399,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                 <tr className="bg-slate-900 text-white">
                   <th className="p-6 text-[10px] font-black uppercase border border-slate-800">Referência</th>
                   <th className="p-6 text-[10px] font-black uppercase border border-slate-800 text-red-400">NSA</th>
-                  <th className="p-6 text-[10px) font-black uppercase border border-slate-800 text-orange-400">APO</th>
+                  <th className="p-6 text-[10px] font-black uppercase border border-slate-800 text-orange-400">APO</th>
                   <th className="p-6 text-[10px] font-black uppercase border border-slate-800 text-blue-400">PAR</th>
                   <th className="p-6 text-[10px] font-black uppercase border border-slate-800 text-green-400">AUT</th>
                 </tr>

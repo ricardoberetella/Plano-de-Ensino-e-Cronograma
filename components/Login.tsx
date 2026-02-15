@@ -39,7 +39,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
               Mecânico de Usinagem<br />Convencional
             </h1>
             <p className="text-[#64748b] font-bold text-[9px] sm:text-[10px] uppercase tracking-[0.12em]">
-              Plano de Aula / Cronograma
+              Plano de Ensino / Cronograma
             </p>
           </div>
 
