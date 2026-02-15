@@ -127,7 +127,6 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
     return months;
   }, [calendar.startDate, calendar.endDate]);
 
-  // Mantido em 12 itens por página para folga visual
   const chunkedSchedule = useMemo(() => {
     const chunks: ScheduleEntry[][] = [];
     for (let i = 0; i < localSchedule.length; i += 12) {
@@ -328,7 +327,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                     <div style={{ marginBottom: '8px', fontSize: '10px', fontWeight: '700', color: 'black' }}>UC: {unit.name.toUpperCase()}</div>
                     
                     <div style={{ border: '1.5pt solid #000', flex: 1, display: 'flex', flexDirection: 'column', backgroundColor: 'white' }}>
-                      <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                      <table style={{ width: '100%', borderCollapse: 'collapse', flex: 1 }}>
                         <thead>
                           <tr style={{ background: '#f5f5f5', borderBottom: '1.5pt solid #000' }}>
                             <th style={{ borderRight: '1pt solid #000', padding: '8px', fontSize: '9px', textTransform: 'uppercase', width: '18%', fontWeight: '700' }}>Aula/Data</th>
@@ -339,17 +338,16 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                         <tbody>
                           {chunk.map((entry, idx) => {
                             const realIdx = (pIndex * 12) + idx;
-                            const isLastRow = idx === chunk.length - 1;
                             return (
-                              <tr key={entry.id} style={{ borderBottom: isLastRow ? 'none' : '1pt solid #000' }}>
+                              <tr key={entry.id} style={{ borderBottom: '1pt solid #000' }}>
                                 <td style={{ borderRight: '1pt solid #000', padding: '6px', textAlign: 'center', fontSize: '11px', fontWeight: '700', color: '#000' }}>
-                                  {entry.date}<br/><span style={{ fontSize: '8px', color: '#444', fontWeight: '500' }}>AULA {realIdx + 1}</span>
+                                  {entry.date}<br/><span style={{ fontSize: '8px', color: '#444', fontWeight: '400' }}>AULA {realIdx + 1}</span>
                                 </td>
-                                <td style={{ borderRight: '1pt solid #000', padding: '8px', fontSize: '12pt', color: '#000', fontWeight: '500', lineHeight: '1.3' }}>
-                                  <div style={{ fontWeight: '700', marginBottom: '2px', color: '#005DAA', fontSize: '9px' }}>{formatType(entry.knowledge)}</div>
-                                  <div style={{ fontWeight: '500' }}>{entry.capacities}</div>
+                                <td style={{ borderRight: '1pt solid #000', padding: '8px', fontSize: '11px', color: '#000', fontWeight: '400', lineHeight: '1.3' }}>
+                                  <div style={{ fontWeight: '700', marginBottom: '2px', color: '#005DAA', fontSize: '8px' }}>{formatType(entry.knowledge)}</div>
+                                  <div style={{ fontWeight: '400' }}>{entry.capacities}</div>
                                 </td>
-                                <td style={{ padding: '8px', fontSize: '12pt', fontStyle: 'italic', color: '#000', fontWeight: '500', lineHeight: '1.3' }}>
+                                <td style={{ padding: '8px', fontSize: '11px', fontStyle: 'italic', color: '#000', fontWeight: '400', lineHeight: '1.3' }}>
                                   {entry.strategy}
                                 </td>
                               </tr>
