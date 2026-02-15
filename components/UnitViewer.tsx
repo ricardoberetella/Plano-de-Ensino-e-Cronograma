@@ -127,11 +127,11 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
     return months;
   }, [calendar.startDate, calendar.endDate]);
 
-  // Reduzido para 15 itens por página para evitar cortes com a fonte maior (12pt)
+  // Reduzido para 12 itens por página para garantir que nada seja cortado com as fontes grandes e negritadas
   const chunkedSchedule = useMemo(() => {
     const chunks: ScheduleEntry[][] = [];
-    for (let i = 0; i < localSchedule.length; i += 15) {
-      chunks.push(localSchedule.slice(i, i + 15));
+    for (let i = 0; i < localSchedule.length; i += 12) {
+      chunks.push(localSchedule.slice(i, i + 12));
     }
     return chunks;
   }, [localSchedule]);
@@ -211,6 +211,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
               ))}
             </div>
 
+            {/* CONTAINER OCULTO PARA PDF - PIXEL PERFECT A4 (DPI 96) */}
             <div style={{ position: 'absolute', left: '-9999px', top: 0 }}>
               <div ref={saContainerRef}>
                 {unit.learningSituations.map((sa, index) => (
@@ -342,7 +343,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
             <div style={{ position: 'absolute', left: '-9999px', top: 0 }}>
               <div ref={cronogramaContainerRef}>
                 {chunkedSchedule.map((chunk, pIndex) => (
-                  <div key={pIndex} style={{ width: '794px', height: '1123px', padding: '40px', backgroundColor: 'white', display: 'flex', flexDirection: 'column', boxSizing: 'border-box' }}>
+                  <div key={pIndex} style={{ width: '794px', height: '1123px', padding: '45px 50px', backgroundColor: 'white', display: 'flex', flexDirection: 'column', boxSizing: 'border-box' }}>
                     {/* Cabeçalho SENAI apenas na página 1 */}
                     {pIndex === 0 ? (
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '3pt solid #E30613', paddingBottom: '12px', marginBottom: '15px' }}>
@@ -353,37 +354,38 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                         </div>
                       </div>
                     ) : (
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1.5pt solid #000', paddingBottom: '6px', marginBottom: '15px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '2pt solid #000', paddingBottom: '6px', marginBottom: '15px' }}>
                         <div style={{ fontSize: '10px', fontWeight: '900', textTransform: 'uppercase', color: 'black' }}>Plano de Aula / Cronograma - Continuação</div>
                         <div style={{ fontSize: '9px', fontWeight: 'bold', color: '#666' }}>Mecânico de Usinagem Convencional | Pág {pIndex + 1}</div>
                       </div>
                     )}
                     
                     {pIndex === 0 && <h2 style={{ textAlign: 'center', fontWeight: '900', fontSize: '15px', textTransform: 'uppercase', margin: '5px 0', borderBottom: '2pt solid #000', paddingBottom: '8px', color: 'black' }}>Planejamento Pedagógico</h2>}
-                    <div style={{ marginBottom: '8px', fontSize: '11px', fontWeight: '900', color: 'black' }}>UC: {unit.name.toUpperCase()}</div>
+                    <div style={{ marginBottom: '10px', fontSize: '11px', fontWeight: '900', color: 'black' }}>UC: {unit.name.toUpperCase()}</div>
                     
-                    <div style={{ flex: 1, overflow: 'hidden' }}>
-                      <table style={{ width: '100%', borderCollapse: 'collapse', border: '2pt solid #000' }}>
+                    {/* Tabela com borda sólida de 2pt em volta para garantir o fechamento da grade */}
+                    <div style={{ flex: 1 }}>
+                      <table style={{ width: '100%', borderCollapse: 'collapse', border: '2pt solid #000', marginBottom: '10px' }}>
                         <thead>
                           <tr style={{ background: '#eee' }}>
-                            <th style={{ border: '1pt solid #000', padding: '8px', fontSize: '10px', textTransform: 'uppercase', width: '18%' }}>Aula/Data</th>
-                            <th style={{ border: '1pt solid #000', padding: '8px', fontSize: '10px', textTransform: 'uppercase', width: '41%' }}>Conhecimentos/Capacidades</th>
-                            <th style={{ border: '1pt solid #000', padding: '8px', fontSize: '10px', textTransform: 'uppercase', width: '41%' }}>Estratégias</th>
+                            <th style={{ border: '1pt solid #000', padding: '10px', fontSize: '10px', textTransform: 'uppercase', width: '18%' }}>Aula/Data</th>
+                            <th style={{ border: '1pt solid #000', padding: '10px', fontSize: '10px', textTransform: 'uppercase', width: '41%' }}>Conhecimentos/Capacidades</th>
+                            <th style={{ border: '1pt solid #000', padding: '10px', fontSize: '10px', textTransform: 'uppercase', width: '41%' }}>Estratégias</th>
                           </tr>
                         </thead>
                         <tbody>
                           {chunk.map((entry, idx) => {
-                            const realIdx = (pIndex * 15) + idx;
+                            const realIdx = (pIndex * 12) + idx;
                             return (
                               <tr key={entry.id}>
-                                <td style={{ border: '1pt solid #000', padding: '6px', textAlign: 'center', fontSize: '11px', fontWeight: '900', color: '#000' }}>
-                                  {entry.date}<br/><span style={{ fontSize: '8px', color: '#333' }}>AULA {realIdx + 1}</span>
+                                <td style={{ border: '1pt solid #000', padding: '8px', textAlign: 'center', fontSize: '12px', fontWeight: '900', color: '#000' }}>
+                                  {entry.date}<br/><span style={{ fontSize: '9px', color: '#333' }}>AULA {realIdx + 1}</span>
                                 </td>
-                                <td style={{ border: '1pt solid #000', padding: '8px', fontSize: '12px', color: '#000' }}>
-                                  <div style={{ fontWeight: '900', marginBottom: '4px', color: '#005DAA', fontSize: '11px' }}>{formatType(entry.knowledge)}</div>
+                                <td style={{ border: '1pt solid #000', padding: '10px', fontSize: '12pt', color: '#000' }}>
+                                  <div style={{ fontWeight: '900', marginBottom: '4px', color: '#005DAA', fontSize: '10px' }}>{formatType(entry.knowledge)}</div>
                                   <div style={{ fontWeight: '900' }}>{entry.capacities}</div>
                                 </td>
-                                <td style={{ border: '1pt solid #000', padding: '8px', fontSize: '12px', fontStyle: 'italic', color: '#000', fontWeight: '800' }}>
+                                <td style={{ border: '1pt solid #000', padding: '10px', fontSize: '12pt', fontStyle: 'italic', color: '#000', fontWeight: '800' }}>
                                   {entry.strategy}
                                 </td>
                               </tr>
@@ -393,7 +395,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                       </table>
                     </div>
                     
-                    <div style={{ marginTop: 'auto', paddingTop: '10px', fontSize: '9px', color: '#888', textAlign: 'right', borderTop: '0.5pt solid #eee' }}>
+                    <div style={{ marginTop: '20px', paddingBottom: '5px', fontSize: '10px', color: '#666', textAlign: 'right', borderTop: '1pt solid #ccc' }}>
                       Sistema MSEP-SENAI | Gerado em {new Date().toLocaleDateString('pt-BR')} | Página {pIndex + 1}
                     </div>
                   </div>
