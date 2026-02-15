@@ -78,13 +78,12 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
     <div className="bg-white rounded-[2.5rem] shadow-2xl border border-slate-200 overflow-hidden animate-fadeIn printable-unit-module" data-active-tab={activeTab}>
       <style>{`
         @media print {
-          /* 1. CONFIGURAÇÃO DE PÁGINA */
+          /* 1. RESET E PÁGINA */
           @page {
             size: A4 portrait;
             margin: 1.0cm 1.5cm 1.2cm 1.5cm !important;
           }
 
-          /* 2. LIMPEZA TOTAL DE SOMBRAS E INTERFACE */
           * {
             box-shadow: none !important;
             text-shadow: none !important;
@@ -93,43 +92,30 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
             print-color-adjust: exact !important;
           }
 
-          html, body, #root, main, .printable-unit-module, .content-area, .max-w-4xl, div, section {
-            height: auto !important;
-            min-height: auto !important;
-            max-height: none !important;
-            overflow: visible !important;
-            display: block !important;
-            position: static !important;
-            background: white !important;
-            border: none !important;
-            padding: 0 !important;
-            margin: 0 !important;
-          }
+          /* Ocultar tudo que não for o documento ativo */
+          body > *:not(#root) { display: none !important; }
+          #root > *:not(main), main > *:not(.printable-unit-module) { display: none !important; }
+          .printable-unit-module { border: none !important; background: white !important; }
+          .no-print, .tabs-header, header, aside, .bg-slate-900.p-8 { display: none !important; }
 
-          aside, header, nav, .tabs-header, .no-print, button, .bg-slate-900.p-8 {
-            display: none !important;
-          }
-
-          .report-document, .report-document-sa {
-            display: none !important;
-          }
+          .report-document, .report-document-sa { display: none !important; }
           [data-active-tab="cronograma"] .report-document { display: block !important; }
           [data-active-tab="sa"] .report-document-sa { display: block !important; }
 
-          /* 3. CABEÇALHO SENAI */
+          /* 2. CABEÇALHO SENAI */
           .report-header {
             display: flex !important;
             justify-content: space-between !important;
             align-items: center !important;
             border-bottom: 4pt solid #E30613 !important;
-            padding-bottom: 10pt !important;
+            padding-bottom: 12pt !important;
             margin-bottom: 15pt !important;
           }
           .logo-box {
             background: #E30613 !important;
             color: white !important;
-            padding: 10pt 16pt !important;
-            font-size: 20pt !important;
+            padding: 12pt 20pt !important;
+            font-size: 22pt !important;
             font-weight: 900 !important;
             font-style: italic !important;
           }
@@ -148,83 +134,85 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
             color: #000 !important;
           }
 
-          /* 4. SITUAÇÕES DE APRENDIZAGEM - REGRAS DE PÁGINA 1 E 2 */
+          /* 3. SITUAÇÕES DE APRENDIZAGEM - 2 PÁGINAS, 3 BLOCOS POR PÁGINA */
           .sa-print-block {
             display: block !important;
             width: 100% !important;
-            min-height: 24cm !important; /* Força preenchimento quase total da página A4 */
-            page-break-after: always !important; /* Garante que cada SA fique em sua própria página */
+            page-break-after: always !important;
+            height: 26cm !important; /* Quase uma folha A4 cheia */
           }
 
           .sa-print-title {
             font-weight: 900 !important;
-            font-size: 14pt !important;
+            font-size: 15pt !important;
             border-bottom: 2.5pt solid #E30613 !important;
-            margin: 20pt 0 15pt 0 !important;
-            padding: 8pt 0 !important;
+            margin: 15pt 0 15pt 0 !important;
+            padding: 10pt 0 !important;
             text-transform: uppercase !important;
             color: #000 !important;
           }
+          
+          /* Os 3 blocos (seções) de cada SA */
           .sa-print-section {
-            margin-bottom: 25pt !important;
-            border: 1.2pt solid #000 !important;
-            padding: 18pt !important; /* Mais padding para preencher volume */
+            margin-bottom: 20pt !important;
+            border: 1.5pt solid #000 !important;
+            padding: 20pt !important;
             page-break-inside: avoid !important;
+            height: calc(28% - 20pt) !important; /* Divide a página em 3 partes aproximadamente iguais */
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: flex-start !important;
           }
+
           .sa-print-section-title {
             font-weight: 900 !important;
-            font-size: 11pt !important;
+            font-size: 12pt !important;
             text-transform: uppercase !important;
             color: #E30613 !important;
-            margin-bottom: 10pt !important;
+            margin-bottom: 12pt !important;
+            border-bottom: 0.5pt solid #eee !important;
+            padding-bottom: 4pt !important;
           }
           .sa-print-text {
-            font-size: 13pt !important; /* Aumentado */
-            line-height: 1.7 !important; /* Aumentado */
+            font-size: 13pt !important;
+            line-height: 1.8 !important;
             color: #000 !important;
             text-align: justify !important;
           }
           .sa-print-results {
             padding-left: 25pt !important;
-            margin-top: 15pt !important;
+            margin-top: 10pt !important;
           }
           .sa-print-results li {
             font-size: 13pt !important;
-            margin-bottom: 12pt !important;
+            margin-bottom: 10pt !important;
             list-style-type: decimal !important;
             color: #000 !important;
+            line-height: 1.6 !important;
           }
 
-          /* 5. CRONOGRAMA - FECHAMENTO DE BORDAS */
+          /* 4. CRONOGRAMA - FECHAMENTO DE BORDAS */
           .tech-table { 
             width: 100% !important; 
             border-collapse: collapse !important; 
             border: 2pt solid #000 !important;
+            margin-bottom: 20pt !important;
           }
           .tech-table th { 
-            background: #f2f2f2 !important; 
+            background: #eee !important; 
             font-size: 9pt !important; 
-            padding: 10pt !important; 
-            border: 1.2pt solid #000 !important; 
-            color: #000 !important;
-          }
-          .tech-table tr {
-            page-break-inside: avoid !important;
+            padding: 12pt !important; 
+            border: 1.5pt solid #000 !important; 
           }
           .tech-table td { 
-            padding: 12pt !important; 
+            padding: 14pt !important; 
             border: 1.2pt solid #000 !important; 
             font-size: 10pt !important; 
             vertical-align: top !important; 
-            color: #000 !important;
           }
-          .p-label { 
-            font-size: 8pt !important; 
-            font-weight: 900 !important; 
-            text-transform: uppercase !important; 
-            color: #E30613 !important; 
-            margin-bottom: 5pt !important;
-            display: block !important;
+          /* Linha de fechamento no final da tabela para cada página */
+          .tech-table tfoot td {
+            border-top: 2pt solid #000 !important;
           }
         }
       `}</style>
@@ -262,8 +250,49 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                 className="bg-[#E30613] text-white px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl flex items-center gap-3 hover:scale-105 transition-all"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                Gerar PDF (2 Páginas)
+                Imprimir Guia (2 Páginas)
               </button>
+            </div>
+
+            {/* RELATÓRIO PDF - SA1 na Página 1, SA2 na Página 2 */}
+            <div className="hidden report-document-sa">
+              <div className="report-header">
+                <div className="logo-box">SENAI</div>
+                <div className="info-box">
+                  <h1>Mecânico de Usinagem Convencional</h1>
+                  <p>Guia de Situações de Aprendizagem - MSEP</p>
+                </div>
+              </div>
+              
+              <h2 className="doc-main-title">Situações de Aprendizagem</h2>
+              <div style={{ marginBottom: '10pt', fontSize: '11pt', fontWeight: '900', color: '#000' }}>
+                UNIDADE CURRICULAR: {unit.name.toUpperCase()}
+              </div>
+
+              {unit.learningSituations.map((sa) => (
+                <div key={sa.id} className="sa-print-block">
+                  <div className="sa-print-title">{sa.title}</div>
+                  
+                  <div className="sa-print-section">
+                    <div className="sa-print-section-title">I. Contextualização / Situação-Problema</div>
+                    <div className="sa-print-text">{sa.context}</div>
+                  </div>
+
+                  <div className="sa-print-section" style={{ background: '#fcfcfc' }}>
+                    <div className="sa-print-section-title">II. Desafio Proposto</div>
+                    <div className="sa-print-text" style={{ fontStyle: 'italic', fontWeight: 'bold' }}>{sa.challenge}</div>
+                  </div>
+
+                  <div className="sa-print-section">
+                    <div className="sa-print-section-title">III. Resultados Esperados / Entregas</div>
+                    <ul className="sa-print-results">
+                      {sa.expectedResults.map((result, rIdx) => (
+                        <li key={rIdx}>{result}</li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              ))}
             </div>
 
             <div className="space-y-12 pb-10 no-print">
@@ -295,51 +324,6 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                 </div>
               ))}
             </div>
-
-            {/* RELATÓRIO PDF OTIMIZADO - PÁGINA 1 (SA1) E PÁGINA 2 (SA2) */}
-            <div className="hidden report-document-sa">
-              <div className="report-header">
-                <div className="logo-box">SENAI</div>
-                <div className="info-box">
-                  <h1>Mecânico de Usinagem Convencional</h1>
-                  <p>Guia de Situações de Aprendizagem - MSEP</p>
-                </div>
-              </div>
-              
-              <h2 className="doc-main-title">Situações de Aprendizagem</h2>
-              <div style={{ marginBottom: '15pt', fontSize: '12pt', fontWeight: '900', color: '#000' }}>
-                UNIDADE CURRICULAR: {unit.name.toUpperCase()}
-              </div>
-
-              {unit.learningSituations.map((sa) => (
-                <div key={sa.id} className="sa-print-block">
-                  <div className="sa-print-title">{sa.title}</div>
-                  
-                  <div className="sa-print-section">
-                    <div className="sa-print-section-title">I. Contextualização / Situação-Problema</div>
-                    <div className="sa-print-text">{sa.context}</div>
-                  </div>
-
-                  <div className="sa-print-section" style={{ background: '#f9f9f9' }}>
-                    <div className="sa-print-section-title">II. Desafio Proposto</div>
-                    <div className="sa-print-text" style={{ fontStyle: 'italic', fontWeight: 'bold' }}>{sa.challenge}</div>
-                  </div>
-
-                  <div className="sa-print-section">
-                    <div className="sa-print-section-title">III. Resultados Esperados / Entregas</div>
-                    <ul className="sa-print-results">
-                      {sa.expectedResults.map((result, rIdx) => (
-                        <li key={rIdx}>{result}</li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-              ))}
-              
-              <div style={{ marginTop: '30pt', fontSize: '9pt', color: '#555', textAlign: 'right', fontStyle: 'italic' }}>
-                Sistema MSEP-SENAI | Gerado em {new Date().toLocaleDateString('pt-BR')}
-              </div>
-            </div>
           </div>
         )}
 
@@ -354,6 +338,69 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                 Exportar Cronograma (PDF)
               </button>
+            </div>
+
+            <div className="hidden report-document">
+              <div className="report-header">
+                <div className="logo-box">SENAI</div>
+                <div className="info-box">
+                  <h1>Mecânico de Usinagem Convencional</h1>
+                  <p>Plano de Aula e Cronograma - MSEP</p>
+                </div>
+              </div>
+              
+              <h2 className="doc-main-title">Planejamento Pedagógico</h2>
+              <div style={{ marginBottom: '12pt', fontSize: '10pt', fontWeight: '900', color: '#000' }}>
+                UC: {unit.name.toUpperCase()}
+              </div>
+
+              <table className="tech-table">
+                <thead>
+                  <tr>
+                    <th style={{ width: '15%' }}>AULA/DATA</th>
+                    <th style={{ width: '42.5%' }}>CONHECIMENTOS E CAPACIDADES</th>
+                    <th style={{ width: '42.5%' }}>ESTRATÉGIAS E RECURSOS</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {localSchedule.map((entry, idx) => (
+                    <tr key={entry.id}>
+                      <td style={{ textAlign: 'center', background: '#f9f9f9' }}>
+                        <div style={{ fontWeight: '900', color: '#005DAA', fontSize: '10pt' }}>{entry.date}</div>
+                        <div style={{ fontSize: '8pt' }}>{getDayOfWeek(entry.date)}</div>
+                        <div style={{ fontSize: '8pt', marginTop: '8pt', fontWeight: '900', background: '#000', color: '#fff', padding: '3pt' }}>AULA {idx+1}</div>
+                      </td>
+                      <td>
+                        <div style={{ marginBottom: '8pt' }}>
+                          <span className="p-label" style={{ fontSize: '8pt', fontWeight: '900', color: '#E30613', textTransform: 'uppercase' }}>Conhecimentos</span>
+                          <div style={{ fontWeight: 'bold', fontSize: '10pt' }}>{entry.knowledge}</div>
+                        </div>
+                        <div>
+                          <span className="p-label" style={{ fontSize: '8pt', fontWeight: '900', color: '#E30613', textTransform: 'uppercase' }}>Capacidades</span>
+                          <div style={{ fontSize: '9.5pt' }}>{entry.capacities}</div>
+                        </div>
+                      </td>
+                      <td>
+                        <div style={{ marginBottom: '8pt' }}>
+                          <span className="p-label" style={{ fontSize: '8pt', fontWeight: '900', color: '#E30613', textTransform: 'uppercase' }}>Estratégia</span>
+                          <div style={{ fontSize: '10pt' }}>{entry.strategy}</div>
+                        </div>
+                        <div>
+                          <span className="p-label" style={{ fontSize: '8pt', fontWeight: '900', color: '#E30613', textTransform: 'uppercase' }}>Recursos</span>
+                          <div style={{ fontSize: '8.5pt', fontStyle: 'italic', color: '#333' }}>{entry.resources}</div>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+                <tfoot>
+                  <tr>
+                    <td colSpan={3} style={{ borderTop: '2pt solid #000', textAlign: 'right', fontSize: '8pt', padding: '10pt', fontStyle: 'italic', color: '#888' }}>
+                      Sistema MSEP-SENAI | Gerado em {new Date().toLocaleDateString('pt-BR')}
+                    </td>
+                  </tr>
+                </tfoot>
+              </table>
             </div>
 
             <div className="no-print space-y-6">
@@ -383,66 +430,6 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                   </div>
                 </div>
               ))}
-            </div>
-
-            {/* CRONOGRAMA PDF - FECHAMENTO DE BORDAS */}
-            <div className="hidden report-document">
-              <div className="report-header">
-                <div className="logo-box">SENAI</div>
-                <div className="info-box">
-                  <h1>Mecânico de Usinagem Convencional</h1>
-                  <p>Plano de Aula e Cronograma - MSEP</p>
-                </div>
-              </div>
-              
-              <h2 className="doc-main-title">Planejamento Pedagógico</h2>
-              <div style={{ marginBottom: '12pt', fontSize: '11pt', fontWeight: '900', color: '#000' }}>
-                UNIDADE CURRICULAR: {unit.name.toUpperCase()}
-              </div>
-
-              <table className="tech-table">
-                <thead>
-                  <tr>
-                    <th style={{ width: '15%' }}>AULA/DATA</th>
-                    <th style={{ width: '42.5%' }}>CONHECIMENTOS E CAPACIDADES</th>
-                    <th style={{ width: '42.5%' }}>ESTRATÉGIAS E RECURSOS</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {localSchedule.map((entry, idx) => (
-                    <tr key={entry.id}>
-                      <td style={{ textAlign: 'center', background: '#f9f9f9' }}>
-                        <div style={{ fontWeight: '900', color: '#005DAA', fontSize: '10pt' }}>{entry.date}</div>
-                        <div style={{ fontSize: '8pt' }}>{getDayOfWeek(entry.date)}</div>
-                        <div style={{ fontSize: '8pt', marginTop: '8pt', fontWeight: '900', background: '#000', color: '#fff', padding: '3pt' }}>AULA {idx+1}</div>
-                      </td>
-                      <td>
-                        <div style={{ marginBottom: '8pt' }}>
-                          <span className="p-label">Conhecimentos</span>
-                          <div style={{ fontWeight: 'bold', fontSize: '10pt' }}>{entry.knowledge}</div>
-                        </div>
-                        <div>
-                          <span className="p-label">Capacidades</span>
-                          <div style={{ fontSize: '9.5pt' }}>{entry.capacities}</div>
-                        </div>
-                      </td>
-                      <td>
-                        <div style={{ marginBottom: '8pt' }}>
-                          <span className="p-label">Estratégia</span>
-                          <div style={{ fontSize: '10pt' }}>{entry.strategy}</div>
-                        </div>
-                        <div>
-                          <span className="p-label">Recursos</span>
-                          <div style={{ fontSize: '8.5pt', fontStyle: 'italic', color: '#333' }}>{entry.resources}</div>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-              <div style={{ marginTop: '25pt', fontSize: '9pt', color: '#888', textAlign: 'right' }}>
-                Sistema MSEP | {new Date().toLocaleDateString('pt-BR')}
-              </div>
             </div>
           </div>
         )}
@@ -485,7 +472,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                   <th className="p-6 text-[10px] font-black uppercase border border-slate-800 text-red-400">NSA</th>
                   <th className="p-6 text-[10px] font-black uppercase border border-slate-800 text-orange-400">APO</th>
                   <th className="p-6 text-[10px] font-black uppercase border border-slate-800 text-blue-400">PAR</th>
-                  <th className="p-6 text-[10px] font-black uppercase border border-slate-800 text-green-400">AUT</th>
+                  <th className="p-6 text-[10px) font-black uppercase border border-slate-800 text-green-400">AUT</th>
                 </tr>
               </thead>
               <tbody className="text-[11px] font-bold">
