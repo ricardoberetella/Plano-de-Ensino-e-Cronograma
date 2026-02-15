@@ -23,6 +23,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
   const [activeTab, setActiveTab] = useState<'geral' | 'sa' | 'rubricas' | 'cronograma' | 'calendario'>('geral');
   const [localSchedule, setLocalSchedule] = useState<ScheduleEntry[]>(unit.schedule);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   
   const saContainerRef = useRef<HTMLDivElement>(null);
   const cronogramaContainerRef = useRef<HTMLDivElement>(null);
@@ -49,7 +50,19 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
   const handleScheduleUpdate = (id: string, field: keyof ScheduleEntry, value: any) => {
     const updated = localSchedule.map(s => s.id === id ? { ...s, [field]: value } : s);
     setLocalSchedule(updated);
-    if (onUpdateSchedule) onUpdateSchedule(updated);
+  };
+
+  const saveSchedule = async () => {
+    if (!onUpdateSchedule) return;
+    setIsSaving(true);
+    try {
+      await onUpdateSchedule(localSchedule);
+      // Feedback visual de sucesso opcional
+    } catch (err) {
+      alert("Erro ao salvar no servidor.");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const formatType = (text: string) => {
@@ -264,18 +277,32 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                 <h3 className="text-3xl font-[1000] text-slate-900 uppercase italic">Plano de Aula / Cronograma</h3>
                 <p className="text-slate-400 text-[10px] font-black uppercase tracking-widest">{localSchedule.length} Aulas Registradas</p>
               </div>
-              <button 
-                onClick={() => downloadPDF(cronogramaContainerRef, `PlanoAula_${unit.name}.pdf`)} 
-                disabled={isGenerating}
-                className="bg-[#005DAA] text-white px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl flex items-center gap-3 hover:scale-105 transition-all disabled:bg-slate-400"
-              >
-                {isGenerating ? 'Gerando...' : (
-                  <>
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-                    Baixar Cronograma PDF
-                  </>
-                )}
-              </button>
+              <div className="flex gap-4">
+                <button 
+                  onClick={saveSchedule}
+                  disabled={isSaving}
+                  className="bg-blue-600 text-white px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl flex items-center gap-3 hover:scale-105 transition-all disabled:bg-slate-400"
+                >
+                  {isSaving ? (
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                  ) : (
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"/></svg>
+                  )}
+                  {isSaving ? 'Salvando...' : 'Salvar Alterações'}
+                </button>
+                <button 
+                  onClick={() => downloadPDF(cronogramaContainerRef, `PlanoAula_${unit.name}.pdf`)} 
+                  disabled={isGenerating}
+                  className="bg-[#005DAA] text-white px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl flex items-center gap-3 hover:scale-105 transition-all disabled:bg-slate-400"
+                >
+                  {isGenerating ? 'Gerando...' : (
+                    <>
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                      Baixar PDF
+                    </>
+                  )}
+                </button>
+              </div>
             </div>
 
             <div className="space-y-6">
@@ -292,28 +319,28 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                     <p className="text-[10px] font-black uppercase text-slate-400 mt-1 italic">{getDayOfWeek(entry.date)}</p>
                   </div>
                   <div className="lg:col-span-9 grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div className="text-sm font-black text-black space-y-2">
-                      <p className="text-blue-600 uppercase mb-2 text-[9px] tracking-widest">Conhecimentos e Capacidades</p>
+                    <div className="space-y-2">
+                      <p className="text-blue-600 uppercase mb-2 text-[9px] font-black tracking-widest">Conhecimentos e Capacidades</p>
                       <input 
                         type="text"
                         value={entry.knowledge}
                         onChange={(e) => handleScheduleUpdate(entry.id, 'knowledge', e.target.value)}
-                        className="w-full font-black text-sm uppercase bg-transparent border-b border-slate-100 focus:border-blue-300 outline-none mb-1"
+                        className="w-full font-black text-sm uppercase text-black bg-transparent border-b border-slate-100 focus:border-blue-300 outline-none mb-1"
                       />
                       <textarea 
                         value={entry.capacities}
                         rows={3}
                         onChange={(e) => handleScheduleUpdate(entry.id, 'capacities', e.target.value)}
-                        className="w-full font-bold text-[13px] text-slate-800 bg-slate-50 p-3 rounded-xl border border-transparent focus:border-blue-200 outline-none resize-none leading-relaxed"
+                        className="w-full font-black text-[15px] text-black bg-slate-50 p-3 rounded-xl border border-transparent focus:border-blue-200 outline-none resize-none leading-relaxed"
                       />
                     </div>
-                    <div className="text-sm font-bold italic text-slate-900">
-                       <p className="text-orange-600 uppercase mb-2 text-[9px] tracking-widest not-italic">Estratégias e Recursos</p>
+                    <div className="space-y-2">
+                       <p className="text-orange-600 uppercase mb-2 text-[9px] font-black tracking-widest">Estratégias e Recursos</p>
                        <textarea 
                         value={entry.strategy}
                         rows={5}
                         onChange={(e) => handleScheduleUpdate(entry.id, 'strategy', e.target.value)}
-                        className="w-full font-bold italic text-[13px] text-slate-600 bg-slate-50 p-3 rounded-xl border border-transparent focus:border-orange-200 outline-none resize-none leading-relaxed"
+                        className="w-full font-bold italic text-[15px] text-black bg-slate-50 p-3 rounded-xl border border-transparent focus:border-orange-200 outline-none resize-none leading-relaxed"
                       />
                     </div>
                   </div>
@@ -339,9 +366,9 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                     <table style={{ width: '100%', borderCollapse: 'collapse', border: '2pt solid #000' }}>
                       <thead>
                         <tr style={{ background: '#eee' }}>
-                          <th style={{ border: '1pt solid #000', padding: '8px', fontSize: '9px', textTransform: 'uppercase', width: '18%' }}>Aula/Data</th>
-                          <th style={{ border: '1pt solid #000', padding: '8px', fontSize: '9px', textTransform: 'uppercase', width: '41%' }}>Conhecimentos/Capacidades</th>
-                          <th style={{ border: '1pt solid #000', padding: '8px', fontSize: '9px', textTransform: 'uppercase', width: '41%' }}>Estratégias</th>
+                          <th style={{ border: '1pt solid #000', padding: '8px', fontSize: '10px', textTransform: 'uppercase', width: '18%' }}>Aula/Data</th>
+                          <th style={{ border: '1pt solid #000', padding: '8px', fontSize: '10px', textTransform: 'uppercase', width: '41%' }}>Conhecimentos/Capacidades</th>
+                          <th style={{ border: '1pt solid #000', padding: '8px', fontSize: '10px', textTransform: 'uppercase', width: '41%' }}>Estratégias</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -349,14 +376,14 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                           const realIdx = (pIndex * 18) + idx;
                           return (
                             <tr key={entry.id}>
-                              <td style={{ border: '1pt solid #000', padding: '6px', textAlign: 'center', fontSize: '10px', fontWeight: '900', color: '#000' }}>
+                              <td style={{ border: '1pt solid #000', padding: '6px', textAlign: 'center', fontSize: '11px', fontWeight: '900', color: '#000' }}>
                                 {entry.date}<br/><span style={{ fontSize: '8px', color: '#333' }}>AULA {realIdx + 1}</span>
                               </td>
-                              <td style={{ border: '1pt solid #000', padding: '8px', fontSize: '11px', color: '#000' }}>
-                                <div style={{ fontWeight: '900', marginBottom: '4px', color: '#005DAA' }}>{formatType(entry.knowledge)}</div>
+                              <td style={{ border: '1pt solid #000', padding: '8px', fontSize: '12px', color: '#000' }}>
+                                <div style={{ fontWeight: '900', marginBottom: '4px', color: '#005DAA', fontSize: '11px' }}>{formatType(entry.knowledge)}</div>
                                 <div style={{ fontWeight: '900' }}>{entry.capacities}</div>
                               </td>
-                              <td style={{ border: '1pt solid #000', padding: '8px', fontSize: '11px', fontStyle: 'italic', color: '#000', fontWeight: '700' }}>
+                              <td style={{ border: '1pt solid #000', padding: '8px', fontSize: '12px', fontStyle: 'italic', color: '#000', fontWeight: '800' }}>
                                 {entry.strategy}
                               </td>
                             </tr>
