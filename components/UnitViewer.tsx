@@ -147,7 +147,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
             <div className="flex justify-between items-center gap-6 border-b border-slate-100 pb-8 mb-10">
               <div>
                 <h3 className="text-3xl font-[1000] text-slate-900 uppercase italic">Situações de Aprendizagem</h3>
-                <p className="text-slate-400 text-[10px] font-black uppercase tracking-widest">Geração de Guia Profissional (IA-PDF)</p>
+                <p className="text-slate-400 text-[10px] font-black uppercase tracking-widest">Guia de Aprendizagem Profissional (IA-PDF)</p>
               </div>
               <button 
                 onClick={() => downloadPDF(saContainerRef, `SA_${unit.name}.pdf`)} 
@@ -193,57 +193,57 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
               ))}
             </div>
 
-            {/* CONTAINER OCULTO PARA PDF - PIXEL PERFECT A4 */}
+            {/* CONTAINER OCULTO PARA PDF - PIXEL PERFECT A4 (DPI 96) */}
             <div style={{ position: 'absolute', left: '-9999px', top: 0 }}>
               <div ref={saContainerRef}>
                 {unit.learningSituations.map((sa, index) => (
-                  <div key={sa.id} style={{ width: '794px', height: '1123px', padding: '30px 40px', backgroundColor: 'white', display: 'flex', flexDirection: 'column' }}>
-                    {/* CABEÇALHO CONDICIONAL: LOGO SENAI APENAS NA PÁGINA 1 */}
+                  <div key={sa.id} style={{ width: '794px', height: '1123px', padding: '25px 40px', backgroundColor: 'white', display: 'flex', flexDirection: 'column', boxSizing: 'border-box' }}>
+                    
+                    {/* CABEÇALHO CONDICIONAL */}
                     {index === 0 ? (
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '3pt solid #E30613', paddingBottom: '10px', marginBottom: '15px' }}>
-                        <div style={{ background: '#E30613', color: 'white', padding: '8px 16px', fontSize: '20px', fontWeight: '900', fontStyle: 'italic' }}>SENAI</div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '3pt solid #E30613', paddingBottom: '10px', marginBottom: '12px' }}>
+                        <div style={{ background: '#E30613', color: 'white', padding: '10px 18px', fontSize: '22px', fontWeight: '900', fontStyle: 'italic' }}>SENAI</div>
                         <div style={{ textAlign: 'right', color: 'black' }}>
-                          <h1 style={{ fontSize: '10px', fontWeight: '900', margin: 0, textTransform: 'uppercase' }}>Mecânico de Usinagem Convencional</h1>
-                          <p style={{ fontSize: '8px', margin: '3px 0 0 0', fontWeight: 'bold' }}>Guia de Situações de Aprendizagem 0{index+1}</p>
+                          <h1 style={{ fontSize: '11px', fontWeight: '900', margin: 0, textTransform: 'uppercase' }}>Mecânico de Usinagem Convencional</h1>
+                          <p style={{ fontSize: '9px', margin: '3px 0 0 0', fontWeight: 'bold' }}>Guia de Situações de Aprendizagem 0{index+1}</p>
                         </div>
                       </div>
                     ) : (
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1.5pt solid #000', paddingBottom: '6px', marginBottom: '12px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1.5pt solid #000', paddingBottom: '5px', marginBottom: '10px' }}>
                         <div style={{ color: 'black', fontSize: '11px', fontWeight: '900', textTransform: 'uppercase' }}>Situação de Aprendizagem 0{index+1}</div>
-                        <div style={{ textAlign: 'right', color: '#666', fontSize: '7px', fontWeight: 'bold' }}>Guia de Situações de Aprendizagem - MSEP</div>
+                        <div style={{ textAlign: 'right', color: '#666', fontSize: '8px', fontWeight: 'bold' }}>UC: {unit.name.toUpperCase()}</div>
                       </div>
                     )}
                     
-                    <h2 style={{ textAlign: 'center', fontWeight: '900', fontSize: '12px', textTransform: 'uppercase', margin: '4px 0', borderBottom: '1pt solid #ccc', paddingBottom: '4px', color: 'black' }}>Guia do Estudante</h2>
-                    <div style={{ marginBottom: '8px', fontSize: '10px', fontWeight: '900', color: 'black' }}>UC: {unit.name.toUpperCase()}</div>
-                    <div style={{ fontSize: '12px', fontWeight: '900', borderBottom: '1pt solid #E30613', marginBottom: '12px', padding: '4px 0', textTransform: 'uppercase', color: 'black' }}>{sa.title}</div>
+                    <h2 style={{ textAlign: 'center', fontWeight: '900', fontSize: '13px', textTransform: 'uppercase', margin: '5px 0', borderBottom: '1pt solid #ccc', paddingBottom: '5px', color: 'black' }}>Guia do Estudante (MSEP)</h2>
+                    <div style={{ fontSize: '13px', fontWeight: '900', borderBottom: '1.5pt solid #E30613', marginBottom: '15px', padding: '5px 0', textTransform: 'uppercase', color: 'black' }}>{sa.title}</div>
                     
-                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                      {/* BLOCO I - CONTEXTUALIZAÇÃO (Fonte menor para caber) */}
-                      <div style={{ border: '0.8pt solid #000', padding: '12px', flex: '1.6', display: 'flex', flexDirection: 'column', minHeight: '0' }}>
-                        <div style={{ fontWeight: '900', fontSize: '9px', color: '#E30613', textTransform: 'uppercase', marginBottom: '6px' }}>I. Contextualização / Situação-Problema</div>
-                        <div style={{ fontSize: '10px', lineHeight: '1.4', color: 'black', textAlign: 'justify', overflow: 'hidden' }}>{sa.context}</div>
+                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                      {/* BLOCO I - CONTEXTUALIZAÇÃO (Fonte aumentada e espaçamento melhorado) */}
+                      <div style={{ border: '1pt solid #000', padding: '15px', minHeight: '180px', display: 'flex', flexDirection: 'column' }}>
+                        <div style={{ fontWeight: '900', fontSize: '10px', color: '#E30613', textTransform: 'uppercase', marginBottom: '8px' }}>I. Contextualização / Situação-Problema</div>
+                        <div style={{ fontSize: '12px', lineHeight: '1.5', color: 'black', textAlign: 'justify' }}>{sa.context}</div>
                       </div>
                       
-                      {/* BLOCO II - DESAFIO (Fonte menor para caber) */}
-                      <div style={{ border: '0.8pt solid #000', padding: '12px', flex: '1.4', background: '#fcfcfc', display: 'flex', flexDirection: 'column', minHeight: '0' }}>
-                        <div style={{ fontWeight: '900', fontSize: '9px', color: '#E30613', textTransform: 'uppercase', marginBottom: '6px' }}>II. Desafio Proposto</div>
-                        <div style={{ fontSize: '10px', lineHeight: '1.4', color: 'black', fontStyle: 'italic', fontWeight: 'bold', overflow: 'hidden' }}>{sa.challenge}</div>
+                      {/* BLOCO II - DESAFIO (Fonte aumentada e espaçamento melhorado) */}
+                      <div style={{ border: '1pt solid #000', padding: '15px', background: '#fdfdfd', minHeight: '220px', display: 'flex', flexDirection: 'column' }}>
+                        <div style={{ fontWeight: '900', fontSize: '10px', color: '#E30613', textTransform: 'uppercase', marginBottom: '8px' }}>II. Desafio Proposto</div>
+                        <div style={{ fontSize: '12px', lineHeight: '1.5', color: 'black', fontStyle: 'italic', fontWeight: '600' }}>{sa.challenge}</div>
                       </div>
                       
-                      {/* BLOCO III - RESULTADOS (Garantindo exibição completa) */}
-                      <div style={{ border: '0.8pt solid #000', padding: '12px', flex: '1.2', display: 'flex', flexDirection: 'column', minHeight: '0' }}>
-                        <div style={{ fontWeight: '900', fontSize: '9px', color: '#E30613', textTransform: 'uppercase', marginBottom: '6px' }}>III. Resultados Esperados / Entregas</div>
-                        <ul style={{ paddingLeft: '18px', marginTop: '2px', overflow: 'hidden' }}>
+                      {/* BLOCO III - RESULTADOS (Garantindo que apareça completo) */}
+                      <div style={{ border: '1pt solid #000', padding: '15px', display: 'flex', flexDirection: 'column' }}>
+                        <div style={{ fontWeight: '900', fontSize: '10px', color: '#E30613', textTransform: 'uppercase', marginBottom: '8px' }}>III. Resultados Esperados / Entregas</div>
+                        <ul style={{ paddingLeft: '22px', marginTop: '4px' }}>
                           {sa.expectedResults.map((res, ri) => (
-                            <li key={ri} style={{ fontSize: '9.5px', marginBottom: '5px', listStyleType: 'decimal', color: 'black', lineHeight: '1.3' }}>{res}</li>
+                            <li key={ri} style={{ fontSize: '11.5px', marginBottom: '6px', listStyleType: 'decimal', color: 'black', lineHeight: '1.4' }}>{res}</li>
                           ))}
                         </ul>
                       </div>
                     </div>
 
-                    <div style={{ marginTop: '10px', fontSize: '8px', color: '#999', textAlign: 'right', fontStyle: 'italic' }}>
-                      Sistema MSEP-SENAI | Pág {index+1} de {unit.learningSituations.length} | Gerado em {new Date().toLocaleDateString('pt-BR')}
+                    <div style={{ marginTop: '15px', fontSize: '8.5px', color: '#999', textAlign: 'right', fontStyle: 'italic' }}>
+                      Sistema MSEP-SENAI | Página {index+1} | Gerado em {new Date().toLocaleDateString('pt-BR')}
                     </div>
                   </div>
                 ))}
