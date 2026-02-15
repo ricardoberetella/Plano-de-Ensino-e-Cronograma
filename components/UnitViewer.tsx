@@ -46,6 +46,12 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
     return isNaN(date.getTime()) ? "" : new Intl.DateTimeFormat('pt-BR', { weekday: 'long' }).format(date);
   };
 
+  const handleScheduleUpdate = (id: string, field: keyof ScheduleEntry, value: any) => {
+    const updated = localSchedule.map(s => s.id === id ? { ...s, [field]: value } : s);
+    setLocalSchedule(updated);
+    if (onUpdateSchedule) onUpdateSchedule(updated);
+  };
+
   const formatType = (text: string) => {
     return text
       .replace('TEORIA (TEOR)', 'Teoria')
@@ -277,17 +283,38 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                 <div key={entry.id} className="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-lg grid grid-cols-1 lg:grid-cols-12 gap-8 hover:border-blue-200 transition-all">
                   <div className="lg:col-span-3">
                     <p className="text-[9px] font-black text-slate-400 uppercase mb-1">AULA {idx+1}</p>
-                    <div className="text-blue-600 font-[1000] text-xl uppercase tracking-tighter">{entry.date}</div>
+                    <input 
+                      type="text"
+                      value={entry.date}
+                      onChange={(e) => handleScheduleUpdate(entry.id, 'date', e.target.value)}
+                      className="text-blue-600 font-[1000] text-xl uppercase tracking-tighter w-full bg-transparent border-b border-transparent focus:border-blue-300 outline-none"
+                    />
                     <p className="text-[10px] font-black uppercase text-slate-400 mt-1 italic">{getDayOfWeek(entry.date)}</p>
                   </div>
                   <div className="lg:col-span-9 grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div className="text-sm font-black text-black">
+                    <div className="text-sm font-black text-black space-y-2">
                       <p className="text-blue-600 uppercase mb-2 text-[9px] tracking-widest">Conhecimentos e Capacidades</p>
-                      <p><strong>{formatType(entry.knowledge)}:</strong> {entry.capacities}</p>
+                      <input 
+                        type="text"
+                        value={entry.knowledge}
+                        onChange={(e) => handleScheduleUpdate(entry.id, 'knowledge', e.target.value)}
+                        className="w-full font-black text-sm uppercase bg-transparent border-b border-slate-100 focus:border-blue-300 outline-none mb-1"
+                      />
+                      <textarea 
+                        value={entry.capacities}
+                        rows={3}
+                        onChange={(e) => handleScheduleUpdate(entry.id, 'capacities', e.target.value)}
+                        className="w-full font-bold text-[13px] text-slate-800 bg-slate-50 p-3 rounded-xl border border-transparent focus:border-blue-200 outline-none resize-none leading-relaxed"
+                      />
                     </div>
                     <div className="text-sm font-bold italic text-slate-900">
                        <p className="text-orange-600 uppercase mb-2 text-[9px] tracking-widest not-italic">Estratégias e Recursos</p>
-                       <p>{entry.strategy}</p>
+                       <textarea 
+                        value={entry.strategy}
+                        rows={5}
+                        onChange={(e) => handleScheduleUpdate(entry.id, 'strategy', e.target.value)}
+                        className="w-full font-bold italic text-[13px] text-slate-600 bg-slate-50 p-3 rounded-xl border border-transparent focus:border-orange-200 outline-none resize-none leading-relaxed"
+                      />
                     </div>
                   </div>
                 </div>
