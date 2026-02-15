@@ -46,6 +46,14 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
     return isNaN(date.getTime()) ? "" : new Intl.DateTimeFormat('pt-BR', { weekday: 'long' }).format(date);
   };
 
+  const formatType = (text: string) => {
+    return text
+      .replace('TEORIA (TEOR)', 'Teoria')
+      .replace('PRÁTICA (PRAT)', 'Prática')
+      .replace('(TEOR)', 'Teoria')
+      .replace('(PRAT)', 'Prática');
+  };
+
   const downloadPDF = async (ref: React.RefObject<HTMLDivElement | null>, filename: string) => {
     if (!ref.current) return;
     setIsGenerating(true);
@@ -53,7 +61,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
     try {
       const element = ref.current;
       const pdf = new jsPDF('p', 'mm', 'a4');
-      const pages = element.children;
+      const pages = Array.from(element.children);
 
       for (let i = 0; i < pages.length; i++) {
         const page = pages[i] as HTMLElement;
@@ -100,6 +108,15 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
     }
     return months;
   }, [calendar.startDate, calendar.endDate]);
+
+  // Divide o cronograma em páginas para o PDF (aprox 18 itens por página)
+  const chunkedSchedule = useMemo(() => {
+    const chunks: ScheduleEntry[][] = [];
+    for (let i = 0; i < localSchedule.length; i += 18) {
+      chunks.push(localSchedule.slice(i, i + 18));
+    }
+    return chunks;
+  }, [localSchedule]);
 
   return (
     <div className="bg-white rounded-[2.5rem] shadow-2xl border border-slate-200 overflow-hidden animate-fadeIn">
@@ -148,7 +165,6 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
               </button>
             </div>
 
-            {/* PREVIEW WEB */}
             <div className="space-y-12 pb-10">
               {unit.learningSituations.map((sa) => (
                 <div key={sa.id} className="p-10 bg-white border border-slate-200 rounded-[3rem] shadow-xl relative overflow-hidden">
@@ -179,7 +195,6 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
               ))}
             </div>
 
-            {/* CONTAINER OCULTO PARA PDF (A4 PIXEL PERFECT) */}
             <div style={{ position: 'absolute', left: '-9999px', top: 0 }}>
               <div ref={saContainerRef}>
                 {unit.learningSituations.map((sa, index) => (
@@ -195,7 +210,6 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                     <div style={{ marginBottom: '15px', fontSize: '12px', fontWeight: '900', color: 'black' }}>UC: {unit.name.toUpperCase()}</div>
                     <div style={{ fontSize: '14px', fontWeight: '900', borderBottom: '2pt solid #E30613', marginBottom: '20px', padding: '8px 0', textTransform: 'uppercase', color: 'black' }}>{sa.title}</div>
                     
-                    {/* OS 3 BLOCOS COM BORDAS */}
                     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '20px' }}>
                       <div style={{ border: '1.5pt solid #000', padding: '20px', flex: 1 }}>
                         <div style={{ fontWeight: '900', fontSize: '11px', color: '#E30613', textTransform: 'uppercase', marginBottom: '10px' }}>I. Contextualização / Situação-Problema</div>
@@ -225,16 +239,19 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
         {activeTab === 'cronograma' && (
           <div className="space-y-8">
             <div className="flex justify-between items-center gap-6 border-b border-slate-100 pb-8">
-              <h3 className="text-3xl font-[1000] text-slate-900 uppercase italic">Plano de Aula</h3>
+              <div>
+                <h3 className="text-3xl font-[1000] text-slate-900 uppercase italic">Plano de Aula</h3>
+                <p className="text-slate-400 text-[10px] font-black uppercase tracking-widest">{localSchedule.length} Aulas Registradas</p>
+              </div>
               <button 
                 onClick={() => downloadPDF(cronogramaContainerRef, `PlanoAula_${unit.name}.pdf`)} 
                 disabled={isGenerating}
                 className="bg-[#005DAA] text-white px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl flex items-center gap-3 hover:scale-105 transition-all disabled:bg-slate-400"
               >
-                {isGenerating ? 'Gerando...' : (
+                {isGenerating ? 'Gerando Arquivo Completo...' : (
                   <>
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-                    Baixar Cronograma PDF
+                    Baixar Cronograma Completo (PDF)
                   </>
                 )}
               </button>
@@ -242,64 +259,82 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
 
             <div className="space-y-6">
               {localSchedule.map((entry, idx) => (
-                <div key={entry.id} className="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-lg grid grid-cols-1 lg:grid-cols-12 gap-8">
+                <div key={entry.id} className="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-lg grid grid-cols-1 lg:grid-cols-12 gap-8 hover:border-blue-200 transition-all">
                   <div className="lg:col-span-3">
                     <p className="text-[9px] font-black text-slate-400 uppercase mb-1">AULA {idx+1}</p>
                     <div className="text-blue-600 font-[1000] text-xl uppercase tracking-tighter">{entry.date}</div>
                     <p className="text-[10px] font-black uppercase text-slate-400 mt-1 italic">{getDayOfWeek(entry.date)}</p>
                   </div>
                   <div className="lg:col-span-9 grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div className="text-[11px] font-bold text-slate-800"><p><strong>C:</strong> {entry.knowledge}</p><p className="mt-2"><strong>Cap:</strong> {entry.capacities}</p></div>
-                    <div className="text-[11px] font-medium italic text-slate-500"><p>{entry.strategy}</p></div>
+                    <div className="text-[11px] font-bold text-slate-800">
+                      <p className="text-blue-600 uppercase mb-2 text-[9px] tracking-widest">Conhecimentos e Capacidades</p>
+                      <p><strong>{formatType(entry.knowledge)}:</strong> {entry.capacities}</p>
+                    </div>
+                    <div className="text-[11px] font-medium italic text-slate-500">
+                       <p className="text-orange-600 uppercase mb-2 text-[9px] tracking-widest not-italic">Estratégias e Recursos</p>
+                       <p>{entry.strategy}</p>
+                    </div>
                   </div>
                 </div>
               ))}
             </div>
 
-            {/* CONTAINER OCULTO PARA CRONOGRAMA PDF */}
+            {/* CONTAINER OCULTO PARA CRONOGRAMA PDF - DIVIDIDO EM PÁGINAS */}
             <div style={{ position: 'absolute', left: '-9999px', top: 0 }}>
               <div ref={cronogramaContainerRef}>
-                <div style={{ width: '794px', height: '1123px', padding: '40px', backgroundColor: 'white' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '3pt solid #E30613', paddingBottom: '12px', marginBottom: '20px' }}>
-                    <div style={{ background: '#E30613', color: 'white', padding: '10px 15px', fontSize: '22px', fontWeight: '900', fontStyle: 'italic' }}>SENAI</div>
-                    <div style={{ textAlign: 'right', color: 'black' }}>
-                      <h1 style={{ fontSize: '11px', fontWeight: '900', margin: 0, textTransform: 'uppercase' }}>Mecânico de Usinagem Convencional</h1>
-                      <p style={{ fontSize: '9px', margin: '3px 0 0 0', fontWeight: 'bold' }}>Plano de Aula e Cronograma - MSEP</p>
+                {chunkedSchedule.map((chunk, pIndex) => (
+                  <div key={pIndex} style={{ width: '794px', height: '1123px', padding: '40px', backgroundColor: 'white', display: 'flex', flexDirection: 'column' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '3pt solid #E30613', paddingBottom: '12px', marginBottom: '20px' }}>
+                      <div style={{ background: '#E30613', color: 'white', padding: '10px 15px', fontSize: '22px', fontWeight: '900', fontStyle: 'italic' }}>SENAI</div>
+                      <div style={{ textAlign: 'right', color: 'black' }}>
+                        <h1 style={{ fontSize: '11px', fontWeight: '900', margin: 0, textTransform: 'uppercase' }}>Mecânico de Usinagem Convencional</h1>
+                        <p style={{ fontSize: '9px', margin: '3px 0 0 0', fontWeight: 'bold' }}>Plano de Aula e Cronograma - MSEP (Pág {pIndex + 1})</p>
+                      </div>
+                    </div>
+                    
+                    <h2 style={{ textAlign: 'center', fontWeight: '900', fontSize: '15px', textTransform: 'uppercase', margin: '10px 0', borderBottom: '2pt solid #000', paddingBottom: '8px', color: 'black' }}>Planejamento Pedagógico</h2>
+                    <div style={{ marginBottom: '10px', fontSize: '11px', fontWeight: '900', color: 'black' }}>UC: {unit.name.toUpperCase()}</div>
+                    
+                    <table style={{ width: '100%', borderCollapse: 'collapse', border: '2pt solid #000' }}>
+                      <thead>
+                        <tr style={{ background: '#eee' }}>
+                          <th style={{ border: '1pt solid #000', padding: '8px', fontSize: '9px', textTransform: 'uppercase', width: '18%' }}>Aula/Data</th>
+                          <th style={{ border: '1pt solid #000', padding: '8px', fontSize: '9px', textTransform: 'uppercase', width: '41%' }}>Conhecimentos/Capacidades</th>
+                          <th style={{ border: '1pt solid #000', padding: '8px', fontSize: '9px', textTransform: 'uppercase', width: '41%' }}>Estratégias</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {chunk.map((entry, idx) => {
+                          const realIdx = (pIndex * 18) + idx;
+                          return (
+                            <tr key={entry.id}>
+                              <td style={{ border: '1pt solid #000', padding: '6px', textAlign: 'center', fontSize: '9px', fontWeight: 'bold' }}>
+                                {entry.date}<br/><span style={{ fontSize: '8px', color: '#666' }}>AULA {realIdx + 1}</span>
+                              </td>
+                              <td style={{ border: '1pt solid #000', padding: '6px', fontSize: '10px' }}>
+                                <div style={{ fontWeight: 'bold', marginBottom: '4px', color: '#005DAA' }}>{formatType(entry.knowledge)}</div>
+                                <div style={{ fontSize: '9px', color: '#000' }}>{entry.capacities}</div>
+                              </td>
+                              <td style={{ border: '1pt solid #000', padding: '6px', fontSize: '9px', fontStyle: 'italic', color: '#333' }}>
+                                {entry.strategy}
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                    
+                    <div style={{ marginTop: 'auto', paddingTop: '15px', fontSize: '9px', color: '#888', textAlign: 'right' }}>
+                      Sistema MSEP-SENAI | Gerado em {new Date().toLocaleDateString('pt-BR')}
                     </div>
                   </div>
-                  <h2 style={{ textAlign: 'center', fontWeight: '900', fontSize: '15px', textTransform: 'uppercase', margin: '15px 0', borderBottom: '2pt solid #000', paddingBottom: '8px', color: 'black' }}>Planejamento Pedagógico</h2>
-                  <div style={{ marginBottom: '15px', fontSize: '11px', fontWeight: '900', color: 'black' }}>UC: {unit.name.toUpperCase()}</div>
-                  <table style={{ width: '100%', borderCollapse: 'collapse', border: '2pt solid #000' }}>
-                    <thead>
-                      <tr style={{ background: '#eee' }}>
-                        <th style={{ border: '1pt solid #000', padding: '10px', fontSize: '9px', textTransform: 'uppercase' }}>Aula/Data</th>
-                        <th style={{ border: '1pt solid #000', padding: '10px', fontSize: '9px', textTransform: 'uppercase' }}>Conhecimentos/Capacidades</th>
-                        <th style={{ border: '1pt solid #000', padding: '10px', fontSize: '9px', textTransform: 'uppercase' }}>Estratégias</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {localSchedule.slice(0, 12).map((entry, idx) => (
-                        <tr key={entry.id}>
-                          <td style={{ border: '1pt solid #000', padding: '10px', textAlign: 'center', fontSize: '10px', fontWeight: 'bold' }}>
-                            {entry.date}<br/>AULA {idx+1}
-                          </td>
-                          <td style={{ border: '1pt solid #000', padding: '10px', fontSize: '10px' }}>
-                            <div style={{ fontWeight: 'bold', marginBottom: '4px' }}>{entry.knowledge}</div>
-                            <div style={{ fontSize: '9px', color: '#444' }}>{entry.capacities}</div>
-                          </td>
-                          <td style={{ border: '1pt solid #000', padding: '10px', fontSize: '10px', fontStyle: 'italic' }}>{entry.strategy}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-                {/* Se houver mais aulas, o jsPDF processaria as páginas seguintes no loop, mas aqui o container precisa de todas */}
+                ))}
               </div>
             </div>
           </div>
         )}
 
-        {/* OUTRAS TABS (WEB ONLY) */}
+        {/* OUTRAS TABS */}
         {activeTab === 'geral' && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
             <section>
