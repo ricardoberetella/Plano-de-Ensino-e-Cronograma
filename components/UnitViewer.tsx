@@ -109,7 +109,6 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
     return months;
   }, [calendar.startDate, calendar.endDate]);
 
-  // Divide o cronograma em páginas para o PDF (aprox 18 itens por página)
   const chunkedSchedule = useMemo(() => {
     const chunks: ScheduleEntry[][] = [];
     for (let i = 0; i < localSchedule.length; i += 18) {
@@ -120,7 +119,6 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
 
   return (
     <div className="bg-white rounded-[2.5rem] shadow-2xl border border-slate-200 overflow-hidden animate-fadeIn">
-      {/* CABEÇALHO WEB */}
       <div className="bg-slate-900 p-8 text-white flex justify-between items-center">
         <div>
           <span className="bg-blue-600 px-3 py-1 rounded text-[9px] font-black uppercase tracking-widest mb-2 inline-block">MSEP - Unidade Curricular</span>
@@ -149,7 +147,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
             <div className="flex justify-between items-center gap-6 border-b border-slate-100 pb-8 mb-10">
               <div>
                 <h3 className="text-3xl font-[1000] text-slate-900 uppercase italic">Situações de Aprendizagem</h3>
-                <p className="text-slate-400 text-[10px] font-black uppercase tracking-widest">Geração de Guia em 2 Páginas (3 blocos/pág)</p>
+                <p className="text-slate-400 text-[10px] font-black uppercase tracking-widest">Geração de Guia Profissional (IA-PDF)</p>
               </div>
               <button 
                 onClick={() => downloadPDF(saContainerRef, `SA_${unit.name}.pdf`)} 
@@ -159,7 +157,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                 {isGenerating ? 'Gerando Arquivo...' : (
                   <>
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-                    Baixar PDF Oficial
+                    Baixar Guia PDF
                   </>
                 )}
               </button>
@@ -198,37 +196,54 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
             <div style={{ position: 'absolute', left: '-9999px', top: 0 }}>
               <div ref={saContainerRef}>
                 {unit.learningSituations.map((sa, index) => (
-                  <div key={sa.id} style={{ width: '794px', height: '1123px', padding: '50px', backgroundColor: 'white', display: 'flex', flexDirection: 'column' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '4pt solid #E30613', paddingBottom: '15px', marginBottom: '20px' }}>
-                      <div style={{ background: '#E30613', color: 'white', padding: '10px 20px', fontSize: '24px', fontWeight: '900', fontStyle: 'italic' }}>SENAI</div>
-                      <div style={{ textAlign: 'right', color: 'black' }}>
-                        <h1 style={{ fontSize: '12px', fontWeight: '900', margin: 0, textTransform: 'uppercase' }}>Mecânico de Usinagem Convencional</h1>
-                        <p style={{ fontSize: '10px', margin: '4px 0 0 0', fontWeight: 'bold' }}>Guia de Situações de Aprendizagem 0{index+1}</p>
+                  <div key={sa.id} style={{ width: '794px', height: '1123px', padding: '40px 50px', backgroundColor: 'white', display: 'flex', flexDirection: 'column' }}>
+                    {/* CABEÇALHO CONDICIONAL: LOGO SENAI APENAS NA PÁGINA 1 */}
+                    {index === 0 ? (
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '4pt solid #E30613', paddingBottom: '15px', marginBottom: '20px' }}>
+                        <div style={{ background: '#E30613', color: 'white', padding: '10px 20px', fontSize: '24px', fontWeight: '900', fontStyle: 'italic' }}>SENAI</div>
+                        <div style={{ textAlign: 'right', color: 'black' }}>
+                          <h1 style={{ fontSize: '11px', fontWeight: '900', margin: 0, textTransform: 'uppercase' }}>Mecânico de Usinagem Convencional</h1>
+                          <p style={{ fontSize: '9px', margin: '4px 0 0 0', fontWeight: 'bold' }}>Guia de Situações de Aprendizagem 0{index+1}</p>
+                        </div>
                       </div>
-                    </div>
-                    <h2 style={{ textAlign: 'center', fontWeight: '900', fontSize: '16px', textTransform: 'uppercase', margin: '15px 0', borderBottom: '2pt solid #000', paddingBottom: '8px', color: 'black' }}>Situação de Aprendizagem</h2>
-                    <div style={{ marginBottom: '15px', fontSize: '12px', fontWeight: '900', color: 'black' }}>UC: {unit.name.toUpperCase()}</div>
-                    <div style={{ fontSize: '14px', fontWeight: '900', borderBottom: '2pt solid #E30613', marginBottom: '20px', padding: '8px 0', textTransform: 'uppercase', color: 'black' }}>{sa.title}</div>
+                    ) : (
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '2pt solid #000', paddingBottom: '8px', marginBottom: '15px' }}>
+                        <div style={{ color: 'black', fontSize: '12px', fontWeight: '900', textTransform: 'uppercase' }}>Situação de Aprendizagem 0{index+1}</div>
+                        <div style={{ textAlign: 'right', color: '#666', fontSize: '8px', fontWeight: 'bold' }}>Guia de Situações de Aprendizagem - MSEP</div>
+                      </div>
+                    )}
                     
-                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                      <div style={{ border: '1.5pt solid #000', padding: '20px', flex: 1 }}>
-                        <div style={{ fontWeight: '900', fontSize: '11px', color: '#E30613', textTransform: 'uppercase', marginBottom: '10px' }}>I. Contextualização / Situação-Problema</div>
-                        <div style={{ fontSize: '14px', lineHeight: '1.8', color: 'black', textAlign: 'justify' }}>{sa.context}</div>
+                    <h2 style={{ textAlign: 'center', fontWeight: '900', fontSize: '14px', textTransform: 'uppercase', margin: '5px 0', borderBottom: '1.5pt solid #ccc', paddingBottom: '6px', color: 'black' }}>Situação de Aprendizagem</h2>
+                    <div style={{ marginBottom: '10px', fontSize: '11px', fontWeight: '900', color: 'black' }}>UC: {unit.name.toUpperCase()}</div>
+                    <div style={{ fontSize: '13px', fontWeight: '900', borderBottom: '1.5pt solid #E30613', marginBottom: '15px', padding: '6px 0', textTransform: 'uppercase', color: 'black' }}>{sa.title}</div>
+                    
+                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                      {/* BLOCO I */}
+                      <div style={{ border: '1pt solid #000', padding: '15px', flex: '1.5', display: 'flex', flexDirection: 'column' }}>
+                        <div style={{ fontWeight: '900', fontSize: '10px', color: '#E30613', textTransform: 'uppercase', marginBottom: '8px' }}>I. Contextualização / Situação-Problema</div>
+                        <div style={{ fontSize: '12.5px', lineHeight: '1.6', color: 'black', textAlign: 'justify' }}>{sa.context}</div>
                       </div>
-                      <div style={{ border: '1.5pt solid #000', padding: '20px', flex: 1, background: '#f9f9f9' }}>
-                        <div style={{ fontWeight: '900', fontSize: '11px', color: '#E30613', textTransform: 'uppercase', marginBottom: '10px' }}>II. Desafio Proposto</div>
-                        <div style={{ fontSize: '14px', lineHeight: '1.8', color: 'black', fontStyle: 'italic', fontWeight: 'bold' }}>{sa.challenge}</div>
+                      
+                      {/* BLOCO II */}
+                      <div style={{ border: '1pt solid #000', padding: '15px', flex: '1.2', background: '#fcfcfc', display: 'flex', flexDirection: 'column' }}>
+                        <div style={{ fontWeight: '900', fontSize: '10px', color: '#E30613', textTransform: 'uppercase', marginBottom: '8px' }}>II. Desafio Proposto</div>
+                        <div style={{ fontSize: '12.5px', lineHeight: '1.6', color: 'black', fontStyle: 'italic', fontWeight: 'bold' }}>{sa.challenge}</div>
                       </div>
-                      <div style={{ border: '1.5pt solid #000', padding: '20px', flex: 1 }}>
-                        <div style={{ fontWeight: '900', fontSize: '11px', color: '#E30613', textTransform: 'uppercase', marginBottom: '10px' }}>III. Resultados Esperados / Entregas</div>
-                        <ul style={{ paddingLeft: '25px', marginTop: '10px' }}>
+                      
+                      {/* BLOCO III - GARANTIA DE EXIBIÇÃO EM CADA PÁGINA */}
+                      <div style={{ border: '1pt solid #000', padding: '15px', flex: '1.3', display: 'flex', flexDirection: 'column' }}>
+                        <div style={{ fontWeight: '900', fontSize: '10px', color: '#E30613', textTransform: 'uppercase', marginBottom: '8px' }}>III. Resultados Esperados / Entregas</div>
+                        <ul style={{ paddingLeft: '20px', marginTop: '5px' }}>
                           {sa.expectedResults.map((res, ri) => (
-                            <li key={ri} style={{ fontSize: '14px', marginBottom: '12px', listStyleType: 'decimal', color: 'black', lineHeight: '1.6' }}>{res}</li>
+                            <li key={ri} style={{ fontSize: '12px', marginBottom: '8px', listStyleType: 'decimal', color: 'black', lineHeight: '1.4' }}>{res}</li>
                           ))}
                         </ul>
                       </div>
                     </div>
-                    <div style={{ marginTop: '20px', fontSize: '10px', color: '#666', textAlign: 'right', fontStyle: 'italic' }}>Sistema MSEP-SENAI | Gerado em {new Date().toLocaleDateString('pt-BR')}</div>
+
+                    <div style={{ marginTop: '15px', fontSize: '9px', color: '#999', textAlign: 'right', fontStyle: 'italic' }}>
+                      Sistema MSEP-SENAI | Pág {index+1} de {unit.learningSituations.length} | Gerado em {new Date().toLocaleDateString('pt-BR')}
+                    </div>
                   </div>
                 ))}
               </div>
@@ -248,10 +263,10 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                 disabled={isGenerating}
                 className="bg-[#005DAA] text-white px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl flex items-center gap-3 hover:scale-105 transition-all disabled:bg-slate-400"
               >
-                {isGenerating ? 'Gerando Arquivo Completo...' : (
+                {isGenerating ? 'Gerando...' : (
                   <>
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-                    Baixar Cronograma Completo (PDF)
+                    Baixar Cronograma PDF
                   </>
                 )}
               </button>
@@ -279,7 +294,6 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
               ))}
             </div>
 
-            {/* CONTAINER OCULTO PARA CRONOGRAMA PDF - DIVIDIDO EM PÁGINAS */}
             <div style={{ position: 'absolute', left: '-9999px', top: 0 }}>
               <div ref={cronogramaContainerRef}>
                 {chunkedSchedule.map((chunk, pIndex) => (
@@ -334,7 +348,6 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
           </div>
         )}
 
-        {/* OUTRAS TABS */}
         {activeTab === 'geral' && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
             <section>
