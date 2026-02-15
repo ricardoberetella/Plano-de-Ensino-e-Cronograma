@@ -259,7 +259,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
           <div className="space-y-8">
             <div className="flex justify-between items-center gap-6 border-b border-slate-100 pb-8">
               <div>
-                <h3 className="text-3xl font-[1000] text-slate-900 uppercase italic">Plano de Aula / Cronograma</h3>
+                <h3 className="text-3xl font-[1000] text-slate-900 uppercase italic">Plano de Ensino / Cronograma</h3>
                 <p className="text-slate-400 text-[10px] font-black uppercase tracking-widest">{localSchedule.length} Aulas Registradas</p>
               </div>
               <div className="flex gap-4">
@@ -307,18 +307,18 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
             <div style={{ position: 'absolute', left: '-9999px', top: 0 }}>
               <div ref={cronogramaContainerRef}>
                 {chunkedSchedule.map((chunk, pIndex) => (
-                  <div key={pIndex} style={{ width: '794px', height: '1123px', padding: '40px 50px 60px 50px', backgroundColor: 'white', display: 'flex', flexDirection: 'column', boxSizing: 'border-box', position: 'relative' }}>
+                  <div key={pIndex} style={{ width: '794px', height: '1123px', padding: '40px 50px 70px 50px', backgroundColor: 'white', display: 'flex', flexDirection: 'column', boxSizing: 'border-box', position: 'relative' }}>
                     {pIndex === 0 ? (
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '2.5pt solid #E30613', paddingBottom: '10px', marginBottom: '15px' }}>
                         <div style={{ background: '#E30613', color: 'white', padding: '8px 12px', fontSize: '20px', fontWeight: '800', fontStyle: 'italic' }}>SENAI</div>
                         <div style={{ textAlign: 'right', color: 'black' }}>
                           <h1 style={{ fontSize: '10px', fontWeight: '700', margin: 0, textTransform: 'uppercase' }}>Mecânico de Usinagem Convencional</h1>
-                          <p style={{ fontSize: '8px', margin: '2px 0 0 0', fontWeight: '500' }}>Plano de Aula / Cronograma - MSEP</p>
+                          <p style={{ fontSize: '8px', margin: '2px 0 0 0', fontWeight: '500' }}>Plano de Ensino / Cronograma - MSEP</p>
                         </div>
                       </div>
                     ) : (
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1.5pt solid #000', paddingBottom: '5px', marginBottom: '15px' }}>
-                        <div style={{ fontSize: '9px', fontWeight: '700', textTransform: 'uppercase', color: 'black' }}>Plano de Aula / Cronograma - Continuação</div>
+                        <div style={{ fontSize: '9px', fontWeight: '700', textTransform: 'uppercase', color: 'black' }}>Plano de Ensino / Cronograma - Continuação</div>
                         <div style={{ fontSize: '8px', fontWeight: '500', color: '#666' }}>Pág {pIndex + 1}</div>
                       </div>
                     )}
@@ -326,7 +326,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                     {pIndex === 0 && <h2 style={{ textAlign: 'center', fontWeight: '700', fontSize: '14px', textTransform: 'uppercase', margin: '5px 0', borderBottom: '1.5pt solid #000', paddingBottom: '5px', color: 'black' }}>Plano de Ensino / Cronograma</h2>}
                     <div style={{ marginBottom: '8px', fontSize: '10px', fontWeight: '700', color: 'black' }}>UC: {unit.name.toUpperCase()}</div>
                     
-                    <div style={{ border: '1.5pt solid #000', flex: 1, display: 'flex', flexDirection: 'column', backgroundColor: 'white' }}>
+                    <div style={{ border: '1.5pt solid #000', borderBottom: '2pt solid #000', flex: 1, display: 'flex', flexDirection: 'column', backgroundColor: 'white' }}>
                       <table style={{ width: '100%', borderCollapse: 'collapse', flex: 1 }}>
                         <thead>
                           <tr style={{ background: '#f5f5f5', borderBottom: '1.5pt solid #000' }}>
@@ -340,8 +340,8 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                             const realIdx = (pIndex * 12) + idx;
                             return (
                               <tr key={entry.id} style={{ borderBottom: '1pt solid #000' }}>
-                                <td style={{ borderRight: '1pt solid #000', padding: '6px', textAlign: 'center', fontSize: '11px', fontWeight: '700', color: '#000' }}>
-                                  {entry.date}<br/><span style={{ fontSize: '8px', color: '#444', fontWeight: '400' }}>AULA {realIdx + 1}</span>
+                                <td style={{ borderRight: '1pt solid #000', padding: '6px', textAlign: 'center', fontSize: '11px', fontWeight: '400', color: '#000' }}>
+                                  <strong style={{ fontWeight: '700' }}>{entry.date}</strong><br/><span style={{ fontSize: '8px', color: '#444', fontWeight: '400' }}>AULA {realIdx + 1}</span>
                                 </td>
                                 <td style={{ borderRight: '1pt solid #000', padding: '8px', fontSize: '11px', color: '#000', fontWeight: '400', lineHeight: '1.3' }}>
                                   <div style={{ fontWeight: '700', marginBottom: '2px', color: '#005DAA', fontSize: '8px' }}>{formatType(entry.knowledge)}</div>
@@ -399,7 +399,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                 <tr className="bg-slate-900 text-white">
                   <th className="p-6 text-[10px] font-black uppercase border border-slate-800">Referência</th>
                   <th className="p-6 text-[10px] font-black uppercase border border-slate-800 text-red-400">NSA</th>
-                  <th className="p-6 text-[10px] font-black uppercase border border-slate-800 text-orange-400">APO</th>
+                  <th className="p-6 text-[10px) font-black uppercase border border-slate-800 text-orange-400">APO</th>
                   <th className="p-6 text-[10px] font-black uppercase border border-slate-800 text-blue-400">PAR</th>
                   <th className="p-6 text-[10px] font-black uppercase border border-slate-800 text-green-400">AUT</th>
                 </tr>
