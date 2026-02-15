@@ -324,7 +324,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                       </div>
                     )}
                     
-                    {pIndex === 0 && <h2 style={{ textAlign: 'center', fontWeight: '700', fontSize: '14px', textTransform: 'uppercase', margin: '5px 0', borderBottom: '1.5pt solid #000', paddingBottom: '5px', color: 'black' }}>Planejamento Pedagógico</h2>}
+                    {pIndex === 0 && <h2 style={{ textAlign: 'center', fontWeight: '700', fontSize: '14px', textTransform: 'uppercase', margin: '5px 0', borderBottom: '1.5pt solid #000', paddingBottom: '5px', color: 'black' }}>Plano de Ensino / Cronograma</h2>}
                     <div style={{ marginBottom: '8px', fontSize: '10px', fontWeight: '700', color: 'black' }}>UC: {unit.name.toUpperCase()}</div>
                     
                     <div style={{ border: '1.5pt solid #000', flex: 1, display: 'flex', flexDirection: 'column', backgroundColor: 'white' }}>
