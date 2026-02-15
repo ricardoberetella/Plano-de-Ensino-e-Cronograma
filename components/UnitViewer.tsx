@@ -182,7 +182,6 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                       <ul className="space-y-3">
                         {sa.expectedResults.map((result, rIdx) => (
                           <li key={rIdx} className="flex gap-4 group">
-                            <span className="w-6 h-6 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center shrink-0 text-[10px] font-black">{rIdx + 1}</span>
                             <p className="text-slate-600 text-sm font-bold leading-tight pt-0.5">{result}</p>
                           </li>
                         ))}
@@ -219,24 +218,24 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                     <div style={{ fontSize: '13px', fontWeight: '900', borderBottom: '1.5pt solid #E30613', marginBottom: '15px', padding: '5px 0', textTransform: 'uppercase', color: 'black' }}>{sa.title}</div>
                     
                     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '15px' }}>
-                      {/* BLOCO I - CONTEXTUALIZAÇÃO (Fonte aumentada e espaçamento melhorado) */}
+                      {/* BLOCO I - CONTEXTUALIZAÇÃO */}
                       <div style={{ border: '1pt solid #000', padding: '15px', minHeight: '180px', display: 'flex', flexDirection: 'column' }}>
                         <div style={{ fontWeight: '900', fontSize: '10px', color: '#E30613', textTransform: 'uppercase', marginBottom: '8px' }}>I. Contextualização / Situação-Problema</div>
                         <div style={{ fontSize: '12px', lineHeight: '1.5', color: 'black', textAlign: 'justify' }}>{sa.context}</div>
                       </div>
                       
-                      {/* BLOCO II - DESAFIO (Fonte aumentada e espaçamento melhorado) */}
+                      {/* BLOCO II - DESAFIO */}
                       <div style={{ border: '1pt solid #000', padding: '15px', background: '#fdfdfd', minHeight: '220px', display: 'flex', flexDirection: 'column' }}>
                         <div style={{ fontWeight: '900', fontSize: '10px', color: '#E30613', textTransform: 'uppercase', marginBottom: '8px' }}>II. Desafio Proposto</div>
                         <div style={{ fontSize: '12px', lineHeight: '1.5', color: 'black', fontStyle: 'italic', fontWeight: '600' }}>{sa.challenge}</div>
                       </div>
                       
-                      {/* BLOCO III - RESULTADOS (Garantindo que apareça completo) */}
+                      {/* BLOCO III - RESULTADOS (REMOÇÃO DOS NÚMEROS 1-5) */}
                       <div style={{ border: '1pt solid #000', padding: '15px', display: 'flex', flexDirection: 'column' }}>
                         <div style={{ fontWeight: '900', fontSize: '10px', color: '#E30613', textTransform: 'uppercase', marginBottom: '8px' }}>III. Resultados Esperados / Entregas</div>
-                        <ul style={{ paddingLeft: '22px', marginTop: '4px' }}>
+                        <ul style={{ paddingLeft: '0px', marginTop: '4px', listStyleType: 'none' }}>
                           {sa.expectedResults.map((res, ri) => (
-                            <li key={ri} style={{ fontSize: '11.5px', marginBottom: '6px', listStyleType: 'decimal', color: 'black', lineHeight: '1.4' }}>{res}</li>
+                            <li key={ri} style={{ fontSize: '11.5px', marginBottom: '6px', color: 'black', lineHeight: '1.4' }}>{res}</li>
                           ))}
                         </ul>
                       </div>
