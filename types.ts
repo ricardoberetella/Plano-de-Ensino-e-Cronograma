@@ -1,5 +1,5 @@
 
-export type ViewType = 'dashboard' | 'plano-curso' | 'plano-ensino' | 'cronograma' | 'situacoes' | 'calendario' | 'editor';
+export type ViewType = 'dashboard' | 'plano-curso' | 'plano-ensino' | 'cronograma' | 'situacoes' | 'calendario' | 'editor' | 'plano-demonstracao';
 
 export type CalendarColor = 'yellow' | 'green' | 'blue' | 'red' | 'cyan' | 'orange' | 'purple' | 'pink' | 'white' | 'none';
 

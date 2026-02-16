@@ -40,11 +40,19 @@ const Dashboard: React.FC<DashboardProps> = ({ plans, onEdit, onView, onRefresh 
           </div>
           <p className="mt-1 text-slate-400 text-[9px] font-bold uppercase">Firebase: Conectado</p>
         </div>
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-          <p className="text-slate-500 text-[10px] font-black uppercase tracking-widest">IA Assistente</p>
-          <h3 className="text-3xl font-black mt-1 text-blue-600">Proeducador</h3>
-          <p className="mt-1 text-slate-400 text-[9px] font-bold uppercase">Base Oficial Ativa</p>
-        </div>
+        <a 
+          href="https://plano-de-demonstra-es.vercel.app/" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:border-blue-600 transition-all group cursor-pointer block"
+        >
+          <p className="text-slate-500 text-[10px] font-black uppercase tracking-widest">Ferramenta Auxiliar</p>
+          <div className="flex items-center justify-between mt-1">
+            <h3 className="text-2xl font-black text-blue-600 uppercase group-hover:text-blue-700">Plano de Demonstração</h3>
+            <svg className="w-5 h-5 text-blue-400 group-hover:text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+          </div>
+          <p className="mt-1 text-slate-400 text-[9px] font-bold uppercase">Acesso Externo Vercel</p>
+        </a>
       </div>
 
       <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
