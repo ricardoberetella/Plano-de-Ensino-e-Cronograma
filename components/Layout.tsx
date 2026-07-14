@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { ViewType } from '../types';
 
@@ -9,6 +8,9 @@ interface LayoutProps {
   onLogout?: () => void;
   activeProfileId?: string;
   onProfileChange?: (id: string) => void;
+  // Novas propriedades integradas do estado global de semestre
+  semestre: 1 | 2;
+  onSemestreChange: (semestre: 1 | 2) => void;
 }
 
 interface Profile {
@@ -24,7 +26,9 @@ const Layout: React.FC<LayoutProps> = ({
   onViewChange, 
   onLogout, 
   activeProfileId = 'beretella',
-  onProfileChange 
+  onProfileChange,
+  semestre,
+  onSemestreChange
 }) => {
   const profiles: Profile[] = [
     { id: 'beretella', name: 'Ricardo Beretella', initials: 'RB', tags: 'LIDT | CRD | FUSI' },
@@ -49,16 +53,60 @@ const Layout: React.FC<LayoutProps> = ({
   return (
     <div className="flex h-screen bg-slate-100 overflow-hidden font-sans">
       <aside className="w-16 md:w-52 bg-slate-900 text-white flex flex-col flex-shrink-0 shadow-2xl transition-all duration-300">
-        <div className="p-3 md:p-4 flex-1">
-          <div className="mb-8 text-center">
+        <div className="p-3 md:p-4 flex-1 flex flex-col min-h-0">
+          
+          {/* Logo SENAI */}
+          <div className="mb-6 text-center shrink-0">
             <div className="inline-block bg-[#E30613] px-2 py-1.5 md:px-4 md:py-2 rounded-sm shadow-md cursor-pointer" onClick={() => onViewChange('dashboard')}>
               <h2 className="text-white font-[1000] italic text-xl md:text-3xl tracking-[-0.08em] leading-none select-none transform skew-x-[-4deg]">
                 SENAI
               </h2>
             </div>
           </div>
+
+          {/* NOVO: Seletor de Semestre Visual e Seguro */}
+          <div className="mb-6 px-1 shrink-0">
+            {/* Visual para telas maiores (Desktop) */}
+            <div className="hidden md:block">
+              <p className="text-[7px] font-black uppercase text-slate-500 mb-2 ml-1 tracking-widest">Período de Curso</p>
+              <div className="bg-slate-950 p-1 rounded-xl flex gap-1 border border-slate-800">
+                <button
+                  onClick={() => onSemestreChange(1)}
+                  className={`flex-1 text-center py-2 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all ${
+                    semestre === 1 
+                      ? 'bg-blue-600 text-white shadow-md' 
+                      : 'text-slate-400 hover:text-white hover:bg-slate-900/50'
+                  }`}
+                >
+                  1º Sem
+                </button>
+                <button
+                  onClick={() => onSemestreChange(2)}
+                  className={`flex-1 text-center py-2 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all ${
+                    semestre === 2 
+                      ? 'bg-blue-600 text-white shadow-md' 
+                      : 'text-slate-400 hover:text-white hover:bg-slate-900/50'
+                  }`}
+                >
+                  2º Sem
+                </button>
+              </div>
+            </div>
+
+            {/* Visual compacto para telas menores (Mobile/Comprimido) */}
+            <div className="block md:hidden text-center">
+              <button
+                onClick={() => onSemestreChange(semestre === 1 ? 2 : 1)}
+                className="w-8 h-8 rounded-full bg-slate-950 border border-slate-800 flex items-center justify-center text-[10px] font-black text-blue-400 hover:bg-blue-600 hover:text-white transition-all shadow-inner"
+                title={`Mudar para o ${semestre === 1 ? '2º' : '1º'} Semestre`}
+              >
+                {semestre}º
+              </button>
+            </div>
+          </div>
           
-          <nav className="space-y-1.5">
+          {/* Menu Lateral de Navegação */}
+          <nav className="space-y-1.5 overflow-y-auto flex-1 custom-scrollbar pr-1">
             {menuItems.map(item => (
               <button 
                 key={item.id}
@@ -73,9 +121,10 @@ const Layout: React.FC<LayoutProps> = ({
           </nav>
         </div>
         
-        <div className="p-2 md:p-3 m-2 space-y-2">
+        {/* Painel Inferior: Perfis e Logout */}
+        <div className="p-2 md:p-3 m-2 space-y-2 shrink-0 border-t border-slate-800/60 pt-3">
           <div className="bg-slate-800/40 rounded-xl border border-slate-700/30 p-1.5">
-             <p className="text-[7px] font-black uppercase text-slate-500 mb-1 ml-1 hidden md:block tracking-widest">Professor Ativo</p>
+            <p className="text-[7px] font-black uppercase text-slate-500 mb-1 ml-1 hidden md:block tracking-widest">Professor Ativo</p>
             <div className="space-y-1.5">
               {profiles.map((profile) => (
                 <button 
@@ -111,6 +160,7 @@ const Layout: React.FC<LayoutProps> = ({
         </div>
       </aside>
 
+      {/* Conteúdo Principal */}
       <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
         <header className="bg-white border-b border-slate-200 h-14 flex items-center px-4 md:px-8 justify-between z-10 shadow-sm">
           <div className="flex items-center gap-2 md:gap-4 overflow-hidden">
@@ -118,8 +168,10 @@ const Layout: React.FC<LayoutProps> = ({
               {menuItems.find(i => i.id === activeView)?.label || 'Painel'}
             </h1>
             <span className="h-3 w-px bg-slate-200 flex-shrink-0"></span>
+            
+            {/* Dinâmico: Exibe o semestre ativamente no cabeçalho do curso */}
             <span className="text-[8px] md:text-[9px] font-black text-blue-600 bg-blue-50 px-2 py-0.5 rounded uppercase tracking-tight truncate">
-              Mecânico de Usinagem Convencional
+              Mecânico de Usinagem Convencional - {semestre}º Semestre
             </span>
           </div>
           <div className="flex items-center gap-4">
