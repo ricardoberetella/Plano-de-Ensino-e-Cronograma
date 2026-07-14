@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import Layout from './components/Layout';
 import Dashboard from './components/Dashboard';
@@ -6,7 +5,7 @@ import PlanForm from './components/PlanForm';
 import UnitViewer from './components/UnitViewer';
 import Login from './components/Login';
 import GeneralCalendar from './components/GeneralCalendar';
-import { TeachingPlan, ViewType, CurricularUnit, ScheduleEntry, UnitCalendar, CalendarMarking, CalendarColor } from './types';
+import { TeachingPlan, ViewType, CurricularUnit, ScheduleEntry, UnitCalendar } from './types';
 import { SAMPLE_PLANS, SCHEDULE_VERSION } from './constants';
 import { FirebaseService } from './services/firebase';
 
@@ -18,29 +17,55 @@ const App: React.FC = () => {
   const [currentPlan, setCurrentPlan] = useState<TeachingPlan | null>(null);
   const [selectedUnit, setSelectedUnit] = useState<CurricularUnit | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  
+  // NOVO: Estado global de semestre para isolamento completo (padrão: 1º semestre)
+  const [semestre, setSemestre] = useState<1 | 2>(1);
 
-  const loadPlans = useCallback(async (profileId: string) => {
+  // Define o ID do plano baseado no perfil e no semestre selecionado
+  const getPlanId = useCallback((profileId: string, semNum: number) => {
+    return semNum === 1 
+      ? `plan-usinagem-${profileId}` 
+      : `plan-usinagem-${profileId}-sem2`;
+  }, []);
+
+  const loadPlans = useCallback(async (profileId: string, semNum: number) => {
     setIsLoading(true);
     try {
       const dbPlans = await FirebaseService.getPlans(profileId);
+      const targetPlanId = getPlanId(profileId, semNum);
       
-      if (!dbPlans || dbPlans.length === 0) {
-        const template = SAMPLE_PLANS.find(p => p.profileId === profileId) || SAMPLE_PLANS[0];
-        const defaultPlan = { 
+      // Filtra os planos salvos no banco que correspondem ao semestre atual
+      const filteredPlans = dbPlans.filter(p => p.id === targetPlanId);
+
+      if (!filteredPlans || filteredPlans.length === 0) {
+        // Busca os dados iniciais do template no constants.tsx
+        // Se for semestre 2, tenta buscar SAMPLE_PLANS do semestre 2 (ex: id finaliza em -sem2 ou propriedade específica), se não clona o padrão
+        const template = SAMPLE_PLANS.find(p => p.profileId === profileId && (semNum === 2 ? p.id.includes('sem2') : !p.id.includes('sem2'))) 
+          || SAMPLE_PLANS.find(p => p.profileId === profileId) 
+          || SAMPLE_PLANS[0];
+
+        const defaultPlan: TeachingPlan = { 
           ...template, 
-          id: `plan-usinagem-${profileId}`, 
+          id: targetPlanId, 
           profileId: profileId,
+          courseName: semNum === 1 ? template.courseName : `${template.courseName} - 2º SEMESTRE`,
           version: SCHEDULE_VERSION,
           updatedAt: new Date().toISOString()
         };
+
         await FirebaseService.savePlan(defaultPlan);
         const refreshed = await FirebaseService.getPlans(profileId);
-        setPlans(refreshed);
-        setCurrentPlan(refreshed[0]);
-        setSelectedUnit(refreshed[0].units[0]);
+        const semRefreshed = refreshed.filter(p => p.id === targetPlanId);
+        
+        setPlans(semRefreshed);
+        setCurrentPlan(semRefreshed[0]);
+        setSelectedUnit(semRefreshed[0].units[0]);
       } else {
-        const processedPlans = await Promise.all(dbPlans.map(async (plan) => {
-          const template = SAMPLE_PLANS.find(p => p.profileId === profileId) || SAMPLE_PLANS[0];
+        const processedPlans = await Promise.all(filteredPlans.map(async (plan) => {
+          const template = SAMPLE_PLANS.find(p => p.profileId === profileId && (semNum === 2 ? p.id.includes('sem2') : !p.id.includes('sem2'))) 
+            || SAMPLE_PLANS.find(p => p.profileId === profileId) 
+            || SAMPLE_PLANS[0];
+            
           let updated = false;
           
           template.units.forEach(tUnit => {
@@ -70,7 +95,9 @@ const App: React.FC = () => {
         }));
 
         setPlans(processedPlans);
-        if (currentPlan) {
+        
+        // Mantém a unidade selecionada caso o usuário já estivesse nela
+        if (currentPlan && currentPlan.id === targetPlanId) {
           const updatedCurrent = processedPlans.find(p => p.id === currentPlan.id);
           if (updatedCurrent) {
             setCurrentPlan(updatedCurrent);
@@ -81,7 +108,7 @@ const App: React.FC = () => {
           }
         } else {
           setCurrentPlan(processedPlans[0]);
-          setSelectedUnit(processedPlans[0].units[0]);
+          setSelectedUnit(processedPlans[0]?.units[0] || null);
         }
       }
     } catch (err) {
@@ -89,20 +116,21 @@ const App: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [activeProfileId, currentPlan, selectedUnit]);
+  }, [getPlanId, currentPlan, selectedUnit]);
 
+  // Recarrega os planos sempre que o semestre ou perfil mudar
   useEffect(() => {
     if (isAuthenticated) {
-      loadPlans(activeProfileId);
+      loadPlans(activeProfileId, semestre);
     }
-  }, [activeProfileId, isAuthenticated]);
+  }, [activeProfileId, isAuthenticated, semestre]);
 
   const handleSave = async (updatedPlan: TeachingPlan) => {
-    const planToSave = { ...updatedPlan, profileId: activeProfileId };
+    const planToSave = { ...updatedPlan, id: getPlanId(activeProfileId, semestre), profileId: activeProfileId };
     try {
       await FirebaseService.savePlan(planToSave);
       const refreshed = await FirebaseService.getPlans(activeProfileId);
-      setPlans(refreshed);
+      setPlans(refreshed.filter(p => p.id === planToSave.id));
       setView('dashboard');
     } catch (error) {
       console.error("Erro ao salvar dados:", error);
@@ -129,6 +157,7 @@ const App: React.FC = () => {
   const handleLogout = () => {
     setIsAuthenticated(false);
     setView('dashboard');
+    setSemestre(1); // Reseta para o padrão
   };
 
   const handleProfileChange = (profileId: string) => {
@@ -156,6 +185,9 @@ const App: React.FC = () => {
       onLogout={handleLogout}
       activeProfileId={activeProfileId}
       onProfileChange={handleProfileChange}
+      // Passando as novas propriedades de semestre para o Layout
+      semestre={semestre}
+      onSemestreChange={setSemestre}
     >
       {isLoading ? (
         <div className="flex flex-col items-center justify-center h-full space-y-4">
@@ -164,7 +196,7 @@ const App: React.FC = () => {
         </div>
       ) : (
         <>
-          {view === 'dashboard' && <Dashboard plans={plans} onEdit={(p) => { setCurrentPlan(p); setView('editor'); }} onView={(p) => { setCurrentPlan(p); setSelectedUnit(p.units[0]); setView('plano-curso'); }} onRefresh={() => loadPlans(activeProfileId)} />}
+          {view === 'dashboard' && <Dashboard plans={plans} onEdit={(p) => { setCurrentPlan(p); setView('editor'); }} onView={(p) => { setCurrentPlan(p); setSelectedUnit(p.units[0]); setView('plano-curso'); }} onRefresh={() => loadPlans(activeProfileId, semestre)} />}
           
           {view === 'plano-curso' && currentPlan && (
             <div className="max-w-4xl mx-auto space-y-10 animate-fadeIn pb-20">
