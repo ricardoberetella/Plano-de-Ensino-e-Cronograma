@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import Layout from './components/Layout';
 import Dashboard from './components/Dashboard';
@@ -25,7 +24,7 @@ const App: React.FC = () => {
       const dbPlans = await FirebaseService.getPlans(profileId);
       
       if (!dbPlans || dbPlans.length === 0) {
-        const template = SAMPLE_PLANS.find(p => p.profileId === profileId) || SAMPLE_PLANS[0];
+        const template = SAMPLE_PLANS.find(p => (p as any).profileId === profileId) || SAMPLE_PLANS[0];
         const defaultPlan = { 
           ...template, 
           id: `plan-usinagem-${profileId}`, 
@@ -40,7 +39,7 @@ const App: React.FC = () => {
         setSelectedUnit(refreshed[0].units[0]);
       } else {
         const processedPlans = await Promise.all(dbPlans.map(async (plan) => {
-          const template = SAMPLE_PLANS.find(p => p.profileId === profileId) || SAMPLE_PLANS[0];
+          const template = SAMPLE_PLANS.find(p => (p as any).profileId === profileId) || SAMPLE_PLANS[0];
           let updated = false;
           
           template.units.forEach(tUnit => {
