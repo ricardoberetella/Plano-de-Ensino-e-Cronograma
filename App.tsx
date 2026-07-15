@@ -1,4 +1,6 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+// C:/Users/Aluno/Desktop/Plano-de-Ensino-e-Cronograma/App.tsx
+
+import React, { useState, useEffect, useCallback } from 'react';
 import Layout from './components/Layout';
 import Dashboard from './components/Dashboard';
 import PlanForm from './components/PlanForm';
@@ -18,7 +20,7 @@ const App: React.FC = () => {
   const [selectedUnit, setSelectedUnit] = useState<CurricularUnit | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   
-  // NOVO: Estado global de semestre para isolamento completo (padrão: 1º semestre)
+  // Estado global de semestre para isolamento completo (padrão: 1º semestre)
   const [semestre, setSemestre] = useState<1 | 2>(1);
 
   // Define o ID do plano baseado no perfil e no semestre selecionado
@@ -39,7 +41,6 @@ const App: React.FC = () => {
 
       if (!filteredPlans || filteredPlans.length === 0) {
         // Busca os dados iniciais do template no constants.tsx
-        // Se for semestre 2, tenta buscar SAMPLE_PLANS do semestre 2 (ex: id finaliza em -sem2 ou propriedade específica), se não clona o padrão
         const template = SAMPLE_PLANS.find(p => p.profileId === profileId && (semNum === 2 ? p.id.includes('sem2') : !p.id.includes('sem2'))) 
           || SAMPLE_PLANS.find(p => p.profileId === profileId) 
           || SAMPLE_PLANS[0];
@@ -58,8 +59,8 @@ const App: React.FC = () => {
         const semRefreshed = refreshed.filter(p => p.id === targetPlanId);
         
         setPlans(semRefreshed);
-        setCurrentPlan(semRefreshed[0]);
-        setSelectedUnit(semRefreshed[0].units[0]);
+        setCurrentPlan(semRefreshed[0] || null);
+        setSelectedUnit(semRefreshed[0]?.units?.[0] || null);
       } else {
         const processedPlans = await Promise.all(filteredPlans.map(async (plan) => {
           const template = SAMPLE_PLANS.find(p => p.profileId === profileId && (semNum === 2 ? p.id.includes('sem2') : !p.id.includes('sem2'))) 
@@ -68,22 +69,32 @@ const App: React.FC = () => {
             
           let updated = false;
           
+          // Garante a inicialização das listas essenciais para evitar erros de undefined
+          plan.units = plan.units || [];
+          template.units = template.units || [];
+          
           template.units.forEach(tUnit => {
-            const hasUnit = plan.units.some(u => u.name === tUnit.name);
+            const hasUnit = plan.units.some(u => u && u.name === tUnit.name);
             if (!hasUnit) {
               plan.units.push(tUnit);
               updated = true;
             }
           });
 
-          const fusi = plan.units.find(u => u.id.toLowerCase().includes('fusi') || u.name.toUpperCase().includes('FUNDAMENTOS'));
-          if (fusi && (plan as any).version !== SCHEDULE_VERSION) {
-            const tFusi = template.units.find(u => u.id.toLowerCase().includes('fusi') || u.name.toUpperCase().includes('FUNDAMENTOS'));
-            if (tFusi) {
-              const idx = plan.units.indexOf(fusi);
-              plan.units[idx] = { ...tFusi };
-              (plan as any).version = SCHEDULE_VERSION;
-              updated = true;
+          // Encontra se existe resquício de FUSI ou a nova unidade PRUC
+          const oldUnit = plan.units.find(u => u && (u.id.toLowerCase().includes('fusi') || u.name.toUpperCase().includes('FUNDAMENTOS')));
+          const newUnit = plan.units.find(u => u && (u.id.toLowerCase().includes('pruc') || u.name.toUpperCase().includes('PROCESSOS')));
+
+          // Migração inteligente caso as versões de agendamento divirjam
+          if ((oldUnit || newUnit) && (plan as any).version !== SCHEDULE_VERSION) {
+            const targetTemplateUnit = template.units.find(u => u && (u.id.toLowerCase().includes('pruc') || u.name.toUpperCase().includes('PROCESSOS')));
+            if (targetTemplateUnit) {
+              const idx = plan.units.indexOf(oldUnit || newUnit!);
+              if (idx !== -1) {
+                plan.units[idx] = { ...targetTemplateUnit };
+                (plan as any).version = SCHEDULE_VERSION;
+                updated = true;
+              }
             }
           }
 
@@ -107,8 +118,8 @@ const App: React.FC = () => {
             }
           }
         } else {
-          setCurrentPlan(processedPlans[0]);
-          setSelectedUnit(processedPlans[0]?.units[0] || null);
+          setCurrentPlan(processedPlans[0] || null);
+          setSelectedUnit(processedPlans[0]?.units?.[0] || null);
         }
       }
     } catch (err) {
@@ -168,11 +179,15 @@ const App: React.FC = () => {
   };
 
   const getUnitSigla = (unit: CurricularUnit) => {
+    if (!unit || !unit.name) return '';
     const name = unit.name.toUpperCase();
     const id = unit.id.toLowerCase();
+    
     if (name.includes('LEITURA') || name.includes('DESENHO') || id.includes('lidt')) return 'LIDT';
     if (name.includes('CONTROLE') || name.includes('DIMENSIONAL') || id.includes('crd')) return 'CRD';
+    if (name.includes('PROCESSOS') || name.includes('PRUC') || id.includes('pruc')) return 'PRUC';
     if (name.includes('FUNDAMENTOS') || name.includes('USINAGEM') || id.includes('fusi')) return 'FUSI';
+    
     return unit.name.split(' ').map(w => w[0]).join('').toUpperCase();
   };
 
@@ -185,7 +200,6 @@ const App: React.FC = () => {
       onLogout={handleLogout}
       activeProfileId={activeProfileId}
       onProfileChange={handleProfileChange}
-      // Passando as novas propriedades de semestre para o Layout
       semestre={semestre}
       onSemestreChange={setSemestre}
     >
@@ -196,7 +210,14 @@ const App: React.FC = () => {
         </div>
       ) : (
         <>
-          {view === 'dashboard' && <Dashboard plans={plans} onEdit={(p) => { setCurrentPlan(p); setView('editor'); }} onView={(p) => { setCurrentPlan(p); setSelectedUnit(p.units[0]); setView('plano-curso'); }} onRefresh={() => loadPlans(activeProfileId, semestre)} />}
+          {view === 'dashboard' && (
+            <Dashboard 
+              plans={plans} 
+              onEdit={(p) => { setCurrentPlan(p); setView('editor'); }} 
+              onView={(p) => { setCurrentPlan(p); setSelectedUnit(p.units?.[0] || null); setView('plano-curso'); }} 
+              onRefresh={() => loadPlans(activeProfileId, semestre)} 
+            />
+          )}
           
           {view === 'plano-curso' && currentPlan && (
             <div className="max-w-4xl mx-auto space-y-10 animate-fadeIn pb-20">
@@ -217,7 +238,7 @@ const App: React.FC = () => {
               <div className="bg-slate-900 rounded-[2.5rem] p-8 md:p-12 text-white shadow-2xl">
                 <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 mb-8">III. Unidades Curriculares</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                  {currentPlan.units.map((unit, idx) => (
+                  {(currentPlan.units || []).map((unit, idx) => (
                     <button key={unit.id} onClick={() => { setSelectedUnit(unit); setView('plano-ensino'); }} className="bg-slate-800 p-8 rounded-3xl text-left hover:bg-blue-600 transition-all group relative overflow-hidden">
                       <span className="text-6xl font-black opacity-5 absolute -right-2 -bottom-2">0{idx + 1}</span>
                       <p className="text-[9px] font-black text-blue-400 mb-2">{getUnitSigla(unit)}</p>
@@ -232,7 +253,7 @@ const App: React.FC = () => {
           {view === 'plano-ensino' && currentPlan && selectedUnit && (
             <div className="space-y-8 max-w-7xl mx-auto pb-20">
               <div className="flex gap-2 overflow-x-auto pb-4 scrollbar-hide px-1">
-                {currentPlan.units.map(u => (
+                {(currentPlan.units || []).map(u => (
                   <button 
                     key={u.id} 
                     onClick={() => setSelectedUnit(u)} 
@@ -248,7 +269,7 @@ const App: React.FC = () => {
                 onUpdateCalendar={(newCal) => handleUpdateCalendar(selectedUnit.id, newCal)}
                 onUpdateUnit={(updatedUnit) => {
                   if (!currentPlan) return;
-                  const updatedUnits = currentPlan.units.map(u => u.id === updatedUnit.id ? updatedUnit : u);
+                  const updatedUnits = (currentPlan.units || []).map(u => u.id === updatedUnit.id ? updatedUnit : u);
                   const updatedPlan = { ...currentPlan, units: updatedUnits };
                   setCurrentPlan(updatedPlan);
                   FirebaseService.savePlan(updatedPlan);
