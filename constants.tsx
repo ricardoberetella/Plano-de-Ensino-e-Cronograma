@@ -21,7 +21,10 @@ export const SAMPLE_PLANS: TeachingPlan[] = [
     startDate: "2026-01-26",
     endDate: "2026-06-22",
     totalHours: 240,
-    status: "active"
+    status: "active",
+    schedule: [], // Evita o erro de undefined .forEach no carregamento do cronograma
+    entries: [],  // Evita possíveis erros caso a estrutura use 'entries'
+    units: []     // Evita possíveis erros caso a estrutura use 'units'
   }
 ];
 
@@ -47,7 +50,7 @@ export const LIDT_SCHEDULE = [
   { id: 'l14', date: '11/05/2026', hours: 2, capacities: 'Interpretar acabamento superficial.', knowledge: '6.3. Acabamento superficial (rugosidade).', strategy: '• Explicação dos símbolos de acabamento.', resources: 'Tabela de símbolos.' },
   { id: 'l15', date: '18/05/2026', hours: 2, capacities: 'Todas as capacities da SA.', knowledge: 'Todos os conhecimentos da SA.', strategy: '• Início da elaboration dos croquis detalhados.', resources: 'Papel, instrumentos de desenho.' },
   { id: 'l16', date: '25/05/2026', hours: 2, capacities: 'Todas as capacities da SA.', knowledge: 'Todos os conhecimentos da SA.', strategy: '• Continuação e refinamento dos croquis.', resources: 'Dossiê em fase de conclusão.' },
-  { id: 'l17', date: '01/06/2026', hours: 2, capacities: 'Todas as capacities da SA.', knowledge: 'Todos os conhecimentos da SA.', strategy: '• Finalização dos croquis and do dossiê técnico.', resources: 'Dossiê técnico.' },
+  { id: 'l17', date: '01/06/2026', hours: 2, capacities: 'Todas as capacities da SA.', knowledge: 'Todos os conhecimentos da SA.', strategy: '• Finalização dos croquis e do dossiê técnico.', resources: 'Dossiê técnico.' },
   { id: 'l18', date: '08/06/2026', hours: 2, capacities: 'Todas as capacities da SA.', knowledge: 'Todos os conhecimentos da SA.', strategy: '• Apresentação dos Resultados e Dossiês.', resources: 'Projetor.' },
   { id: 'l19', date: '15/06/2026', hours: 2, capacities: 'Todas as capacities da SA.', knowledge: 'Todos os conhecimentos da SA.', strategy: '• Feedback e Avaliação final.', resources: 'Fichas de avaliação.' },
   { id: 'l20', date: '22/06/2026', hours: 2, capacities: 'Todas as capacities da SA.', knowledge: 'Fechamento de Notas.', strategy: '• Encerramento da Unidade Curricular.', resources: 'Diário de classe.' }
@@ -98,7 +101,7 @@ export const FUSI_SCHEDULE = [
   { id: 'f21', hours: 4, date: '18/03/2026', capacities: 'Realizar operações de furação de acordo com as especificações, normas técnicas e de saúde e segurança no trabalho; Realizar operações de rosqueamento de acordo com as especificações, normas técnicas e de saúde e segurança no trabalho.', knowledge: 'Furação e Rosqueamento', strategy: 'Estudo técnico sobre furação coordenada e tabelas de roscas.', resources: 'Sala de aula.' },
   { id: 'f22', hours: 4, date: '19/03/2026', capacities: 'Realizar operações de furação de acordo com as especificações, normas técnicas e de saúde e segurança no trabalho; Realizar operações de rosqueamento de acordo com as especificações, normas técnicas e de saúde e segurança no trabalho.', knowledge: 'Operações de Furação', strategy: 'Desafio 1: Furação e rosqueamento de componentes.', resources: 'Oficina de usinagem.' },
   { id: 'f23', hours: 4, date: '23/03/2026', capacities: 'Realizar operações de furação de acordo com as especificações, normas técnicas e de saúde e segurança no trabalho; Controlar a qualidade das peças usinadas em tornos e fresadoras convencionais, visualmente e por meio de instrumentos de acordo com as especificações técnicas.', knowledge: 'Fresagem e Controle', strategy: 'Desafio 1: Furação coordenada do corpo do calculador.', resources: 'Oficina de usinagem, Fresadora.' },
-  { id: 'f24', hours: 4, date: '25/03/2026', knowledge: 'Manutenção e Segurança', capacities: 'Relacionar os tipos de manutenção à sua aplicação na indústria; Elaborar plano de trabalho de acordo com normas e procedimentos de meio ambiente, de saúde e segurança no trabalho.', strategy: 'Teoria sobre descarte de resíduos e lubrificação de máquinas.', resources: 'Sala de aula.' },
+  { id: 'f24', hours: 4, date: '25/03/2026', knowledge: 'Manutenção e Segurança', capacities: 'Relacionar os types de manutenção à sua aplicação na indústria; Elaborar plano de trabalho de acordo com normas e procedimentos de meio ambiente, de saúde e segurança no trabalho.', strategy: 'Teoria sobre descarte de resíduos e lubrificação de máquinas.', resources: 'Sala de aula.' },
   { id: 'f25', hours: 4, date: '26/03/2026', capacities: 'Realizar operações de baixa complexidade em torno convencional de acordo com as especificações, normas técnicas e de saúde e segurança no trabalho; Controlar a qualidade das peças usinadas em tornos e fresadoras convencionais, visualmente e por meio de instrumentos de acordo com as especificações técnicas.', knowledge: 'Operações de Torno', strategy: 'Desafio 1: Acabamento de diâmetros críticos (Torno).', resources: 'Oficina de usinagem, Torno.' },
   { id: 'f26', hours: 4, date: '30/03/2026', capacities: 'Realizar operações de baixa complexidade em fresadora convencional de acordo com as especificações, normas técnicas e de saúde e segurança no trabalho.', knowledge: 'Fresagem Convencional', strategy: 'Desafio 1: Acabamento final das faces do bloco.', resources: 'Oficina de usinagem, Fresadora.' },
   { id: 'f27', hours: 4, date: '01/04/2026', capacities: 'Controlar a qualidade das peças usinadas em tornos e fresadoras convencionais, visualmente e por meio de instrumentos de acordo com as especificações técnicas.', knowledge: 'Qualidade Industrial', strategy: 'Documentação de controle de qualidade (Teoria).', resources: 'Sala de aula.' },
