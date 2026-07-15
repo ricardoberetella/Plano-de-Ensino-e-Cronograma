@@ -5,14 +5,13 @@ import { TeachingPlan, CurricularUnit } from './types';
 export const SENAI_BLUE = "#005DAA";
 export const SENAI_RED = "#E30613";
 
-// Versão do cronograma atualizada para o 2º Semestre (FUSI alterada para PRUC)
-export const SCHEDULE_VERSION = "2026-V21-PRUC-160H";
+// Versão do cronograma atualizada para o 2º Semestre (PRUSC - 160H)
+export const SCHEDULE_VERSION = "2026-V22-PRUSC-160H";
 
 // ============================================================================
-// ==================== CRONOGRAMAS: 1º SEMESTRE ========================
+// ==================== CRONOGRAMAS: 1º SEMESTRE ==============================
 // ============================================================================
 
-// --- CRONOGRAMA LIDT (1º Semestre - Leitura e Interpretação de Desenho Técnico) ---
 export const LIDT_SCHEDULE = [
   { id: 'l1', date: '26/01/2026', hours: 2, capacities: 'Todas as capacities da SA', knowledge: '1.1. Definição de Desenho Técnico', strategy: '• Exposição dialogada; • Apresentação da UC, do MSEP e da Situação de Aprendizagem "Decifrando o Projeto".', resources: 'Sala de aula, projetor.' },
   { id: 'l2', date: '02/02/2026', hours: 2, capacities: 'Interpretar desenhos técnicos de peças.', knowledge: '1.2. Normas técnicas; 1.3. Formatos de folha; 1.4. Linhas.', strategy: '• Exposição dialogada: Apresentação das normas ABNT.', resources: 'Exemplos de desenhos técnicos.' },
@@ -36,7 +35,6 @@ export const LIDT_SCHEDULE = [
   { id: 'l20', date: '22/06/2026', hours: 2, capacities: 'Todas as capacities da SA.', knowledge: 'Fechamento de Notas.', strategy: '• Encerramento da Unidade Curricular.', resources: 'Diário de classe.' }
 ];
 
-// --- CRONOGRAMA CRD (1º Semestre - Controle Rápido Dimensional) ---
 export const CRD_SCHEDULE = [
   { id: 'c1', date: '27/01/2026', hours: 2, capacities: 'I. Identificar a importância da metrologia.', knowledge: '1. Metrologia', strategy: 'Apresentação da SA. Exposição dialogada.', resources: 'Projetor.' },
   { id: 'c2', date: '03/02/2026', hours: 2, capacities: 'I. Identificar a importância da metrologia.', knowledge: '2. Erros de medição', strategy: 'Discussão em grupo sobre tipos de erro.', resources: 'Instrumentos de medição.' },
@@ -54,13 +52,12 @@ export const CRD_SCHEDULE = [
   { id: 'c14', date: '12/05/2026', hours: 2, capacities: 'VIII. Controlar dimensões.', knowledge: '9.2 Ajustes recomendados.', strategy: 'Estudo prático de montagens mecânicas.', resources: 'Desenhos técnicos.' },
   { id: 'c15', date: '19/05/2026', hours: 2, capacities: 'IX. Registrar desvios de medidas.', knowledge: '10. Prontuário de qualidade.', strategy: 'Preenchimento de relatórios e controle.', resources: 'Folhas de registro.' },
   { id: 'c16', date: '26/05/2026', hours: 2, capacities: 'IX. Registrar desvios de medidas.', knowledge: '10.2 Cartas de controle.', strategy: 'Exercício de registro estatístico básico.', resources: 'Planilhas.' },
-  { id: 'c17', date: '02/06/2026', hours: 2, capacities: 'Todas as capacities da SA.', knowledge: 'Apresentação dos resultados de metrologia.', strategy: 'Avaliação prática individual no laboratório.', resources: 'Peças reais e instrumentos.' },
+  { id: 'c17', date: '02/06/2026', hours: 2, capacities: 'Todas as capacities da SA.', knowledge: 'Apresentação dos resultados de metrologia.', strategy: 'Avaliação prática individual no laboratório.', resources: 'Peças reais e instruments.' },
   { id: 'c18', date: '09/06/2026', hours: 2, capacities: 'Todas as capacities da SA.', knowledge: 'Revisão geral dos relatórios de qualidade.', strategy: 'Entrega de portfólio de medição.', resources: 'Portfólios.' },
   { id: 'c19', date: '16/06/2026', hours: 2, capacities: 'Todas as capacities da SA.', knowledge: 'Fechamento final.', strategy: 'Entrega de notas e feedback individual.', resources: 'Boletim.' },
   { id: 'c20', date: '23/06/2026', hours: 2, capacities: 'Todas as capacities da SA.', knowledge: 'Encerramento.', strategy: 'Fechamento de diário e arquivo morto.', resources: 'Sistema.' }
 ];
 
-// --- CRONOGRAMA FUSI (1º Semestre - Fundamentos de Usinagem) ---
 export const FUSI_SCHEDULE = [
   { id: 'f1', date: '28/01/2026', hours: 4, capacities: 'Planejar processos de usinagem.', knowledge: 'Introdução à Usinagem e Segurança.', strategy: 'Exposição dialogada e regras de oficina.', resources: 'Quadro, EPIs.' },
   { id: 'f2', date: '04/02/2026', hours: 4, capacities: 'Planejar processos de usinagem.', knowledge: 'Ferramentas de Corte e Materiais.', strategy: 'Demonstração de geometrias de corte.', resources: 'Insertos, ferramentas.' },
@@ -85,33 +82,95 @@ export const FUSI_SCHEDULE = [
 ];
 
 // ============================================================================
-// ==================== CRONOGRAMAS: 2º SEMESTRE ========================
+// ==================== CRONOGRAMAS: 2º SEMESTRE (PRUSC) ======================
 // ============================================================================
 
-// --- CRONOGRAMA PRUC (2º Semestre - Processos de Usinagem Convencional) ---
-export const PRUC_SCHEDULE = [
-  { id: 'p1', date: '22/07/2026', hours: 4, capacities: 'Realizar operações em torno convencional de acordo com as especificações, normas técnicas e de saúde e segurança no trabalho.', knowledge: 'Introdução aos Processos de Usinagem e Segurança no 2º Semestre.', strategy: '• Apresentação do plano do curso; • Definições de segurança aplicadas à usinagem.', resources: 'Sala de aula, projetor.' },
-  { id: 'p2', date: '29/07/2026', hours: 4, capacities: 'Realizar operações em torno convencional de acordo com as especificações, normas técnicas e de saúde e segurança no trabalho.', knowledge: '1. Torneamento: 1.1. Ferramenta de perfilamento; 1.2. Acessórios (Lunetas, Graminho).', strategy: '• Demonstração prática do uso de ferramentas de perfilamento e ajuste com graminho.', resources: 'Torno convencional, lunetas, graminho.' },
-  { id: 'p3', date: '05/08/2026', hours: 4, capacities: 'Realizar operações em torno convencional de acordo com as especificações, normas técnicas e de saúde e segurança no trabalho.', knowledge: '1. Torneamento: 1.2.3. Eixo mandril e 1.2.4. Prisma em V.', strategy: '• Prática de torneamento utilizando montagem em eixo mandril e centralização com prisma.', resources: 'Eixo mandril, prisma em V, relógio comparador.' },
-  { id: 'p4', date: '12/08/2026', hours: 4, capacities: 'Realizar operações em torno convencional de acordo com as especificações, normas técnicas e de saúde e segurança no trabalho.', knowledge: '1.3. Cálculos técnicos: 1.3.1. Conicidade com desalinhamento do cabeçote móvel.', strategy: '• Aula teórica e prática de cálculos e desalinhamento real do cabeçote móvel.', resources: 'Calculadora, torno convencional, micrômetro.' },
-  { id: 'p5', date: '19/08/2026', hours: 4, capacities: 'Realizar operações em torno convencional de acordo com as especificações, normas técnicas e de saúde e segurança no trabalho.', knowledge: '1.4. Operação: 1.4.1. Tornear perfil com ferramenta de forma.', strategy: '• Execução prática de torneamento com ferramentas de forma e acabamento.', resources: 'Torno mecânico, ferramentas de perfilamento.' },
-  { id: 'p6', date: '26/08/2026', hours: 4, capacities: 'Realizar operações em fresadora convencional de acordo com as especificações, normas técnicas e de saúde e segurança no trabalho.', knowledge: '2. Fresagem: 2.1. Ferramentas (Gravação e esférica); 2.2. Acessórios (Grampos e garras).', strategy: '• Fixação segura de blocos de teste com garras e introdução a fresas esféricas.', resources: 'Fresadora convencional, garras de fixação, fresas esféricas.' },
-  { id: 'p7', date: '02/09/2026', hours: 4, capacities: 'Realizar operações em fresadora convencional de acordo com as especificações, normas técnicas e de saúde e segurança no trabalho.', knowledge: '2.3. Conjunto divisor: 2.3.1. Divisão direta e 2.3.2. Divisão indireta.', strategy: '• Demonstração e cálculos teóricos de divisões diretas e indiretas para usinagem geométrica.', resources: 'Aparelho divisor, disco de furos.' },
-  { id: 'p8', date: '09/09/2026', hours: 4, capacities: 'Realizar operações em fresadora convencional de acordo com as especificações, normas técnicas e de saúde e segurança no trabalho.', knowledge: '2.3. Conjunto divisor: 2.3.3. Divisão diferencial.', strategy: '• Exercícios avançados de montagem de grade de engrenagens para divisão diferencial.', resources: 'Aparelho divisor universal, engrenagens.' },
-  { id: 'p9', date: '16/09/2026', hours: 4, capacities: 'Realizar operações em fresadora convencional de acordo com as especificações, normas técnicas e de saúde e segurança no trabalho.', knowledge: '2.4. Operação: 2.4.1. Fresar superfície plana paralela no aparelho divisor.', strategy: '• Usinagem prática de faces planas paralelas em peças posicionadas no aparelho divisor.', resources: 'Fresadora, aparelho divisor, fresa cabeçote.' },
-  { id: 'p10', date: '23/09/2026', hours: 4, capacities: 'Realizar operações em fresadora convencional de acordo com as especificações, normas técnicas e de saúde e segurança no trabalho.', knowledge: '2.4.2. Furar de forma coordenada na fresadora e 2.4.3. Alargar furo manualmente na bancada.', strategy: '• Marcação em coordenadas na fresadora para furação precisa e alargamento manual.', resources: 'Fresadora, brocas, alargadores manuais, desandador.' },
-  { id: 'p11', date: '30/09/2026', hours: 4, capacities: 'Realizar operações de serramento por meio de máquinas de acordo com as especificações, normas técnicas e de saúde e segurança no trabalho.', knowledge: '3. Serramento: 3.1. Definição; 3.2. Tipos de serra fita (Horizontal e Vertical); 3.3. Lâmina.', strategy: '• Seleção correta do número de dentes por polegada da lâmina e corte seguro de barras.', resources: 'Serra fita horizontal e vertical, material bruto.' },
-  { id: 'p12', date: '07/10/2026', hours: 4, capacities: 'Realizar operações de serramento por meio de máquinas de acordo com as especificações, normas técnicas e de saúde e segurança no trabalho.', knowledge: '3.4. Operação: 3.4.1. Serrar com serra fita.', strategy: '• Prática supervisionada de cortes em ângulos retos e especiais em máquina serra fita.', resources: 'Serra de fita, fluidos de corte.' },
-  { id: 'p13', date: '14/10/2026', hours: 4, capacities: 'Realizar a montagem de conjuntos mecânicos de acordo com as especificações e normas técnicas e de saúde e segurança no trabalho.', knowledge: '4. Conjuntos mecânicos: 4.1. Definição; 4.2. Tipos; 4.3. Características; 4.4. Técnicas de montagem.', strategy: '• Estudo de desenhos de montagem e sequência operacional de ajuste mecânico.', resources: 'Desenhos técnicos de conjuntos, ferramentas de montagem.' },
-  { id: 'p14', date: '21/10/2026', hours: 4, capacities: 'Realizar a montagem de conjuntos mecânicos de acordo com as especificações e normas técnicas e de saúde e segurança no trabalho.', knowledge: '4.5. Técnicas de ajustagem: 4.5.1. Lixamento e 4.5.2. Polimento.', strategy: '• Práticas manuais de ajuste fino dimensional utilizando abrasivos e polidores na bancada.', resources: 'Lixas de várias granas, pastas de polimento.' },
-  { id: 'p15', date: '28/10/2026', hours: 4, capacities: 'Definir os parâmetros e os processos de usinagem em retíficas convencionais, de acordo com as especificações técnicas.', knowledge: '5. Retificação: 5.1. Processos (Cilíndrica, Plana tangencial, Centerless, Afiadoras) e 5.2. Parâmetros.', strategy: '• Cálculos de RPM do rebolo, RPM da peça e velocidade de avanço na retífica.', resources: 'Calculadora técnica, tabelas de retificação.' },
-  { id: 'p16', date: '04/11/2026', hours: 4, capacities: 'Realizar o balanceamento do rebolo de acordo com as especificações, normas técnicas e de saúde e segurança no trabalho.', knowledge: '6. Balanceamento: 6.1. Rebolos (Tipos, inspeção) e 6.2. Acessórios (Conjunto balanceador).', strategy: '• Inspeção visual, ensaio de som do rebolo e montagem no eixo balanceador estático.', resources: 'Rebolos, eixo balanceador, pedestal de nível.' },
-  { id: 'p17', date: '11/11/2026', hours: 4, capacities: 'Realizar o balanceamento do rebolo de acordo com as especificações, normas técnicas e de saúde e segurança no trabalho.', knowledge: '6.3. Operações: 6.3.1. Balancear rebolo e 6.3.2. Dressar rebolo.', strategy: '• Balanceamento estático de alta precisão através dos contrapesos e dressagem com ponta de diamante.', resources: 'Dressador ponta de diamante, contra-pesos.' },
-  { id: 'p18', date: '18/11/2026', hours: 4, capacities: 'Realizar operações em retificadoras cilíndricas de acordo com as especificações, normas técnicas e de saúde e segurança no trabalho.', knowledge: '7. Retificadora cilíndrica: 7.1 a 7.3. Componentes, acessórios e 7.4. Operação.', strategy: '• Montagem de eixos entre pontas na retífica cilíndrica e usinagem externa de alta precisão.', resources: 'Retificadora cilíndrica, arrastadores, micrômetro.' },
-  { id: 'p19', date: '25/11/2026', hours: 4, capacities: 'Realizar operações em retificadoras planas de acordo com as especificações, normas técnicas e de saúde e segurança no trabalho.', knowledge: '8. Retificadora plana: 8.1 a 8.3. Acessórios (Mesa magnética, morsa de precisão, calços).', strategy: '• Ajuste de paralelismo utilizando calços e fixação segura de placas na mesa magnética.', resources: 'Retificadora plana, mesa magnética, relógio apalpador.' },
-  { id: 'p20', date: '02/12/2026', hours: 4, capacities: 'Realizar operações em retificadoras planas de acordo com as especificações, normas técnicas e de saúde e segurança no trabalho.', knowledge: '8.4. Operações: 8.4.1. Retificar plana, 8.4.2. Plana paralela e 8.4.3. Perpendicular.', strategy: '• Execução prática de retificação de precisão de blocos padrão controlando paralelismo.', resources: 'Retificadora plana, micrômetro centesimal.' },
-  { id: 'p21', date: '09/12/2026', hours: 4, capacities: 'Todas as capacidades da UC.', knowledge: 'Recuperação e ajuste final dos projetos práticos mecânicos.', strategy: '• Montagem final do redutor/conjunto e preenchimento das fichas dimensionais de qualidade.', resources: 'Instrumentos de medição, oficina.' },
-  { id: 'p22', date: '16/12/2026', hours: 4, capacities: 'Todas as capacidades da UC.', knowledge: 'Avaliação final, entrega de notas e feedback.', strategy: '• Encerramento das atividades e avaliação atitudinal dos alunos.', resources: 'Diário de notas.' }
+// --- CRONOGRAMA PRUSC (PROFESSOR GEA - SEGUNDAS E QUARTAS) - 40 x 4H = 160H ---
+export const PRUSC_SCHEDULE_GEA = [
+  { id: 'pg1', date: '20/07/2026', hours: 4, capacities: 'Realizar operações em torno convencional...', knowledge: 'Introdução aos Processos de Usinagem e Segurança no Trabalho.', strategy: 'Apresentação do plano, normas de segurança e uso de EPIs na usinagem.', resources: 'Sala de aula, projetor.' },
+  { id: 'pg2', date: '22/07/2026', hours: 4, capacities: 'Realizar operações em torno convencional...', knowledge: '1. Torneamento: 1.1. Ferramenta de perfilamento.', strategy: 'Prática de afiação e geometria de corte de ferramentas de forma.', resources: 'Torno convencional, esmeril, ferramentas de desbaste.' },
+  { id: 'pg3', date: '27/07/2026', hours: 4, capacities: 'Realizar operações em torno convencional...', knowledge: '1.2. Acessórios: 1.2.1. Lunetas (fixa e móvel).', strategy: 'Demonstração técnica de montagem de eixos longos com lunetas.', resources: 'Torno, lunetas.' },
+  { id: 'pg4', date: '29/07/2026', hours: 4, capacities: 'Realizar operações em torno convencional...', knowledge: '1.2.2. Graminho, 1.2.3. Eixo mandril e 1.2.4. Prisma em V.', strategy: 'Centralização de peças excêntricas com graminho e uso de mandril.', resources: 'Graminho, eixo mandril, prisma em V.' },
+  { id: 'pg5', date: '03/08/2026', hours: 4, capacities: 'Realizar operações em torno convencional...', knowledge: '1.3. Cálculos técnicos: 1.3.1. Conicidade com desalinhamento do cabeçote.', strategy: 'Cálculos matemáticos para desalinhamento de cabeçote móvel e prática.', resources: 'Calculadora, torno, micrômetro.' },
+  { id: 'pg6', date: '05/08/2026', hours: 4, capacities: 'Realizar operações em torno convencional...', knowledge: '1.4. Operação: 1.4.1. Tornear perfil com ferramenta de forma.', strategy: 'Usinagem prática de roldanas e perfis côncavos e convexos.', resources: 'Torno mecânico, calibrador de raios.' },
+  { id: 'pg7', date: '10/08/2026', hours: 4, capacities: 'Realizar operações em fresadora convencional...', knowledge: '2. Fresagem: 2.1. Ferramentas (Gravação e esférica).', strategy: 'Montagem de fresas esféricas e definição de parâmetros de corte.', resources: 'Fresadora convencional, fresas esféricas.' },
+  { id: 'pg8', date: '12/08/2026', hours: 4, capacities: 'Realizar operações em fresadora convencional...', knowledge: '2.2. Acessórios (Grampos e garras de fixação).', strategy: 'Fixação de blocos e prismas complexos na mesa de forma segura.', resources: 'Grampos, tirantes, garras.' },
+  { id: 'pg9', date: '17/08/2026', hours: 4, capacities: 'Realizar operações em fresadora convencional...', knowledge: '2.3. Conjunto divisor: 2.3.1. Divisão direta.', strategy: 'Operação de divisão direta no cabeçote para fresar quadrados/sextavados.', resources: 'Aparelho divisor universal.' },
+  { id: 'pg10', date: '19/08/2026', hours: 4, capacities: 'Realizar operações em fresadora convencional...', knowledge: '2.3.2. Divisão indireta.', strategy: 'Cálculos de divisão indireta através de discos de furos.', resources: 'Divisor, tabelas de divisão.' },
+  { id: 'pg11', date: '24/08/2026', hours: 4, capacities: 'Realizar operações em fresadora convencional...', knowledge: '2.3.3. Divisão diferencial.', strategy: 'Demonstração teórica e montagem prática de grade de engrenagens.', resources: 'Engrenagens helicoidais, cabeçote.' },
+  { id: 'pg12', date: '26/08/2026', hours: 4, capacities: 'Realizar operações em fresadora convencional...', knowledge: '2.4. Operação: 2.4.1. Fresar superfície plana paralela no aparelho divisor.', strategy: 'Execução prática de usinagem com divisor universal.', resources: 'Fresadora, fresa cabeçote.' },
+  { id: 'pg13', date: '31/08/2026', hours: 4, capacities: 'Realizar operações em fresadora convencional...', knowledge: '2.4.2. Furar de forma coordenada.', strategy: 'Usinagem de círculos de furos equidistantes por coordenadas.', resources: 'Fresadora, paquímetro.' },
+  { id: 'pg14', date: '02/09/2026', hours: 4, capacities: 'Realizar operações em fresadora convencional...', knowledge: '2.4.3. Alargar furo manualmente na bancada.', strategy: 'Ajuste final de furos cilíndricos com alargadores manuais.', resources: 'Alargador manual, desandador, bancada.' },
+  { id: 'pg15', date: '09/09/2026', hours: 4, capacities: 'Realizar operações de serramento por meio de máquinas...', knowledge: '3. Serramento: 3.1. Definição; 3.2. Tipos de serra fita.', strategy: 'Conceitos de serramento mecânico horizontal e vertical de precisão. (Feriado de 07/09 compensado)', resources: 'Máquinas serra fita.' },
+  { id: 'pg16', date: '14/09/2026', hours: 4, capacities: 'Realizar operações de serramento por meio de máquinas...', knowledge: '3.3. Lâmina de serra de fita.', strategy: 'Substituição de lâminas e ajuste de tensão operacional.', resources: 'Lâminas de serra fita.' },
+  { id: 'pg17', date: '16/09/2026', hours: 4, capacities: 'Realizar operações de serramento por meio de máquinas...', knowledge: '3.4. Operação: 3.4.1. Serrar com serra de fita.', strategy: 'Operação prática de corte de lotes de matéria-prima.', resources: 'Serra fita horizontal, óleo solúvel.' },
+  { id: 'pg18', date: '21/09/2026', hours: 4, capacities: 'Realizar a montagem de conjuntos mecânicos...', knowledge: '4. Conjuntos mecânicos: 4.1. Definição; 4.2. Tipos; 4.3. Características.', strategy: 'Análise de tolerâncias de montagem deslizante e interferente.', resources: 'Desenhos técnicos de conjuntos.' },
+  { id: 'pg19', date: '23/09/2026', hours: 4, capacities: 'Realizar a montagem de conjuntos mecânicos...', knowledge: '4.4. Técnicas de montagem.', strategy: 'Sequenciamento prático de montagem de acoplamentos e eixos.', resources: 'Prensas, rolamentos.' },
+  { id: 'pg20', date: '28/09/2026', hours: 4, capacities: 'Realizar a montagem de conjuntos mecânicos...', knowledge: '4.5. Técnicas de ajustagem: 4.5.1. Lixamento e 4.5.2. Polimento.', strategy: 'Remoção manual de marcas de usinagem e polimento espelhado.', resources: 'Lixas, abrasivos, bancada.' },
+  { id: 'pg21', date: '30/09/2026', hours: 4, capacities: 'Definir os parâmetros e os processos de usinagem...', knowledge: '5. Retificação: 5.1. Processos (Cilíndrica, Plana tangencial).', strategy: 'Teoria da retificação de superacabamento e aplicações.', resources: 'Retificadoras.' },
+  { id: 'pg22', date: '05/10/2026', hours: 4, capacities: 'Definir os parâmetros e os processos de usinagem...', knowledge: '5.1.2. Sem centro Centerless e 5.1.3. Afiadoras.', strategy: 'Estudo do sistema Centerless e afiação de ferramentas de corte.', resources: 'Afiadora universal.' },
+  { id: 'pg23', date: '07/10/2026', hours: 4, capacities: 'Definir os parâmetros e os processos de usinagem...', knowledge: '5.2. Parâmetros (RPM da peça, RPM do rebolo, Avanço).', strategy: 'Cálculos avançados de avanço micrométrico na retífica.', resources: 'Calculadora.' },
+  { id: 'pg24', date: '14/10/2026', hours: 4, capacities: 'Realizar o balanceamento do rebolo...', knowledge: '6. Balanceamento: 6.1. Rebolos (Tipos, Classificação, Armazenagem). (Feriado de 12/10 compensado)', strategy: 'Ensaio acústico de trincas (som) e armazenamento correto.', resources: 'Rebolos.' },
+  { id: 'pg25', date: '19/10/2026', hours: 4, capacities: 'Realizar o balanceamento do rebolo...', knowledge: '6.2. Acessórios: 6.2.1. Conjunto balanceador estático.', strategy: 'Montagem do flange e contrapesos no rebolo.', resources: 'Flanges de fixação, eixo.' },
+  { id: 'pg26', date: '21/10/2026', hours: 4, capacities: 'Realizar o balanceamento do rebolo...', knowledge: '6.2.4. Nível de precisão e 6.2.5. Contrapesos.', strategy: 'Alinhamento do pedestal nivelador e distribuição de massa.', resources: 'Nível bolha de precisão.' },
+  { id: 'pg27', date: '26/10/2026', hours: 4, capacities: 'Realizar o balanceamento do rebolo...', knowledge: '6.3. Operações: 6.3.1. Balancear rebolo.', strategy: 'Prática individual de balanceamento estático do rebolo.', resources: 'Suporte de balanceamento.' },
+  { id: 'pg28', date: '28/10/2026', hours: 4, capacities: 'Realizar o balanceamento do rebolo...', knowledge: '6.3.2. Dressar rebolo.', strategy: 'Dressagem de faceamento com ponta diamantada de cristal único.', resources: 'Dressador ponta de diamante.' },
+  { id: 'pg29', date: '04/11/2026', hours: 4, capacities: 'Realizar operações em retificadoras cilíndricas...', knowledge: '7. Retificadora cilíndrica: 7.1. Características; 7.2. Componentes. (Feriado de 02/11 compensado)', strategy: 'Alinhamento dos eixos e barramento da retificadora cilíndrica.', resources: 'Retificadora cilíndrica.' },
+  { id: 'pg30', date: '09/11/2026', hours: 4, capacities: 'Realizar operações em retificadoras cilíndricas...', knowledge: '7.3. Acessórios (Placa universal e placa de arrasto).', strategy: 'Montagem de placas de precisão para arraste entre pontas.', resources: 'Placa de arrasto, contra-pontas.' },
+  { id: 'pg31', date: '11/11/2026', hours: 4, capacities: 'Realizar operações em retificadoras cilíndricas...', knowledge: '7.3.4. Arrastadores e 7.3.5. Dressador.', strategy: 'Ajuste fino do dressador embutido na retificadora cilíndrica.', resources: 'Arrastadores.' },
+  { id: 'pg32', date: '16/11/2026', hours: 4, capacities: 'Realizar operações em retificadoras cilíndricas...', knowledge: '7.4. Operação: 7.4.1. Retificar superfície cilíndrica externa.', strategy: 'Usinagem cilíndrica externa com controle dimensional micrométrico.', resources: 'Retificadora cilíndrica, micrômetro.' },
+  { id: 'pg33', date: '18/11/2026', hours: 4, capacities: 'Realizar operações em retificadoras planas...', knowledge: '8. Retificadora plana: 8.1. Características; 8.2. Componentes.', strategy: 'Revisão dos comandos, avanço hidráulico e lubrificação.', resources: 'Retificadora plana.' },
+  { id: 'pg34', date: '23/11/2026', hours: 4, capacities: 'Realizar operações em retificadoras planas...', knowledge: '8.3. Acessórios: 8.3.1. Mesa magnética.', strategy: 'Técnicas de desmagnetização e fixação segura de chapas finas.', resources: 'Mesa magnética.' },
+  { id: 'pg35', date: '25/11/2026', hours: 4, capacities: 'Realizar operações em retificadoras planas...', knowledge: '8.3.2. Morsa e 8.3.3. Mesa de seno.', strategy: 'Usinagem de ângulos com o uso de mesa de seno e calços padrão.', resources: 'Mesa de seno, blocos padrão.' },
+  { id: 'pg36', date: '30/11/2026', hours: 4, capacities: 'Realizar operações em retificadoras planas...', knowledge: '8.3.5. Calços e 8.3.6. Dressador.', strategy: 'Preparo da superfície e dressagem estrita do rebolo tangencial.', resources: 'Retificadora plana, dressador.' },
+  { id: 'pg37', date: '02/12/2026', hours: 4, capacities: 'Realizar operações em retificadoras planas...', knowledge: '8.4. Operações: 8.4.1. Retificar superfície plana.', strategy: 'Processo de retificação plana de face de referência centesimal.', resources: 'Mesa magnética, calços de precisão.' },
+  { id: 'pg38', date: '07/12/2026', hours: 4, capacities: 'Realizar operações em retificadoras planas...', knowledge: '8.4.2. Retificar paralela e 8.4.3. Perpendicular.', strategy: 'Garantia de esquadro e paralelismo centesimal em blocos de teste.', resources: 'Retificadora plana, micrômetro.' },
+  { id: 'pg39', date: '09/12/2026', hours: 4, capacities: 'Todas as capacidades da UC.', knowledge: 'Montagem final dos conjuntos mecânicos e análise de ajustes.', strategy: 'Montagem e ajustagem manual dos projetos de redutores e caixas.', resources: 'Bancadas, ferramentas manuais.' },
+  { id: 'pg40', date: '14/12/2026', hours: 4, capacities: 'Todas as capacidades da UC.', knowledge: 'Avaliação Final de Desempenho Atitudinal e Técnico.', strategy: 'Entrega final de relatórios dimensionais, notas e fechamento do diário.', resources: 'Planilhas de notas.' }
+];
+
+// --- CRONOGRAMA PRUSC (PROFESSOR BERETELLA - TERÇAS E SEXTAS) - 40 x 4H = 160H ---
+export const PRUSC_SCHEDULE_BERETELLA = [
+  { id: 'pb1', date: '21/07/2026', hours: 4, capacities: 'Realizar operações em torno convencional...', knowledge: 'Introdução aos Processos de Usinagem e Segurança no Trabalho.', strategy: 'Apresentação do plano, normas de segurança e uso de EPIs na usinagem.', resources: 'Sala de aula, projetor.' },
+  { id: 'pb2', date: '24/07/2026', hours: 4, capacities: 'Realizar operações em torno convencional...', knowledge: '1. Torneamento: 1.1. Ferramenta de perfilamento.', strategy: 'Prática de afiação e geometria de corte de ferramentas de forma.', resources: 'Torno convencional, esmeril, ferramentas de desbaste.' },
+  { id: 'pb3', date: '28/07/2026', hours: 4, capacities: 'Realizar operações em torno convencional...', knowledge: '1.2. Acessórios: 1.2.1. Lunetas (fixa e móvel).', strategy: 'Demonstração técnica de montagem de eixos longos com lunetas.', resources: 'Torno, lunetas.' },
+  { id: 'pb4', date: '31/07/2026', hours: 4, capacities: 'Realizar operações em torno convencional...', knowledge: '1.2.2. Graminho, 1.2.3. Eixo mandril e 1.2.4. Prisma em V.', strategy: 'Centralização de peças excêntricas com graminho e uso de mandril.', resources: 'Graminho, eixo mandril, prisma em V.' },
+  { id: 'pb5', date: '04/08/2026', hours: 4, capacities: 'Realizar operações em torno convencional...', knowledge: '1.3. Cálculos técnicos: 1.3.1. Conicidade com desalinhamento do cabeçote.', strategy: 'Cálculos matemáticos para desalinhamento de cabeçote móvel e prática.', resources: 'Calculadora, torno, micrômetro.' },
+  { id: 'pb6', date: '07/08/2026', hours: 4, capacities: 'Realizar operações em torno convencional...', knowledge: '1.4. Operação: 1.4.1. Tornear perfil com ferramenta de forma.', strategy: 'Usinagem prática de roldanas e perfis côncavos e convexos.', resources: 'Torno mecânico, calibrador de raios.' },
+  { id: 'pb7', date: '11/08/2026', hours: 4, capacities: 'Realizar operações em fresadora convencional...', knowledge: '2. Fresagem: 2.1. Ferramentas (Gravação e esférica).', strategy: 'Montagem de fresas esféricas e definição de parâmetros de corte.', resources: 'Fresadora convencional, fresas esféricas.' },
+  { id: 'pb8', date: '14/08/2026', hours: 4, capacities: 'Realizar operações em fresadora convencional...', knowledge: '2.2. Acessórios (Grampos e garras de fixação).', strategy: 'Fixação de blocos e prismas complexos na mesa de forma segura.', resources: 'Grampos, tirantes, garras.' },
+  { id: 'pb9', date: '18/08/2026', hours: 4, capacities: 'Realizar operações em fresadora convencional...', knowledge: '2.3. Conjunto divisor: 2.3.1. Divisão direta.', strategy: 'Operação de divisão direta no cabeçote para fresar quadrados/sextavados.', resources: 'Aparelho divisor universal.' },
+  { id: 'pb10', date: '21/08/2026', hours: 4, capacities: 'Realizar operações em fresadora convencional...', knowledge: '2.3.2. Divisão indireta.', strategy: 'Cálculos de divisão indireta através de discos de furos.', resources: 'Divisor, tabelas de divisão.' },
+  { id: 'pb11', date: '25/08/2026', hours: 4, capacities: 'Realizar operações em fresadora convencional...', knowledge: '2.3.3. Divisão diferencial.', strategy: 'Demonstração teórica e montagem prática de grade de engrenagens.', resources: 'Engrenagens helicoidais, cabeçote.' },
+  { id: 'pb12', date: '28/08/2026', hours: 4, capacities: 'Realizar operações em fresadora convencional...', knowledge: '2.4. Operação: 2.4.1. Fresar superfície plana paralela no aparelho divisor.', strategy: 'Execução prática de usinagem com divisor universal.', resources: 'Fresadora, fresa cabeçote.' },
+  { id: 'pb13', date: '01/09/2026', hours: 4, capacities: 'Realizar operações em fresadora convencional...', knowledge: '2.4.2. Furar de forma coordenada.', strategy: 'Usinagem de círculos de furos equidistantes por coordenadas.', resources: 'Fresadora, paquímetro.' },
+  { id: 'pb14', date: '04/09/2026', hours: 4, capacities: 'Realizar operações em fresadora convencional...', knowledge: '2.4.3. Alargar furo manualmente na bancada.', strategy: 'Ajuste final de furos cilíndricos com alargadores manuais.', resources: 'Alargador manual, desandador, bancada.' },
+  { id: 'pb15', date: '08/09/2026', hours: 4, capacities: 'Realizar operações de serramento por meio de máquinas...', knowledge: '3. Serramento: 3.1. Definição; 3.2. Tipos de serra fita.', strategy: 'Conceitos de serramento mecânico horizontal e vertical de precisão.', resources: 'Máquinas serra fita.' },
+  { id: 'pb16', date: '11/09/2026', hours: 4, capacities: 'Realizar operações de serramento por meio de máquinas...', knowledge: '3.3. Lâmina de serra de fita.', strategy: 'Substituição de lâminas e ajuste de tensão operacional.', resources: 'Lâminas de serra fita.' },
+  { id: 'pb17', date: '15/09/2026', hours: 4, capacities: 'Realizar operações de serramento por meio de máquinas...', knowledge: '3.4. Operação: 3.4.1. Serrar com serra de fita.', strategy: 'Operação prática de corte de lotes de matéria-prima.', resources: 'Serra fita horizontal, óleo solúvel.' },
+  { id: 'pb18', date: '18/09/2026', hours: 4, capacities: 'Realizar a montagem de conjuntos mecânicos...', knowledge: '4. Conjuntos mecânicos: 4.1. Definição; 4.2. Tipos; 4.3. Características.', strategy: 'Análise de tolerâncias de montagem deslizante e interferente.', resources: 'Desenhos técnicos de conjuntos.' },
+  { id: 'pb19', date: '22/09/2026', hours: 4, capacities: 'Realizar a montagem de conjuntos mecânicos...', knowledge: '4.4. Técnicas de montagem.', strategy: 'Sequenciamento prático de montagem de acoplamentos e eixos.', resources: 'Prensas, rolamentos.' },
+  { id: 'pb20', date: '25/09/2026', hours: 4, capacities: 'Realizar a montagem de conjuntos mecânicos...', knowledge: '4.5. Técnicas de ajustagem: 4.5.1. Lixamento e 4.5.2. Polimento.', strategy: 'Remoção manual de marcas de usinagem e polimento espelhado.', resources: 'Lixas, abrasivos, bancada.' },
+  { id: 'pb21', date: '29/09/2026', hours: 4, capacities: 'Definir os parâmetros e os processos de usinagem...', knowledge: '5. Retificação: 5.1. Processos (Cilíndrica, Plana tangencial).', strategy: 'Teoria da retificação de superacabamento e aplicações.', resources: 'Retificadoras.' },
+  { id: 'pb22', date: '02/10/2026', hours: 4, capacities: 'Definir os parâmetros e os processos de usinagem...', knowledge: '5.1.2. Sem centro Centerless e 5.1.3. Afiadoras.', strategy: 'Estudo do sistema Centerless e afiação de ferramentas de corte.', resources: 'Afiadora universal.' },
+  { id: 'pb23', date: '06/10/2026', hours: 4, capacities: 'Definir os parâmetros e os processos de usinagem...', knowledge: '5.2. Parâmetros (RPM da peça, RPM do rebolo, Avanço).', strategy: 'Cálculos avançados de avanço micrométrico na retífica.', resources: 'Calculadora.' },
+  { id: 'pb24', date: '09/10/2026', hours: 4, capacities: 'Realizar o balanceamento do rebolo...', knowledge: '6. Balanceamento: 6.1. Rebolos (Tipos, Classificação, Armazenagem).', strategy: 'Ensaio acústico de trincas (som) e armazenamento correto.', resources: 'Rebolos.' },
+  { id: 'pb25', date: '13/10/2026', hours: 4, capacities: 'Realizar o balanceamento do rebolo...', knowledge: '6.2. Acessórios: 6.2.1. Conjunto balanceador estático.', strategy: 'Montagem do flange e contrapesos no rebolo.', resources: 'Flanges de fixação, eixo.' },
+  { id: 'pb26', date: '16/10/2026', hours: 4, capacities: 'Realizar o balanceamento do rebolo...', knowledge: '6.2.4. Nível de precisão e 6.2.5. Contrapesos.', strategy: 'Alinhamento do pedestal nivelador e distribuição de massa.', resources: 'Nível bolha de precisão.' },
+  { id: 'pb27', date: '20/10/2026', hours: 4, capacities: 'Realizar o balanceamento do rebolo...', knowledge: '6.3. Operações: 6.3.1. Balancear rebolo.', strategy: 'Prática individual de balanceamento estático do rebolo.', resources: 'Suporte de balanceamento.' },
+  { id: 'pb28', date: '23/10/2026', hours: 4, capacities: 'Realizar o balanceamento do rebolo...', knowledge: '6.3.2. Dressar rebolo.', strategy: 'Dressagem de faceamento com ponta diamantada de cristal único.', resources: 'Dressador ponta de diamante.' },
+  { id: 'pb29', date: '27/10/2026', hours: 4, capacities: 'Realizar operações em retificadoras cilíndricas...', knowledge: '7. Retificadora cilíndrica: 7.1. Características; 7.2. Componentes.', strategy: 'Alinhamento dos eixos e barramento da retificadora cilíndrica.', resources: 'Retificadora cilíndrica.' },
+  { id: 'pb30', date: '30/10/2026', hours: 4, capacities: 'Realizar operações em retificadoras cilíndricas...', knowledge: '7.3. Acessórios (Placa universal e placa de arrasto).', strategy: 'Montagem de placas de precisão para arraste entre pontas.', resources: 'Placa de arrasto, contra-pontas.' },
+  { id: 'pb31', date: '03/11/2026', hours: 4, capacities: 'Realizar operações em retificadoras cilíndricas...', knowledge: '7.3.4. Arrastadores e 7.3.5. Dressador.', strategy: 'Ajuste fino do dressador embutido na retificadora cilíndrica.', resources: 'Arrastadores.' },
+  { id: 'pb32', date: '06/11/2026', hours: 4, capacities: 'Realizar operações em retificadoras cilíndricas...', knowledge: '7.4. Operação: 7.4.1. Retificar superfície cilíndrica externa.', strategy: 'Usinagem cilíndrica externa com controle dimensional micrométrico.', resources: 'Retificadora cilíndrica, micrômetro.' },
+  { id: 'pb33', date: '10/11/2026', hours: 4, capacities: 'Realizar operações em retificadoras planas...', knowledge: '8. Retificadora plana: 8.1. Características; 8.2. Componentes.', strategy: 'Revisão dos comandos, avanço hidráulico e lubrificação.', resources: 'Retificadora plana.' },
+  { id: 'pb34', date: '13/11/2026', hours: 4, capacities: 'Realizar operações em retificadoras planas...', knowledge: '8.3. Acessórios: 8.3.1. Mesa magnética.', strategy: 'Técnicas de desmagnetização e fixação segura de chapas finas.', resources: 'Mesa magnética.' },
+  { id: 'pb35', date: '17/11/2026', hours: 4, capacities: 'Realizar operações em retificadoras planas...', knowledge: '8.3.2. Morsa e 8.3.3. Mesa de seno.', strategy: 'Usinagem de ângulos com o uso de mesa de seno e calços padrão.', resources: 'Mesa de seno, blocos padrão.' },
+  { id: 'pb36', date: '20/11/2026', hours: 4, capacities: 'Realizar operações em retificadoras planas...', knowledge: '8.3.5. Calços e 8.3.6. Dressador.', strategy: 'Preparo da superfície e dressagem estrita do rebolo tangencial.', resources: 'Retificadora plana, dressador.' },
+  { id: 'pb37', date: '24/11/2026', hours: 4, capacities: 'Realizar operações em retificadoras planas...', knowledge: '8.4. Operações: 8.4.1. Retificar superfície plana.', strategy: 'Processo de retificação plana de face de referência centesimal.', resources: 'Mesa magnética, calços de precisão.' },
+  { id: 'pb38', date: '27/11/2026', hours: 4, capacities: 'Realizar operações em retificadoras planas...', knowledge: '8.4.2. Retificar paralela e 8.4.3. Perpendicular.', strategy: 'Garantia de esquadro e paralelismo centesimal em blocos de teste.', resources: 'Retificadora plana, micrômetro.' },
+  { id: 'pb39', date: '01/12/2026', hours: 4, capacities: 'Todas as capacidades da UC.', knowledge: 'Montagem final dos conjuntos mecânicos e análise de ajustes.', strategy: 'Montagem e ajustagem manual dos projetos de redutores e caixas.', resources: 'Bancadas, ferramentas manuais.' },
+  { id: 'pb40', date: '04/12/2026', hours: 4, capacities: 'Todas as capacidades da UC.', knowledge: 'Avaliação Final de Desempenho Atitudinal e Técnico.', strategy: 'Entrega final de relatórios dimensionais, notas e fechamento do diário.', resources: 'Planilhas de notas.' }
 ];
 
 // ============================================================================
@@ -190,10 +249,8 @@ const CRD_UNIT_TEMPLATE: CurricularUnit = {
   }
 };
 
-// --- TEMPLATE DA NOVA UC PRUC DO 2º SEMESTRE (160H) ---
-const PRUC_UNIT_TEMPLATE: CurricularUnit = {
-  id: 'pruc',
-  name: 'Processos de Usinagem Convencional (PRUC)',
+// --- BASE DE CAPACIDADES E CONHECIMENTOS COMPARTILHADA DA UC PRUSC ---
+const BASE_PRUSC_PROPERTIES = {
   basicCapacities: [
     'Realizar operações em torno convencional de acordo com as especificações, normas técnicas e de saúde e segurança no trabalho.',
     'Realizar operações em fresadora convencional de acordo com as especificações, normas técnicas e de saúde e segurança no trabalho.',
@@ -244,7 +301,7 @@ const PRUC_UNIT_TEMPLATE: CurricularUnit = {
   ],
   learningSituations: [
     {
-      id: 'sa-pruc-1',
+      id: 'sa-prusc-1',
       title: 'Fabricação e Ajustagem de Elementos de Transmissão',
       context: 'Como mecânico de usinagem em formação, você recebeu um conjunto mecânico que necessita da fabricação de um eixo torneado cônico, ranhuras fresadas e retificação de precisão para montagem final deslizante.',
       challenge: 'Calcular o desalinhamento do cabeçote do torno, realizar divisões diretas/indiretas na fresadora, balancear o rebolo e operar as retificadoras para garantir as tolerâncias especificadas no projeto.',
@@ -253,11 +310,31 @@ const PRUC_UNIT_TEMPLATE: CurricularUnit = {
   ],
   rubrics: [
     { capacity: 'Operar tornos, fresadoras e retificadoras', nsa: 'Abaixo de 50% de precisão e descumprimento de normas de segurança.', apo: 'Usinagem dentro de limites aceitáveis com pequenos desvios dimensionais.', par: 'Usinagem precisa atendendo à maioria das tolerâncias dimensionais.', aut: 'Usinagem de alta precisão técnica de acordo com todas as especificações e normas de segurança.' }
-  ],
-  schedule: PRUC_SCHEDULE,
+  ]
+};
+
+// --- TEMPLATE DA UC PRUSC DO PROFESSOR GEA (SEGUNDAS E QUARTAS) ---
+const PRUSC_UNIT_TEMPLATE_GEA: CurricularUnit = {
+  ...BASE_PRUSC_PROPERTIES,
+  id: 'prusc-gea',
+  name: 'Processo de Usinagem Convencional (PRUSC)',
+  schedule: PRUSC_SCHEDULE_GEA,
   calendar: {
-    startDate: '2026-07-22',
-    endDate: '2026-12-16',
+    startDate: '2026-07-20',
+    endDate: '2026-12-14',
+    markings: []
+  }
+};
+
+// --- TEMPLATE DA UC PRUSC DO PROFESSOR BERETELLA (TERÇAS E SEXTAS) ---
+const PRUSC_UNIT_TEMPLATE_BERETELLA: CurricularUnit = {
+  ...BASE_PRUSC_PROPERTIES,
+  id: 'prusc-beretella',
+  name: 'Processo de Usinagem Convencional (PRUSC)',
+  schedule: PRUSC_SCHEDULE_BERETELLA,
+  calendar: {
+    startDate: '2026-07-21',
+    endDate: '2026-12-04',
     markings: []
   }
 };
@@ -267,7 +344,7 @@ const PRUC_UNIT_TEMPLATE: CurricularUnit = {
 // ============================================================================
 
 export const SAMPLE_PLANS: TeachingPlan[] = [
-  // --- 1º SEMESTRE - PLANO PADRÃO ---
+  // --- 1º SEMESTRE - PROFESSOR BERETELLA ---
   {
     id: 'plan-usinagem-beretella',
     profileId: 'beretella',
@@ -283,7 +360,7 @@ export const SAMPLE_PLANS: TeachingPlan[] = [
     updatedAt: '2026-01-20T10:00:00.000Z'
   },
   
-  // --- 2º SEMESTRE - PLANO PADRÃO (Com a UC PRUC de 160H) ---
+  // --- 2º SEMESTRE - PROFESSOR BERETELLA (Terças e Sextas) ---
   {
     id: 'plan-usinagem-beretella-sem2',
     profileId: 'beretella',
@@ -294,12 +371,12 @@ export const SAMPLE_PLANS: TeachingPlan[] = [
     methodology: 'Práticas intensivas de oficina com desenvolvimento de projetos reais (montagem mecânica, serramento de fita e ajustagem por lixamento/polimento), estimulando o trabalho cooperativo e as competências industriais.',
     evaluation: 'Entrega física, medição metrológica centesimal e testes mecânicos dos subconjuntos fabricados nas aulas práticas.',
     bibliography: '• Ajustagem Mecânica Avançada - SENAI; • Retificação Plana e Cilíndrica - SENAI; • Manual de Tecnologia de Metais.',
-    units: [LIDT_UNIT_TEMPLATE, CRD_UNIT_TEMPLATE, PRUC_UNIT_TEMPLATE],
+    units: [PRUSC_UNIT_TEMPLATE_BERETELLA],
     createdAt: '2026-07-15T09:00:00.000Z',
     updatedAt: '2026-07-15T09:00:00.000Z'
   },
 
-  // --- MODELO COPIADO PARA O OUTRO PROFESSOR (GEA) ---
+  // --- 1º SEMESTRE - PROFESSOR GEA ---
   {
     id: 'plan-usinagem-gea',
     profileId: 'gea',
@@ -314,6 +391,8 @@ export const SAMPLE_PLANS: TeachingPlan[] = [
     createdAt: '2026-01-20T10:00:00.000Z',
     updatedAt: '2026-01-20T10:00:00.000Z'
   },
+
+  // --- 2º SEMESTRE - PROFESSOR GEA (Segundas e Quartas) ---
   {
     id: 'plan-usinagem-gea-sem2',
     profileId: 'gea',
@@ -324,7 +403,7 @@ export const SAMPLE_PLANS: TeachingPlan[] = [
     methodology: 'Práticas intensivas de oficina com desenvolvimento de projetos mecânicos e ajustagem.',
     evaluation: 'Rubricas técnicas de processo e produto acabado (acoplamentos e redutores).',
     bibliography: '• Ajustagem Mecânica Avançada - SENAI; • Elementos de Máquinas - Sarkis.',
-    units: [LIDT_UNIT_TEMPLATE, CRD_UNIT_TEMPLATE, PRUC_UNIT_TEMPLATE],
+    units: [PRUSC_UNIT_TEMPLATE_GEA],
     createdAt: '2026-07-15T09:00:00.000Z',
     updatedAt: '2026-07-15T09:00:00.000Z'
   }
