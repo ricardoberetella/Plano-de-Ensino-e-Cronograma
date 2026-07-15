@@ -5,8 +5,8 @@ import { TeachingPlan } from './types';
 export const SENAI_BLUE = "#005DAA";
 export const SENAI_RED = "#E30613";
 
-// Versão do cronograma atualizada para o 2º Semestre com a nova UC PRUC de 160H
-export const SCHEDULE_VERSION = "2026-V20-PRUC-160H-SYNC";
+// Versão do cronograma atualizada para o 2º Semestre (FUSI alterada para PRUC)
+export const SCHEDULE_VERSION = "2026-V21-PRUC-160H";
 
 // ============================================================================
 // ==================== PLANOS DE EXEMPLO (SAMPLE_PLANS) ======================
@@ -15,14 +15,14 @@ export const SAMPLE_PLANS: TeachingPlan[] = [
   {
     id: "sample-1",
     name: "Plano de Ensino Exemplo",
-    curricularUnit: "Processos de Usinagem Convencional",
+    curricularUnit: "PRUC", // Atualizado de FUSI para PRUC
     classGroup: "Turma A",
     shift: "MDU-M",
     startDate: "24/07/2026",
     endDate: "18/12/2026",
     totalHours: 160,
     status: "active",
-    schedule: [], // Evita o erro de undefined .forEach no carregamento
+    schedule: [], // Evita o erro de undefined .forEach no carregamento do Firebase
     entries: [],  
     units: []     
   }
@@ -34,7 +34,7 @@ export const SAMPLE_PLANS: TeachingPlan[] = [
 
 // --- CRONOGRAMA LIDT (1º Semestre - Leitura e Interpretação de Desenho Técnico) ---
 export const LIDT_SCHEDULE = [
-  { id: 'l1', date: '26/01/2026', hours: 2, capacities: 'Todas as capacidades da SA', knowledge: '1.1. Definição de Desenho Técnico', strategy: '• Exposição dialogada; • Apresentação da UC, do MSEP e da Situação de Aprendizagem "Decifrando o Projeto".', resources: 'Sala de aula, projetor.' },
+  { id: 'l1', date: '26/01/2026', hours: 2, capacities: 'Todas as capacities da SA', knowledge: '1.1. Definição de Desenho Técnico', strategy: '• Exposição dialogada; • Apresentação da UC, do MSEP e da Situação de Aprendizagem "Decifrando o Projeto".', resources: 'Sala de aula, projetor.' },
   { id: 'l2', date: '02/02/2026', hours: 2, capacities: 'Interpretar desenhos técnicos de peças.', knowledge: '1.2. Normas técnicas; 1.3. Formatos de folha; 1.4. Linhas.', strategy: '• Exposição dialogada: Apresentação das normas ABNT.', resources: 'Exemplos de desenhos técnicos.' },
   { id: 'l3', date: '09/02/2026', hours: 2, capacities: 'Interpretar desenhos técnicos de peças.', knowledge: '1.5. Escalas; 1.6. Figuras e sólidos geométricos.', strategy: '• Exposição dialogada e Demonstração.', resources: 'Projetor, modelos de sólidos.' },
   { id: 'l4', date: '23/02/2026', hours: 2, capacities: 'Elaborar croquis de peças.', knowledge: '2.1. Perspectiva (isométrica, vistas)...', strategy: '• Atividade prática: Introdução à perspectiva isométrica.', resources: 'Papel, lápis.' },
@@ -48,12 +48,12 @@ export const LIDT_SCHEDULE = [
   { id: 'l12', date: '27/04/2026', hours: 2, capacities: 'Interpretar tolerância dimensional.', knowledge: '6.1. Tolerância dimensional (campos, ISO).', strategy: '• Introdução aos conceitos de tolerância e ajustes.', resources: 'Tabelas de tolerância ISO.' },
   { id: 'l13', date: '04/05/2026', hours: 2, capacities: 'Interpretar tolerância geométrica.', knowledge: '6.2. Tolerância geométrica (forma, posição).', strategy: '• Apresentação dos símbolos e significados.', resources: 'Quadro de tolerâncias geométricas.' },
   { id: 'l14', date: '11/05/2026', hours: 2, capacities: 'Interpretar acabamento superficial.', knowledge: '6.3. Acabamento superficial (rugosidade).', strategy: '• Explicação dos símbolos de acabamento.', resources: 'Tabela de símbolos.' },
-  { id: 'l15', date: '18/05/2026', hours: 2, capacities: 'Todas as capacidades da SA.', knowledge: 'Todos os conhecimentos da SA.', strategy: '• Início da elaboração dos croquis detalhados.', resources: 'Papel, instrumentos de desenho.' },
-  { id: 'l16', date: '25/05/2026', hours: 2, capacities: 'Todas as capacidades da SA.', knowledge: 'Todos os conhecimentos da SA.', strategy: '• Continuação e refinamento dos croquis.', resources: 'Dossiê em fase de conclusão.' },
-  { id: 'l17', date: '01/06/2026', hours: 2, capacities: 'Todas as capacidades da SA.', knowledge: 'Todos os conhecimentos da SA.', strategy: '• Finalização dos croquis e do dossiê técnico.', resources: 'Dossiê técnico.' },
-  { id: 'l18', date: '08/06/2026', hours: 2, capacities: 'Todas as capacidades da SA.', knowledge: 'Todos os conhecimentos da SA.', strategy: '• Apresentação dos Resultados e Dossiês.', resources: 'Projetor.' },
-  { id: 'l19', date: '15/06/2026', hours: 2, capacities: 'Todas as capacidades da SA.', knowledge: 'Todos os conhecimentos da SA.', strategy: '• Feedback e Avaliação final.', resources: 'Fichas de avaliação.' },
-  { id: 'l20', date: '22/06/2026', hours: 2, capacities: 'Todas as capacidades da SA.', knowledge: 'Fechamento de Notas.', strategy: '• Encerramento da Unidade Curricular.', resources: 'Diário de classe.' }
+  { id: 'l15', date: '18/05/2026', hours: 2, capacities: 'Todas as capacities da SA.', knowledge: 'Todos os conhecimentos da SA.', strategy: '• Início da divulgação dos croquis detalhados.', resources: 'Papel, instrumentos de desenho.' },
+  { id: 'l16', date: '25/05/2026', hours: 2, capacities: 'Todas as capacities da SA.', knowledge: 'Todos os conhecimentos da SA.', strategy: '• Continuação e refinamento dos croquis.', resources: 'Dossiê em fase de conclusão.' },
+  { id: 'l17', date: '01/06/2026', hours: 2, capacities: 'Todas as capacities da SA.', knowledge: 'Todos os conhecimentos da SA.', strategy: '• Finalização dos croquis e do dossiê técnico.', resources: 'Dossiê técnico.' },
+  { id: 'l18', date: '08/06/2026', hours: 2, capacities: 'Todas as capacities da SA.', knowledge: 'Todos os conhecimentos da SA.', strategy: '• Apresentação dos Resultados e Dossiês.', resources: 'Projetor.' },
+  { id: 'l19', date: '15/06/2026', hours: 2, capacities: 'Todas as capacities da SA.', knowledge: 'Todos os conhecimentos da SA.', strategy: '• Feedback e Avaliação final.', resources: 'Fichas de avaliação.' },
+  { id: 'l20', date: '22/06/2026', hours: 2, capacities: 'Todas as capacities da SA.', knowledge: 'Fechamento de Notas.', strategy: '• Encerramento da Unidade Curricular.', resources: 'Diário de classe.' }
 ];
 
 // --- CRONOGRAMA CRD (1º Semestre - Controle Rápido Dimensional) ---
@@ -80,7 +80,7 @@ export const CRD_SCHEDULE = [
 // ==================== CRONOGRAMA: 2º SEMESTRE (PRUC - 160h) ==================
 // ============================================================================
 
-// --- CRONOGRAMA PRUC (Usinagem Convencional - Terças e Sextas) ---
+// --- CRONOGRAMA PRUC (Processos de Usinagem Convencional - Terças e Sextas) ---
 // Planejado estritamente com base no Calendário Escolar do 2º Semestre de 2026 - CFP 6.62.
 export const PRUC_SCHEDULE = [
   { id: 'p01', hours: 4, date: '24/07/2026', capacities: 'Organizar o ambiente de trabalho e as atividades; Zelar pelo uso de equipamentos, instrumentos, ferramentas e materiais.', knowledge: 'Apresentação da UC e Planejamento da SA', strategy: 'Apresentação do cronograma, critérios de avaliação da SA e normas de segurança da oficina.', resources: 'Projetor, plano de curso.' },
@@ -101,7 +101,7 @@ export const PRUC_SCHEDULE = [
   { id: 'p16', hours: 4, date: '18/09/2026', capacities: 'Realizar operações em fresadora convencional de acordo com as especificações, normas técnicas e de saúde e segurança no trabalho.', knowledge: '2.4.2. Furar de forma coordenada na fresadora.', strategy: 'Cálculo de coordenadas cartesianas (X, Y) e execução de furos de precisão na fresadora por coordenadas.', resources: 'Fresadora, cabeçote mandrilador, brocas.' },
   { id: 'p17', hours: 4, date: '22/09/2026', capacities: 'Realizar operações em fresadora convencional de acordo com as especificações, normas técnicas e de saúde e segurança no trabalho.', knowledge: '2.4.3. Alargar furo manualmente na bancada.', strategy: 'Prática de acabamento dimensional e geométrico de furos coordenados utilizando alargadores manuais.', resources: 'Bancada de ajuste, desandador, alargadores.' },
   { id: 'p18', hours: 4, date: '25/09/2026', capacities: 'Realizar a montagem de conjuntos mecânicos de acordo com as especificações e normas técnicas.', knowledge: '4. Conjuntos mecânicos: Definição, tipos, características e técnicas de montagem.', strategy: 'Alinhamento, ajuste e montagem preliminar de componentes mecânicos fresados e torneados.', resources: 'Bancada, parafusos, pinos de guia.' },
-  { id: 'p19', hours: 4, date: '29/09/2026', capacities: 'Realizar a montagem de conjuntos mecânicos de acordo com as especificações e normas técnicas.', knowledge: '4.5. Techniques de ajustagem (Lixamento e Polimento).', strategy: 'Ajuste manual de folgas em guias e montagens por meio de lixamento fino e polimento industrial.', resources: 'Lixas de grana fina, pastas de polimento.' },
+  { id: 'p19', hours: 4, date: '29/09/2026', capacities: 'Realizar a montagem de conjuntos mecânicos de acordo com as especificações e normas técnicas.', knowledge: '4.5. Técnicas de ajustagem (Lixamento e Polimento).', strategy: 'Ajuste manual de folgas em guias e montagens por meio de lixamento fino e polimento industrial.', resources: 'Lixas de grana fina, pastas de polimento.' },
   { id: 'p20', hours: 4, date: '02/10/2026', capacities: 'Definir os parâmetros e os processos de usinagem em retificas convencionais de acordo com as especificações técnicas.', knowledge: '5. Retificação: Processos (Cilíndrica, Plana Tangencial, Centerless e Afiadoras).', strategy: 'Estudo comparativo dos processos de retificação e as exigências geométricas aplicadas de acabamento.', resources: 'Sala de aula, projetor.' },
   { id: 'p21', hours: 4, date: '06/10/2026', capacities: 'Definir os parâmetros e os processos de usinagem em retificas convencionais.', knowledge: '5.2. Parâmetros: RPM da peça, RPM do rebolo, Avanço longitudinal e transversal.', strategy: 'Cálculos de velocidade periférica do rebolo e velocidade de rotação do material a ser retificado.', resources: 'Quadro, formulas técnicas.' },
   { id: 'p22', hours: 4, date: '09/10/2026', capacities: 'Realizar o balanceamento do rebolo de acordo com as especificações, normas técnicas e de segurança.', knowledge: '6. Balanceamento de Rebolos: Tipos, classificação e inspeção (Teste do som).', strategy: 'Inspeção visual e teste do som acústico do rebolo antes da montagem para identificar trincas ocultas.', resources: 'Rebolos, martelo plástico.' },
