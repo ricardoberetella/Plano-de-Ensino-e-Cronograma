@@ -1,4 +1,3 @@
-
 import { initializeApp } from "firebase/app";
 import { 
   getFirestore, 
@@ -28,8 +27,6 @@ export const db = getFirestore(app);
 export const FirebaseService = {
   async getPlans(profileId: string): Promise<TeachingPlan[]> {
     try {
-      // Simplificamos a query para usar apenas WHERE. 
-      // Firestore exige um índice composto manual para WHERE + ORDER BY simultâneos.
       const q = query(
         collection(db, "plans"), 
         where("profileId", "==", profileId)
@@ -38,11 +35,14 @@ export const FirebaseService = {
       const querySnapshot = await getDocs(q);
       const results = querySnapshot.docs.map(doc => doc.data() as TeachingPlan);
       
-      // Realizamos a ordenação no lado do cliente (Client-side sorting)
-      // para evitar a necessidade de configuração de índices no console do Firebase.
+      // Ordenação segura que evita NaN e travamentos caso faltem campos de data
       return results.sort((a, b) => {
-        const dateA = new Date(a.updatedAt || a.createdAt).getTime();
-        const dateB = new Date(b.updatedAt || b.createdAt).getTime();
+        const rawA = a.updatedAt || (a as any).createdAt || new Date().toISOString();
+        const rawB = b.updatedAt || (b as any).createdAt || new Date().toISOString();
+        
+        const dateA = new Date(rawA).getTime() || 0;
+        const dateB = new Date(rawB).getTime() || 0;
+        
         return dateB - dateA; // Descendente (mais recentes primeiro)
       });
     } catch (error) {
@@ -54,9 +54,12 @@ export const FirebaseService = {
   async savePlan(plan: TeachingPlan): Promise<void> {
     try {
       const planRef = doc(db, "plans", plan.id);
+      const now = new Date().toISOString();
+      
       await setDoc(planRef, {
         ...plan,
-        updatedAt: new Date().toISOString()
+        createdAt: (plan as any).createdAt || now,
+        updatedAt: now
       }, { merge: true });
     } catch (error) {
       console.error("Erro ao salvar no Firebase:", error);
