@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Layout from './components/Layout';
 import Dashboard from './components/Dashboard';
 import PlanForm from './components/PlanForm';
 import UnitViewer from './components/UnitViewer';
 import Login from './components/Login';
 import GeneralCalendar from './components/GeneralCalendar';
-import { TeachingPlan, ViewType, CurricularUnit, ScheduleEntry, UnitCalendar, CalendarMarking, CalendarColor } from './types';
+import { TeachingPlan, ViewType, CurricularUnit, ScheduleEntry, UnitCalendar } from './types';
 import { SAMPLE_PLANS, SCHEDULE_VERSION } from './constants';
 import { FirebaseService } from './services/firebase';
 
@@ -20,44 +20,70 @@ const App: React.FC = () => {
 
   const loadPlans = useCallback(async (profileId: string) => {
     setIsLoading(true);
+    // Diagnóstico inicial para identificar o problema de importação
+    console.log("=== DIAGNÓSTICO DE INICIALIZAÇÃO ===");
+    console.log("Profile Ativo:", profileId);
+    console.log("SAMPLE_PLANS importado:", SAMPLE_PLANS);
+    console.log("É Array?", Array.isArray(SAMPLE_PLANS));
+
+    const safeSamplePlans = Array.isArray(SAMPLE_PLANS) ? SAMPLE_PLANS : [];
+
     try {
       const dbPlans = await FirebaseService.getPlans(profileId);
+      console.log("Planos recuperados do Firebase:", dbPlans);
+      
+      const defaultTemplate = safeSamplePlans.length > 0 ? safeSamplePlans[0] : null;
       
       if (!dbPlans || dbPlans.length === 0) {
-        const template = SAMPLE_PLANS.find(p => (p as any).profileId === profileId) || SAMPLE_PLANS[0];
+        const template = safeSamplePlans.find(p => p && (p as any).profileId === profileId) || defaultTemplate;
+        
+        if (!template) {
+          console.error("ERRO: Nenhum template disponível em SAMPLE_PLANS para inicializar o banco.");
+          setPlans([]);
+          return;
+        }
+
         const defaultPlan = { 
           ...template, 
           id: `plan-usinagem-${profileId}`, 
           profileId: profileId,
-          version: SCHEDULE_VERSION,
+          version: SCHEDULE_VERSION || '1.0',
           updatedAt: new Date().toISOString()
         };
         await FirebaseService.savePlan(defaultPlan);
         const refreshed = await FirebaseService.getPlans(profileId);
         setPlans(refreshed);
-        setCurrentPlan(refreshed[0]);
-        setSelectedUnit(refreshed[0].units[0]);
+        setCurrentPlan(refreshed[0] || null);
+        setSelectedUnit(refreshed[0]?.units?.[0] || null);
       } else {
         const processedPlans = await Promise.all(dbPlans.map(async (plan) => {
-          const template = SAMPLE_PLANS.find(p => (p as any).profileId === profileId) || SAMPLE_PLANS[0];
+          const template = safeSamplePlans.find(p => p && (p as any).profileId === profileId) || defaultTemplate;
           let updated = false;
           
-          template.units.forEach(tUnit => {
-            const hasUnit = plan.units.some(u => u.name === tUnit.name);
-            if (!hasUnit) {
-              plan.units.push(tUnit);
-              updated = true;
+          if (template && Array.isArray(template.units)) {
+            if (!Array.isArray(plan.units)) {
+              plan.units = [];
             }
-          });
 
-          const fusi = plan.units.find(u => u.id.toLowerCase().includes('fusi') || u.name.toUpperCase().includes('FUNDAMENTOS'));
-          if (fusi && (plan as any).version !== SCHEDULE_VERSION) {
-            const tFusi = template.units.find(u => u.id.toLowerCase().includes('fusi') || u.name.toUpperCase().includes('FUNDAMENTOS'));
-            if (tFusi) {
-              const idx = plan.units.indexOf(fusi);
-              plan.units[idx] = { ...tFusi };
-              (plan as any).version = SCHEDULE_VERSION;
-              updated = true;
+            template.units.forEach(tUnit => {
+              if (tUnit && tUnit.name) {
+                const hasUnit = plan.units.some(u => u && u.name === tUnit.name);
+                if (!hasUnit) {
+                  plan.units.push(tUnit);
+                  updated = true;
+                }
+              }
+            });
+
+            const fusi = plan.units?.find(u => u && (u.id?.toLowerCase().includes('fusi') || u.name?.toUpperCase().includes('FUNDAMENTOS')));
+            if (fusi && (plan as any).version !== SCHEDULE_VERSION) {
+              const tFusi = template.units.find(u => u && (u.id?.toLowerCase().includes('fusi') || u.name?.toUpperCase().includes('FUNDAMENTOS')));
+              if (tFusi) {
+                const idx = plan.units.indexOf(fusi);
+                plan.units[idx] = { ...tFusi };
+                (plan as any).version = SCHEDULE_VERSION;
+                updated = true;
+              }
             }
           }
 
@@ -73,18 +99,18 @@ const App: React.FC = () => {
           const updatedCurrent = processedPlans.find(p => p.id === currentPlan.id);
           if (updatedCurrent) {
             setCurrentPlan(updatedCurrent);
-            if (selectedUnit) {
+            if (selectedUnit && updatedCurrent.units) {
               const updatedUnit = updatedCurrent.units.find(u => u.id === selectedUnit.id);
               if (updatedUnit) setSelectedUnit(updatedUnit);
             }
           }
-        } else {
+        } else if (processedPlans.length > 0) {
           setCurrentPlan(processedPlans[0]);
-          setSelectedUnit(processedPlans[0].units[0]);
+          setSelectedUnit(processedPlans[0].units?.[0] || null);
         }
       }
     } catch (err) {
-      console.error("Erro ao carregar Firebase:", err);
+      console.error("Erro crítico ao carregar Firebase:", err);
     } finally {
       setIsLoading(false);
     }
@@ -138,8 +164,9 @@ const App: React.FC = () => {
   };
 
   const getUnitSigla = (unit: CurricularUnit) => {
+    if (!unit || !unit.name) return '';
     const name = unit.name.toUpperCase();
-    const id = unit.id.toLowerCase();
+    const id = (unit.id || '').toLowerCase();
     if (name.includes('LEITURA') || name.includes('DESENHO') || id.includes('lidt')) return 'LIDT';
     if (name.includes('CONTROLE') || name.includes('DIMENSIONAL') || id.includes('crd')) return 'CRD';
     if (name.includes('FUNDAMENTOS') || name.includes('USINAGEM') || id.includes('fusi')) return 'FUSI';
@@ -184,7 +211,7 @@ const App: React.FC = () => {
               <div className="bg-slate-900 rounded-[2.5rem] p-8 md:p-12 text-white shadow-2xl">
                 <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 mb-8">III. Unidades Curriculares</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                  {currentPlan.units.map((unit, idx) => (
+                  {currentPlan.units?.map((unit, idx) => (
                     <button key={unit.id} onClick={() => { setSelectedUnit(unit); setView('plano-ensino'); }} className="bg-slate-800 p-8 rounded-3xl text-left hover:bg-blue-600 transition-all group relative overflow-hidden">
                       <span className="text-6xl font-black opacity-5 absolute -right-2 -bottom-2">0{idx + 1}</span>
                       <p className="text-[9px] font-black text-blue-400 mb-2">{getUnitSigla(unit)}</p>
@@ -199,7 +226,7 @@ const App: React.FC = () => {
           {view === 'plano-ensino' && currentPlan && selectedUnit && (
             <div className="space-y-8 max-w-7xl mx-auto pb-20">
               <div className="flex gap-2 overflow-x-auto pb-4 scrollbar-hide px-1">
-                {currentPlan.units.map(u => (
+                {currentPlan.units?.map(u => (
                   <button 
                     key={u.id} 
                     onClick={() => setSelectedUnit(u)} 
