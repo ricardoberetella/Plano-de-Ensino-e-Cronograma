@@ -28,6 +28,8 @@ const App: React.FC = () => {
     if (name.includes('LEITURA') || name.includes('DESENHO') || id.includes('lidt')) return 'LIDT';
     if (name.includes('CONTROLE') || name.includes('DIMENSIONAL') || id.includes('crd')) return 'CRD';
     if (name.includes('FUNDAMENTOS') || name.includes('USINAGEM') || id.includes('fusi')) return 'FUSI';
+    if (name.includes('PROCESSOS') || name.includes('PRUSC')) return 'PRUSC';
+    if (name.includes('METROLOGIA') || name.includes('METIND')) return 'METIND';
     return unit.name.split(' ').map(w => w[0]).join('').toUpperCase();
   };
 
@@ -35,7 +37,12 @@ const App: React.FC = () => {
   const filteredUnits = useMemo(() => {
     if (!currentPlan) return [];
     return currentPlan.units.filter(unit => {
-      // Se a unidade não tiver a propriedade 'semester', tratamos como 1º semestre (legado)
+      // Força a detecção por código/nome caso a propriedade semester esteja ausente no banco
+      const code = (unit.code || '').toUpperCase();
+      if (code === 'PRUSC' || code === 'METIND') {
+        (unit as any).semester = 2;
+      }
+      
       const unitSemester = (unit as any).semester || 1;
       return unitSemester === currentSemester;
     });
@@ -59,13 +66,24 @@ const App: React.FC = () => {
     try {
       const dbPlans = await FirebaseService.getPlans(profileId);
       
+      // Ajusta o ID de busca para bater com o formato do JSON de constantes
+      const sampleKey = profileId === 'beretella' ? 'ricardo-beretella' : 'ricardo-gea';
+      const template1Sem = SAMPLE_PLANS[sampleKey]?.['1º SEM'] || SAMPLE_PLANS[0];
+      const template2Sem = SAMPLE_PLANS[sampleKey]?.['2º SEM'];
+
       if (!dbPlans || dbPlans.length === 0) {
-        const template = SAMPLE_PLANS.find(p => p.profileId === profileId) || SAMPLE_PLANS[0];
+        // Une as unidades do primeiro e segundo semestre do template
+        const combinedUnits = [
+          ...template1Sem.units.map(u => ({ ...u, semester: 1 })),
+          ...(template2Sem ? template2Sem.units.map(u => ({ ...u, semester: 2 })) : [])
+        ];
+
         const defaultPlan = { 
-          ...template, 
+          ...template1Sem, 
           id: `plan-usinagem-${profileId}`, 
           profileId: profileId,
           version: SCHEDULE_VERSION,
+          units: combinedUnits,
           updatedAt: new Date().toISOString()
         };
         await FirebaseService.savePlan(defaultPlan);
@@ -75,51 +93,75 @@ const App: React.FC = () => {
         setSelectedUnit(refreshed[0].units[0]);
       } else {
         const processedPlans = await Promise.all(dbPlans.map(async (plan) => {
-          const template = SAMPLE_PLANS.find(p => p.profileId === profileId) || SAMPLE_PLANS[0];
           let updated = false;
           
-          // --- HIGIENIZAÇÃO DE UNIDADES DUPLICADAS (LIDT / CRD / IDS 04 e 05) ---
+          // Assegura que propriedades antigas do banco recebam o semestre correto
+          plan.units = plan.units.map(unit => {
+            const code = (unit.code || '').toUpperCase();
+            if (code === 'PRUSC' || code === 'METIND') {
+              if ((unit as any).semester !== 2) {
+                (unit as any).semester = 2;
+                updated = true;
+              }
+            } else {
+              if (!(unit as any).semester) {
+                (unit as any).semester = 1;
+              }
+            }
+            return unit;
+          });
+
+          // --- HIGIENIZAÇÃO DE UNIDADES DUPLICADAS ---
           const cleanedUnits: CurricularUnit[] = [];
-          const seenSiglas = new Set<string>();
+          const seenSiglas1Sem = new Set<string>();
+          const seenSiglas2Sem = new Set<string>();
 
           for (const unit of plan.units) {
             const sigla = getUnitSigla(unit);
-            // Ignora IDs que representem duplicação ou siglas repetidas do primeiro semestre
-            const isDuplicated = 
-              ((unit as any).semester || 1) === 1 && 
-              (unit.id === "04" || unit.id === "05" || seenSiglas.has(sigla));
+            const sem = (unit as any).semester || 1;
 
-            if (isDuplicated) {
-              updated = true; // Força uma atualização para persistir a versão limpa no banco
-            } else {
-              if (((unit as any).semester || 1) === 1) {
-                seenSiglas.add(sigla);
+            if (sem === 1) {
+              if (unit.id === "04" || unit.id === "05" || seenSiglas1Sem.has(sigla)) {
+                updated = true;
+              } else {
+                seenSiglas1Sem.add(sigla);
+                cleanedUnits.push(unit);
               }
-              cleanedUnits.push(unit);
+            } else {
+              if (seenSiglas2Sem.has(sigla)) {
+                updated = true;
+              } else {
+                seenSiglas2Sem.add(sigla);
+                cleanedUnits.push(unit);
+              }
             }
           }
           plan.units = cleanedUnits;
 
-          // Mescla novas unidades do template se de fato estiverem faltando
-          template.units.forEach(tUnit => {
-            const tSigla = getUnitSigla(tUnit);
-            const hasUnit = plan.units.some(u => getUnitSigla(u) === tSigla && ((u as any).semester || 1) === 1);
-            if (!hasUnit) {
-              plan.units.push(tUnit);
-              updated = true;
-            }
-          });
+          // Injeta as unidades do 2º Semestre do template caso não existam no plano do banco
+          if (template2Sem) {
+            template2Sem.units.forEach(tUnit => {
+              const tSigla = getUnitSigla(tUnit);
+              const hasUnit = plan.units.some(u => getUnitSigla(u) === tSigla && (u as any).semester === 2);
+              if (!hasUnit) {
+                plan.units.push({ ...tUnit, semester: 2 });
+                updated = true;
+              }
+            });
+          }
 
-          // Atualiza fusi ou força a sincronização da nova versão de cronograma
-          const fusi = plan.units.find(u => u.id.toLowerCase().includes('fusi') || u.name.toUpperCase().includes('FUNDAMENTOS'));
-          if (fusi && (plan as any).version !== SCHEDULE_VERSION) {
-            const tFusi = template.units.find(u => u.id.toLowerCase().includes('fusi') || u.name.toUpperCase().includes('FUNDAMENTOS'));
-            if (tFusi) {
-              const idx = plan.units.indexOf(fusi);
-              plan.units[idx] = { ...tFusi };
-              (plan as any).version = SCHEDULE_VERSION;
-              updated = true;
+          // Atualização forçada por mudança de versão do cronograma
+          if ((plan as any).version !== SCHEDULE_VERSION) {
+            if (template2Sem) {
+              template2Sem.units.forEach(tUnit => {
+                const idx = plan.units.findIndex(u => getUnitSigla(u) === getUnitSigla(tUnit) && (u as any).semester === 2);
+                if (idx !== -1) {
+                  plan.units[idx] = { ...tUnit, semester: 2 };
+                }
+              });
             }
+            (plan as any).version = SCHEDULE_VERSION;
+            updated = true;
           }
 
           if (updated) {
@@ -141,7 +183,7 @@ const App: React.FC = () => {
           }
         } else {
           setCurrentPlan(processedPlans[0]);
-          const initialUnits = processedPlans[0].units.filter(u => ((u as any).semester || 1) === 1);
+          const initialUnits = processedPlans[0].units.filter(u => ((u as any).semester || 1) === currentSemester);
           setSelectedUnit(initialUnits[0] || processedPlans[0].units[0]);
         }
       }
@@ -150,7 +192,7 @@ const App: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [activeProfileId, currentPlan, selectedUnit]);
+  }, [activeProfileId, currentPlan, selectedUnit, currentSemester]);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -249,14 +291,14 @@ const App: React.FC = () => {
                 </div>
                 <section><h3 className="text-[10px] font-black uppercase text-blue-600 tracking-[0.3em] mb-4">I. Perfil de Conclusão</h3><p className="text-slate-600 text-sm leading-relaxed font-medium">{currentPlan.objective}</p></section>
               </div>
-              <div className="bg-slate-900 rounded-[2.5rem] p-8 md:p-12 text-white shadow-2xl">
-                <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 mb-8">III. Unidades Curriculares ({currentSemester}º Semestre)</h3>
+              <div className="bg-white border border-slate-200 rounded-[2.5rem] p-8 md:p-12 text-slate-900 shadow-2xl">
+                <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-blue-600 mb-8">III. Unidades Curriculares ({currentSemester}º Semestre)</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                   {filteredUnits.map((unit, idx) => (
-                    <button key={unit.id} onClick={() => { setSelectedUnit(unit); setView('plano-ensino'); }} className="bg-slate-800 p-8 rounded-3xl text-left hover:bg-blue-600 transition-all group relative overflow-hidden">
+                    <button key={unit.id} onClick={() => { setSelectedUnit(unit); setView('plano-ensino'); }} className="bg-slate-50 border border-slate-200 p-8 rounded-3xl text-left hover:bg-blue-600 hover:text-white transition-all group relative overflow-hidden">
                       <span className="text-6xl font-black opacity-5 absolute -right-2 -bottom-2">0{idx + 1}</span>
-                      <p className="text-[9px] font-black text-blue-400 mb-2">{getUnitSigla(unit)}</p>
-                      <h4 className="font-black text-lg leading-tight uppercase line-clamp-2">{unit.name}</h4>
+                      <p className="text-[9px] font-black text-blue-500 group-hover:text-blue-200 mb-2">{getUnitSigla(unit)}</p>
+                      <h4 className="font-black text-lg leading-tight uppercase line-clamp-2 text-slate-800 group-hover:text-white">{unit.name}</h4>
                     </button>
                   ))}
                   {filteredUnits.length === 0 && (
