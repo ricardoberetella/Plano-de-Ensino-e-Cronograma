@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { ViewType } from '../types';
 
@@ -9,6 +8,9 @@ interface LayoutProps {
   onLogout?: () => void;
   activeProfileId?: string;
   onProfileChange?: (id: string) => void;
+  // Propriedades injetadas para o controle de semestre
+  currentSemester: 1 | 2;
+  onSemesterChange: (semester: 1 | 2) => void;
 }
 
 interface Profile {
@@ -24,7 +26,9 @@ const Layout: React.FC<LayoutProps> = ({
   onViewChange, 
   onLogout, 
   activeProfileId = 'beretella',
-  onProfileChange 
+  onProfileChange,
+  currentSemester,
+  onSemesterChange
 }) => {
   const profiles: Profile[] = [
     { id: 'beretella', name: 'Ricardo Beretella', initials: 'RB', tags: 'LIDT | CRD | FUSI' },
@@ -59,7 +63,7 @@ const Layout: React.FC<LayoutProps> = ({
                 title={item.label}
               >
                 <div className="flex-shrink-0 scale-90 md:scale-100">{item.icon}</div>
-                <span className="hidden md:block text-[10px] font-black uppercase tracking-tight">{item.label}</span>
+                <span className="hidden md:block text-[10px] font-black uppercase tracking-tight"> {item.label}</span>
               </button>
             ))}
           </nav>
@@ -104,20 +108,45 @@ const Layout: React.FC<LayoutProps> = ({
       </aside>
 
       <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        <header className="bg-white border-b border-slate-200 h-14 flex items-center px-4 md:px-8 justify-between z-10 shadow-sm">
+        <header className="bg-white border-b border-slate-200 h-14 flex items-center px-4 md:px-8 justify-between z-10 shadow-sm gap-4">
           <div className="flex items-center gap-2 md:gap-4 overflow-hidden">
             <h1 className="text-[9px] md:text-xs font-black text-slate-800 uppercase tracking-widest whitespace-nowrap">
               {menuItems.find(i => i.id === activeView)?.label || 'Painel'}
             </h1>
             <span className="h-3 w-px bg-slate-200 flex-shrink-0"></span>
-            <span className="text-[8px] md:text-[9px] font-black text-blue-600 bg-blue-50 px-2 py-0.5 rounded uppercase tracking-tight truncate">
+            <span className="text-[8px] md:text-[9px] font-black text-blue-600 bg-blue-50 px-2 py-0.5 rounded uppercase tracking-tight truncate max-w-[120px] sm:max-w-none">
               Mecânico de Usinagem Convencional
             </span>
           </div>
-          <div className="flex items-center gap-4">
+
+          {/* MENU SELETOR DE SEMESTRE ADICIONADO DIRETAMENTE NA TOPBAR */}
+          <div className="flex bg-slate-100 p-0.5 rounded-xl border border-slate-200/60 flex-shrink-0">
+            <button
+              onClick={() => onSemesterChange(1)}
+              className={`px-3 py-1 rounded-lg text-[9px] md:text-[10px] font-black uppercase tracking-tight transition-all duration-200 ${
+                currentSemester === 1 
+                  ? 'bg-white text-blue-600 shadow-sm' 
+                  : 'text-slate-400 hover:text-slate-600'
+              }`}
+            >
+              1º Sem
+            </button>
+            <button
+              onClick={() => onSemesterChange(2)}
+              className={`px-3 py-1 rounded-lg text-[9px] md:text-[10px] font-black uppercase tracking-tight transition-all duration-200 ${
+                currentSemester === 2 
+                  ? 'bg-white text-blue-600 shadow-sm' 
+                  : 'text-slate-400 hover:text-slate-600'
+              }`}
+            >
+              2º Sem
+            </button>
+          </div>
+
+          <div className="flex items-center gap-4 flex-shrink-0">
              <div className="flex items-center gap-2">
                 <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest hidden sm:block">Firebase Cloud Online</span>
+                <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest hidden lg:block">Firebase Cloud Online</span>
              </div>
              <div className="bg-slate-100 px-3 py-1 rounded-full hidden md:flex items-center gap-2">
                 <span className="text-[8px] font-black text-slate-500 uppercase">Perfil:</span>
