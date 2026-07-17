@@ -1,16 +1,18 @@
-
 import React from 'react';
 import { TeachingPlan } from '../types';
 import { FirebaseService } from '../services/firebase';
 
 interface DashboardProps {
-  plans: TeachingPlan[];
+  plans?: TeachingPlan[]; // Tornamos opcional para evitar quebras de tipagem externa
   onEdit: (plan: TeachingPlan) => void;
   onView: (plan: TeachingPlan) => void;
   onRefresh: () => void;
 }
 
-const Dashboard: React.FC<DashboardProps> = ({ plans, onEdit, onView, onRefresh }) => {
+const Dashboard: React.FC<DashboardProps> = ({ plans = [], onEdit, onView, onRefresh }) => {
+  // Garantimos que 'plans' sempre será um array seguro para manipulação
+  const safePlans = Array.isArray(plans) ? plans : [];
+
   return (
     <div className="space-y-8 animate-fadeIn">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -30,7 +32,7 @@ const Dashboard: React.FC<DashboardProps> = ({ plans, onEdit, onView, onRefresh 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
           <p className="text-slate-500 text-[10px] font-black uppercase tracking-widest">Planos Totais</p>
-          <h3 className="text-3xl font-black mt-1 text-slate-800">{plans.length}</h3>
+          <h3 className="text-3xl font-black mt-1 text-slate-800">{safePlans.length}</h3>
         </div>
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 border-b-4 border-b-blue-500">
           <p className="text-slate-500 text-[10px] font-black uppercase tracking-widest">Serviço de Dados</p>
@@ -58,7 +60,7 @@ const Dashboard: React.FC<DashboardProps> = ({ plans, onEdit, onView, onRefresh 
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
-            {plans.map(plan => (
+            {safePlans?.map(plan => (
               <tr key={plan.id} className="hover:bg-slate-50 transition-colors group">
                 <td className="px-6 py-4">
                   <p className="font-black text-slate-800 text-sm uppercase">{plan.courseName}</p>
@@ -98,7 +100,7 @@ const Dashboard: React.FC<DashboardProps> = ({ plans, onEdit, onView, onRefresh 
                 </td>
               </tr>
             ))}
-            {plans.length === 0 && (
+            {safePlans.length === 0 && (
               <tr>
                 <td colSpan={4} className="px-6 py-20 text-center">
                   <p className="text-slate-400 font-black uppercase text-[10px] tracking-widest italic">Aguardando planos do Firebase Cloud...</p>
