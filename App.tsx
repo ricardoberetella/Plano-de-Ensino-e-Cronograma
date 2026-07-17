@@ -53,23 +53,21 @@ const App: React.FC = () => {
           const template = SAMPLE_PLANS.find(p => p.profileId === profileId) || SAMPLE_PLANS[0];
           let updated = false;
           
-          // Se o plano não possuir unidades cadastradas, previne quebra usando array vazio
           if (!plan.units) plan.units = [];
 
-          // --- HIGIENIZAÇÃO DE UNIDADES DUPLICADAS (LIDT / CRD / IDS 04 e 05) ---
+          // --- HIGIENIZAÇÃO DE UNIDADES DUPLICADAS ---
           const cleanedUnits: CurricularUnit[] = [];
           const seenSiglas = new Set<string>();
 
           for (const unit of plan.units) {
             const sigla = getUnitSigla(unit);
-            // Ignora IDs que representem duplicação ou siglas repetidas
             const isDuplicated = 
               unit.id === "04" || 
               unit.id === "05" || 
               seenSiglas.has(sigla);
 
             if (isDuplicated) {
-              updated = true; // Força uma atualização para persistir a versão limpa no banco
+              updated = true;
             } else {
               seenSiglas.add(sigla);
               cleanedUnits.push(unit);
@@ -77,7 +75,6 @@ const App: React.FC = () => {
           }
           plan.units = cleanedUnits;
 
-          // Mescla novas unidades do template se de fato estiverem faltando
           template.units?.forEach(tUnit => {
             const tSigla = getUnitSigla(tUnit);
             const hasUnit = plan.units.some(u => getUnitSigla(u) === tSigla);
@@ -87,7 +84,6 @@ const App: React.FC = () => {
             }
           });
 
-          // Atualiza fusi ou força a sincronização da nova versão de cronograma
           const fusi = plan.units.find(u => u.id?.toLowerCase().includes('fusi') || u.name?.toUpperCase().includes('FUNDAMENTOS'));
           if (fusi && (plan as any).version !== SCHEDULE_VERSION) {
             const tFusi = template.units?.find(u => u.id?.toLowerCase().includes('fusi') || u.name?.toUpperCase().includes('FUNDAMENTOS'));
@@ -126,13 +122,13 @@ const App: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [currentPlan, selectedUnit]);
+  }, [activeProfileId, currentPlan, selectedUnit]);
 
   useEffect(() => {
     if (isAuthenticated) {
       loadPlans(activeProfileId);
     }
-  }, [activeProfileId, isAuthenticated]);
+  }, [activeProfileId, isAuthenticated, loadPlans]);
 
   const handleSave = async (updatedPlan: TeachingPlan) => {
     const planToSave = { ...updatedPlan, profileId: activeProfileId };
@@ -192,7 +188,14 @@ const App: React.FC = () => {
         </div>
       ) : (
         <>
-          {view === 'dashboard' && <Dashboard plans={plans} onEdit={(p) => { setCurrentPlan(p); setView('editor'); }} onView={(p) => { setCurrentPlan(p); setSelectedUnit(p.units?.[0] || null); setView('plano-curso'); }} onRefresh={() => loadPlans(activeProfileId)} />}
+          {view === 'dashboard' && (
+            <Dashboard 
+              plans={plans} 
+              onEdit={(p) => { setCurrentPlan(p); setView('editor'); }} 
+              onView={(p) => { setCurrentPlan(p); setSelectedUnit(p.units?.[0] || null); setView('plano-curso'); }} 
+              onRefresh={() => loadPlans(activeProfileId)} 
+            />
+          )}
           
           {view === 'plano-curso' && currentPlan && (
             <div className="max-w-4xl mx-auto space-y-10 animate-fadeIn pb-20">
