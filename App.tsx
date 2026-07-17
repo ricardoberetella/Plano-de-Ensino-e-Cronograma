@@ -17,8 +17,10 @@ const App: React.FC = () => {
   const [currentPlan, setCurrentPlan] = useState<TeachingPlan | null>(null);
   const [selectedUnit, setSelectedUnit] = useState<CurricularUnit | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  
+  // Novo estado para controlar a aba de semestres ativa no cabeçalho
+  const [activeSemester, setActiveSemester] = useState<number>(1);
 
-  // Refs para manter os valores atualizados sem disparar o loop do useCallback
   const currentPlanRef = useRef<TeachingPlan | null>(null);
   const selectedUnitRef = useRef<CurricularUnit | null>(null);
 
@@ -30,7 +32,6 @@ const App: React.FC = () => {
     selectedUnitRef.current = selectedUnit;
   }, [selectedUnit]);
 
-  // Busca segura de templates de planos
   const getTemplatePlan = useCallback((profileId: string): TeachingPlan => {
     if (Array.isArray(SAMPLE_PLANS)) {
       return SAMPLE_PLANS.find(p => p?.profileId === profileId) || SAMPLE_PLANS[0];
@@ -61,7 +62,17 @@ const App: React.FC = () => {
     if (name.includes('LEITURA') || name.includes('DESENHO') || id.includes('lidt')) return 'LIDT';
     if (name.includes('CONTROLE') || name.includes('DIMENSIONAL') || id.includes('crd')) return 'CRD';
     if (name.includes('FUNDAMENTOS') || name.includes('USINAGEM') || id.includes('fusi')) return 'FUSI';
+    if (name.includes('METROLOGIA') || id.includes('mia') || id.includes('metr')) return 'MIA';
     return unit.name.split(' ').map(w => w[0]).join('').toUpperCase();
+  };
+
+  // Define se a unidade pertence ao 1º ou 2º semestre baseado no nome/sigla
+  const getUnitSemester = (unit: CurricularUnit): number => {
+    const sigla = getUnitSigla(unit);
+    if (sigla === 'MIA' || unit.name.toUpperCase().includes('METROLOGIA')) {
+      return 2; // Metrologia Industrial vai para o 2º Semestre
+    }
+    return 1; // LIDT, CRD e FUSI ficam no 1º Semestre
   };
 
   const loadPlans = useCallback(async (profileId: string) => {
@@ -154,7 +165,7 @@ const App: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [getTemplatePlan]); // Dependência estática e limpa para evitar loops
+  }, [getTemplatePlan]);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -200,9 +211,13 @@ const App: React.FC = () => {
     setCurrentPlan(null);
     setSelectedUnit(null);
     setView('dashboard');
+    setActiveSemester(1); // Reseta para o primeiro semestre ao mudar perfil
   };
 
   if (!isAuthenticated) return <Login onLogin={() => setIsAuthenticated(true)} />;
+
+  // Filtra as unidades de acordo com o semestre selecionado no topo
+  const filteredUnits = currentPlan?.units?.filter(unit => getUnitSemester(unit) === activeSemester) || [];
 
   return (
     <Layout 
@@ -211,6 +226,8 @@ const App: React.FC = () => {
       onLogout={handleLogout || (() => {})}
       activeProfileId={activeProfileId}
       onProfileChange={handleProfileChange || (() => {})}
+      activeSemester={activeSemester}
+      onSemesterChange={setActiveSemester} // Passa a função para o Layout habilitar o clique das abas do topo
     >
       {isLoading ? (
         <div className="flex flex-col items-center justify-center h-full space-y-4">
@@ -244,21 +261,29 @@ const App: React.FC = () => {
                 </div>
                 <section><h3 className="text-[10px] font-black uppercase text-blue-600 tracking-[0.3em] mb-4">I. Perfil de Conclusão</h3><p className="text-slate-600 text-sm leading-relaxed font-medium">{currentPlan.objective}</p></section>
               </div>
+              
               <div className="bg-slate-900 rounded-[2.5rem] p-8 md:p-12 text-white shadow-2xl">
-                <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 mb-8">III. Unidades Curriculares</h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                  {currentPlan.units?.map((unit, idx) => (
-                    <button 
-                      key={unit.id || idx} 
-                      onClick={() => { if(unit) { setSelectedUnit(unit); setView('plano-ensino'); } }} 
-                      className="bg-slate-800 p-8 rounded-3xl text-left hover:bg-blue-600 transition-all group relative overflow-hidden"
-                    >
-                      <span className="text-6xl font-black opacity-5 absolute -right-2 -bottom-2">0{idx + 1}</span>
-                      <p className="text-[9px] font-black text-blue-400 mb-2">{getUnitSigla(unit)}</p>
-                      <h4 className="font-black text-lg leading-tight uppercase line-clamp-2">{unit.name}</h4>
-                    </button>
-                  ))}
+                <div className="flex justify-between items-center mb-8">
+                  <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500">III. Unidades Curriculares ({activeSemester}º Semestre)</h3>
                 </div>
+                
+                {filteredUnits.length === 0 ? (
+                  <p className="text-slate-400 text-xs font-medium italic p-4 text-center">Nenhuma unidade curricular mapeada para este semestre.</p>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                    {filteredUnits.map((unit, idx) => (
+                      <button 
+                        key={unit.id || idx} 
+                        onClick={() => { if(unit) { setSelectedUnit(unit); setView('plano-ensino'); } }} 
+                        className="bg-slate-800 p-8 rounded-3xl text-left hover:bg-blue-600 transition-all group relative overflow-hidden"
+                      >
+                        <span className="text-6xl font-black opacity-5 absolute -right-2 -bottom-2">0{idx + 1}</span>
+                        <p className="text-[9px] font-black text-blue-400 mb-2">{getUnitSigla(unit)}</p>
+                        <h4 className="font-black text-lg leading-tight uppercase line-clamp-2">{unit.name}</h4>
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           )}
