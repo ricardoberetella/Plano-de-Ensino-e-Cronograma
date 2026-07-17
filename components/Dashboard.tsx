@@ -3,14 +3,13 @@ import { TeachingPlan } from '../types';
 import { FirebaseService } from '../services/firebase';
 
 interface DashboardProps {
-  plans?: TeachingPlan[]; // Tornamos opcional para evitar quebras de tipagem externa
+  plans?: TeachingPlan[]; 
   onEdit: (plan: TeachingPlan) => void;
   onView: (plan: TeachingPlan) => void;
   onRefresh: () => void;
 }
 
 const Dashboard: React.FC<DashboardProps> = ({ plans = [], onEdit, onView, onRefresh }) => {
-  // Garantimos que 'plans' sempre será um array seguro para manipulação
   const safePlans = Array.isArray(plans) ? plans : [];
 
   return (
