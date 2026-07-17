@@ -17,8 +17,6 @@ const App: React.FC = () => {
   const [currentPlan, setCurrentPlan] = useState<TeachingPlan | null>(null);
   const [selectedUnit, setSelectedUnit] = useState<CurricularUnit | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  
-  // Novo estado para controlar a aba de semestres ativa no cabeçalho
   const [activeSemester, setActiveSemester] = useState<number>(1);
 
   const currentPlanRef = useRef<TeachingPlan | null>(null);
@@ -55,24 +53,30 @@ const App: React.FC = () => {
     };
   }, []);
 
+  // Extração inteligente de siglas sincronizada com a nova matriz
   const getUnitSigla = (unit: CurricularUnit) => {
     if (!unit || !unit.name) return '';
     const name = unit.name.toUpperCase();
     const id = unit.id ? unit.id.toLowerCase() : '';
+    
     if (name.includes('LEITURA') || name.includes('DESENHO') || id.includes('lidt')) return 'LIDT';
     if (name.includes('CONTROLE') || name.includes('DIMENSIONAL') || id.includes('crd')) return 'CRD';
     if (name.includes('FUNDAMENTOS') || name.includes('USINAGEM') || id.includes('fusi')) return 'FUSI';
-    if (name.includes('METROLOGIA') || id.includes('mia') || id.includes('metr')) return 'MIA';
+    
+    // Novas unidades do 2º Semestre
+    if (name.includes('PROCESSOS DE USINAGEM') || name.includes('CONVENCIONAL') || id.includes('prusc')) return 'PRUSC';
+    if (name.includes('METROLOGIA INDUSTRIAL') || id.includes('mein') || id.includes('mia')) return 'MEIN';
+    
     return unit.name.split(' ').map(w => w[0]).join('').toUpperCase();
   };
 
-  // Define se a unidade pertence ao 1º ou 2º semestre baseado no nome/sigla
+  // Mapeamento rígido por semestre ajustado com as novas nomenclaturas
   const getUnitSemester = (unit: CurricularUnit): number => {
     const sigla = getUnitSigla(unit);
-    if (sigla === 'MIA' || unit.name.toUpperCase().includes('METROLOGIA')) {
-      return 2; // Metrologia Industrial vai para o 2º Semestre
+    if (sigla === 'PRUSC' || sigla === 'MEIN') {
+      return 2; // Segundo Semestre
     }
-    return 1; // LIDT, CRD e FUSI ficam no 1º Semestre
+    return 1; // Primeiro Semestre: LIDT, CRD e FUSI
   };
 
   const loadPlans = useCallback(async (profileId: string) => {
@@ -104,7 +108,7 @@ const App: React.FC = () => {
 
           for (const unit of plan.units) {
             const sigla = getUnitSigla(unit);
-            const isDuplicated = unit.id === "04" || unit.id === "05" || seenSiglas.has(sigla);
+            const isDuplicated = seenSiglas.has(sigla);
             if (isDuplicated) {
               updated = true;
             } else {
@@ -123,15 +127,10 @@ const App: React.FC = () => {
             }
           });
 
-          const fusi = plan.units.find(u => u.id?.toLowerCase().includes('fusi') || u.name?.toUpperCase().includes('FUNDAMENTOS'));
-          if (fusi && (plan as any).version !== SCHEDULE_VERSION) {
-            const tFusi = template.units?.find(u => u.id?.toLowerCase().includes('fusi') || u.name?.toUpperCase().includes('FUNDAMENTOS'));
-            if (tFusi) {
-              const idx = plan.units.indexOf(fusi);
-              plan.units[idx] = { ...tFusi };
-              (plan as any).version = SCHEDULE_VERSION;
-              updated = true;
-            }
+          if ((plan as any).version !== SCHEDULE_VERSION) {
+            plan.units = template.units ? [...template.units] : plan.units;
+            (plan as any).version = SCHEDULE_VERSION;
+            updated = true;
           }
 
           if (updated) {
@@ -211,23 +210,23 @@ const App: React.FC = () => {
     setCurrentPlan(null);
     setSelectedUnit(null);
     setView('dashboard');
-    setActiveSemester(1); // Reseta para o primeiro semestre ao mudar perfil
+    setActiveSemester(1);
   };
 
   if (!isAuthenticated) return <Login onLogin={() => setIsAuthenticated(true)} />;
 
-  // Filtra as unidades de acordo com o semestre selecionado no topo
+  // Filtra dinamicamente as unidades baseadas no semestre ativo selecionado no cabeçalho
   const filteredUnits = currentPlan?.units?.filter(unit => getUnitSemester(unit) === activeSemester) || [];
 
   return (
     <Layout 
       activeView={view} 
-      onViewChange={setView || (() => {})} 
-      onLogout={handleLogout || (() => {})}
+      onViewChange={setView} 
+      onLogout={handleLogout}
       activeProfileId={activeProfileId}
-      onProfileChange={handleProfileChange || (() => {})}
+      onProfileChange={handleProfileChange}
       activeSemester={activeSemester}
-      onSemesterChange={setActiveSemester} // Passa a função para o Layout habilitar o clique das abas do topo
+      onSemesterChange={setActiveSemester}
     >
       {isLoading ? (
         <div className="flex flex-col items-center justify-center h-full space-y-4">
@@ -238,7 +237,7 @@ const App: React.FC = () => {
         <>
           {view === 'dashboard' && (
             <Dashboard 
-              plans={plans || []} 
+              plans={plans} 
               onEdit={(p) => { setCurrentPlan(p); setView('editor'); }} 
               onView={(p) => { setCurrentPlan(p); setSelectedUnit(p?.units?.[0] || null); setView('plano-curso'); }} 
               onRefresh={() => loadPlans(activeProfileId)} 
@@ -268,7 +267,7 @@ const App: React.FC = () => {
                 </div>
                 
                 {filteredUnits.length === 0 ? (
-                  <p className="text-slate-400 text-xs font-medium italic p-4 text-center">Nenhuma unidade curricular mapeada para este semestre.</p>
+                  <p className="text-slate-400 text-xs font-medium italic p-4 text-center">Nenhuma unidade curricular cadastrada para este semestre.</p>
                 ) : (
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                     {filteredUnits.map((unit, idx) => (
