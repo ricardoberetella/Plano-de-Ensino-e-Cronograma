@@ -18,7 +18,33 @@ const App: React.FC = () => {
   const [selectedUnit, setSelectedUnit] = useState<CurricularUnit | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Função utilitária para normalizar e identificar a sigla correta
+  // Função utilitária para buscar o template de forma segura, seja SAMPLE_PLANS um array ou objeto
+  const getTemplatePlan = useCallback((profileId: string): TeachingPlan => {
+    // 1. Se SAMPLE_PLANS for um Array válido
+    if (Array.isArray(SAMPLE_PLANS)) {
+      return SAMPLE_PLANS.find(p => p?.profileId === profileId) || SAMPLE_PLANS[0];
+    }
+    // 2. Se SAMPLE_PLANS for um Objeto cujas chaves contêm os planos
+    if (SAMPLE_PLANS && typeof SAMPLE_PLANS === 'object') {
+      const plansArray = Object.values(SAMPLE_PLANS) as TeachingPlan[];
+      if (plansArray.length > 0) {
+        return plansArray.find(p => p?.profileId === profileId) || plansArray[0];
+      }
+    }
+    // 3. Fallback absoluto para evitar que o app quebre se a constante estiver vazia
+    return {
+      id: `fallback-${profileId}`,
+      profileId,
+      courseName: 'Mecânico de Usinagem Convencional',
+      totalHours: 800,
+      modality: 'Qualificação Profissional',
+      objective: '',
+      units: [],
+      version: SCHEDULE_VERSION,
+      updatedAt: new Date().toISOString()
+    };
+  }, []);
+
   const getUnitSigla = (unit: CurricularUnit) => {
     if (!unit || !unit.name) return '';
     const name = unit.name.toUpperCase();
@@ -33,9 +59,9 @@ const App: React.FC = () => {
     setIsLoading(true);
     try {
       const dbPlans = await FirebaseService.getPlans(profileId);
+      const template = getTemplatePlan(profileId);
       
       if (!dbPlans || dbPlans.length === 0) {
-        const template = SAMPLE_PLANS.find(p => p.profileId === profileId) || SAMPLE_PLANS[0];
         const defaultPlan = { 
           ...template, 
           id: `plan-usinagem-${profileId}`, 
@@ -50,7 +76,6 @@ const App: React.FC = () => {
         setSelectedUnit(refreshed[0]?.units?.[0] || null);
       } else {
         const processedPlans = await Promise.all(dbPlans.map(async (plan) => {
-          const template = SAMPLE_PLANS.find(p => p.profileId === profileId) || SAMPLE_PLANS[0];
           let updated = false;
           
           if (!plan.units) plan.units = [];
@@ -122,7 +147,7 @@ const App: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [activeProfileId, currentPlan, selectedUnit]);
+  }, [activeProfileId, currentPlan, selectedUnit, getTemplatePlan]);
 
   useEffect(() => {
     if (isAuthenticated) {
