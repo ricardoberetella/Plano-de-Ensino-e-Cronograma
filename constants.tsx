@@ -1,6 +1,6 @@
 import { TeachingPlan } from './types';
 
-export const SCHEDULE_VERSION = 20260717; // Nova versão para forçar a atualização dos dados no Firebase
+export const SCHEDULE_VERSION = 20260717; // Mantida a sua nova versão para forçar a sincronização no Firebase
 
 export const SAMPLE_PLANS: TeachingPlan[] = [
   {
@@ -17,21 +17,48 @@ export const SAMPLE_PLANS: TeachingPlan[] = [
       {
         id: "lidt",
         name: "Leitura e Interpretação de Desenho Técnico",
-        hours: 0,
+        hours: 60, // Ajustado carga padrão do bloco comum do SENAI
         schedule: [],
         calendar: { start: '', end: '', daysOfWeek: [], exceptions: [] }
       },
       {
         id: "crd",
         name: "Controle Dimensional",
-        hours: 0,
+        hours: 60, // Ajustado carga padrão do bloco comum do SENAI
         schedule: [],
         calendar: { start: '', end: '', daysOfWeek: [], exceptions: [] }
       },
       {
         id: "fusi",
         name: "Fundamentos da Usinagem",
-        hours: 0,
+        hours: 160,
+        schedule: [],
+        calendar: { start: '', end: '', daysOfWeek: [], exceptions: [] }
+      },
+      {
+        id: "mein",
+        name: "Metrologia Industrial", // Movido corretamente para o 1º Semestre
+        hours: 80,
+        capabilities: [
+          "Medir peças por meio de instrumentos da ordem direta, de acordo com especificações técnicas.",
+          "Medir peças por meio de instrumentos da ordem indireta, de acordo com especificações técnicas.",
+          "Medir a dureza de materiais de acordo com especificações técnicas.",
+          "Medir perfil de peças por meio de imagens projetadas, de acordo com especificações técnicas.",
+          "Medir tridimensionalmente peças de acordo com especificações técnicas.",
+          "Medir peças digitalmente por meio de sistemas de medição por visão de acordo com especificações técnicas.",
+          "Medir peças com braço de medição portátil de acordo com especificações técnicas.",
+          "Testar a funcionalidade de peças e conjuntos de acordo com especificações técnicas."
+        ],
+        knowledges: [
+          "Medição de ordem direta: Instrumentos (Paquímetro para medição de engrenagens, Micrômetro para medição de rosca, Micrômetro para medição de engrenagens, Rugosímetro, Calibrador de altura linear height), Procedimentos (Manuseio, Conservação, Armazenamento).",
+          "Medição de ordem indireta: Instrumentos (Comparador de diâmetro interno, Calibrador passa não passa, Bloco padrão, Régua e mesa de seno), Aplicação, Leitura, Técnicas de utilização, Procedimentos (Manuseio, Conservação, Armazenamento).",
+          "Durômetro: Tipos, Características, Aplicação, Técnicas de utilização, Procedimentos (Manuseio, Conservação, Armazenamento).",
+          "Projetor de perfil: Tipos, Características, Aplicação, Técnicas de utilização, Projeção (Diascópica, Episcópica), Procedimentos.",
+          "Máquina de medição por coordenadas: Tipos (Manual, CNC), Características, Aplicação, Técnicas de utilização, Dispositivos de medição, Dados, Procedimentos.",
+          "Medição por Visão: Tipos, Características, Aplicação, Técnicas de utilização, Procedimentos (Manuseio, Conservação, Armazenamento).",
+          "Braço de medição: Tipos (Manual, CNC), Características, Aplicação, Técnicas de utilização, Dispositivos de medição, Dados, Procedimentos.",
+          "Funcionalidade: Objetivo, Importância, Aspectos a serem testados (Funcionalidade, Comportamento, Qualidade), Tipos de testes (Funcional, De componentes, De integração), Ferramentas e métodos (Testes automatizados, Bancada de teste, Simulação)."
+        ],
         schedule: [],
         calendar: { start: '', end: '', daysOfWeek: [], exceptions: [] }
       },
@@ -63,33 +90,6 @@ export const SAMPLE_PLANS: TeachingPlan[] = [
         ],
         schedule: [],
         calendar: { start: '', end: '', daysOfWeek: [], exceptions: [] }
-      },
-      {
-        id: "mein",
-        name: "Metrologia Industrial",
-        hours: 80,
-        capabilities: [
-          "Medir peças por meio de instrumentos da ordem direta, de acordo com especificações técnicas.",
-          "Medir peças por meio de instrumentos da ordem indireta, de acordo com especificações técnicas.",
-          "Medir a dureza de materiais de acordo com especificações técnicas.",
-          "Medir perfil de peças por meio de imagens projetadas, de acordo com especificações técnicas.",
-          "Medir tridimensionalmente peças de acordo com especificações técnicas.",
-          "Medir peças digitalmente por meio de sistemas de medição por visão de acordo com especificações técnicas.",
-          "Medir peças com braço de medição portátil de acordo com especificações técnicas.",
-          "Testar a funcionalidade de peças e conjuntos de acordo com especificações técnicas."
-        ],
-        knowledges: [
-          "Medição de ordem direta: Instrumentos (Paquímetro para medição de engrenagens, Micrômetro para medição de rosca, Micrômetro para medição de engrenagens, Rugosímetro, Calibrador de altura linear height), Procedimentos (Manuseio, Conservação, Armazenamento).",
-          "Medição de ordem indireta: Instrumentos (Comparador de diâmetro interno, Calibrador passa não passa, Bloco padrão, Régua e mesa de seno), Aplicação, Leitura, Técnicas de utilização, Procedimentos (Manuseio, Conservação, Armazenamento).",
-          "Durômetro: Tipos, Características, Aplicação, Técnicas de utilização, Procedimentos (Manuseio, Conservação, Armazenamento).",
-          "Projetor de perfil: Tipos, Características, Aplicação, Técnicas de utilização, Projeção (Diascópica, Episcópica), Procedimentos.",
-          "Máquina de medição por coordenadas: Tipos (Manual, CNC), Características, Aplicação, Técnicas de utilização, Dispositivos de medição, Dados, Procedimentos.",
-          "Medição por Visão: Tipos, Características, Aplicação, Técnicas de utilização, Procedimentos (Manuseio, Conservação, Armazenamento).",
-          "Braço de medição: Tipos (Manual, CNC), Características, Aplicação, Técnicas de utilização, Dispositivos de medição, Dados, Procedimentos.",
-          "Funcionalidade: Objetivo, Importância, Aspectos a serem testados (Funcionalidade, Comportamento, Qualidade), Tipos de testes (Funcional, De componentes, De integração), Ferramentas e métodos (Testes automatizados, Bancada de teste, Simulação)."
-        ],
-        schedule: [],
-        calendar: { start: '', end: '', daysOfWeek: [], exceptions: [] }
       }
     ]
   },
@@ -99,9 +99,9 @@ export const SAMPLE_PLANS: TeachingPlan[] = [
     courseName: "Mecânico de Usinagem Convencional",
     totalHours: 800,
     modality: "Aprendizagem Industrial",
-    objective: "Desenvolver capacidades técnicas e socioemocionais relativas aos elementos de máquina, ferramentas, processos de fabricação, manutenção e usinagem convencional seguindo normas de saúde e segurança.",
+    objective: "Desenvolver capacidades técnicas e socioemocionais relativas aos elementos de máquina, ferramentas, associados a processos de fabricação, manutenção e usinagem convencional seguindo normas de saúde e segurança.",
     version: SCHEDULE_VERSION,
     updatedAt: new Date().toISOString(),
-    units: [] // O algoritmo do App.tsx vai clonar a estrutura acima automaticamente para o Gea
+    units: []
   }
 ];
