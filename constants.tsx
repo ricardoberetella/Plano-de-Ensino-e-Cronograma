@@ -1,9 +1,9 @@
-import { TeachingPlan } from './types';
+import { TeachingPlan, CurricularUnit } from './types';
 
 export const SENAI_BLUE = "#005DAA";
 export const SENAI_RED = "#E30613";
 
-// Versão do cronograma - Alterada para forçar o App a atualizar o banco de dados com os novos dados fiéis
+// Versão do cronograma - Mantida para garantir a atualização dos dados no banco
 export const SCHEDULE_VERSION = "2026-V12-GEA-BERE-FULL";
 
 // --- CRONOGRAMA LIDT (Revisado) ---
@@ -13,7 +13,7 @@ export const LIDT_SCHEDULE = [
   { id: 'l3', date: '09/02/2026', hours: 2, capacities: 'Interpretar desenhos técnicos de peças.', knowledge: '1.5. Escalas; 1.6. Figuras e sólidos geométricos.', strategy: '• Exposição dialogada e Demonstração.', resources: 'Projetor, models de sólidos.' },
   { id: 'l4', date: '23/02/2026', hours: 2, capacities: 'Elaborar croquis de peças.', knowledge: '2.1. Perspectiva (isométrica, vistas)...', strategy: '• Atividade prática: Introdução à perspectiva isométrica.', resources: 'Papel, lpis.' },
   { id: 'l5', date: '02/03/2026', hours: 2, capacities: 'Elaborar croquis de peças.', knowledge: '2.2. Projeção ortogonal (vistas, supressão de vistas).', strategy: '• Atividade prática: Desenho das 3 vistas principais.', resources: 'Modelos de peças simples.' },
-  { id: 'l6', date: '09/03/2026', hours: 2, capacities: 'Elaborar croquis de peças.', knowledge: '2.5. Cotagem (vistas únicas, face de referência).', strategy: '• Exercícios de cotagem de vistas ortogonais.', resources: 'Exercícios impressos.' },
+  { id: 'l6', date: '09/03/2026', hours: 2, capacities: 'Elaborar croquis de peças.', knowledge: '2.5. Cotagem (vistas uniques, face de referência).', strategy: '• Exercícios de cotagem de vistas ortoriais.', resources: 'Exercícios impressos.' },
   { id: 'l7', date: '16/03/2026', hours: 2, capacities: 'Interpretar desenhos técnicos de peças.', knowledge: '3.1. Cortes... 3.2. Meio corte.', strategy: '• Exposição dialogada e Demonstração de cortes.', resources: 'Desenhos técnicos com cortes.' },
   { id: 'l8', date: '23/03/2026', hours: 2, capacities: 'Interpretar desenhos técnicos de peças.', knowledge: '3.3 a 3.7. Outros tipos de corte.', strategy: '• Estudo de caso: Análise de desenhos complexos.', resources: 'Conjunto de desenhos variados.' },
   { id: 'l9', date: '30/03/2026', hours: 2, capacities: 'Elaborar croquis de peças.', knowledge: '4. Vistas especiais (auxiliares, rotação).', strategy: '• Exercícios de desenho de vistas auxiliares.', resources: 'Modelos de peças com faces inclinadas.' },
@@ -176,4 +176,30 @@ export const FUSI_SCHEDULE = [
   { id: 'f58', hours: 4, date: '11/06/2026', capacities: 'Revisão Geral de Processos e Documentação.', knowledge: 'TEORIA (TEOR)', strategy: 'Conferência de diários e fichas técnicas.', resources: 'Sala de aula.' },
   { id: 'f59', hours: 4, date: '17/06/2026', capacities: 'Feedback Final e Divulgação de Notas.', knowledge: 'TEORIA (TEOR)', strategy: 'Encerramento letivo em sala de aula.', resources: 'Sala de aula.' },
   { id: 'f60', hours: 4, date: '22/06/2026', capacities: 'Entrega Final das Peças e Avaliação de Resultados.', knowledge: 'PRÁTICA (PRAT)', strategy: 'Finalização de todas as atividades de oficina.', resources: 'Oficina de usinagem.' }
+];
+
+// --- UNIDADES CURRICULARES INICIAIS (SAMPLE_PLANS) ---
+// Retornando a exportação exigida pelo UnitViewer.tsx para corrigir o erro de build no Vercel.
+export const SAMPLE_PLANS: CurricularUnit[] = [
+  {
+    id: 'lidt',
+    name: 'Leitura e Interpretação de Desenho Técnico (LIDT)',
+    totalHours: 40,
+    color: '#3B82F6', // Azul para LIDT
+    schedule: LIDT_SCHEDULE
+  },
+  {
+    id: 'crd',
+    name: 'Controle Dimensional (CRD)',
+    totalHours: 32,
+    color: '#10B981', // Verde para CRD
+    schedule: CRD_SCHEDULE
+  },
+  {
+    id: 'fusi',
+    name: 'Fundamentos de Usinagem (FUSI)',
+    totalHours: 240,
+    color: '#EF4444', // Vermelho para FUSI
+    schedule: FUSI_SCHEDULE // Vincula o padrão (Beretella) por padrão
+  }
 ];
