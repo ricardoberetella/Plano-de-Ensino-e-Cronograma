@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Layout from './components/Layout';
 import Dashboard from './components/Dashboard';
 import PlanForm from './components/PlanForm';
@@ -6,7 +6,6 @@ import UnitViewer from './components/UnitViewer';
 import Login from './components/Login';
 import GeneralCalendar from './components/GeneralCalendar';
 import { TeachingPlan, ViewType, CurricularUnit, ScheduleEntry, UnitCalendar } from './types';
-import { SAMPLE_PLANS, SCHEDULE_VERSION } from './constants';
 import { FirebaseService } from './services/firebase';
 
 const App: React.FC = () => {
@@ -35,109 +34,34 @@ const App: React.FC = () => {
       const dbPlans = await FirebaseService.getPlans(profileId);
       const safeDbPlans = Array.isArray(dbPlans) ? dbPlans : [];
       
-      if (safeDbPlans.length === 0) {
-        const template = SAMPLE_PLANS.find(p => p.profileId === profileId) || SAMPLE_PLANS[0];
-        const defaultPlan = { 
-          ...template, 
-          id: `plan-usinagem-${profileId}`, 
-          profileId: profileId,
-          version: SCHEDULE_VERSION,
-          updatedAt: new Date().toISOString()
-        };
-        await FirebaseService.savePlan(defaultPlan);
-        const refreshed = await FirebaseService.getPlans(profileId);
-        const safeRefreshed = Array.isArray(refreshed) ? refreshed : [];
-        
-        setPlans(safeRefreshed);
-        if (safeRefreshed.length > 0) {
-          // Filtra MI para não aparecer na inicialização
-          const filteredUnits = (safeRefreshed[0].units || []).filter(u => getUnitSigla(u) !== 'MI');
-          safeRefreshed[0].units = filteredUnits;
-          setCurrentPlan(safeRefreshed[0]);
-          if (filteredUnits.length > 0) setSelectedUnit(filteredUnits[0]);
+      // Mapeia os planos SEM NENHUMA higienização ou alteração forçada no Firebase
+      const processedPlans = safeDbPlans.map(plan => {
+        if (plan && Array.isArray(plan.units)) {
+          // Apenas filtra visualmente o MI para não poluir a tela
+          plan.units = plan.units.filter(u => getUnitSigla(u) !== 'MI');
         }
-      } else {
-        const processedPlans = await Promise.all(safeDbPlans.map(async (plan) => {
-          const template = SAMPLE_PLANS.find(p => p.profileId === profileId) || SAMPLE_PLANS[0];
-          let updated = false;
-          
-          const currentUnits = Array.isArray(plan.units) ? plan.units : [];
-          const cleanedUnits: CurricularUnit[] = [];
-          const seenSiglas = new Set<string>();
+        return plan;
+      });
 
-          for (const unit of currentUnits) {
-            const sigla = getUnitSigla(unit);
-            
-            // --- EXCLUSÃO COMPLETA DE MI E DUPLICADOS ---
-            const shouldExclude = 
-              sigla === 'MI' || 
-              unit.id === "04" || 
-              unit.id === "05" || 
-              seenSiglas.has(sigla);
+      setPlans(processedPlans);
 
-            if (shouldExclude) {
-              updated = true; 
-            } else {
-              seenSiglas.add(sigla);
-              cleanedUnits.push(unit);
-            }
+      if (currentPlan) {
+        const updatedCurrent = processedPlans.find(p => p.id === currentPlan.id);
+        if (updatedCurrent) {
+          setCurrentPlan(updatedCurrent);
+          if (selectedUnit && Array.isArray(updatedCurrent.units)) {
+            const updatedUnit = updatedCurrent.units.find(u => u.id === selectedUnit.id || getUnitSigla(u) === getUnitSigla(selectedUnit));
+            if (updatedUnit) setSelectedUnit(updatedUnit);
           }
-          plan.units = cleanedUnits;
-
-          // Mescla do template apenas se não for MI e estiver faltando
-          if (template && Array.isArray(template.units)) {
-            template.units.forEach(tUnit => {
-              const tSigla = getUnitSigla(tUnit);
-              if (tSigla === 'MI') return; // Bloqueia redescobrir o MI
-              
-              const hasUnit = plan.units.some(u => getUnitSigla(u) === tSigla);
-              if (!hasUnit) {
-                plan.units.push(tUnit);
-                updated = true;
-              }
-            });
-          }
-
-          const fusi = plan.units.find(u => getUnitSigla(u) === 'FUSI');
-          if (fusi && (plan as any).version !== SCHEDULE_VERSION) {
-            const tFusi = template?.units?.find(u => getUnitSigla(u) === 'FUSI');
-            if (tFusi) {
-              const idx = plan.units.indexOf(fusi);
-              plan.units[idx] = { ...tFusi };
-              (plan as any).version = SCHEDULE_VERSION;
-              updated = true;
-            }
-          }
-
-          if (updated) {
-            plan.updatedAt = new Date().toISOString();
-            await FirebaseService.savePlan(plan);
-          }
-          return plan;
-        }));
-
-        setPlans(processedPlans);
-        if (currentPlan) {
-          const updatedCurrent = processedPlans.find(p => p.id === currentPlan.id);
-          if (updatedCurrent) {
-            // Garante filtro em tempo de execução
-            updatedCurrent.units = (updatedCurrent.units || []).filter(u => getUnitSigla(u) !== 'MI');
-            setCurrentPlan(updatedCurrent);
-            if (selectedUnit && Array.isArray(updatedCurrent.units)) {
-              const updatedUnit = updatedCurrent.units.find(u => u.id === selectedUnit.id);
-              if (updatedUnit) setSelectedUnit(updatedUnit);
-            }
-          }
-        } else if (processedPlans.length > 0) {
-          processedPlans[0].units = (processedPlans[0].units || []).filter(u => getUnitSigla(u) !== 'MI');
-          setCurrentPlan(processedPlans[0]);
-          if (processedPlans[0].units.length > 0) {
-            setSelectedUnit(processedPlans[0].units[0]);
-          }
+        }
+      } else if (processedPlans.length > 0) {
+        setCurrentPlan(processedPlans[0]);
+        if (processedPlans[0].units && processedPlans[0].units.length > 0) {
+          setSelectedUnit(processedPlans[0].units[0]);
         }
       }
     } catch (err) {
-      console.error("Erro ao carregar Firebase:", err);
+      console.error("Erro ao carregar dados do Firebase:", err);
     } finally {
       setIsLoading(false);
     }
@@ -152,17 +76,14 @@ const App: React.FC = () => {
   const handleSave = async (updatedPlan: TeachingPlan) => {
     const planToSave = { 
       ...updatedPlan, 
-      profileId: activeProfileId,
-      units: (updatedPlan.units || []).filter(u => getUnitSigla(u) !== 'MI')
+      profileId: activeProfileId
     };
     try {
       await FirebaseService.savePlan(planToSave);
-      const refreshed = await FirebaseService.getPlans(activeProfileId);
-      setPlans(Array.isArray(refreshed) ? refreshed : []);
+      await loadPlans(activeProfileId);
       setView('dashboard');
     } catch (error) {
       console.error("Erro ao salvar dados:", error);
-      throw error;
     }
   };
 
@@ -196,7 +117,6 @@ const App: React.FC = () => {
 
   if (!isAuthenticated) return <Login onLogin={() => setIsAuthenticated(true)} />;
 
-  // Filtra MI em nível de renderização final por segurança
   const safeUnits = (currentPlan && Array.isArray(currentPlan.units) ? currentPlan.units : [])
     .filter(u => getUnitSigla(u) !== 'MI');
 
@@ -211,7 +131,7 @@ const App: React.FC = () => {
       {isLoading ? (
         <div className="flex flex-col items-center justify-center h-full space-y-4">
           <div className="w-12 h-12 border-4 border-slate-200 border-t-blue-600 rounded-full animate-spin"></div>
-          <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Sincronizando dados...</p>
+          <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Recuperando tabelas originais...</p>
         </div>
       ) : (
         <>
@@ -255,7 +175,7 @@ const App: React.FC = () => {
                   <button 
                     key={u.id || idx} 
                     onClick={() => setSelectedUnit(u)} 
-                    className={`flex-shrink-0 px-8 py-4 rounded-2xl text-[10px] font-black uppercase transition-all border-2 ${selectedUnit.id === u.id ? 'bg-blue-600 border-blue-600 text-white shadow-xl scale-105' : 'bg-white border-slate-200 text-slate-400 hover:border-blue-100'}`}
+                    className={`flex-shrink-0 px-8 py-4 rounded-2xl text-[10px] font-black uppercase transition-all border-2 ${getUnitSigla(selectedUnit) === getUnitSigla(u) ? 'bg-blue-600 border-blue-600 text-white shadow-xl scale-105' : 'bg-white border-slate-200 text-slate-400 hover:border-blue-100'}`}
                   >
                     {getUnitSigla(u)}
                   </button>
