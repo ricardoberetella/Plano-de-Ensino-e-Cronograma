@@ -45,15 +45,14 @@ const App: React.FC = () => {
       profileId,
       courseName: 'Mecânico de Usinagem Convencional',
       totalHours: 800,
-      modality: 'Qualificação Profissional',
-      objective: '',
+      modality: 'Aprendizagem Industrial',
+      objective: 'Desenvolver capacidades técnicas e socioemocionais relativas aos elementos de máquina, ferramentas, processos de fabricação, manutenção e usinagem convencional seguindo normas de saúde e segurança.',
       units: [],
       version: SCHEDULE_VERSION,
       updatedAt: new Date().toISOString()
     };
   }, []);
 
-  // Extração inteligente de siglas sincronizada com a nova matriz
   const getUnitSigla = (unit: CurricularUnit) => {
     if (!unit || !unit.name) return '';
     const name = unit.name.toUpperCase();
@@ -62,21 +61,18 @@ const App: React.FC = () => {
     if (name.includes('LEITURA') || name.includes('DESENHO') || id.includes('lidt')) return 'LIDT';
     if (name.includes('CONTROLE') || name.includes('DIMENSIONAL') || id.includes('crd')) return 'CRD';
     if (name.includes('FUNDAMENTOS') || name.includes('USINAGEM') || id.includes('fusi')) return 'FUSI';
-    
-    // Novas unidades do 2º Semestre
-    if (name.includes('PROCESSOS DE USINAGEM') || name.includes('CONVENCIONAL') || id.includes('prusc')) return 'PRUSC';
-    if (name.includes('METROLOGIA INDUSTRIAL') || id.includes('mein') || id.includes('mia')) return 'MEIN';
+    if (name.includes('PROCESSOS DE USINAGEM') || name.includes('PRUSC') || id.includes('prusc')) return 'PRUSC';
+    if (name.includes('METROLOGIA INDUSTRIAL') || name.includes('MEIN') || id.includes('mein') || id.includes('mia')) return 'MEIN';
     
     return unit.name.split(' ').map(w => w[0]).join('').toUpperCase();
   };
 
-  // Mapeamento rígido por semestre ajustado com as novas nomenclaturas
   const getUnitSemester = (unit: CurricularUnit): number => {
     const sigla = getUnitSigla(unit);
     if (sigla === 'PRUSC' || sigla === 'MEIN') {
-      return 2; // Segundo Semestre
+      return 2;
     }
-    return 1; // Primeiro Semestre: LIDT, CRD e FUSI
+    return 1;
   };
 
   const loadPlans = useCallback(async (profileId: string) => {
@@ -100,40 +96,60 @@ const App: React.FC = () => {
         setSelectedUnit(refreshed?.[0]?.units?.[0] || null);
       } else {
         const processedPlans = await Promise.all(dbPlans.map(async (plan) => {
-          let updated = false;
+          let forceUpdate = false;
           if (!plan.units) plan.units = [];
 
+          // Remove duplicatas por sigla
           const cleanedUnits: CurricularUnit[] = [];
           const seenSiglas = new Set<string>();
 
           for (const unit of plan.units) {
             const sigla = getUnitSigla(unit);
-            const isDuplicated = seenSiglas.has(sigla);
-            if (isDuplicated) {
-              updated = true;
+            if (seenSiglas.has(sigla)) {
+              forceUpdate = true;
             } else {
               seenSiglas.add(sigla);
+              // Garante que se for MEIN ou PRUSC antigos, vamos atualizar o nome/id para o padrão rigoroso
+              if (sigla === 'PRUSC') {
+                unit.id = 'prusc';
+                unit.name = 'Processos de Usinagem Convencional';
+              }
+              if (sigla === 'MEIN') {
+                unit.id = 'mein';
+                unit.name = 'Metrologia Industrial';
+              }
               cleanedUnits.push(unit);
             }
           }
           plan.units = cleanedUnits;
 
+          // FORÇA INJEÇÃO DAS MATÉRIAS DO TEMPLATE CASO ESTEJAM FALTANDO NO SEU FIREBASE
           template.units?.forEach(tUnit => {
             const tSigla = getUnitSigla(tUnit);
-            const hasUnit = plan.units.some(u => getUnitSigla(u) === tSigla);
-            if (!hasUnit) {
-              plan.units.push(tUnit);
-              updated = true;
+            const index = plan.units.findIndex(u => getUnitSigla(u) === tSigla);
+            
+            if (index === -1) {
+              // Se não existir de jeito nenhum (como o PRUSC que sumiu), adiciona completo
+              plan.units.push({ ...tUnit });
+              forceUpdate = true;
+            } else {
+              // Se existir, mas as capacidades ou conhecimentos estiverem vazios, força a ementa correta do template
+              if (!plan.units[index].capabilities || plan.units[index].capabilities.length === 0 || forceUpdate) {
+                plan.units[index].capabilities = tUnit.capabilities ? [...tUnit.capabilities] : [];
+                plan.units[index].knowledges = tUnit.knowledges ? [...tUnit.knowledges] : [];
+                forceUpdate = true;
+              }
             }
           });
 
-          if ((plan as any).version !== SCHEDULE_VERSION) {
-            plan.units = template.units ? [...template.units] : plan.units;
-            (plan as any).version = SCHEDULE_VERSION;
-            updated = true;
-          }
+          // Limpeza final para remover resquícios antigos (como MIA/MCO antigos) que não estejam no template
+          plan.units = plan.units.filter(u => {
+            const s = getUnitSigla(u);
+            return ['LIDT', 'CRD', 'FUSI', 'PRUSC', 'MEIN'].includes(s);
+          });
 
-          if (updated) {
+          if (forceUpdate || (plan as any).version !== SCHEDULE_VERSION) {
+            (plan as any).version = SCHEDULE_VERSION;
             plan.updatedAt = new Date().toISOString();
             await FirebaseService.savePlan(plan);
           }
@@ -215,7 +231,6 @@ const App: React.FC = () => {
 
   if (!isAuthenticated) return <Login onLogin={() => setIsAuthenticated(true)} />;
 
-  // Filtra dinamicamente as unidades baseadas no semestre ativo selecionado no cabeçalho
   const filteredUnits = currentPlan?.units?.filter(unit => getUnitSemester(unit) === activeSemester) || [];
 
   return (
@@ -269,16 +284,19 @@ const App: React.FC = () => {
                 {filteredUnits.length === 0 ? (
                   <p className="text-slate-400 text-xs font-medium italic p-4 text-center">Nenhuma unidade curricular cadastrada para este semestre.</p>
                 ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-6">
                     {filteredUnits.map((unit, idx) => (
                       <button 
                         key={unit.id || idx} 
                         onClick={() => { if(unit) { setSelectedUnit(unit); setView('plano-ensino'); } }} 
-                        className="bg-slate-800 p-8 rounded-3xl text-left hover:bg-blue-600 transition-all group relative overflow-hidden"
+                        className="bg-slate-800 p-8 rounded-3xl text-left hover:bg-blue-600 transition-all group relative overflow-hidden min-h-[140px] flex flex-col justify-between"
                       >
                         <span className="text-6xl font-black opacity-5 absolute -right-2 -bottom-2">0{idx + 1}</span>
-                        <p className="text-[9px] font-black text-blue-400 mb-2">{getUnitSigla(unit)}</p>
-                        <h4 className="font-black text-lg leading-tight uppercase line-clamp-2">{unit.name}</h4>
+                        <div>
+                          <p className="text-[9px] font-black text-blue-400 mb-2">{getUnitSigla(unit)}</p>
+                          <h4 className="font-black text-lg leading-tight uppercase">{unit.name}</h4>
+                        </div>
+                        <p className="text-[9px] font-bold text-slate-400 mt-4 group-hover:text-blue-200">Clique para ver Capacidades e Cronograma →</p>
                       </button>
                     ))}
                   </div>
