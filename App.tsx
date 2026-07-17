@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import Layout from './components/Layout';
 import Dashboard from './components/Dashboard';
@@ -18,6 +17,16 @@ const App: React.FC = () => {
   const [currentPlan, setCurrentPlan] = useState<TeachingPlan | null>(null);
   const [selectedUnit, setSelectedUnit] = useState<CurricularUnit | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+
+  // Função utilitária para normalizar e identificar a sigla correta
+  const getUnitSigla = (unit: CurricularUnit) => {
+    const name = unit.name.toUpperCase();
+    const id = unit.id.toLowerCase();
+    if (name.includes('LEITURA') || name.includes('DESENHO') || id.includes('lidt')) return 'LIDT';
+    if (name.includes('CONTROLE') || name.includes('DIMENSIONAL') || id.includes('crd')) return 'CRD';
+    if (name.includes('FUNDAMENTOS') || name.includes('USINAGEM') || id.includes('fusi')) return 'FUSI';
+    return unit.name.split(' ').map(w => w[0]).join('').toUpperCase();
+  };
 
   const loadPlans = useCallback(async (profileId: string) => {
     setIsLoading(true);
@@ -43,14 +52,38 @@ const App: React.FC = () => {
           const template = SAMPLE_PLANS.find(p => p.profileId === profileId) || SAMPLE_PLANS[0];
           let updated = false;
           
+          // --- HIGIENIZAÇÃO DE UNIDADES DUPLICADAS (LIDT / CRD / IDS 04 e 05) ---
+          const cleanedUnits: CurricularUnit[] = [];
+          const seenSiglas = new Set<string>();
+
+          for (const unit of plan.units) {
+            const sigla = getUnitSigla(unit);
+            // Ignora IDs que representem duplicação ou siglas repetidas
+            const isDuplicated = 
+              unit.id === "04" || 
+              unit.id === "05" || 
+              seenSiglas.has(sigla);
+
+            if (isDuplicated) {
+              updated = true; // Força uma atualização para persistir a versão limpa no banco
+            } else {
+              seenSiglas.add(sigla);
+              cleanedUnits.push(unit);
+            }
+          }
+          plan.units = cleanedUnits;
+
+          // Mescla novas unidades do template se de fato estiverem faltando
           template.units.forEach(tUnit => {
-            const hasUnit = plan.units.some(u => u.name === tUnit.name);
+            const tSigla = getUnitSigla(tUnit);
+            const hasUnit = plan.units.some(u => getUnitSigla(u) === tSigla);
             if (!hasUnit) {
               plan.units.push(tUnit);
               updated = true;
             }
           });
 
+          // Atualiza fusi ou força a sincronização da nova versão de cronograma
           const fusi = plan.units.find(u => u.id.toLowerCase().includes('fusi') || u.name.toUpperCase().includes('FUNDAMENTOS'));
           if (fusi && (plan as any).version !== SCHEDULE_VERSION) {
             const tFusi = template.units.find(u => u.id.toLowerCase().includes('fusi') || u.name.toUpperCase().includes('FUNDAMENTOS'));
@@ -136,15 +169,6 @@ const App: React.FC = () => {
     setCurrentPlan(null);
     setSelectedUnit(null);
     setView('dashboard');
-  };
-
-  const getUnitSigla = (unit: CurricularUnit) => {
-    const name = unit.name.toUpperCase();
-    const id = unit.id.toLowerCase();
-    if (name.includes('LEITURA') || name.includes('DESENHO') || id.includes('lidt')) return 'LIDT';
-    if (name.includes('CONTROLE') || name.includes('DIMENSIONAL') || id.includes('crd')) return 'CRD';
-    if (name.includes('FUNDAMENTOS') || name.includes('USINAGEM') || id.includes('fusi')) return 'FUSI';
-    return unit.name.split(' ').map(w => w[0]).join('').toUpperCase();
   };
 
   if (!isAuthenticated) return <Login onLogin={() => setIsAuthenticated(true)} />;
