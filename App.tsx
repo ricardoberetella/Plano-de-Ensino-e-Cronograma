@@ -18,20 +18,17 @@ const App: React.FC = () => {
   const [selectedUnit, setSelectedUnit] = useState<CurricularUnit | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Função utilitária para buscar o template de forma segura, seja SAMPLE_PLANS um array ou objeto
+  // Busca segura de templates de planos
   const getTemplatePlan = useCallback((profileId: string): TeachingPlan => {
-    // 1. Se SAMPLE_PLANS for um Array válido
     if (Array.isArray(SAMPLE_PLANS)) {
       return SAMPLE_PLANS.find(p => p?.profileId === profileId) || SAMPLE_PLANS[0];
     }
-    // 2. Se SAMPLE_PLANS for um Objeto cujas chaves contêm os planos
     if (SAMPLE_PLANS && typeof SAMPLE_PLANS === 'object') {
       const plansArray = Object.values(SAMPLE_PLANS) as TeachingPlan[];
       if (plansArray.length > 0) {
         return plansArray.find(p => p?.profileId === profileId) || plansArray[0];
       }
     }
-    // 3. Fallback absoluto para evitar que o app quebre se a constante estiver vazia
     return {
       id: `fallback-${profileId}`,
       profileId,
@@ -77,20 +74,14 @@ const App: React.FC = () => {
       } else {
         const processedPlans = await Promise.all(dbPlans.map(async (plan) => {
           let updated = false;
-          
           if (!plan.units) plan.units = [];
 
-          // --- HIGIENIZAÇÃO DE UNIDADES DUPLICADAS ---
           const cleanedUnits: CurricularUnit[] = [];
           const seenSiglas = new Set<string>();
 
           for (const unit of plan.units) {
             const sigla = getUnitSigla(unit);
-            const isDuplicated = 
-              unit.id === "04" || 
-              unit.id === "05" || 
-              seenSiglas.has(sigla);
-
+            const isDuplicated = unit.id === "04" || unit.id === "05" || seenSiglas.has(sigla);
             if (isDuplicated) {
               updated = true;
             } else {
@@ -147,7 +138,7 @@ const App: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [activeProfileId, currentPlan, selectedUnit, getTemplatePlan]);
+  }, [getTemplatePlan, currentPlan, selectedUnit]);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -164,7 +155,6 @@ const App: React.FC = () => {
       setView('dashboard');
     } catch (error) {
       console.error("Erro ao salvar dados:", error);
-      throw error;
     }
   };
 
@@ -201,10 +191,10 @@ const App: React.FC = () => {
   return (
     <Layout 
       activeView={view} 
-      onViewChange={setView} 
-      onLogout={handleLogout}
+      onViewChange={setView || (() => {})} 
+      onLogout={handleLogout || (() => {})}
       activeProfileId={activeProfileId}
-      onProfileChange={handleProfileChange}
+      onProfileChange={handleProfileChange || (() => {})}
     >
       {isLoading ? (
         <div className="flex flex-col items-center justify-center h-full space-y-4">
@@ -215,9 +205,9 @@ const App: React.FC = () => {
         <>
           {view === 'dashboard' && (
             <Dashboard 
-              plans={plans} 
+              plans={plans || []} 
               onEdit={(p) => { setCurrentPlan(p); setView('editor'); }} 
-              onView={(p) => { setCurrentPlan(p); setSelectedUnit(p.units?.[0] || null); setView('plano-curso'); }} 
+              onView={(p) => { setCurrentPlan(p); setSelectedUnit(p?.units?.[0] || null); setView('plano-curso'); }} 
               onRefresh={() => loadPlans(activeProfileId)} 
             />
           )}
@@ -242,7 +232,11 @@ const App: React.FC = () => {
                 <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 mb-8">III. Unidades Curriculares</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                   {currentPlan.units?.map((unit, idx) => (
-                    <button key={unit.id} onClick={() => { setSelectedUnit(unit); setView('plano-ensino'); }} className="bg-slate-800 p-8 rounded-3xl text-left hover:bg-blue-600 transition-all group relative overflow-hidden">
+                    <button 
+                      key={unit.id || idx} 
+                      onClick={() => { if(unit) { setSelectedUnit(unit); setView('plano-ensino'); } }} 
+                      className="bg-slate-800 p-8 rounded-3xl text-left hover:bg-blue-600 transition-all group relative overflow-hidden"
+                    >
                       <span className="text-6xl font-black opacity-5 absolute -right-2 -bottom-2">0{idx + 1}</span>
                       <p className="text-[9px] font-black text-blue-400 mb-2">{getUnitSigla(unit)}</p>
                       <h4 className="font-black text-lg leading-tight uppercase line-clamp-2">{unit.name}</h4>
@@ -256,9 +250,9 @@ const App: React.FC = () => {
           {view === 'plano-ensino' && currentPlan && selectedUnit && (
             <div className="space-y-8 max-w-7xl mx-auto pb-20">
               <div className="flex gap-2 overflow-x-auto pb-4 scrollbar-hide px-1">
-                {currentPlan.units?.map(u => (
+                {currentPlan.units?.map((u, idx) => (
                   <button 
-                    key={u.id} 
+                    key={u.id || idx} 
                     onClick={() => setSelectedUnit(u)} 
                     className={`flex-shrink-0 px-8 py-4 rounded-2xl text-[10px] font-black uppercase transition-all border-2 ${selectedUnit.id === u.id ? 'bg-blue-600 border-blue-600 text-white shadow-xl scale-105' : 'bg-white border-slate-200 text-slate-400 hover:border-blue-100'}`}
                   >
