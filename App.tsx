@@ -17,6 +17,9 @@ const App: React.FC = () => {
   const [currentPlan, setCurrentPlan] = useState<TeachingPlan | null>(null);
   const [selectedUnit, setSelectedUnit] = useState<CurricularUnit | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  
+  // Controle de Semestre Ativo (Inicia no 1º Semestre por padrão)
+  const [currentSemester, setCurrentSemester] = useState<1 | 2>(1);
 
   // Função utilitária para normalizar e identificar a sigla correta
   const getUnitSigla = (unit: CurricularUnit) => {
@@ -27,6 +30,29 @@ const App: React.FC = () => {
     if (name.includes('FUNDAMENTOS') || name.includes('USINAGEM') || id.includes('fusi')) return 'FUSI';
     return unit.name.split(' ').map(w => w[0]).join('').toUpperCase();
   };
+
+  // Filtra dinamicamente as unidades curriculares baseadas no semestre ativo
+  const filteredUnits = useMemo(() => {
+    if (!currentPlan) return [];
+    return currentPlan.units.filter(unit => {
+      // Se a unidade não tiver a propriedade 'semester', tratamos como 1º semestre (legado)
+      const unitSemester = (unit as any).semester || 1;
+      return unitSemester === currentSemester;
+    });
+  }, [currentPlan, currentSemester]);
+
+  // Ajusta a unidade selecionada automaticamente se mudarmos de semestre
+  useEffect(() => {
+    if (filteredUnits.length > 0) {
+      // Evita perder a seleção se a unidade já estiver na lista filtrada
+      const isAlreadyInFilter = filteredUnits.some(u => selectedUnit && u.id === selectedUnit.id);
+      if (!isAlreadyInFilter) {
+        setSelectedUnit(filteredUnits[0]);
+      }
+    } else {
+      setSelectedUnit(null);
+    }
+  }, [filteredUnits, currentSemester]);
 
   const loadPlans = useCallback(async (profileId: string) => {
     setIsLoading(true);
@@ -58,16 +84,17 @@ const App: React.FC = () => {
 
           for (const unit of plan.units) {
             const sigla = getUnitSigla(unit);
-            // Ignora IDs que representem duplicação ou siglas repetidas
+            // Ignora IDs que representem duplicação ou siglas repetidas do primeiro semestre
             const isDuplicated = 
-              unit.id === "04" || 
-              unit.id === "05" || 
-              seenSiglas.has(sigla);
+              ((unit as any).semester || 1) === 1 && 
+              (unit.id === "04" || unit.id === "05" || seenSiglas.has(sigla));
 
             if (isDuplicated) {
               updated = true; // Força uma atualização para persistir a versão limpa no banco
             } else {
-              seenSiglas.add(sigla);
+              if (((unit as any).semester || 1) === 1) {
+                seenSiglas.add(sigla);
+              }
               cleanedUnits.push(unit);
             }
           }
@@ -76,7 +103,7 @@ const App: React.FC = () => {
           // Mescla novas unidades do template se de fato estiverem faltando
           template.units.forEach(tUnit => {
             const tSigla = getUnitSigla(tUnit);
-            const hasUnit = plan.units.some(u => getUnitSigla(u) === tSigla);
+            const hasUnit = plan.units.some(u => getUnitSigla(u) === tSigla && ((u as any).semester || 1) === 1);
             if (!hasUnit) {
               plan.units.push(tUnit);
               updated = true;
@@ -114,7 +141,8 @@ const App: React.FC = () => {
           }
         } else {
           setCurrentPlan(processedPlans[0]);
-          setSelectedUnit(processedPlans[0].units[0]);
+          const initialUnits = processedPlans[0].units.filter(u => ((u as any).semester || 1) === 1);
+          setSelectedUnit(initialUnits[0] || processedPlans[0].units[0]);
         }
       }
     } catch (err) {
@@ -180,6 +208,8 @@ const App: React.FC = () => {
       onLogout={handleLogout}
       activeProfileId={activeProfileId}
       onProfileChange={handleProfileChange}
+      currentSemester={currentSemester}
+      onSemesterChange={setCurrentSemester}
     >
       {isLoading ? (
         <div className="flex flex-col items-center justify-center h-full space-y-4">
@@ -188,7 +218,20 @@ const App: React.FC = () => {
         </div>
       ) : (
         <>
-          {view === 'dashboard' && <Dashboard plans={plans} onEdit={(p) => { setCurrentPlan(p); setView('editor'); }} onView={(p) => { setCurrentPlan(p); setSelectedUnit(p.units[0]); setView('plano-curso'); }} onRefresh={() => loadPlans(activeProfileId)} />}
+          {view === 'dashboard' && (
+            <Dashboard 
+              plans={plans} 
+              onEdit={(p) => { setCurrentPlan(p); setView('editor'); }} 
+              onView={(p) => { 
+                setCurrentPlan(p); 
+                const firstFiltered = p.units.find(u => ((u as any).semester || 1) === currentSemester);
+                setSelectedUnit(firstFiltered || p.units[0]); 
+                setView('plano-curso'); 
+              }} 
+              onRefresh={() => loadPlans(activeProfileId)} 
+              currentSemester={currentSemester}
+            />
+          )}
           
           {view === 'plano-curso' && currentPlan && (
             <div className="max-w-4xl mx-auto space-y-10 animate-fadeIn pb-20">
@@ -207,15 +250,18 @@ const App: React.FC = () => {
                 <section><h3 className="text-[10px] font-black uppercase text-blue-600 tracking-[0.3em] mb-4">I. Perfil de Conclusão</h3><p className="text-slate-600 text-sm leading-relaxed font-medium">{currentPlan.objective}</p></section>
               </div>
               <div className="bg-slate-900 rounded-[2.5rem] p-8 md:p-12 text-white shadow-2xl">
-                <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 mb-8">III. Unidades Curriculares</h3>
+                <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 mb-8">III. Unidades Curriculares ({currentSemester}º Semestre)</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                  {currentPlan.units.map((unit, idx) => (
+                  {filteredUnits.map((unit, idx) => (
                     <button key={unit.id} onClick={() => { setSelectedUnit(unit); setView('plano-ensino'); }} className="bg-slate-800 p-8 rounded-3xl text-left hover:bg-blue-600 transition-all group relative overflow-hidden">
                       <span className="text-6xl font-black opacity-5 absolute -right-2 -bottom-2">0{idx + 1}</span>
                       <p className="text-[9px] font-black text-blue-400 mb-2">{getUnitSigla(unit)}</p>
                       <h4 className="font-black text-lg leading-tight uppercase line-clamp-2">{unit.name}</h4>
                     </button>
                   ))}
+                  {filteredUnits.length === 0 && (
+                    <p className="text-slate-500 text-xs italic p-4 col-span-full text-center">Nenhuma unidade cadastrada para este semestre ainda.</p>
+                  )}
                 </div>
               </div>
             </div>
@@ -224,7 +270,7 @@ const App: React.FC = () => {
           {view === 'plano-ensino' && currentPlan && selectedUnit && (
             <div className="space-y-8 max-w-7xl mx-auto pb-20">
               <div className="flex gap-2 overflow-x-auto pb-4 scrollbar-hide px-1">
-                {currentPlan.units.map(u => (
+                {filteredUnits.map(u => (
                   <button 
                     key={u.id} 
                     onClick={() => setSelectedUnit(u)} 
@@ -249,7 +295,7 @@ const App: React.FC = () => {
             </div>
           )}
 
-          {view === 'calendario' && currentPlan && <GeneralCalendar plan={currentPlan} />}
+          {view === 'calendario' && currentPlan && <GeneralCalendar plan={currentPlan} currentSemester={currentSemester} />}
 
           {view === 'editor' && <PlanForm initialPlan={currentPlan || undefined} onSave={handleSave} onCancel={() => setView('dashboard')} />}
         </>
