@@ -4,7 +4,10 @@
 
 export const SCHEDULE_VERSION = '2026.2.v2';
 
+// ============================================================================
 // --- CRONOGRAMAS DETALHADOS: 2º SEMESTRE (PROFESSOR RICARDO GEA) ---
+// ============================================================================
+
 const PRUSC_SCHEDULE_GEA = [
   { id: 'p_gea_01', date: '23/07/2026', hours: 4, capacities: 'CT3: Operações de serramento', knowledge: '3. Serramento: Definição, Tipos de serra fita (Horizontal e Vertical), Lâminas.', strategy: 'Apresentação da UC e normas de segurança da oficina. Prática de corte de matéria-prima.', resources: 'Serra de fita horizontal, matéria-prima.' },
   { id: 'p_gea_02', date: '27/07/2026', hours: 4, capacities: 'CT1: Operações em torno convencional', knowledge: '1. Torneamento: Ferramenta de perfilamento, acessórios (lunetas, graminho).', strategy: 'Demonstração de alinhamento com graminho e montagem de acessórios no torno.', resources: 'Torno convencional, graminho, lunetas.' },
@@ -71,12 +74,15 @@ const METIND_SCHEDULE_GEA = [
   { id: 'm_gea_20', date: '08/12/2026', hours: 4, capacities: 'Todas as capacities da UC', knowledge: 'Avaliação técnica laboratorial final e encerramento de diários.', strategy: 'Fechamento de médias e feedbacks individuais sobre exatidão metrológica.', resources: 'Fichas de notas.' }
 ];
 
+// ============================================================================
 // --- CRONOGRAMAS DETALHADOS: 2º SEMESTRE (PROFESSOR RICARDO BERETELLA) ---
+// ============================================================================
+
 const PRUSC_SCHEDULE_BERETELLA = [
   { id: 'p_ber_01', date: '24/07/2026', hours: 4, capacities: 'CT3: Operações de serramento', knowledge: '3. Serramento: Definição, Tipos de serra fita (Horizontal e Vertical), Lâminas.', strategy: 'Apresentação da UC e normas de segurança da oficina. Prática de corte de matéria-prima.', resources: 'Serra de fita horizontal, matéria-prima.' },
   { id: 'p_ber_02', date: '28/07/2026', hours: 4, capacities: 'CT1: Operações em torno convencional', knowledge: '1. Torneamento: Ferramenta de perfilamento, acessórios (lunetas, graminho).', strategy: 'Demonstração de alinhamento com graminho e montagem de acessórios no torno.', resources: 'Torno convencional, graminho, lunetas.' },
   { id: 'p_ber_03', date: '31/07/2026', hours: 4, capacities: 'CT1: Operações em torno convencional', knowledge: '1.3. Cálculos técnicos: Conicidade com desalinhamento do cabeçote móvel.', strategy: 'Aula teórica e exercícios práticos de cálculo de desalinhamento de cabeçote.', resources: 'Quadro, calculadoras, guias técnicos.' },
-  { id: 'p_ber_04', date: '04/08/2026', hours: 4, capacities: 'CT1: Operações em torno convencional', knowledge: '1.4. Operação: Tornear perfil com ferramenta de forma.', strategy: 'Execução prática de torneamento cônico e perfilamento com ferramenta de forma.', resources: 'Torno convencional, ferramentas de perfil raiado.' },
+  { id: 'p_ber_04', date: '04/08/2026', hours: 4, capacities: 'CT1: Operações em torno convencional', knowledge: '1.4. Operação: Tornear perfil com ferramenta de forma.', strategy: 'Execução prática de torneamento cônico e perfilamento com ferramenta de forma.', resources: 'Torno convencional, tools de perfil raiado.' },
   { id: 'p_ber_05', date: '07/08/2026', hours: 4, capacities: 'CT2: Operações em fresadora', knowledge: '2. Fresagem: Ferramentas de gravação e esféricas. Acessórios (grampos e garras).', strategy: 'Mapeamento de fixação de peças na mesa da fresadora utilizando garras de fixação.', resources: 'Fresadora convencional, garras, grampos.' },
   { id: 'p_ber_06', date: '11/08/2026', hours: 4, capacities: 'CT2: Operações em fresadora', knowledge: '2.3. Conjunto divisor: Divisão direta e indireta.', strategy: 'Cálculos matemáticos para divisão de divisores universais. Prática de engrenamento básico.', resources: 'Aparelho divisor, discos de furo.' },
   { id: 'p_ber_07', date: '14/08/2026', hours: 4, capacities: 'CT2: Operações em fresadora', knowledge: '2.3.3. Divisão diferencial.', strategy: 'Demonstração de setup complexo para divisão diferencial na fresadora.', resources: 'Aparelho divisor, trem de engrenagens.' },
@@ -106,7 +112,7 @@ const PRUSC_SCHEDULE_BERETELLA = [
   { id: 'p_ber_31', date: '06/11/2026', hours: 4, capacities: 'CT1 a CT8: Prática supervisionada de refugo e correção', knowledge: 'Estudo de caso e retrabalho de componentes fora de tolerância.', strategy: 'Recuperação de peças corrigindo diâmetros e superfícies por retificação ou buchas.', resources: 'Máquinas-ferramenta.' },
   { id: 'p_ber_32', date: '10/11/2026', hours: 4, capacities: 'CT1 a CT8: Prática avançada de usinagem', knowledge: 'Operações complexas acumuladas: Divisor indireto + Retífica plana.', strategy: 'Usinagem final de ranhuras sincronizadas e canais em eixos retificados.', resources: 'Fresadora e retificadora.' },
   { id: 'p_ber_33', date: '13/11/2026', hours: 4, capacities: 'CT1 a CT8: Otimização de processos', knowledge: 'Análise de tempos de corte e desgaste de ferramentas.', strategy: 'Aplicação prática de melhoria de velocidade e avanços para aumento de rendimento.', resources: 'Ferramental técnico.' },
-  { id: 'p_ber_34', date: '17/11/2026', hours: 4, capacities: 'CT4: Ajustagem de conjuntos complexos', knowledge: 'Montagem técnica final com elementos de fixação.', strategy: 'Torqueamento correto e travamento mecânico de conjuntos rotativos.', resources: 'Torquímetro, parafusos.' },
+  { id: 'p_ber_34', date: '17/11/2026', hours: 4, capacities: 'CT4: Ajustagem de conjuntos complexos', knowledge: 'Montagem técnica final com elements de fixação.', strategy: 'Torqueamento correto e travamento mecânico de conjuntos rotativos.', resources: 'Torquímetro, parafusos.' },
   { id: 'p_ber_35', date: '24/11/2026', hours: 4, capacities: 'CT1 a CT8: Acabamento superficial rigoroso', knowledge: 'Usinagem abrasiva final e polimento técnico espelhado.', strategy: 'Execução de etapas de polimento fino com pastas de diamante na bancada.', resources: 'Pastas abrasivas, feltros.' },
   { id: 'p_ber_36', date: '27/11/2026', hours: 4, capacities: 'CT1 a CT8: Revisão prática de oficina', knowledge: 'Fechamento dos postos de trabalho mecânico do semestre.', strategy: 'Finalização de usinagens brutas e checagem final de dimensional técnico.', resources: 'Instrumentos de medição.' },
   { id: 'p_ber_37', date: '01/12/2026', hours: 4, capacities: 'CS1 e CS2: Conservação patrimonial e 5S', knowledge: 'Conservação de máquinas de usinagem e rebolos.', strategy: 'Prática intensa de limpeza de barramentos, lubrificação de guias e organização.', resources: 'Óleos lubrificantes, graxas, pincéis.' },
@@ -142,7 +148,6 @@ const METIND_SCHEDULE_BERETELLA = [
 // OBJETO ESTRUTURAL MANTENDO AS DUAS ABORDAGENS DE INTEGRAÇÃO (ARRAY E DICIONÁRIO)
 // ============================================================================
 
-// 1. Definição Base por Chaves Estruturadas (Garante compatibilidade total do mapeamento clássico)
 const PLAN_DATA_STRUCTURE = {
   'ricardo-beretella': {
     '1º SEM': {
@@ -282,13 +287,29 @@ const PLAN_DATA_STRUCTURE = {
   }
 };
 
-// 2. Exportação unificada de SAMPLE_PLANS atuando tanto como Array (com propriedades injetadas) quanto Object
+// Mapeamento espelhado para aceitar chaves com os nomes exatos de exibição ou strings do ID
+const EXTENDED_PLAN_DATA = {
+  ...PLAN_DATA_STRUCTURE,
+  'Ricardo Beretella': PLAN_DATA_STRUCTURE['ricardo-beretella'],
+  'Ricardo Gea': PLAN_DATA_STRUCTURE['ricardo-gea'],
+  'ricardoBeretella': PLAN_DATA_STRUCTURE['ricardo-beretella'],
+  'ricardoGea': PLAN_DATA_STRUCTURE['ricardo-gea']
+};
+
+// Injeta mapeamentos internos por número (1 e 2) para os semestres
+Object.keys(EXTENDED_PLAN_DATA).forEach(profKey => {
+  const profData = EXTENDED_PLAN_DATA[profKey];
+  if (profData['1º SEM']) profData[1] = profData['1º SEM'];
+  if (profData['2º SEM']) profData[2] = profData['2º SEM'];
+});
+
+// Exportação unificada atuando tanto como Array quanto Object dicionário estruturado
 export const SAMPLE_PLANS = Object.assign(
   [
-    { ...PLAN_DATA_STRUCTURE['ricardo-beretella']['1º SEM'], profileId: 'ricardo-beretella' },
-    { ...PLAN_DATA_STRUCTURE['ricardo-beretella']['2º SEM'], profileId: 'ricardo-beretella' },
-    { ...PLAN_DATA_STRUCTURE['ricardo-gea']['1º SEM'], profileId: 'ricardo-gea' },
-    { ...PLAN_DATA_STRUCTURE['ricardo-gea']['2º SEM'], profileId: 'ricardo-gea' }
+    { ...PLAN_DATA_STRUCTURE['ricardo-beretella']['1º SEM'], profileId: 'ricardo-beretella', selectedProfessor: 'Ricardo Beretella', selectedSemester: '1º SEM' },
+    { ...PLAN_DATA_STRUCTURE['ricardo-beretella']['2º SEM'], profileId: 'ricardo-beretella', selectedProfessor: 'Ricardo Beretella', selectedSemester: '2º SEM' },
+    { ...PLAN_DATA_STRUCTURE['ricardo-gea']['1º SEM'], profileId: 'ricardo-gea', selectedProfessor: 'Ricardo Gea', selectedSemester: '1º SEM' },
+    { ...PLAN_DATA_STRUCTURE['ricardo-gea']['2º SEM'], profileId: 'ricardo-gea', selectedProfessor: 'Ricardo Gea', selectedSemester: '2º SEM' }
   ],
-  PLAN_DATA_STRUCTURE
+  EXTENDED_PLAN_DATA
 );
