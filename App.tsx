@@ -68,24 +68,24 @@ const App: React.FC = () => {
           name: "Processos de Usinagem Convencional",
           hours: 160,
           capabilities: [
-            "Realizar operações em torno convencional de acordo com as especificações, normas técnicas e de saúde e segurança no trabalho[cite: 1].",
-            "Realizar operações em fresadora convencional de acordo com as especificações, normas técnicas e de saúde e segurança no trabalho[cite: 1].",
-            "Realizar operações de serramento por meio de máquinas de acordo com as especificações, normas técnicas e de saúde e segurança no trabalho[cite: 1].",
-            "Realizar a montagem de conjuntos mecânicos de acordo com as especificações e normas técnicas e de saúde e segurança no trabalho[cite: 1].",
-            "Definir os parâmetros e os processos de usinagem em retificas convencionais, de acordo com as especificações técnicas[cite: 1].",
-            "Realizar o balanceamento do rebolo de acordo com as especificações, normas técnicas e de saúde e segurança no trabalho[cite: 1].",
-            "Realizar operações em retificadoras cilíndricas de acordo com as especificações, normas técnicas e de saúde e segurança no trabalho[cite: 1].",
-            "Realizar operações em retificadoras planas de acordo com as especificações, normas técnicas e de saúde e segurança no trabalho[cite: 1]."
+            "Realizar operações em torno convencional de acordo com as especificações, normas técnicas e de saúde e segurança no trabalho.",
+            "Realizar operações em fresadora convencional de acordo com as especificações, normas técnicas e de saúde e segurança no trabalho.",
+            "Realizar operações de serramento por meio de máquinas de acordo com as especificações, normas técnicas e de saúde e segurança no trabalho.",
+            "Realizar a montagem de conjuntos mecânicos de acordo com as especificações e normas técnicas e de saúde e segurança no trabalho.",
+            "Definir os parâmetros e os processos de usinagem em retificas convencionais, de acordo com as especificações técnicas.",
+            "Realizar o balanceamento do rebolo de acordo com as especificações, normas técnicas e de saúde e segurança no trabalho.",
+            "Realizar operações em retificadoras cilíndricas de acordo com as especificações, normas técnicas e de saúde e segurança no trabalho.",
+            "Realizar operações em retificadoras planas de acordo com as especificações, normas técnicas e de saúde e segurança no trabalho."
           ],
           knowledges: [
-            "Torneamento: Ferramenta de perfilamento, Acessórios (Lunetas, Graminho, Eixo mandril, Prisma em V), Cálculos técnicos, Operação[cite: 1].",
-            "Fresagem: Ferramentas (Gravação, Esférica), Acessórios, Conjunto divisor (Divisão direta, indireta, diferencial), Operação[cite: 1].",
-            "Serramento: Definição, Tipos de serra fita (Horizontal, Vertical), Lâmina de serra, Operação[cite: 1].",
-            "Conjuntos mecânicos: Definição, Tipos, Características, Técnicas de montagem e ajustagem[cite: 1].",
-            "Retificação: Processos (Cilíndrica, Plana tangencial, Centerless, Afiadoras), Parâmetros (RPM, Avanço)[cite: 1].",
-            "Balanceamento: Rebolos (Tipos, Características, Inspeção), Acessórios (Balanceador estático, Flanges, Eixo), Operações[cite: 1].",
-            "Retificadora cilíndrica: Características, Componentes, Acessórios (Placa, Contraponta, Dressador), Operação[cite: 1].",
-            "Retificadora plana: Características, Componentes, Acessórios (Mesa magnética, De seno, Calços), Operação[cite: 1]."
+            "Torneamento: Ferramenta de perfilamento, Acessórios (Lunetas, Graminho, Eixo mandril, Prisma em V), Cálculos técnicos, Operação.",
+            "Fresagem: Ferramentas (Gravação, Esférica), Acessórios, Conjunto divisor (Divisão direta, indireta, diferencial), Operação.",
+            "Serramento: Definição, Tipos de serra fita (Horizontal, Vertical), Lâmina de serra, Operação.",
+            "Conjuntos mecânicos: Definição, Tipos, Características, Técnicas de montagem e ajustagem.",
+            "Retificação: Processos (Cilíndrica, Plana tangencial, Centerless, Afiadoras), Parâmetros (RPM, Avanço).",
+            "Balanceamento: Rebolos (Tipos, Características, Inspeção), Acessórios (Balanceador estático, Flanges, Eixo), Operações.",
+            "Retificadora cilíndrica: Características, Componentes, Acessórios (Placa, Contraponta, Dressador), Operação.",
+            "Retificadora plana: Características, Componentes, Acessórios (Mesa magnética, De seno, Calços), Operação."
           ],
           schedule: [],
           calendar: { start: '', end: '', daysOfWeek: [], exceptions: [] }
@@ -95,24 +95,24 @@ const App: React.FC = () => {
           name: "Metrologia Industrial",
           hours: 80,
           capabilities: [
-            "Medir peças por meio de instrumentos da ordem direta, de acordo com especificações técnicas[cite: 2].",
-            "Medir peças por meio de instrumentos da ordem indireta, de acordo com especificações técnicas[cite: 2].",
-            "Medir a dureza de materiais de acordo com especificações técnicas[cite: 2].",
-            "Medir perfil de peças por meio de imagens projetadas, de acordo com especificações técnicas[cite: 2].",
-            "Medir tridimensionalmente peças de acordo com especificações técnicas[cite: 2].",
-            "Medir peças digitalmente por meio de sistemas de medição por visão de acordo com especificações técnicas[cite: 2].",
-            "Medir peças com braço de medição portátil de acordo com especificações técnicas[cite: 2].",
-            "Testar a funcionalidade de peças e conjuntos de acordo com especificações técnicas[cite: 2]."
+            "Medir peças por meio de instrumentos da ordem direta, de acordo com especificações técnicas.",
+            "Medir peças por meio de instrumentos da ordem indireta, de acordo com especificações técnicas.",
+            "Medir a dureza de materiais de acordo com especificações técnicas.",
+            "Medir perfil de peças por meio de imagens projetadas, de acordo com especificações técnicas.",
+            "Medir tridimensionalmente peças de acordo com especificações técnicas.",
+            "Medir peças digitalmente por meio de sistemas de medição por visão de acordo com especificações técnicas.",
+            "Medir peças com braço de medição portátil de acordo com especificações técnicas.",
+            "Testar a funcionalidade de peças e conjuntos de acordo com especificações técnicas."
           ],
           knowledges: [
-            "Medição direta: Paquímetro de engrenagens, Micrômetro de rosca/engrenagens, Rugosímetro, Calibrador linear height, Procedimentos[cite: 2].",
-            "Medição indireta: Comparador de diâmetro interno, Calibrador passa não passa, Bloco padrão, Régua e mesa de seno, Técnicas[cite: 2].",
-            "Durômetro: Tipos, Características, Aplicação, Técnicas de utilização, Procedimentos[cite: 2].",
-            "Projetor de perfil: Tipos, Características, Aplicação, Técnicas de utilização, Projeção (Diascópica, Episcópica)[cite: 2].",
-            "Máquina de medição por coordenadas: Tipos (Manual, CNC), Características, Aplicação, Técnicas, Dispositivos, Procedimentos[cite: 2].",
-            "Medição por Visão: Tipos, Características, Aplicação, Técnicas de utilização, Procedimentos[cite: 2].",
-            "Braço de medição: Tipos (Manual, CNC), Características, Aplicação, Técnicas de utilização, Dispositivos, Procedimentos[cite: 2].",
-            "Funcionalidade: Objetivo, Importância, Aspectos (Funcionalidade, Comportamento, Qualidade), Tipos de testes, Métodos[cite: 2]."
+            "Medição direta: Paquímetro de engrenagens, Micrômetro de rosca/engrenagens, Rugosímetro, Calibrador linear height, Procedimentos.",
+            "Medição indireta: Comparador de diâmetro interno, Calibrador passa não passa, Bloco padrão, Régua e mesa de seno, Técnicas.",
+            "Durômetro: Tipos, Características, Aplicação, Técnicas de utilização, Procedimentos.",
+            "Projetor de perfil: Tipos, Características, Aplicação, Técnicas de utilização, Projeção (Diascópica, Episcópica).",
+            "Máquina de medição por coordenadas: Tipos (Manual, CNC), Características, Aplicação, Técnicas, Dispositivos, Procedimentos.",
+            "Medição por Visão: Tipos, Características, Aplicação, Técnicas de utilização, Procedimentos.",
+            "Braço de medição: Tipos (Manual, CNC), Características, Aplicação, Técnicas de utilização, Dispositivos, Procedimentos.",
+            "Funcionalidade: Objetivo, Importância, Aspectos (Funcionalidade, Comportamento, Qualidade), Tipos de testes, Métodos."
           ],
           schedule: [],
           calendar: { start: '', end: '', daysOfWeek: [], exceptions: [] }
@@ -121,15 +121,16 @@ const App: React.FC = () => {
     };
   }, []);
 
+  // FILTRO CORRIGIDO: Checa "PROCESSOS" antes de checar "USINAGEM" para evitar conflito de siglas
   const getUnitSigla = (unit: CurricularUnit) => {
     if (!unit || !unit.name) return '';
     const name = unit.name.toUpperCase();
     const id = unit.id ? unit.id.toLowerCase() : '';
     
+    if (name.includes('PROCESSOS') || name.includes('PRUSC') || id === 'prusc') return 'PRUSC';
     if (name.includes('LEITURA') || name.includes('DESENHO') || id === 'lidt') return 'LIDT';
     if (name.includes('CONTROLE') || name.includes('DIMENSIONAL') || id === 'crd') return 'CRD';
     if (name.includes('FUNDAMENTOS') || name.includes('USINAGEM') || id === 'fusi') return 'FUSI';
-    if (name.includes('PROCESSOS') || name.includes('PRUSC') || id === 'prusc') return 'PRUSC';
     if (name.includes('METROLOGIA') || name.includes('MEIN') || id === 'mein') return 'MEIN';
     
     return id.toUpperCase();
@@ -157,7 +158,6 @@ const App: React.FC = () => {
         const processedPlans = await Promise.all(dbPlans.map(async (plan) => {
           let needsReset = false;
 
-          // Se a lista não tem exatamente 5 unidades, ou se falta a sigla PRUSC, ativa o reset forçado
           if (!plan.units || plan.units.length !== 5) {
             needsReset = true;
           } else {
@@ -167,9 +167,9 @@ const App: React.FC = () => {
             }
           }
 
-          // RESET FORÇADO: Sobrescreve as UCs do banco com os dados do template do código local
+          // Se for detectado erro na estrutura salva do banco, aplica a ementa correta local por cima
           if (needsReset) {
-            console.log(`Forçando atualização da ementa para o perfil: ${profileId}`);
+            console.log(`Forçando atualização e reordenamento da ementa para: ${profileId}`);
             plan.units = JSON.parse(JSON.stringify(template.units));
             plan.courseName = template.courseName;
             plan.objective = template.objective;
@@ -179,6 +179,14 @@ const App: React.FC = () => {
             plan.updatedAt = new Date().toISOString();
             
             await FirebaseService.savePlan(plan);
+          } else {
+            // Garante o ID correto interno para os elementos existentes
+            plan.units = plan.units.map(u => {
+              const s = getUnitSigla(u);
+              if (s === 'PRUSC') return { ...u, id: 'prusc' };
+              if (s === 'MEIN') return { ...u, id: 'mein' };
+              return u;
+            });
           }
           return plan;
         }));
@@ -273,7 +281,7 @@ const App: React.FC = () => {
       {isLoading ? (
         <div className="flex flex-col items-center justify-center h-full space-y-4">
           <div className="w-12 h-12 border-4 border-slate-200 border-t-blue-600 rounded-full animate-spin"></div>
-          <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Atualizando Matriz Curricular...</p>
+          <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Organizando semestres e siglas...</p>
         </div>
       ) : (
         <>
