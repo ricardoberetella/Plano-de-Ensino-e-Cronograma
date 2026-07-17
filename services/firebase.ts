@@ -1,4 +1,3 @@
-
 import { initializeApp } from "firebase/app";
 import { 
   getFirestore, 
@@ -28,8 +27,6 @@ export const db = getFirestore(app);
 export const FirebaseService = {
   async getPlans(profileId: string): Promise<TeachingPlan[]> {
     try {
-      // Simplificamos a query para usar apenas WHERE. 
-      // Firestore exige um índice composto manual para WHERE + ORDER BY simultâneos.
       const q = query(
         collection(db, "plans"), 
         where("profileId", "==", profileId)
@@ -38,9 +35,33 @@ export const FirebaseService = {
       const querySnapshot = await getDocs(q);
       const results = querySnapshot.docs.map(doc => doc.data() as TeachingPlan);
       
-      // Realizamos a ordenação no lado do cliente (Client-side sorting)
-      // para evitar a necessidade de configuração de índices no console do Firebase.
-      return results.sort((a, b) => {
+      // --- ROTINA DE AUTO-LIMPEZA DAS UNIDADES REPETIDAS ---
+      // Filtramos e deletamos os planos que possuem IDs de duplicação conhecidos
+      // ou que estejam duplicando as UCs de LIDT e CRD.
+      const cleanedResults: TeachingPlan[] = [];
+      const seenSubjects = new Set<string>();
+
+      for (const plan of results) {
+        // IDs 04 e 05 mostrados na imagem, ou planos cujo assunto (LIDT/CRD) já foi processado
+        const isDuplicated = 
+          plan.id === "04" || 
+          plan.id === "05" || 
+          plan.id.toLowerCase().includes("repetido") ||
+          seenSubjects.has(plan.subject);
+
+        if (isDuplicated) {
+          // Deleta silenciosamente o plano duplicado do Firestore para limpar o banco definitivamente
+          this.deletePlan(plan.id).catch(err => 
+            console.error(`Erro ao remover duplicata ${plan.id}:`, err)
+          );
+        } else {
+          seenSubjects.add(plan.subject);
+          cleanedResults.push(plan);
+        }
+      }
+
+      // Realizamos a ordenação no lado do cliente com a lista já limpa
+      return cleanedResults.sort((a, b) => {
         const dateA = new Date(a.updatedAt || a.createdAt).getTime();
         const dateB = new Date(b.updatedAt || b.createdAt).getTime();
         return dateB - dateA; // Descendente (mais recentes primeiro)
