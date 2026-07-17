@@ -1,11 +1,9 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Layout from './components/Layout';
 import Dashboard from './components/Dashboard';
-import PlanForm from './components/PlanForm';
 import UnitViewer from './components/UnitViewer';
 import Login from './components/Login';
-import GeneralCalendar from './components/GeneralCalendar';
-import { TeachingPlan, ViewType, CurricularUnit, ScheduleEntry, UnitCalendar } from './types';
+import { TeachingPlan, ViewType, CurricularUnit } from './types';
 import { FirebaseService } from './services/firebase';
 
 const App: React.FC = () => {
@@ -22,7 +20,28 @@ const App: React.FC = () => {
     setIsLoading(true);
     try {
       const dbPlans = await FirebaseService.getPlans(profileId);
-      setPlans(dbPlans || []);
+      if (!dbPlans || dbPlans.length === 0) {
+        const emergencyPlan: TeachingPlan = {
+          id: 'emergency-plan',
+          profileId: profileId,
+          courseName: 'Mecânico de Usinagem Convencional',
+          totalHours: 800,
+          modality: 'Aprendizagem Industrial',
+          objective: 'Desenvolvimento técnico.',
+          version: '1.0',
+          updatedAt: new Date().toISOString(),
+          units: [
+            { id: "lidt", name: "Leitura e Interpretação de Desenho Técnico", hours: 60, schedule: [], calendar: { start: '', end: '', daysOfWeek: [], exceptions: [] } },
+            { id: "crd", name: "Controle Dimensional", hours: 60, schedule: [], calendar: { start: '', end: '', daysOfWeek: [], exceptions: [] } },
+            { id: "fusi", name: "Fundamentos da Usinagem", hours: 100, schedule: [], calendar: { start: '', end: '', daysOfWeek: [], exceptions: [] } },
+            { id: "prusc", name: "Processos de Usinagem Convencional", hours: 160, capabilities: [], knowledges: [], schedule: [], calendar: { start: '', end: '', daysOfWeek: [], exceptions: [] } },
+            { id: "mein", name: "Metrologia Industrial", hours: 80, capabilities: [], knowledges: [], schedule: [], calendar: { start: '', end: '', daysOfWeek: [], exceptions: [] } }
+          ]
+        };
+        setPlans([emergencyPlan]);
+      } else {
+        setPlans(dbPlans);
+      }
     } catch (err) {
       console.error("Erro ao carregar:", err);
     } finally {
@@ -41,6 +60,11 @@ const App: React.FC = () => {
     return unit.id?.toUpperCase() || '';
   };
 
+  const getUnitSemester = (unit: CurricularUnit): number => {
+    const sigla = getUnitSigla(unit);
+    return (sigla === 'PRUSC' || sigla === 'MEIN') ? 2 : 1;
+  };
+
   if (!isAuthenticated) return <Login onLogin={() => setIsAuthenticated(true)} />;
 
   return (
@@ -54,9 +78,9 @@ const App: React.FC = () => {
           {view === 'plano-curso' && currentPlan && (
             <div className="p-8">
                {currentPlan.units
-                 .filter(u => (getUnitSigla(u) === 'PRUSC' || getUnitSigla(u) === 'MEIN' ? 2 : 1) === activeSemester)
+                 .filter(u => getUnitSemester(u) === activeSemester)
                  .map(unit => (
-                   <button key={unit.id} onClick={() => { setSelectedUnit(unit); setView('plano-ensino'); }} className="block p-4 mb-4 bg-slate-800 text-white rounded">
+                   <button key={unit.id} onClick={() => { setSelectedUnit(unit); setView('plano-ensino'); }} className="block p-4 mb-4 bg-slate-800 text-white rounded w-full text-left">
                      {unit.name}
                    </button>
                  ))}
