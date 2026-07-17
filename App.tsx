@@ -20,20 +20,22 @@ const App: React.FC = () => {
 
   // Função utilitária para normalizar e identificar a sigla correta
   const getUnitSigla = (unit: CurricularUnit) => {
+    if (!unit || !unit.name) return 'UC';
     const name = unit.name.toUpperCase();
-    const id = unit.id.toLowerCase();
+    const id = (unit.id || '').toLowerCase();
     if (name.includes('LEITURA') || name.includes('DESENHO') || id.includes('lidt')) return 'LIDT';
     if (name.includes('CONTROLE') || name.includes('DIMENSIONAL') || id.includes('crd')) return 'CRD';
     if (name.includes('FUNDAMENTOS') || name.includes('USINAGEM') || id.includes('fusi')) return 'FUSI';
-    return unit.name.split(' ').map(w => w[0]).join('').toUpperCase();
+    return unit.name.split(' ').map(w => w[0] || '').join('').toUpperCase();
   };
 
   const loadPlans = useCallback(async (profileId: string) => {
     setIsLoading(true);
     try {
       const dbPlans = await FirebaseService.getPlans(profileId);
+      const safeDbPlans = Array.isArray(dbPlans) ? dbPlans : [];
       
-      if (!dbPlans || dbPlans.length === 0) {
+      if (safeDbPlans.length === 0) {
         const template = SAMPLE_PLANS.find(p => p.profileId === profileId) || SAMPLE_PLANS[0];
         const defaultPlan = { 
           ...template, 
@@ -44,28 +46,36 @@ const App: React.FC = () => {
         };
         await FirebaseService.savePlan(defaultPlan);
         const refreshed = await FirebaseService.getPlans(profileId);
-        setPlans(refreshed);
-        setCurrentPlan(refreshed[0]);
-        setSelectedUnit(refreshed[0].units[0]);
+        const safeRefreshed = Array.isArray(refreshed) ? refreshed : [];
+        
+        setPlans(safeRefreshed);
+        if (safeRefreshed.length > 0) {
+          setCurrentPlan(safeRefreshed[0]);
+          if (Array.isArray(safeRefreshed[0].units) && safeRefreshed[0].units.length > 0) {
+            setSelectedUnit(safeRefreshed[0].units[0]);
+          }
+        }
       } else {
-        const processedPlans = await Promise.all(dbPlans.map(async (plan) => {
+        const processedPlans = await Promise.all(safeDbPlans.map(async (plan) => {
           const template = SAMPLE_PLANS.find(p => p.profileId === profileId) || SAMPLE_PLANS[0];
           let updated = false;
+          
+          // Assegura que plan.units é uma lista válida antes de higienizar
+          const currentUnits = Array.isArray(plan.units) ? plan.units : [];
           
           // --- HIGIENIZAÇÃO DE UNIDADES DUPLICADAS (LIDT / CRD / IDS 04 e 05) ---
           const cleanedUnits: CurricularUnit[] = [];
           const seenSiglas = new Set<string>();
 
-          for (const unit of plan.units) {
+          for (const unit of currentUnits) {
             const sigla = getUnitSigla(unit);
-            // Ignora IDs que representem duplicação ou siglas repetidas
             const isDuplicated = 
               unit.id === "04" || 
               unit.id === "05" || 
               seenSiglas.has(sigla);
 
             if (isDuplicated) {
-              updated = true; // Força uma atualização para persistir a versão limpa no banco
+              updated = true; 
             } else {
               seenSiglas.add(sigla);
               cleanedUnits.push(unit);
@@ -74,19 +84,21 @@ const App: React.FC = () => {
           plan.units = cleanedUnits;
 
           // Mescla novas unidades do template se de fato estiverem faltando
-          template.units.forEach(tUnit => {
-            const tSigla = getUnitSigla(tUnit);
-            const hasUnit = plan.units.some(u => getUnitSigla(u) === tSigla);
-            if (!hasUnit) {
-              plan.units.push(tUnit);
-              updated = true;
-            }
-          });
+          if (template && Array.isArray(template.units)) {
+            template.units.forEach(tUnit => {
+              const tSigla = getUnitSigla(tUnit);
+              const hasUnit = plan.units.some(u => getUnitSigla(u) === tSigla);
+              if (!hasUnit) {
+                plan.units.push(tUnit);
+                updated = true;
+              }
+            });
+          }
 
           // Atualiza fusi ou força a sincronização da nova versão de cronograma
-          const fusi = plan.units.find(u => u.id.toLowerCase().includes('fusi') || u.name.toUpperCase().includes('FUNDAMENTOS'));
+          const fusi = plan.units.find(u => u.id?.toLowerCase().includes('fusi') || u.name?.toUpperCase().includes('FUNDAMENTOS'));
           if (fusi && (plan as any).version !== SCHEDULE_VERSION) {
-            const tFusi = template.units.find(u => u.id.toLowerCase().includes('fusi') || u.name.toUpperCase().includes('FUNDAMENTOS'));
+            const tFusi = template?.units?.find(u => u.id?.toLowerCase().includes('fusi') || u.name?.toUpperCase().includes('FUNDAMENTOS'));
             if (tFusi) {
               const idx = plan.units.indexOf(fusi);
               plan.units[idx] = { ...tFusi };
@@ -107,14 +119,16 @@ const App: React.FC = () => {
           const updatedCurrent = processedPlans.find(p => p.id === currentPlan.id);
           if (updatedCurrent) {
             setCurrentPlan(updatedCurrent);
-            if (selectedUnit) {
+            if (selectedUnit && Array.isArray(updatedCurrent.units)) {
               const updatedUnit = updatedCurrent.units.find(u => u.id === selectedUnit.id);
               if (updatedUnit) setSelectedUnit(updatedUnit);
             }
           }
-        } else {
+        } else if (processedPlans.length > 0) {
           setCurrentPlan(processedPlans[0]);
-          setSelectedUnit(processedPlans[0].units[0]);
+          if (Array.isArray(processedPlans[0].units) && processedPlans[0].units.length > 0) {
+            setSelectedUnit(processedPlans[0].units[0]);
+          }
         }
       }
     } catch (err) {
@@ -135,7 +149,7 @@ const App: React.FC = () => {
     try {
       await FirebaseService.savePlan(planToSave);
       const refreshed = await FirebaseService.getPlans(activeProfileId);
-      setPlans(refreshed);
+      setPlans(Array.isArray(refreshed) ? refreshed : []);
       setView('dashboard');
     } catch (error) {
       console.error("Erro ao salvar dados:", error);
@@ -144,7 +158,7 @@ const App: React.FC = () => {
   };
 
   const handleUpdateSchedule = async (unitId: string, newSchedule: ScheduleEntry[]) => {
-    if (!currentPlan) return;
+    if (!currentPlan || !Array.isArray(currentPlan.units)) return;
     const updatedUnits = currentPlan.units.map(u => u.id === unitId ? { ...u, schedule: newSchedule } : u);
     const updatedPlan = { ...currentPlan, units: updatedUnits, profileId: activeProfileId, updatedAt: new Date().toISOString() };
     setCurrentPlan(updatedPlan);
@@ -152,7 +166,7 @@ const App: React.FC = () => {
   };
 
   const handleUpdateCalendar = async (unitId: string, newCalendar: UnitCalendar) => {
-    if (!currentPlan) return;
+    if (!currentPlan || !Array.isArray(currentPlan.units)) return;
     const updatedUnits = currentPlan.units.map(u => u.id === unitId ? { ...u, calendar: newCalendar } : u);
     const updatedPlan = { ...currentPlan, units: updatedUnits, profileId: activeProfileId, updatedAt: new Date().toISOString() };
     setCurrentPlan(updatedPlan);
@@ -173,6 +187,9 @@ const App: React.FC = () => {
 
   if (!isAuthenticated) return <Login onLogin={() => setIsAuthenticated(true)} />;
 
+  // Variável utilitária para garantir iteração segura de unidades na interface
+  const safeUnits = currentPlan && Array.isArray(currentPlan.units) ? currentPlan.units : [];
+
   return (
     <Layout 
       activeView={view} 
@@ -188,7 +205,7 @@ const App: React.FC = () => {
         </div>
       ) : (
         <>
-          {view === 'dashboard' && <Dashboard plans={plans} onEdit={(p) => { setCurrentPlan(p); setView('editor'); }} onView={(p) => { setCurrentPlan(p); setSelectedUnit(p.units[0]); setView('plano-curso'); }} onRefresh={() => loadPlans(activeProfileId)} />}
+          {view === 'dashboard' && <Dashboard plans={plans} onEdit={(p) => { setCurrentPlan(p); setView('editor'); }} onView={(p) => { setCurrentPlan(p); if (p && Array.isArray(p.units)) { setSelectedUnit(p.units[0]); }; setView('plano-curso'); }} onRefresh={() => loadPlans(activeProfileId)} />}
           
           {view === 'plano-curso' && currentPlan && (
             <div className="max-w-4xl mx-auto space-y-10 animate-fadeIn pb-20">
@@ -209,8 +226,8 @@ const App: React.FC = () => {
               <div className="bg-slate-900 rounded-[2.5rem] p-8 md:p-12 text-white shadow-2xl">
                 <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 mb-8">III. Unidades Curriculares</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                  {currentPlan.units.map((unit, idx) => (
-                    <button key={unit.id} onClick={() => { setSelectedUnit(unit); setView('plano-ensino'); }} className="bg-slate-800 p-8 rounded-3xl text-left hover:bg-blue-600 transition-all group relative overflow-hidden">
+                  {safeUnits.map((unit, idx) => (
+                    <button key={unit.id || idx} onClick={() => { setSelectedUnit(unit); setView('plano-ensino'); }} className="bg-slate-800 p-8 rounded-3xl text-left hover:bg-blue-600 transition-all group relative overflow-hidden">
                       <span className="text-6xl font-black opacity-5 absolute -right-2 -bottom-2">0{idx + 1}</span>
                       <p className="text-[9px] font-black text-blue-400 mb-2">{getUnitSigla(unit)}</p>
                       <h4 className="font-black text-lg leading-tight uppercase line-clamp-2">{unit.name}</h4>
@@ -224,9 +241,9 @@ const App: React.FC = () => {
           {view === 'plano-ensino' && currentPlan && selectedUnit && (
             <div className="space-y-8 max-w-7xl mx-auto pb-20">
               <div className="flex gap-2 overflow-x-auto pb-4 scrollbar-hide px-1">
-                {currentPlan.units.map(u => (
+                {safeUnits.map((u, idx) => (
                   <button 
-                    key={u.id} 
+                    key={u.id || idx} 
                     onClick={() => setSelectedUnit(u)} 
                     className={`flex-shrink-0 px-8 py-4 rounded-2xl text-[10px] font-black uppercase transition-all border-2 ${selectedUnit.id === u.id ? 'bg-blue-600 border-blue-600 text-white shadow-xl scale-105' : 'bg-white border-slate-200 text-slate-400 hover:border-blue-100'}`}
                   >
@@ -239,7 +256,7 @@ const App: React.FC = () => {
                 onUpdateSchedule={(newSched) => handleUpdateSchedule(selectedUnit.id, newSched)} 
                 onUpdateCalendar={(newCal) => handleUpdateCalendar(selectedUnit.id, newCal)}
                 onUpdateUnit={(updatedUnit) => {
-                  if (!currentPlan) return;
+                  if (!currentPlan || !Array.isArray(currentPlan.units)) return;
                   const updatedUnits = currentPlan.units.map(u => u.id === updatedUnit.id ? updatedUnit : u);
                   const updatedPlan = { ...currentPlan, units: updatedUnits };
                   setCurrentPlan(updatedPlan);
