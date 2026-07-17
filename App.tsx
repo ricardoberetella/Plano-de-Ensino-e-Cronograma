@@ -5,7 +5,7 @@ import PlanForm from './components/PlanForm';
 import UnitViewer from './components/UnitViewer';
 import Login from './components/Login';
 import GeneralCalendar from './components/GeneralCalendar';
-import { TeachingPlan, ViewType, CurricularUnit, ScheduleEntry, UnitCalendar, CalendarMarking, CalendarColor } from './types';
+import { TeachingPlan, ViewType, CurricularUnit, ScheduleEntry, UnitCalendar } from './types';
 import { SAMPLE_PLANS, SCHEDULE_VERSION } from './constants';
 import { FirebaseService } from './services/firebase';
 
@@ -18,7 +18,6 @@ const App: React.FC = () => {
   const [selectedUnit, setSelectedUnit] = useState<CurricularUnit | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Função utilitária para normalizar e identificar a sigla correta
   const getUnitSigla = (unit: CurricularUnit) => {
     if (!unit || !unit.name) return 'UC';
     const name = unit.name.toUpperCase();
@@ -26,6 +25,7 @@ const App: React.FC = () => {
     if (name.includes('LEITURA') || name.includes('DESENHO') || id.includes('lidt')) return 'LIDT';
     if (name.includes('CONTROLE') || name.includes('DIMENSIONAL') || id.includes('crd')) return 'CRD';
     if (name.includes('FUNDAMENTOS') || name.includes('USINAGEM') || id.includes('fusi')) return 'FUSI';
+    if (name.includes('METROLOGIA')) return 'MI';
     return unit.name.split(' ').map(w => w[0] || '').join('').toUpperCase();
   };
 
@@ -50,31 +50,32 @@ const App: React.FC = () => {
         
         setPlans(safeRefreshed);
         if (safeRefreshed.length > 0) {
+          // Filtra MI para não aparecer na inicialização
+          const filteredUnits = (safeRefreshed[0].units || []).filter(u => getUnitSigla(u) !== 'MI');
+          safeRefreshed[0].units = filteredUnits;
           setCurrentPlan(safeRefreshed[0]);
-          if (Array.isArray(safeRefreshed[0].units) && safeRefreshed[0].units.length > 0) {
-            setSelectedUnit(safeRefreshed[0].units[0]);
-          }
+          if (filteredUnits.length > 0) setSelectedUnit(filteredUnits[0]);
         }
       } else {
         const processedPlans = await Promise.all(safeDbPlans.map(async (plan) => {
           const template = SAMPLE_PLANS.find(p => p.profileId === profileId) || SAMPLE_PLANS[0];
           let updated = false;
           
-          // Assegura que plan.units é uma lista válida antes de higienizar
           const currentUnits = Array.isArray(plan.units) ? plan.units : [];
-          
-          // --- HIGIENIZAÇÃO DE UNIDADES DUPLICADAS (LIDT / CRD / IDS 04 e 05) ---
           const cleanedUnits: CurricularUnit[] = [];
           const seenSiglas = new Set<string>();
 
           for (const unit of currentUnits) {
             const sigla = getUnitSigla(unit);
-            const isDuplicated = 
+            
+            // --- EXCLUSÃO COMPLETA DE MI E DUPLICADOS ---
+            const shouldExclude = 
+              sigla === 'MI' || 
               unit.id === "04" || 
               unit.id === "05" || 
               seenSiglas.has(sigla);
 
-            if (isDuplicated) {
+            if (shouldExclude) {
               updated = true; 
             } else {
               seenSiglas.add(sigla);
@@ -83,10 +84,12 @@ const App: React.FC = () => {
           }
           plan.units = cleanedUnits;
 
-          // Mescla novas unidades do template se de fato estiverem faltando
+          // Mescla do template apenas se não for MI e estiver faltando
           if (template && Array.isArray(template.units)) {
             template.units.forEach(tUnit => {
               const tSigla = getUnitSigla(tUnit);
+              if (tSigla === 'MI') return; // Bloqueia redescobrir o MI
+              
               const hasUnit = plan.units.some(u => getUnitSigla(u) === tSigla);
               if (!hasUnit) {
                 plan.units.push(tUnit);
@@ -95,10 +98,9 @@ const App: React.FC = () => {
             });
           }
 
-          // Atualiza fusi ou força a sincronização da nova versão de cronograma
-          const fusi = plan.units.find(u => u.id?.toLowerCase().includes('fusi') || u.name?.toUpperCase().includes('FUNDAMENTOS'));
+          const fusi = plan.units.find(u => getUnitSigla(u) === 'FUSI');
           if (fusi && (plan as any).version !== SCHEDULE_VERSION) {
-            const tFusi = template?.units?.find(u => u.id?.toLowerCase().includes('fusi') || u.name?.toUpperCase().includes('FUNDAMENTOS'));
+            const tFusi = template?.units?.find(u => getUnitSigla(u) === 'FUSI');
             if (tFusi) {
               const idx = plan.units.indexOf(fusi);
               plan.units[idx] = { ...tFusi };
@@ -118,6 +120,8 @@ const App: React.FC = () => {
         if (currentPlan) {
           const updatedCurrent = processedPlans.find(p => p.id === currentPlan.id);
           if (updatedCurrent) {
+            // Garante filtro em tempo de execução
+            updatedCurrent.units = (updatedCurrent.units || []).filter(u => getUnitSigla(u) !== 'MI');
             setCurrentPlan(updatedCurrent);
             if (selectedUnit && Array.isArray(updatedCurrent.units)) {
               const updatedUnit = updatedCurrent.units.find(u => u.id === selectedUnit.id);
@@ -125,8 +129,9 @@ const App: React.FC = () => {
             }
           }
         } else if (processedPlans.length > 0) {
+          processedPlans[0].units = (processedPlans[0].units || []).filter(u => getUnitSigla(u) !== 'MI');
           setCurrentPlan(processedPlans[0]);
-          if (Array.isArray(processedPlans[0].units) && processedPlans[0].units.length > 0) {
+          if (processedPlans[0].units.length > 0) {
             setSelectedUnit(processedPlans[0].units[0]);
           }
         }
@@ -145,7 +150,11 @@ const App: React.FC = () => {
   }, [activeProfileId, isAuthenticated]);
 
   const handleSave = async (updatedPlan: TeachingPlan) => {
-    const planToSave = { ...updatedPlan, profileId: activeProfileId };
+    const planToSave = { 
+      ...updatedPlan, 
+      profileId: activeProfileId,
+      units: (updatedPlan.units || []).filter(u => getUnitSigla(u) !== 'MI')
+    };
     try {
       await FirebaseService.savePlan(planToSave);
       const refreshed = await FirebaseService.getPlans(activeProfileId);
@@ -187,8 +196,9 @@ const App: React.FC = () => {
 
   if (!isAuthenticated) return <Login onLogin={() => setIsAuthenticated(true)} />;
 
-  // Variável utilitária para garantir iteração segura de unidades na interface
-  const safeUnits = currentPlan && Array.isArray(currentPlan.units) ? currentPlan.units : [];
+  // Filtra MI em nível de renderização final por segurança
+  const safeUnits = (currentPlan && Array.isArray(currentPlan.units) ? currentPlan.units : [])
+    .filter(u => getUnitSigla(u) !== 'MI');
 
   return (
     <Layout 
@@ -205,7 +215,7 @@ const App: React.FC = () => {
         </div>
       ) : (
         <>
-          {view === 'dashboard' && <Dashboard plans={plans} onEdit={(p) => { setCurrentPlan(p); setView('editor'); }} onView={(p) => { setCurrentPlan(p); if (p && Array.isArray(p.units)) { setSelectedUnit(p.units[0]); }; setView('plano-curso'); }} onRefresh={() => loadPlans(activeProfileId)} />}
+          {view === 'dashboard' && <Dashboard plans={plans} onEdit={(p) => { setCurrentPlan(p); setView('editor'); }} onView={(p) => { setCurrentPlan(p); if (p && Array.isArray(p.units)) { const valid = p.units.filter(u => getUnitSigla(u) !== 'MI'); setSelectedUnit(valid[0] || null); }; setView('plano-curso'); }} onRefresh={() => loadPlans(activeProfileId)} />}
           
           {view === 'plano-curso' && currentPlan && (
             <div className="max-w-4xl mx-auto space-y-10 animate-fadeIn pb-20">
