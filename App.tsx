@@ -30,26 +30,94 @@ const App: React.FC = () => {
     selectedUnitRef.current = selectedUnit;
   }, [selectedUnit]);
 
-  const getTemplatePlan = useCallback((profileId: string): TeachingPlan => {
-    if (Array.isArray(SAMPLE_PLANS)) {
-      return SAMPLE_PLANS.find(p => p?.profileId === profileId) || SAMPLE_PLANS[0];
-    }
-    if (SAMPLE_PLANS && typeof SAMPLE_PLANS === 'object') {
-      const plansArray = Object.values(SAMPLE_PLANS) as TeachingPlan[];
-      if (plansArray.length > 0) {
-        return plansArray.find(p => p?.profileId === profileId) || plansArray[0];
-      }
-    }
+  // Ementa oficial completa injetada estaticamente para contornar qualquer travamento do Firebase
+  const getOfficialTemplate = useCallback((profileId: string): TeachingPlan => {
     return {
-      id: `fallback-${profileId}`,
+      id: `plan-usinagem-${profileId}`,
       profileId,
       courseName: 'Mecânico de Usinagem Convencional',
       totalHours: 800,
       modality: 'Aprendizagem Industrial',
       objective: 'Desenvolver capacidades técnicas e socioemocionais relativas aos elementos de máquina, ferramentas, processos de fabricação, manutenção e usinagem convencional seguindo normas de saúde e segurança.',
-      units: [],
       version: SCHEDULE_VERSION,
-      updatedAt: new Date().toISOString()
+      updatedAt: new Date().toISOString(),
+      units: [
+        {
+          id: "lidt",
+          name: "Leitura e Interpretação de Desenho Técnico",
+          hours: 60,
+          schedule: [],
+          calendar: { start: '', end: '', daysOfWeek: [], exceptions: [] }
+        },
+        {
+          id: "crd",
+          name: "Controle Dimensional",
+          hours: 60,
+          schedule: [],
+          calendar: { start: '', end: '', daysOfWeek: [], exceptions: [] }
+        },
+        {
+          id: "fusi",
+          name: "Fundamentos da Usinagem",
+          hours: 100,
+          schedule: [],
+          calendar: { start: '', end: '', daysOfWeek: [], exceptions: [] }
+        },
+        {
+          id: "prusc",
+          name: "Processos de Usinagem Convencional",
+          hours: 160,
+          capabilities: [
+            "Realizar operações em torno convencional de acordo com as especificações, normas técnicas e de saúde e segurança no trabalho[cite: 1].",
+            "Realizar operações em fresadora convencional de acordo com as especificações, normas técnicas e de saúde e segurança no trabalho[cite: 1].",
+            "Realizar operações de serramento por meio de máquinas de acordo com as especificações, normas técnicas e de saúde e segurança no trabalho[cite: 1].",
+            "Realizar a montagem de conjuntos mecânicos de acordo com as especificações e normas técnicas e de saúde e segurança no trabalho[cite: 1].",
+            "Definir os parâmetros e os processos de usinagem em retificas convencionais, de acordo com as especificações técnicas[cite: 1].",
+            "Realizar o balanceamento do rebolo de acordo com as especificações, normas técnicas e de saúde e segurança no trabalho[cite: 1].",
+            "Realizar operações em retificadoras cilíndricas de acordo com as especificações, normas técnicas e de saúde e segurança no trabalho[cite: 1].",
+            "Realizar operações em retificadoras planas de acordo com as especificações, normas técnicas e de saúde e segurança no trabalho[cite: 1]."
+          ],
+          knowledges: [
+            "Torneamento: Ferramenta de perfilamento, Acessórios (Lunetas, Graminho, Eixo mandril, Prisma em V), Cálculos técnicos, Operação[cite: 1].",
+            "Fresagem: Ferramentas (Gravação, Esférica), Acessórios, Conjunto divisor (Divisão direta, indireta, diferencial), Operação[cite: 1].",
+            "Serramento: Definição, Tipos de serra fita (Horizontal, Vertical), Lâmina de serra, Operação[cite: 1].",
+            "Conjuntos mecânicos: Definição, Tipos, Características, Técnicas de montagem e ajustagem[cite: 1].",
+            "Retificação: Processos (Cilíndrica, Plana tangencial, Centerless, Afiadoras), Parâmetros (RPM, Avanço)[cite: 1].",
+            "Balanceamento: Rebolos (Tipos, Características, Inspeção), Acessórios (Balanceador estático, Flanges, Eixo), Operações[cite: 1].",
+            "Retificadora cilíndrica: Características, Componentes, Acessórios (Placa, Contraponta, Dressador), Operação[cite: 1].",
+            "Retificadora plana: Características, Componentes, Acessórios (Mesa magnética, De seno, Calços), Operação[cite: 1]."
+          ],
+          schedule: [],
+          calendar: { start: '', end: '', daysOfWeek: [], exceptions: [] }
+        },
+        {
+          id: "mein",
+          name: "Metrologia Industrial",
+          hours: 80,
+          capabilities: [
+            "Medir peças por meio de instrumentos da ordem direta, de acordo com especificações técnicas[cite: 2].",
+            "Medir peças por meio de instrumentos da ordem indireta, de acordo com especificações técnicas[cite: 2].",
+            "Medir a dureza de materiais de acordo com especificações técnicas[cite: 2].",
+            "Medir perfil de peças por meio de imagens projetadas, de acordo com especificações técnicas[cite: 2].",
+            "Medir tridimensionalmente peças de acordo com especificações técnicas[cite: 2].",
+            "Medir peças digitalmente por meio de sistemas de medição por visão de acordo com especificações técnicas[cite: 2].",
+            "Medir peças com braço de medição portátil de acordo com especificações técnicas[cite: 2].",
+            "Testar a funcionalidade de peças e conjuntos de acordo com especificações técnicas[cite: 2]."
+          ],
+          knowledges: [
+            "Medição direta: Paquímetro de engrenagens, Micrômetro de rosca/engrenagens, Rugosímetro, Calibrador linear height, Procedimentos[cite: 2].",
+            "Medição indireta: Comparador de diâmetro interno, Calibrador passa não passa, Bloco padrão, Régua e mesa de seno, Técnicas[cite: 2].",
+            "Durômetro: Tipos, Características, Aplicação, Técnicas de utilização, Procedimentos[cite: 2].",
+            "Projetor de perfil: Tipos, Características, Aplicação, Técnicas de utilização, Projeção (Diascópica, Episcópica)[cite: 2].",
+            "Máquina de medição por coordenadas: Tipos (Manual, CNC), Características, Aplicação, Técnicas, Dispositivos, Procedimentos[cite: 2].",
+            "Medição por Visão: Tipos, Características, Aplicação, Técnicas de utilização, Procedimentos[cite: 2].",
+            "Braço de medição: Tipos (Manual, CNC), Características, Aplicação, Técnicas de utilização, Dispositivos, Procedimentos[cite: 2].",
+            "Funcionalidade: Objetivo, Importância, Aspectos (Funcionalidade, Comportamento, Qualidade), Tipos de testes, Métodos[cite: 2]."
+          ],
+          schedule: [],
+          calendar: { start: '', end: '', daysOfWeek: [], exceptions: [] }
+        }
+      ]
     };
   }, []);
 
@@ -58,20 +126,18 @@ const App: React.FC = () => {
     const name = unit.name.toUpperCase();
     const id = unit.id ? unit.id.toLowerCase() : '';
     
-    if (name.includes('LEITURA') || name.includes('DESENHO') || id.includes('lidt')) return 'LIDT';
-    if (name.includes('CONTROLE') || name.includes('DIMENSIONAL') || id.includes('crd')) return 'CRD';
-    if (name.includes('FUNDAMENTOS') || name.includes('USINAGEM') || id.includes('fusi')) return 'FUSI';
-    if (name.includes('PROCESSOS DE USINAGEM') || name.includes('PRUSC') || id.includes('prusc')) return 'PRUSC';
-    if (name.includes('METROLOGIA INDUSTRIAL') || name.includes('MEIN') || id.includes('mein') || id.includes('mia')) return 'MEIN';
+    if (name.includes('LEITURA') || name.includes('DESENHO') || id === 'lidt') return 'LIDT';
+    if (name.includes('CONTROLE') || name.includes('DIMENSIONAL') || id === 'crd') return 'CRD';
+    if (name.includes('FUNDAMENTOS') || name.includes('USINAGEM') || id === 'fusi') return 'FUSI';
+    if (name.includes('PROCESSOS') || name.includes('PRUSC') || id === 'prusc') return 'PRUSC';
+    if (name.includes('METROLOGIA') || name.includes('MEIN') || id === 'mein') return 'MEIN';
     
-    return unit.name.split(' ').map(w => w[0]).join('').toUpperCase();
+    return id.toUpperCase();
   };
 
   const getUnitSemester = (unit: CurricularUnit): number => {
     const sigla = getUnitSigla(unit);
-    if (sigla === 'PRUSC' || sigla === 'MEIN') {
-      return 2;
-    }
+    if (sigla === 'PRUSC' || sigla === 'MEIN') return 2;
     return 1;
   };
 
@@ -79,78 +145,39 @@ const App: React.FC = () => {
     setIsLoading(true);
     try {
       const dbPlans = await FirebaseService.getPlans(profileId);
-      const template = getTemplatePlan(profileId);
+      const template = getOfficialTemplate(profileId);
       
       if (!dbPlans || dbPlans.length === 0) {
-        const defaultPlan = { 
-          ...template, 
-          id: `plan-usinagem-${profileId}`, 
-          profileId: profileId,
-          version: SCHEDULE_VERSION,
-          updatedAt: new Date().toISOString()
-        };
-        await FirebaseService.savePlan(defaultPlan);
+        await FirebaseService.savePlan(template);
         const refreshed = await FirebaseService.getPlans(profileId);
         setPlans(refreshed || []);
         setCurrentPlan(refreshed?.[0] || null);
         setSelectedUnit(refreshed?.[0]?.units?.[0] || null);
       } else {
         const processedPlans = await Promise.all(dbPlans.map(async (plan) => {
-          let forceUpdate = false;
-          if (!plan.units) plan.units = [];
+          let needsReset = false;
 
-          // Remove duplicatas por sigla
-          const cleanedUnits: CurricularUnit[] = [];
-          const seenSiglas = new Set<string>();
-
-          for (const unit of plan.units) {
-            const sigla = getUnitSigla(unit);
-            if (seenSiglas.has(sigla)) {
-              forceUpdate = true;
-            } else {
-              seenSiglas.add(sigla);
-              // Garante que se for MEIN ou PRUSC antigos, vamos atualizar o nome/id para o padrão rigoroso
-              if (sigla === 'PRUSC') {
-                unit.id = 'prusc';
-                unit.name = 'Processos de Usinagem Convencional';
-              }
-              if (sigla === 'MEIN') {
-                unit.id = 'mein';
-                unit.name = 'Metrologia Industrial';
-              }
-              cleanedUnits.push(unit);
+          // Se a lista não tem exatamente 5 unidades, ou se falta a sigla PRUSC, ativa o reset forçado
+          if (!plan.units || plan.units.length !== 5) {
+            needsReset = true;
+          } else {
+            const siglasNoBanco = plan.units.map(u => getUnitSigla(u));
+            if (!siglasNoBanco.includes('PRUSC') || !siglasNoBanco.includes('MEIN')) {
+              needsReset = true;
             }
           }
-          plan.units = cleanedUnits;
 
-          // FORÇA INJEÇÃO DAS MATÉRIAS DO TEMPLATE CASO ESTEJAM FALTANDO NO SEU FIREBASE
-          template.units?.forEach(tUnit => {
-            const tSigla = getUnitSigla(tUnit);
-            const index = plan.units.findIndex(u => getUnitSigla(u) === tSigla);
-            
-            if (index === -1) {
-              // Se não existir de jeito nenhum (como o PRUSC que sumiu), adiciona completo
-              plan.units.push({ ...tUnit });
-              forceUpdate = true;
-            } else {
-              // Se existir, mas as capacidades ou conhecimentos estiverem vazios, força a ementa correta do template
-              if (!plan.units[index].capabilities || plan.units[index].capabilities.length === 0 || forceUpdate) {
-                plan.units[index].capabilities = tUnit.capabilities ? [...tUnit.capabilities] : [];
-                plan.units[index].knowledges = tUnit.knowledges ? [...tUnit.knowledges] : [];
-                forceUpdate = true;
-              }
-            }
-          });
-
-          // Limpeza final para remover resquícios antigos (como MIA/MCO antigos) que não estejam no template
-          plan.units = plan.units.filter(u => {
-            const s = getUnitSigla(u);
-            return ['LIDT', 'CRD', 'FUSI', 'PRUSC', 'MEIN'].includes(s);
-          });
-
-          if (forceUpdate || (plan as any).version !== SCHEDULE_VERSION) {
+          // RESET FORÇADO: Sobrescreve as UCs do banco com os dados do template do código local
+          if (needsReset) {
+            console.log(`Forçando atualização da ementa para o perfil: ${profileId}`);
+            plan.units = JSON.parse(JSON.stringify(template.units));
+            plan.courseName = template.courseName;
+            plan.objective = template.objective;
+            plan.modality = template.modality;
+            plan.totalHours = template.totalHours;
             (plan as any).version = SCHEDULE_VERSION;
             plan.updatedAt = new Date().toISOString();
+            
             await FirebaseService.savePlan(plan);
           }
           return plan;
@@ -166,7 +193,7 @@ const App: React.FC = () => {
           if (updatedCurrent) {
             setCurrentPlan(updatedCurrent);
             if (activeSelectedUnit) {
-              const updatedUnit = updatedCurrent.units?.find(u => u.id === activeSelectedUnit.id);
+              const updatedUnit = updatedCurrent.units?.find(u => getUnitSigla(u) === getUnitSigla(activeSelectedUnit));
               if (updatedUnit) setSelectedUnit(updatedUnit);
             }
           }
@@ -176,11 +203,11 @@ const App: React.FC = () => {
         }
       }
     } catch (err) {
-      console.error("Erro fatal ao carregar Firebase:", err);
+      console.error("Erro ao sincronizar ementa:", err);
     } finally {
       setIsLoading(false);
     }
-  }, [getTemplatePlan]);
+  }, [getOfficialTemplate]);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -246,7 +273,7 @@ const App: React.FC = () => {
       {isLoading ? (
         <div className="flex flex-col items-center justify-center h-full space-y-4">
           <div className="w-12 h-12 border-4 border-slate-200 border-t-blue-600 rounded-full animate-spin"></div>
-          <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Sincronizando dados...</p>
+          <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Atualizando Matriz Curricular...</p>
         </div>
       ) : (
         <>
@@ -282,9 +309,9 @@ const App: React.FC = () => {
                 </div>
                 
                 {filteredUnits.length === 0 ? (
-                  <p className="text-slate-400 text-xs font-medium italic p-4 text-center">Nenhuma unidade curricular cadastrada para este semestre.</p>
+                  <p className="text-slate-400 text-xs font-medium italic p-4 text-center">Nenhuma unidade cadastrada para este semestre.</p>
                 ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     {filteredUnits.map((unit, idx) => (
                       <button 
                         key={unit.id || idx} 
