@@ -2,9 +2,9 @@
 // CONSTANTES GERAIS DO SISTEMA
 // ============================================================================
 
-export const SCHEDULE_VERSION = '2026.2.v1';
+export const SCHEDULE_VERSION = '2026.2.v2';
 
-// --- CRONOGRAMAS DO 2º SEMESTRE (PROFESSOR RICARDO GEA) ---
+// --- CRONOGRAMAS DETALHADOS: 2º SEMESTRE (PROFESSOR RICARDO GEA) ---
 const PRUSC_SCHEDULE_GEA = [
   { id: 'p_gea_01', date: '23/07/2026', hours: 4, capacities: 'CT3: Operações de serramento', knowledge: '3. Serramento: Definição, Tipos de serra fita (Horizontal e Vertical), Lâminas.', strategy: 'Apresentação da UC e normas de segurança da oficina. Prática de corte de matéria-prima.', resources: 'Serra de fita horizontal, matéria-prima.' },
   { id: 'p_gea_02', date: '27/07/2026', hours: 4, capacities: 'CT1: Operações em torno convencional', knowledge: '1. Torneamento: Ferramenta de perfilamento, acessórios (lunetas, graminho).', strategy: 'Demonstração de alinhamento com graminho e montagem de acessórios no torno.', resources: 'Torno convencional, graminho, lunetas.' },
@@ -35,7 +35,7 @@ const PRUSC_SCHEDULE_GEA = [
   { id: 'p_gea_27', date: '22/10/2026', hours: 4, capacities: 'CT1 e CT2: Manutenção e processos integrados', knowledge: 'Usinagem fina de componentes do projeto integrado.', strategy: 'Acompanhamento do plano de trabalho de usinagem sequencial desenvolvido pelo aluno.', resources: 'Torno e fresadora.' },
   { id: 'p_gea_28', date: '26/10/2026', hours: 4, capacities: 'CT4: Ajustagem fina e montagem', knowledge: 'Técnicas transversais de acabamento em guias deslizantes.', strategy: 'Ajustagem fina de montagem com controle de folga por meio de azul de prússia.', resources: 'Azul de prússia, raspadores de metal.' },
   { id: 'p_gea_29', date: '29/10/2026', hours: 4, capacities: 'CT7 e CT8: Retificação final de precisão', knowledge: 'Retificação das folgas funcionais dos eixos e placas montadas.', strategy: 'Usinagem de correção dimensional final nos conjuntos usinados do projeto.', resources: 'Retificadoras cilíndrica e plana.' },
-  { id: 'p_gea_30', date: '05/11/2026', hours: 4, capacities: 'CT4: Teste funcional de conjuntos', knowledge: 'Montagem mecânica completa e verificação cinemática.', strategy: 'Avaliação da suavidade de movimento mecânico e adjustments de fixação de parafusos.', resources: 'Chaves de aperto, bancada de montagem.' },
+  { id: 'p_gea_30', date: '05/11/2026', hours: 4, capacities: 'CT4: Teste funcional de conjuntos', knowledge: 'Montagem mecânica completa e verificação cinemática.', strategy: 'Avaliação da suavidade de movement mecânico e adjustments de fixação de parafusos.', resources: 'Chaves de aperto, bancada de montagem.' },
   { id: 'p_gea_31', date: '09/11/2026', hours: 4, capacities: 'CT1 a CT8: Prática supervisionada de refugo e correção', knowledge: 'Estudo de caso e retrabalho de componentes fora de tolerância.', strategy: 'Recuperação de peças corrigindo diâmetros e superfícies por retificação ou buchas.', resources: 'Máquinas-ferramenta.' },
   { id: 'p_gea_32', date: '12/11/2026', hours: 4, capacities: 'CT1 a CT8: Prática avançada de usinagem', knowledge: 'Operações complexas acumuladas: Divisor indireto + Retífica plana.', strategy: 'Usinagem final de ranhuras sincronizadas e canais em eixos retificados.', resources: 'Fresadora e retificadora.' },
   { id: 'p_gea_33', date: '19/11/2026', hours: 4, capacities: 'CT1 a CT8: Otimização de processos', knowledge: 'Análise de tempos de corte e desgaste de ferramentas.', strategy: 'Aplicação prática de melhoria de velocidade e avanços para aumento de rendimento.', resources: 'Ferramental técnico.' },
@@ -63,7 +63,7 @@ const METIND_SCHEDULE_GEA = [
   { id: 'm_gea_12', date: '13/10/2026', hours: 4, capacities: 'CT5: Medição tridimensional de peças', knowledge: '5.1.2. Programas CNC em MMC: Alinhamento automático e relatórios analíticos.', strategy: 'Demonstração de execução de programa de medição automatizada CNC de carcaças.', resources: 'MMC CNC, software de metrologia.' },
   { id: 'm_gea_13', date: '20/10/2026', hours: 4, capacities: 'CT6: Medição digital por sistemas de visão', knowledge: '6. Medição por Visão: Câmeras de alta resolução, iluminação e algoritmos de borda.', strategy: 'Configuração de sistemas ópticos automáticos digitais para medição sem contato.', resources: 'Sistema de medição por vídeo óptico.' },
   { id: 'm_gea_14', date: '27/10/2026', hours: 4, capacities: 'CT7: Medição com braço portátil', knowledge: '7. Braço de medição portátil: Articulações, calibração da esfera e encoders ópticos.', strategy: 'Prática de medição dimensional móvel diretamente em peças fixadas na bancada.', resources: 'Braço de medição portátil articulado.' },
-  { id: 'm_gea_15', date: '03/11/2026', hours: 4, capacities: 'CT7: Medição com braço portátil', knowledge: '7.6. Dados: Exportação para arquivos CAD e relatórios de desvio geométrico.', strategy: 'Comparação de nuvem de pontos coletada por braço portátil contra modelo 3D nominal.', resources: 'Computador, software CAD/Metrologia.' },
+  { id: 'm_ber_15', date: '03/11/2026', hours: 4, capacities: 'CT7: Medição com braço portátil', knowledge: '7.6. Dados: Exportação para arquivos CAD e relatórios de desvio geométrico.', strategy: 'Comparação de nuvem de pontos coletada por braço portátil contra modelo 3D nominal.', resources: 'Computador, software CAD/Metrologia.' },
   { id: 'm_gea_16', date: '10/11/2026', hours: 4, capacities: 'CT8: Testes de funcionalidade e conjuntos', knowledge: '8. Funcionalidade: Aspectos de montagem, folgas reais e comportamento sob esforço.', strategy: 'Montagem mecânica em bancada de testes para validação funcional de engrenamentos.', resources: 'Dispositivos e eixos montados.' },
   { id: 'm_gea_17', date: '17/11/2026', hours: 4, capacities: 'CT8: Testes de funcionalidade e conjuntos', knowledge: '8.4. Tipos de testes: Funcional de componentes e testes integrados.', strategy: 'Execução de roteiros de teste analítico e preenchimento de matrizes de conformidade.', resources: 'Fichas de ensaio técnico.' },
   { id: 'm_gea_18', date: '24/11/2026', hours: 4, capacities: 'CT1 a CT8: Prática analítica integrada', knowledge: 'Validação de tolerâncias geométricas complexas (GD&T) em desenhos técnicos.', strategy: 'Análise laboratorial completa de peças reprovadas na oficina de usinagem.', resources: 'Instrumentos do laboratório.' },
@@ -71,7 +71,7 @@ const METIND_SCHEDULE_GEA = [
   { id: 'm_gea_20', date: '08/12/2026', hours: 4, capacities: 'Todas as capacities da UC', knowledge: 'Avaliação técnica laboratorial final e encerramento de diários.', strategy: 'Fechamento de médias e feedbacks individuais sobre exatidão metrológica.', resources: 'Fichas de notas.' }
 ];
 
-// --- CRONOGRAMAS DO 2º SEMESTRE (PROFESSOR RICARDO BERETELLA) ---
+// --- CRONOGRAMAS DETALHADOS: 2º SEMESTRE (PROFESSOR RICARDO BERETELLA) ---
 const PRUSC_SCHEDULE_BERETELLA = [
   { id: 'p_ber_01', date: '24/07/2026', hours: 4, capacities: 'CT3: Operações de serramento', knowledge: '3. Serramento: Definição, Tipos de serra fita (Horizontal e Vertical), Lâminas.', strategy: 'Apresentação da UC e normas de segurança da oficina. Prática de corte de matéria-prima.', resources: 'Serra de fita horizontal, matéria-prima.' },
   { id: 'p_ber_02', date: '28/07/2026', hours: 4, capacities: 'CT1: Operações em torno convencional', knowledge: '1. Torneamento: Ferramenta de perfilamento, acessórios (lunetas, graminho).', strategy: 'Demonstração de alinhamento com graminho e montagem de acessórios no torno.', resources: 'Torno convencional, graminho, lunetas.' },
@@ -135,101 +135,160 @@ const METIND_SCHEDULE_BERETELLA = [
   { id: 'm_ber_17', date: '23/11/2026', hours: 4, capacities: 'CT8: Testes de funcionalidade e conjuntos', knowledge: '8.4. Tipos de testes: Funcional de componentes e testes integrados.', strategy: 'Execução de roteiros de teste analítico e preenchimento de matrizes de conformidade.', resources: 'Fichas de ensaio técnico.' },
   { id: 'm_ber_18', date: '30/11/2026', hours: 4, capacities: 'CT1 a CT8: Prática analítica integrada', knowledge: 'Validação de tolerâncias geométricas complexas (GD&T) em desenhos técnicos.', strategy: 'Análise laboratorial completa de peças reprovadas na oficina de usinagem.', resources: 'Instrumentos do laboratório.' },
   { id: 'm_ber_19', date: '07/12/2026', hours: 4, capacities: 'CT1 a CT8: Relatórios finais e auditoria', knowledge: 'Emissão de certificados de conformidade técnica dimensional.', strategy: 'Estruturação de dossiê de qualidade das peças finais do projeto integrador.', resources: 'Computador, planilhas de desvios.' },
-  { id: 'm_ber_19', date: '14/12/2026', hours: 4, capacities: 'Todas as capacities da UC', knowledge: 'Avaliação técnica laboratorial final e encerramento de diários.', strategy: 'Fechamento de médias e feedbacks individuais sobre exatidão metrológica.', resources: 'Fichas de notas.' }
+  { id: 'm_ber_20', date: '14/12/2026', hours: 4, capacities: 'Todas as capacities da UC', knowledge: 'Avaliação técnica laboratorial final e encerramento de diários.', strategy: 'Fechamento de médias e feedbacks individuais sobre exatidão metrológica.', resources: 'Fichas de notas.' }
 ];
 
 // ============================================================================
-// OBJETO ESTRUTURAL EXPORTADO COMO MATRIZ DE PLANOS (ARRAY)
+// OBJETO ESTRUTURAL MANTENDO AS DUAS ABORDAGENS DE INTEGRAÇÃO (ARRAY E DICIONÁRIO)
 // ============================================================================
 
-export const SAMPLE_PLANS = [
-  // --------------------------------------------------------------------------
-  // PLANO DO 1º SEMESTRE - MANTIDO INTEGRALMENTE CONFORME A SUA INTERFACE
-  // --------------------------------------------------------------------------
-  {
-    id: 'plan_beretella_1sem',
-    courseName: 'Mecânico de Usinagem Convencional',
-    period: '1º SEM',
-    semester: 1,
-    instructor: 'Ricardo Beretella',
-    profileId: 'ricardo-beretella', // Suporte para id em string minúscula
-    units: [
-      {
-        id: 'uc_lidt_1sem',
-        code: 'MSEP',
-        name: 'Leitura e Interpretação de Desenho Técnico',
-        hours: 60,
-        schedule: [] // Mantido vazio para preservar a integridade estática original do componente
-      }
-    ]
+// 1. Definição Base por Chaves Estruturadas (Garante compatibilidade total do mapeamento clássico)
+const PLAN_DATA_STRUCTURE = {
+  'ricardo-beretella': {
+    '1º SEM': {
+      id: 'plan_beretella_1sem',
+      courseName: 'Mecânico de Usinagem Convencional',
+      period: '1º SEM',
+      semester: 1,
+      instructor: 'Ricardo Beretella',
+      units: [
+        {
+          id: 'uc_lidt_1sem',
+          code: 'MSEP',
+          name: 'Leitura e Interpretação de Desenho Técnico',
+          hours: 60,
+          capacities: [
+            '1. Interpretar desenhos técnicos de peças a partir de projetos da metalmecânica.',
+            '2. Elaborar croquis de peças em projeção ortogonal e em perspectiva à mão livre.'
+          ],
+          knowledge: [
+            '1. DESENHO TÉCNICO: Definição, Normas técnicas, Primeiro e Terceiro diedro, Linhas.'
+          ],
+          schedule: []
+        }
+      ]
+    },
+    '2º SEM': {
+      id: 'plan_beretella_2sem',
+      courseName: 'Mecânico de Usinagem Convencional',
+      period: '2º SEM',
+      semester: 2,
+      instructor: 'Ricardo Beretella',
+      units: [
+        {
+          id: 'uc_prusc_ber',
+          code: 'PRUSC',
+          name: 'Processos de Usinagem Convencional',
+          hours: 160,
+          capacities: [
+            '1. Operar torno mecânico convencional seguindo procedimentos técnicos e de segurança.',
+            '2. Operar fresadora convencional para a execução de perfis planos e canais.',
+            '3. Realizar operações de retificação plana e cilíndrica de precisão.'
+          ],
+          knowledge: [
+            '1. TORNEAMENTO: Parâmetros de corte, Ferramentas de corte, Tipos de roscas e rebaixos.',
+            '2. FRESAGEM: Divisor universal, Tipos de fresas, Cálculos de engrenamento e velocidades.',
+            '3. RETIFICAÇÃO: Balanceamento de rebolos, Dressagem, Fixação magnética de superfícies.'
+          ],
+          schedule: PRUSC_SCHEDULE_BERETELLA
+        },
+        {
+          id: 'uc_metind_ber',
+          code: 'METIND',
+          name: 'Metrologia Industrial',
+          hours: 80,
+          capacities: [
+            '1. Utilizar instrumentos de medição linear e angular de alta resolução.',
+            '2. Operar projetor de perfil e calibradores especiais passa-não-passa.',
+            '3. Realizar controle dimensional em máquinas tridimensionais manuais e CNC.'
+          ],
+          knowledge: [
+            '1. INSTRUMENTOS: Micrômetros de rosca, Relógio apalpador, Rugosímetro e Linear Height.',
+            '2. CALIBRAÇÃO: Blocos padrão, Mesa e régua de seno, Tolerâncias geométricas de forma.',
+            '3. METROLOGIA AVANÇADA: Máquina de Medir por Coordenadas (MMC), Sistemas ópticos e braço portátil.'
+          ],
+          schedule: METIND_SCHEDULE_BERETELLA
+        }
+      ]
+    }
   },
-  {
-    id: 'plan_gea_1sem',
-    courseName: 'Mecânico de Usinagem Convencional',
-    period: '1º SEM',
-    semester: 1,
-    instructor: 'Ricardo Gea',
-    profileId: 'ricardo-gea',
-    units: [
-      {
-        id: 'uc_lidt_gea_1sem',
-        code: 'MSEP',
-        name: 'Leitura e Interpretação de Desenho Técnico',
-        hours: 60,
-        schedule: []
-      }
-    ]
-  },
-
-  // --------------------------------------------------------------------------
-  // PLANOS DO 2º SEMESTRE - NOVAS INSERÇÕES
-  // --------------------------------------------------------------------------
-  {
-    id: 'plan_ber_2026_2',
-    courseName: 'Mecânico de Usinagem Convencional',
-    period: '2º SEM',
-    semester: 2,
-    instructor: 'Ricardo Beretella',
-    profileId: 'ricardo-beretella',
-    units: [
-      {
-        id: 'uc_prusc_ber',
-        code: 'PRUSC',
-        name: 'Processos de Usinagem Convencional',
-        hours: 160,
-        schedule: PRUSC_SCHEDULE_BERETELLA
-      },
-      {
-        id: 'uc_metind_ber',
-        code: 'METIND',
-        name: 'Metrologia Industrial',
-        hours: 80,
-        schedule: METIND_SCHEDULE_BERETELLA
-      }
-    ]
-  },
-  {
-    id: 'plan_gea_2026_2',
-    courseName: 'Mecânico de Usinagem Convencional',
-    period: '2º SEM',
-    semester: 2,
-    instructor: 'Ricardo Gea',
-    profileId: 'ricardo-gea',
-    units: [
-      {
-        id: 'uc_prusc_gea',
-        code: 'PRUSC',
-        name: 'Processos de Usinagem Convencional',
-        hours: 160,
-        schedule: PRUSC_SCHEDULE_GEA
-      },
-      {
-        id: 'uc_metind_gea',
-        code: 'METIND',
-        name: 'Metrologia Industrial',
-        hours: 80,
-        schedule: METIND_SCHEDULE_GEA
-      }
-    ]
+  'ricardo-gea': {
+    '1º SEM': {
+      id: 'plan_gea_1sem',
+      courseName: 'Mecânico de Usinagem Convencional',
+      period: '1º SEM',
+      semester: 1,
+      instructor: 'Ricardo Gea',
+      units: [
+        {
+          id: 'uc_lidt_gea_1sem',
+          code: 'MSEP',
+          name: 'Leitura e Interpretação de Desenho Técnico',
+          hours: 60,
+          capacities: [
+            '1. Interpretar desenhos técnicos de peças a partir de projetos da metalmecânica.',
+            '2. Elaborar croquis de peças em projeção ortogonal.'
+          ],
+          knowledge: [
+            '1. DESENHO TÉCNICO: Definição, Normas técnicas, Projeções e Linhas.'
+          ],
+          schedule: []
+        }
+      ]
+    },
+    '2º SEM': {
+      id: 'plan_gea_2sem',
+      courseName: 'Mecânico de Usinagem Convencional',
+      period: '2º SEM',
+      semester: 2,
+      instructor: 'Ricardo Gea',
+      units: [
+        {
+          id: 'uc_prusc_gea',
+          code: 'PRUSC',
+          name: 'Processos de Usinagem Convencional',
+          hours: 160,
+          capacities: [
+            '1. Operar torno mecânico convencional seguindo procedimentos técnicos e de segurança.',
+            '2. Operar fresadora convencional para a execução de perfis planos e canais.',
+            '3. Realizar operações de retificação plana e cilíndrica de precisão.'
+          ],
+          knowledge: [
+            '1. TORNEAMENTO: Parâmetros de corte, Ferramentas de corte, Tipos de roscas e rebaixos.',
+            '2. FRESAGEM: Divisor universal, Tipos de fresas, Cálculos de engrenamento e velocidades.',
+            '3. RETIFICAÇÃO: Balanceamento de rebolos, Dressagem, Fixação magnética de superfícies.'
+          ],
+          schedule: PRUSC_SCHEDULE_GEA
+        },
+        {
+          id: 'uc_metind_gea',
+          code: 'METIND',
+          name: 'Metrologia Industrial',
+          hours: 80,
+          capacities: [
+            '1. Utilizar instrumentos de medição linear e angular de alta resolução.',
+            '2. Operar projetor de perfil e calibradores especiais passa-não-passa.',
+            '3. Realizar controle dimensional em máquinas tridimensionais manuais e CNC.'
+          ],
+          knowledge: [
+            '1. INSTRUMENTOS: Micrômetros de rosca, Relógio apalpador, Rugosímetro e Linear Height.',
+            '2. CALIBRAÇÃO: Blocos padrão, Mesa e régua de seno, Tolerâncias geométricas de forma.',
+            '3. METROLOGIA AVANÇADA: Máquina de Medir por Coordenadas (MMC), Sistemas ópticos e braço portátil.'
+          ],
+          schedule: METIND_SCHEDULE_GEA
+        }
+      ]
+    }
   }
-];
+};
+
+// 2. Exportação unificada de SAMPLE_PLANS atuando tanto como Array (com propriedades injetadas) quanto Object
+export const SAMPLE_PLANS = Object.assign(
+  [
+    { ...PLAN_DATA_STRUCTURE['ricardo-beretella']['1º SEM'], profileId: 'ricardo-beretella' },
+    { ...PLAN_DATA_STRUCTURE['ricardo-beretella']['2º SEM'], profileId: 'ricardo-beretella' },
+    { ...PLAN_DATA_STRUCTURE['ricardo-gea']['1º SEM'], profileId: 'ricardo-gea' },
+    { ...PLAN_DATA_STRUCTURE['ricardo-gea']['2º SEM'], profileId: 'ricardo-gea' }
+  ],
+  PLAN_DATA_STRUCTURE
+);
