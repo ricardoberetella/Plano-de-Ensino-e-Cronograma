@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import Layout from './components/Layout';
 import Dashboard from './components/Dashboard';
 import PlanForm from './components/PlanForm';
@@ -17,6 +17,18 @@ const App: React.FC = () => {
   const [currentPlan, setCurrentPlan] = useState<TeachingPlan | null>(null);
   const [selectedUnit, setSelectedUnit] = useState<CurricularUnit | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+
+  // Refs para manter os valores atualizados sem disparar o loop do useCallback
+  const currentPlanRef = useRef<TeachingPlan | null>(null);
+  const selectedUnitRef = useRef<CurricularUnit | null>(null);
+
+  useEffect(() => {
+    currentPlanRef.current = currentPlan;
+  }, [currentPlan]);
+
+  useEffect(() => {
+    selectedUnitRef.current = selectedUnit;
+  }, [selectedUnit]);
 
   // Busca segura de templates de planos
   const getTemplatePlan = useCallback((profileId: string): TeachingPlan => {
@@ -68,9 +80,9 @@ const App: React.FC = () => {
         };
         await FirebaseService.savePlan(defaultPlan);
         const refreshed = await FirebaseService.getPlans(profileId);
-        setPlans(refreshed);
-        setCurrentPlan(refreshed[0]);
-        setSelectedUnit(refreshed[0]?.units?.[0] || null);
+        setPlans(refreshed || []);
+        setCurrentPlan(refreshed?.[0] || null);
+        setSelectedUnit(refreshed?.[0]?.units?.[0] || null);
       } else {
         const processedPlans = await Promise.all(dbPlans.map(async (plan) => {
           let updated = false;
@@ -119,26 +131,30 @@ const App: React.FC = () => {
         }));
 
         setPlans(processedPlans);
-        if (currentPlan) {
-          const updatedCurrent = processedPlans.find(p => p.id === currentPlan.id);
+        
+        const activeCurrentPlan = currentPlanRef.current;
+        const activeSelectedUnit = selectedUnitRef.current;
+
+        if (activeCurrentPlan) {
+          const updatedCurrent = processedPlans.find(p => p.id === activeCurrentPlan.id);
           if (updatedCurrent) {
             setCurrentPlan(updatedCurrent);
-            if (selectedUnit) {
-              const updatedUnit = updatedCurrent.units?.find(u => u.id === selectedUnit.id);
+            if (activeSelectedUnit) {
+              const updatedUnit = updatedCurrent.units?.find(u => u.id === activeSelectedUnit.id);
               if (updatedUnit) setSelectedUnit(updatedUnit);
             }
           }
         } else {
-          setCurrentPlan(processedPlans[0]);
+          setCurrentPlan(processedPlans[0] || null);
           setSelectedUnit(processedPlans[0]?.units?.[0] || null);
         }
       }
     } catch (err) {
-      console.error("Erro ao carregar Firebase:", err);
+      console.error("Erro fatal ao carregar Firebase:", err);
     } finally {
       setIsLoading(false);
     }
-  }, [getTemplatePlan, currentPlan, selectedUnit]);
+  }, [getTemplatePlan]); // Dependência estática e limpa para evitar loops
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -151,7 +167,7 @@ const App: React.FC = () => {
     try {
       await FirebaseService.savePlan(planToSave);
       const refreshed = await FirebaseService.getPlans(activeProfileId);
-      setPlans(refreshed);
+      setPlans(refreshed || []);
       setView('dashboard');
     } catch (error) {
       console.error("Erro ao salvar dados:", error);
