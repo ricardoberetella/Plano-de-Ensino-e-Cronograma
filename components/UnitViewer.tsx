@@ -1,5 +1,12 @@
 import React, { useState, useMemo } from 'react';
 
+// Tipagem completa alinhada com os padrões do SENAI
+interface GeneralCompetencies {
+  technicalCapacities: string[];
+  socioemotionalCapacities: string[];
+  knowledge: string[];
+}
+
 interface LearningSituation {
   id: string;
   title: string;
@@ -30,22 +37,23 @@ interface ScheduleEntry {
   completed: boolean;
 }
 
-interface UnitMeta {
-  color: string;
-  sigla: string;
-}
-
-interface LocalUnit {
+interface FullUnitData {
   name: string;
   semester: number;
+  general: GeneralCompetencies;
   learningSituations: LearningSituation[];
   rubrics: Rubric[];
   schedule: ScheduleEntry[];
 }
 
+interface UnitMeta {
+  color: string;
+  sigla: string;
+}
+
 interface UnitViewerProps {
   unitMeta?: UnitMeta;
-  initialUnit?: LocalUnit;
+  selectedUcSigla?: 'LIDT' | 'CDMAT' | 'CRD' | 'FUSI';
 }
 
 const COLOR_MAP: Record<string, string> = {
@@ -64,20 +72,150 @@ const TEXT_COLOR_MAP: Record<string, string> = {
   slate: '#ffffff',
 };
 
-const UnitViewer: React.FC<UnitViewerProps> = ({
-  unitMeta = { color: 'blue', sigla: 'UC' },
-  initialUnit
-}) => {
-  // Dados injetados diretamente (Read-Only)
-  const unit = initialUnit || {
-    name: 'Unidade Curricular',
+// BANCO DE DADOS COMPLETO E DEFINITIVO DO 1º SEMESTRE (Não editável)
+const CURRICULUM_DATABASE: Record<'LIDT' | 'CDMAT' | 'CRD' | 'FUSI', FullUnitData> = {
+  LIDT: {
+    name: 'Leitura e Interpretação de Desenho Técnico',
     semester: 1,
-    learningSituations: [],
+    general: {
+      technicalCapacities: [
+        'Interpretar projeções ortogonais (1º e 3º diedro) de peças mecânicas.',
+        'Identificar e aplicar escalas numéricas, hachuras, cortes (totais, parciais e desvios) e seções.',
+        'Interpretar cotagem, tolerâncias dimensionais, geométricas (forma e posição) e indicações de rugosidade superficial.',
+        'Elaborar croquis cotados de componentes mecânicos simples de acordo com as normas ABNT.'
+      ],
+      socioemotionalCapacities: [
+        'Demonstrar rigor técnico e atenção aos detalhes na transcrição de especificações de projetos.',
+        'Trabalhar de forma colaborativa na resolução de problemas de interpretação geométrica.',
+        'Cumprir metas e prazos estabelecidos nos cronogramas de desenvolvimento de projetos.'
+      ],
+      knowledge: [
+        'Formatos de papel, legenda e dobramento de desenhos (Normas ABNT).',
+        'Sistemas de projeção ortográfica e representação em perspectiva isométrica.',
+        'Cortes, seções, rupturas e omissão de corte.',
+        'Sistemas de cotagem e tolerâncias ISO (furos e eixos).',
+        'Simbologia técnica de acabamento superficial e tratamentos térmicos.'
+      ]
+    },
+    learningSituations: [
+      {
+        id: 'lidt-sa1',
+        title: 'Detecção de Falhas de Fabricação por Erro de Desenho',
+        contextualization: 'O setor de controle de qualidade identificou um lote de eixos escalonados produzidos fora dos limites de concentricidade devido a um desenho de fabricação ambíguo.',
+        challenge: 'Interpretar e corrigir o desenho técnico do eixo escalonado, adicionando as tolerâncias geométricas de forma e posição corretas.',
+        expectedResults: ['Desenho técnico corrigido com aplicação estrita da norma de tolerância geométrica ISO.', 'Relatório descritivo apontando os desvios encontrados na peça piloto.']
+      }
+    ],
     rubrics: [],
     schedule: []
-  };
+  },
+  CDMAT: {
+    name: 'Ciência e Tecnologia dos Materiais',
+    semester: 1,
+    general: {
+      technicalCapacities: [
+        'Identificar materiais metálicos ferrosos e não ferrosos por meio de ensaios visuais, magnéticos e faísca.',
+        'Correlacionar as propriedades mecânicas dos materiais (dureza, tenacidade, ductilidade) com suas aplicações na usinagem.',
+        'Interpretar diagramas de equilíbrio e tabelas técnicas de classificação de aços (SAE, AISI, ABNT).'
+      ],
+      socioemotionalCapacities: [
+        'Atuar com responsabilidade socioambiental no descarte e segregação de resíduos e cavacos metálicos.',
+        'Demonstrar proatividade na busca de alternativas técnicas para a substituição de materiais de alta pegada de carbono.'
+      ],
+      knowledge: [
+        'Estrutura cristalina e propriedades físicas e mecânicas dos metais.',
+        'Aços-carbono e aços-liga: Classificação, ligas principais e suas influências.',
+        'Ferros fundidos e metais não ferrosos (Alumínio, Cobre, Latão e Bronze).',
+        'Introdução aos tratamentos térmicos e termoquímicos (têmpera, revenimento, cementação).'
+      ]
+    },
+    learningSituations: [
+      {
+        id: 'cdmat-sa1',
+        title: 'Seleção Prática de Materiais para Eixos de Transmissão',
+        contextualization: 'A oficina escola precisa usinar um eixo que sofrerá esforços severos de torção e fadiga.',
+        challenge: 'Analisar a tabela de materiais disponíveis e selecionar o aço correto fundamentando-se nas propriedades mecânicas do elemento.',
+        expectedResults: ['Ficha técnica de especificação do material escolhido.', 'Justificativa metalúrgica focada em usinabilidade e resistência mecânica.']
+      }
+    ],
+    rubrics: [],
+    schedule: []
+  },
+  CRD: {
+    name: 'Controle Dimensional',
+    semester: 1,
+    general: {
+      technicalCapacities: [
+        'Executar medições lineares e angulares utilizando paquímetro, micrômetro, goniômetro e relógio comparador.',
+        'Realizar calibração e zeragem correta dos instrumentos de medição direta.',
+        'Registrar valores encontrados aplicando conceitos de resolução, incerteza de medição e tolerância dimensional.'
+      ],
+      socioemotionalCapacities: [
+        'Manifestar ética profissional e honestidade na coleta de dados metrológicos de peças acabadas.',
+        'Desenvolver paciência e precisão postural nos métodos manuais de medição dimensional.'
+      ],
+      knowledge: [
+        'Fundamentos da metrologia industrial e o Sistema Internacional de Unidades (SI).',
+        'Tipos, componentes e conservação de paquímetros (resoluções 0,05mm, 0,02mm e 1/128").',
+        'Princípios de medição com micrômetros centesimais e milesimais.',
+        'Relógios comparadores e apalpadores: Blocos-padrão e calibração por comparação.'
+      ]
+    },
+    learningSituations: [
+      {
+        id: 'crd-sa1',
+        title: 'Laudo Metrológico de Componentes Ajustados',
+        contextualization: 'Um cliente externo encomendou um lote de buchas guias e exige um relatório de conformidade geométrica de 100% das peças.',
+        challenge: 'Mensurar o diâmetro interno e externo das buchas utilizando paquímetros e micrômetros, gerando a carta de controle dimensional.',
+        expectedResults: ['Laudo metrológico preenchido com aprovação/reprovação dos itens baseado nas tolerâncias nominais.', 'Cálculo de desvio sistemático verificado.']
+      }
+    ],
+    rubrics: [],
+    schedule: []
+  },
+  FUSI: {
+    name: 'Fundamentos de Usinagem Inicial',
+    semester: 1,
+    general: {
+      technicalCapacities: [
+        'Operar máquinas-ferramentas convencionais (furadeira de bancada/coluna e prensa hidromecânica) de forma segura.',
+        'Selecionar e afiar ferramentas de corte de aço rápido (HSS) para operações de furação e escareamento.',
+        'Calcular parâmetros de corte essenciais (RPM e avanço) baseando-se no diâmetro da ferramenta e material da peça.',
+        'Executar operações de traçagem de coordenadas em bancada ajustando superfícies com limas manuais.'
+      ],
+      socioemotionalCapacities: [
+        'Adotar comportamento preventivo rigoroso quanto ao uso de EPIs e cumprimento das normas regulamentadoras (NR-12).',
+        'Manter o posto de trabalho limpo, organizado e livre de riscos operacionais (Filosofia 5S).'
+      ],
+      knowledge: [
+        'Normas de Segurança do Trabalho aplicadas a ambientes metalmecânicos (NR-6, NR-12).',
+        'Fluidos de corte: Tipos, funções, refrigeração, lubrificação e impacto ambiental.',
+        'Geometria das ferramentas de corte de aço rápido (HSS) e ângulos de afiação.',
+        'Técnicas de ajustagem manual: Limagem, traçagem, furação, escareamento e rosqueamento manual com machos/cossinetes.'
+      ]
+    },
+    learningSituations: [
+      {
+        id: 'fusi-sa1',
+        title: 'Confecção do Bloco de Ajustagem e Traçagem Inicial',
+        contextualization: 'No processo de integração na oficina mecânica, o estudante recebe uma barra bruta de aço SAE 1020 cortada no oxigênio.',
+        challenge: 'Efetuar a ajustagem manual das faces de referência no esquadro de 90° com tolerância de ±0,2mm e traçar o centro para furação.',
+        expectedResults: ['Bloco prismático ajustado nas dimensões nominais do desenho técnico.', 'Operação de furação executada sem desvios de concentricidade.']
+      }
+    ],
+    rubrics: [],
+    schedule: []
+  }
+};
 
-  const [activeTab, setActiveTab] = useState<'sa' | 'rubricas' | 'cronograma' | 'calendario'>('sa');
+const UnitViewer: React.FC<UnitViewerProps> = ({
+  unitMeta = { color: 'blue', sigla: 'LIDT' },
+  selectedUcSigla = 'LIDT'
+}) => {
+  // Carrega os dados estáticos baseados na sigla ativa
+  const unit = CURRICULUM_DATABASE[selectedUcSigla] || CURRICULUM_DATABASE.LIDT;
+
+  const [activeTab, setActiveTab] = useState<'geral' | 'sa' | 'rubricas' | 'cronograma' | 'calendario'>('geral');
   const calendarYear = 2026;
 
   // Funções Utilitárias de Data
@@ -111,15 +249,22 @@ const UnitViewer: React.FC<UnitViewerProps> = ({
     return ['2026-01', '2026-02', '2026-03', '2026-04', '2026-05', '2026-06', '2026-07', '2026-08', '2026-09', '2026-10', '2026-11', '2026-12'];
   }, []);
 
-  const handlePrint = () => {
-    window.print();
-  };
-
   return (
     <div className="w-full bg-slate-50 min-h-screen p-6">
-      {/* NAVEGAÇÃO INTERNA */}
+      {/* TÍTULO DA UNIDADE SELECIONADA */}
+      <div className="mb-6 p-4 bg-white border border-slate-200 rounded-3xl shadow-sm flex items-center justify-between">
+        <div>
+          <span className="text-[9px] font-black uppercase tracking-[0.2em] text-blue-600 block mb-0.5">Unidade Curricular Ativa</span>
+          <h2 className="text-lg font-black text-slate-800">{unit.name}</h2>
+        </div>
+        <span className="text-xs font-black px-3 py-1.5 rounded-xl bg-slate-100 text-slate-700">
+          {unit.semester}º Semestre
+        </span>
+      </div>
+
+      {/* NAVEGAÇÃO INTERNA ENTRE ABAS */}
       <div className="flex border-b border-slate-200 mb-6 no-print gap-2">
-        {(['sa', 'rubricas', 'cronograma', 'calendario'] as const).map(tab => (
+        {(['geral', 'sa', 'rubricas', 'cronograma', 'calendario'] as const).map(tab => (
           <button
             key={tab}
             type="button"
@@ -130,7 +275,7 @@ const UnitViewer: React.FC<UnitViewerProps> = ({
                 : 'border-transparent text-slate-500 hover:text-slate-800'
             }`}
           >
-            {tab === 'sa' ? 'Situações de Aprendizagem' : tab}
+            {tab === 'geral' ? 'Geral' : tab === 'sa' ? 'Situações de Aprendizagem' : tab}
           </button>
         ))}
       </div>
@@ -138,86 +283,112 @@ const UnitViewer: React.FC<UnitViewerProps> = ({
       {/* CONTEÚDO DAS ABAS */}
       <div className="tab-content">
         
+        {/* ABA: GERAL (CAPACIDADES E CONHECIMENTOS) */}
+        {activeTab === 'geral' && (
+          <div className="space-y-6 animate-fadeIn">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              
+              {/* CAPACIDADES TÉCNICAS */}
+              <div className="bg-white p-6 border border-slate-200 rounded-3xl shadow-sm space-y-3">
+                <h3 className="text-xs font-black text-blue-600 uppercase tracking-wider flex items-center gap-2 border-b border-slate-100 pb-2">
+                  <span className="w-2 h-2 rounded-full bg-blue-600" />
+                  Capacidades Técnicas
+                </h3>
+                <ul className="space-y-2">
+                  {unit.general.technicalCapacities.map((cap, i) => (
+                    <li key={i} className="text-xs text-slate-700 bg-slate-50/70 p-3 rounded-xl border border-slate-100 font-medium">
+                      {cap}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* CAPACIDADES SOCIOEMOCIONAIS */}
+              <div className="bg-white p-6 border border-slate-200 rounded-3xl shadow-sm space-y-3">
+                <h3 className="text-xs font-black text-emerald-600 uppercase tracking-wider flex items-center gap-2 border-b border-slate-100 pb-2">
+                  <span className="w-2 h-2 rounded-full bg-emerald-600" />
+                  Capacidades Socioemocionais / Organizacionais
+                </h3>
+                <ul className="space-y-2">
+                  {unit.general.socioemotionalCapacities.map((cap, i) => (
+                    <li key={i} className="text-xs text-slate-700 bg-slate-50/70 p-3 rounded-xl border border-slate-100 font-medium">
+                      {cap}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+
+            {/* CONHECIMENTOS */}
+            <div className="bg-white p-6 border border-slate-200 rounded-3xl shadow-sm space-y-3">
+              <h3 className="text-xs font-black text-slate-700 uppercase tracking-wider flex items-center gap-2 border-b border-slate-100 pb-2">
+                <span className="w-2 h-2 rounded-full bg-slate-500" />
+                Conhecimentos Teóricos e Tecnológicos
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {unit.general.knowledge.map((know, i) => (
+                  <div key={i} className="text-xs text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-100 flex items-center gap-3">
+                    <span className="text-[10px] font-black text-slate-400 bg-slate-200/60 w-5 h-5 rounded-lg flex items-center justify-center flex-shrink-0">
+                      {i + 1}
+                    </span>
+                    <span className="font-medium">{know}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+        
         {/* ABA: SITUAÇÃO DE APRENDIZAGEM */}
         {activeTab === 'sa' && (
           <div className="space-y-6">
-            <div className="no-print space-y-6">
-              {unit.learningSituations.map((situation, idx) => (
-                <div key={situation.id || idx} className="bg-white p-6 border border-slate-200 rounded-3xl shadow-sm space-y-4">
-                  <h3 className="text-sm font-black text-slate-800 uppercase border-b border-slate-100 pb-2">
-                    {idx + 1}. {situation.title || 'Situação de Aprendizagem'}
-                  </h3>
-                  
-                  <div>
-                    <span className="block text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1">Contextualização</span>
-                    <p className="text-sm text-slate-700 bg-slate-50 p-3 rounded-xl whitespace-pre-line border border-slate-100">
-                      {situation.contextualization || 'Nenhuma contextualização informada.'}
-                    </p>
-                  </div>
+            <div className="space-y-6">
+              {unit.learningSituations.length > 0 ? (
+                unit.learningSituations.map((situation, idx) => (
+                  <div key={situation.id || idx} className="bg-white p-6 border border-slate-200 rounded-3xl shadow-sm space-y-4">
+                    <h3 className="text-sm font-black text-slate-800 uppercase border-b border-slate-100 pb-2">
+                      {idx + 1}. {situation.title}
+                    </h3>
+                    
+                    <div>
+                      <span className="block text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1">Contextualização</span>
+                      <p className="text-sm text-slate-700 bg-slate-50 p-3 rounded-xl whitespace-pre-line border border-slate-100">
+                        {situation.contextualization}
+                      </p>
+                    </div>
 
-                  <div>
-                    <span className="block text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1">Desafio Proposto</span>
-                    <p className="text-sm text-slate-700 bg-slate-50 p-3 rounded-xl whitespace-pre-line border border-slate-100">
-                      {situation.challenge || 'Nenhum desafio informado.'}
-                    </p>
-                  </div>
+                    <div>
+                      <span className="block text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1">Desafio Proposto</span>
+                      <p className="text-sm text-slate-700 bg-slate-50 p-3 rounded-xl whitespace-pre-line border border-slate-100">
+                        {situation.challenge}
+                      </p>
+                    </div>
 
-                  <div>
-                    <span className="block text-[10px] font-black text-slate-400 uppercase tracking-wider mb-2">Resultados Esperados</span>
-                    <ul className="space-y-2">
-                      {situation.expectedResults.map((result, rIdx) => (
-                        <li key={rIdx} className="text-xs text-slate-700 bg-slate-50/60 border border-slate-100 px-3 py-2 rounded-xl flex items-center gap-2">
-                          <span className="w-1.5 h-1.5 bg-blue-500 rounded-full flex-shrink-0" />
-                          {result}
-                        </li>
-                      ))}
-                    </ul>
+                    <div>
+                      <span className="block text-[10px] font-black text-slate-400 uppercase tracking-wider mb-2">Resultados Esperados</span>
+                      <ul className="space-y-2">
+                        {situation.expectedResults.map((result, rIdx) => (
+                          <li key={rIdx} className="text-xs text-slate-700 bg-slate-50/60 border border-slate-100 px-3 py-2 rounded-xl flex items-center gap-2">
+                            <span className="w-1.5 h-1.5 bg-blue-500 rounded-full flex-shrink-0" />
+                            {result}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
                   </div>
+                ))
+              ) : (
+                <div className="text-center p-12 bg-white border border-slate-200 rounded-3xl text-xs text-slate-400">
+                  Nenhuma situação de aprendizagem cadastrada para esta unidade.
                 </div>
-              ))}
-            </div>
-
-            {/* DOCUMENTO IMPRESSO SA */}
-            <div className="hidden report-document-sa">
-              <div className="report-header">
-                <div className="logo-box">SENAI</div>
-                <div className="info-box">
-                  <h1>{unit.name}</h1>
-                  <p>SITUAÇÃO DE APRENDIZAGEM — {unit.semester}º SEMESTRE</p>
-                </div>
-              </div>
-              <h2 className="doc-main-title">Planejamento da Situação de Aprendizagem</h2>
-              {unit.learningSituations.map((situation, idx) => (
-                <div key={situation.id || idx} className="sa-print-block">
-                  <h3 className="sa-print-title">{idx + 1}. {situation.title}</h3>
-                  <div className="sa-print-section">
-                    <h4 className="sa-print-section-title">Contextualização</h4>
-                    <p className="sa-print-text">{situation.contextualization}</p>
-                  </div>
-                  <div className="sa-print-section">
-                    <h4 className="sa-print-section-title">Desafio Proposto</h4>
-                    <p className="sa-print-text">{situation.challenge}</p>
-                  </div>
-                  <div className="sa-print-section">
-                    <h4 className="sa-print-section-title">Resultados Esperados</h4>
-                    <ul className="list-disc pl-5 mt-2 space-y-1">
-                      {situation.expectedResults.map((result, rIdx) => (
-                        <li key={rIdx} className="sa-print-text">{result}</li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-              ))}
+              )}
             </div>
           </div>
         )}
 
         {/* ABA: RUBRICAS */}
         {activeTab === 'rubricas' && (
-          <div className="space-y-6 no-print">
-            <h3 className="text-[11px] font-black text-slate-400 uppercase tracking-[0.3em] mb-4">
-              Matriz de Avaliação (Rubricas)
-            </h3>
+          <div className="space-y-6">
             <div className="overflow-x-auto border border-slate-200 rounded-3xl bg-white shadow-sm">
               <table className="w-full text-left border-collapse table-fixed">
                 <thead>
@@ -230,15 +401,21 @@ const UnitViewer: React.FC<UnitViewerProps> = ({
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 text-xs text-slate-700">
-                  {unit.rubrics.map(rubric => (
-                    <tr key={rubric.id} className="hover:bg-slate-50/50 transition-colors">
-                      <td className="p-4 font-bold bg-slate-50/30">{rubric.capacity}</td>
-                      <td className="p-4 whitespace-pre-line">{rubric.levels.nsa || '—'}</td>
-                      <td className="p-4 whitespace-pre-line">{rubric.levels.apo || '—'}</td>
-                      <td className="p-4 whitespace-pre-line">{rubric.levels.par || '—'}</td>
-                      <td className="p-4 whitespace-pre-line">{rubric.levels.aut || '—'}</td>
+                  {unit.rubrics.length > 0 ? (
+                    unit.rubrics.map(rubric => (
+                      <tr key={rubric.id} className="hover:bg-slate-50/50 transition-colors">
+                        <td className="p-4 font-bold bg-slate-50/30">{rubric.capacity}</td>
+                        <td className="p-4 whitespace-pre-line">{rubric.levels.nsa || '—'}</td>
+                        <td className="p-4 whitespace-pre-line">{rubric.levels.apo || '—'}</td>
+                        <td className="p-4 whitespace-pre-line">{rubric.levels.par || '—'}</td>
+                        <td className="p-4 whitespace-pre-line">{rubric.levels.aut || '—'}</td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan={5} className="text-center p-12 text-slate-400">Nenhuma rubrica cadastrada.</td>
                     </tr>
-                  ))}
+                  )}
                 </tbody>
               </table>
             </div>
@@ -248,21 +425,7 @@ const UnitViewer: React.FC<UnitViewerProps> = ({
         {/* ABA: CRONOGRAMA */}
         {activeTab === 'cronograma' && (
           <div className="space-y-6">
-            <div className="flex justify-between items-center mb-4 no-print">
-              <h3 className="text-[11px] font-black text-slate-400 uppercase tracking-[0.3em]">
-                Plano de Aula Semanal
-              </h3>
-              <button
-                type="button"
-                onClick={handlePrint}
-                className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-wider transition-colors"
-              >
-                Imprimir Plano
-              </button>
-            </div>
-
-            {/* TABELA DE TELA (NÃO EDITÁVEL) */}
-            <div className="overflow-x-auto border border-slate-200 rounded-3xl bg-white shadow-sm no-print">
+            <div className="overflow-x-auto border border-slate-200 rounded-3xl bg-white shadow-sm">
               <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className="bg-slate-50 border-b border-slate-200 text-[10px] font-black text-slate-500 uppercase tracking-wider">
@@ -274,93 +437,47 @@ const UnitViewer: React.FC<UnitViewerProps> = ({
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 text-xs text-slate-700">
-                  {unit.schedule.map((entry) => (
-                    <tr key={entry.id} className="hover:bg-slate-50/50 transition-colors">
-                      <td className="p-4">
-                        <span className="font-bold text-slate-800">{entry.date || 'A definir'}</span>
-                        <span className="block text-[9px] text-slate-400 uppercase font-black tracking-tighter mt-0.5">
-                          {getDayOfWeek(entry.date)}
-                        </span>
-                      </td>
-                      <td className="p-4 text-center font-bold text-blue-600">{entry.hours}h</td>
-                      <td className="p-4 space-y-1">
-                        <div className="font-bold text-slate-800">{entry.capacities || '—'}</div>
-                        <div className="text-slate-500 whitespace-pre-line italic">{entry.knowledge || '—'}</div>
-                      </td>
-                      <td className="p-4 space-y-1">
-                        <div className="font-medium text-slate-800">{entry.strategy || '—'}</div>
-                        <div className="text-slate-400">{entry.resources || '—'}</div>
-                      </td>
-                      <td className="p-4 text-center">
-                        <span className={`px-2 py-1 rounded-lg text-[9px] font-black uppercase ${
-                          entry.completed ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-amber-50 text-amber-700 border border-amber-200'
-                        }`}>
-                          {entry.completed ? 'Realizada' : 'Prevista'}
-                        </span>
-                      </td>
+                  {unit.schedule.length > 0 ? (
+                    unit.schedule.map((entry) => (
+                      <tr key={entry.id} className="hover:bg-slate-50/50 transition-colors">
+                        <td className="p-4">
+                          <span className="font-bold text-slate-800">{entry.date || 'A definir'}</span>
+                          <span className="block text-[9px] text-slate-400 uppercase font-black tracking-tighter mt-0.5">
+                            {getDayOfWeek(entry.date)}
+                          </span>
+                        </td>
+                        <td className="p-4 text-center font-bold text-blue-600">{entry.hours}h</td>
+                        <td className="p-4 space-y-1">
+                          <div className="font-bold text-slate-800">{entry.capacities || '—'}</div>
+                          <div className="text-slate-500 whitespace-pre-line italic">{entry.knowledge || '—'}</div>
+                        </td>
+                        <td className="p-4 space-y-1">
+                          <div className="font-medium text-slate-800">{entry.strategy || '—'}</div>
+                          <div className="text-slate-400">{entry.resources || '—'}</div>
+                        </td>
+                        <td className="p-4 text-center">
+                          <span className={`px-2 py-1 rounded-lg text-[9px] font-black uppercase ${
+                            entry.completed ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-amber-50 text-amber-700 border border-amber-200'
+                          }`}>
+                            {entry.completed ? 'Realizada' : 'Prevista'}
+                          </span>
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan={5} className="text-center p-12 text-slate-400">Nenhum plano de aula listado no cronograma.</td>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            {/* DOCUMENTO IMPRESSO CRONOGRAMA */}
-            <div className="hidden report-document">
-              <div className="report-header">
-                <div className="logo-box">SENAI</div>
-                <div className="info-box">
-                  <h1>{unit.name}</h1>
-                  <p>CRONOGRAMA DE EXECUÇÃO DA UNIDADE CURRICULAR</p>
-                </div>
-              </div>
-              <h2 className="doc-main-title">Plano de Aulas e Distribuição de Carga Horária</h2>
-              <table className="tech-table">
-                <thead>
-                  <tr>
-                    <th style={{ width: '12%' }}>Data / Dia</th>
-                    <th style={{ width: '8%', textAlign: 'center' }}>H.A.</th>
-                    <th style={{ width: '40%' }}>Capacidades & Saberes Previstos</th>
-                    <th style={{ width: '40%' }}>Metodologia & Recursos Didáticos</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {unit.schedule.map((entry, index) => (
-                    <tr key={entry.id || index}>
-                      <td>
-                        <strong>{entry.date || 'A definir'}</strong>
-                        <span className="block text-[6.5px] text-slate-500 uppercase mt-0.5">
-                          {getDayOfWeek(entry.date)}
-                        </span>
-                      </td>
-                      <td style={{ textAlign: 'center' }}><strong>{entry.hours}h</strong></td>
-                      <td>
-                        <div className="mb-2 font-medium">{entry.capacities || '—'}</div>
-                        <div className="text-slate-600 italic whitespace-pre-line">{entry.knowledge || '—'}</div>
-                      </td>
-                      <td>
-                        <div className="mb-2 font-medium">{entry.strategy || '—'}</div>
-                        <div className="text-slate-600">{entry.resources || '—'}</div>
-                      </td>
-                    </tr>
-                  ))}
+                  )}
                 </tbody>
               </table>
             </div>
           </div>
         )}
 
-        {/* ABA: CALENDÁRIO MENSAL */}
+        {/* ABA: CALENDÁRIO */}
         {activeTab === 'calendario' && (
-          <div className="space-y-8 no-print animate-fadeIn">
-            <div>
-              <h3 className="text-[11px] font-black text-slate-400 uppercase tracking-[0.3em]">
-                Distribuição Mensal no Calendário
-              </h3>
-              <p className="text-xs text-slate-500 mt-1">
-                Visualização estática das aulas alocadas para o ano de <strong>{calendarYear}</strong>.
-              </p>
-            </div>
-
+          <div className="space-y-8 animate-fadeIn">
             <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
               {monthsInRange.map(monthStr => {
                 const [year, month] = monthStr.split('-').map(Number);
@@ -407,7 +524,6 @@ const UnitViewer: React.FC<UnitViewerProps> = ({
                                       backgroundColor: COLOR_MAP[unitMeta.color],
                                       color: TEXT_COLOR_MAP[unitMeta.color]
                                     }}
-                                    title={`${unitMeta.sigla}: ${e.hours}h\n${e.capacities}`}
                                   >
                                     {e.hours}h
                                   </span>
