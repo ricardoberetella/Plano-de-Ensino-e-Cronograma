@@ -72,8 +72,7 @@ const TEXT_COLOR_MAP: Record<string, string> = {
   slate: '#ffffff',
 };
 
-// BANCO DE DADOS COMPLETO E DEFINITIVO DO 1º SEMESTRE
-const CURRICULUM_DATABASE: Record<'LIDT' | 'CDMAT' | 'CRD' | 'FUSI', FullUnitData> = {
+const INITIAL_DATABASE: Record<'LIDT' | 'CDMAT' | 'CRD' | 'FUSI', FullUnitData> = {
   LIDT: {
     name: 'Leitura e Interpretação de Desenho Técnico',
     semester: 1,
@@ -129,15 +128,7 @@ const CURRICULUM_DATABASE: Record<'LIDT' | 'CDMAT' | 'CRD' | 'FUSI', FullUnitDat
         'Introdução aos tratamentos térmicos e termoquímicos (têmpera, revenimento, cementação).'
       ]
     },
-    learningSituations: [
-      {
-        id: 'cdmat-sa1',
-        title: 'Seleção Prática de Materiais para Eixos de Transmissão',
-        contextualization: 'A oficina escola precisa usinar um eixo que sofrerá esforços severos de torção e fadiga.',
-        challenge: 'Analisar a tabela de materiais disponíveis e selecionar o aço correto fundamentando-se nas propriedades mecânicas do elemento.',
-        expectedResults: ['Ficha técnica de especificação do material escolhido.', 'Justificativa metalúrgica focada em usinabilidade e resistência mecânica.']
-      }
-    ],
+    learningSituations: [],
     rubrics: [],
     schedule: []
   },
@@ -161,15 +152,7 @@ const CURRICULUM_DATABASE: Record<'LIDT' | 'CDMAT' | 'CRD' | 'FUSI', FullUnitDat
         'Relógios comparadores e apalpadores: Blocos-padrão e calibração por comparação.'
       ]
     },
-    learningSituations: [
-      {
-        id: 'crd-sa1',
-        title: 'Laudo Metrológico de Componentes Ajustados',
-        contextualization: 'Um cliente externo encomendou um lote de buchas guias e exige um relatório de conformidade geométrica de 100% das peças.',
-        challenge: 'Mensurar o diâmetro interno e externo das buchas utilizando paquímetros e micrômetros, gerando a carta de controle dimensional.',
-        expectedResults: ['Laudo metrológico preenchido com aprovação/reprovação dos itens baseado nas tolerâncias nominais.', 'Cálculo de desvio sistemático verificado.']
-      }
-    ],
+    learningSituations: [],
     rubrics: [],
     schedule: []
   },
@@ -220,7 +203,7 @@ const CURRICULUM_DATABASE: Record<'LIDT' | 'CDMAT' | 'CRD' | 'FUSI', FullUnitDat
         '13. Rosqueamento: Definição, ferramentas (macho, cossinete), acessórios (desandador, porta cossinete), características (sistemas de roscas, tabelas) e rosqueadeiras.',
         '14. Ajustagem: Definição, ferramentas manuais (limas, riscadores, martelos, punção), acessórios (morsa de bancada, mordentes, desempeno, cepo, traçador de altura), esmerilhamento e operações (limar, traçar, puncionar, serrar e dobrar).',
         '15. Controle da qualidade: Inspeção visual (rebarbas, oxidação, marcas, riscos) e inspeção dimensional (ficha de autoinspeção e técnicas de medição).',
-        '16. Refrigeração: Definição, fluidos de corte (aplicações, tipos, mecanismos, propriedades) e procedimentos operacionais.'
+        '16. Refrigeração: Definição, fluidos de corte (aplicações, tipos, mechanisms, propriedades) e procedimentos operacionais.'
       ]
     },
     learningSituations: [
@@ -254,9 +237,22 @@ const UnitViewer: React.FC<UnitViewerProps> = ({
   unitMeta = { color: 'blue', sigla: 'LIDT' },
   selectedUcSigla = 'LIDT'
 }) => {
-  const unit = CURRICULUM_DATABASE[selectedUcSigla] || CURRICULUM_DATABASE.LIDT;
+  // Estado que gerencia a persistência em memória do banco completo
+  const [db, setDb] = useState<Record<'LIDT' | 'CDMAT' | 'CRD' | 'FUSI', FullUnitData>>(INITIAL_DATABASE);
   const [activeTab, setActiveTab] = useState<'geral' | 'sa' | 'rubricas' | 'cronograma' | 'calendario'>('geral');
 
+  const unit = db[selectedUcSigla] || db.LIDT;
+
+  // Handler genérico de atualizações profundas no banco local
+  const updateUnitField = (updater: (draft: FullUnitData) => void) => {
+    setDb(prev => {
+      const copy = JSON.parse(JSON.stringify(prev));
+      updater(copy[selectedUcSigla]);
+      return copy;
+    });
+  };
+
+  // Funções de Processamento Metrológico/Temporal
   const toIsoDate = (dateStr: string) => {
     if (!dateStr) return '';
     const parts = dateStr.split('/');
@@ -288,19 +284,30 @@ const UnitViewer: React.FC<UnitViewerProps> = ({
   }, []);
 
   return (
-    <div className="w-full bg-slate-50 min-h-screen p-6">
-      {/* TÍTULO DA UNIDADE SELECIONADA */}
-      <div className="mb-6 p-4 bg-white border border-slate-200 rounded-3xl shadow-sm flex items-center justify-between">
-        <div>
+    <div className="w-full bg-slate-50 min-h-screen p-6 select-text">
+      {/* TÍTULO DA UNIDADE COM INPUT DISCRETO PARA O NOME */}
+      <div className="mb-6 p-4 bg-white border border-slate-200 rounded-3xl shadow-sm flex items-center justify-between group">
+        <div className="flex-1 mr-4">
           <span className="text-[9px] font-black uppercase tracking-[0.2em] text-blue-600 block mb-0.5">Unidade Curricular Ativa</span>
-          <h2 className="text-lg font-black text-slate-800">{unit.name}</h2>
+          <input
+            type="text"
+            value={unit.name}
+            onChange={(e) => updateUnitField(u => { u.name = e.target.value; })}
+            className="w-full bg-transparent text-lg font-black text-slate-800 border-b border-transparent hover:border-slate-200 focus:border-blue-500 focus:outline-none py-0.5 transition-colors"
+          />
         </div>
-        <span className="text-xs font-black px-3 py-1.5 rounded-xl bg-slate-100 text-slate-700">
-          {unit.semester}º Semestre
-        </span>
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-black text-slate-400">Semestre:</span>
+          <input
+            type="number"
+            value={unit.semester}
+            onChange={(e) => updateUnitField(u => { u.semester = parseInt(e.target.value) || 1; })}
+            className="w-12 bg-slate-100 text-slate-700 font-black text-xs px-2 py-1 rounded-xl text-center focus:outline-none focus:ring-1 focus:ring-blue-500"
+          />
+        </div>
       </div>
 
-      {/* NAVEGAÇÃO INTERNA ENTRE ABAS */}
+      {/* ABAS */}
       <div className="flex border-b border-slate-200 mb-6 no-print gap-2">
         {(['geral', 'sa', 'rubricas', 'cronograma', 'calendario'] as const).map(tab => (
           <button
@@ -318,58 +325,114 @@ const UnitViewer: React.FC<UnitViewerProps> = ({
         ))}
       </div>
 
-      {/* CONTEÚDO DAS ABAS */}
       <div className="tab-content">
         
-        {/* ABA: GERAL (CAPACIDADES E CONHECIMENTOS) */}
+        {/* ABA: GERAL (EDITÁVEL) */}
         {activeTab === 'geral' && (
           <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               
               {/* CAPACIDADES TÉCNICAS */}
-              <div className="bg-white p-6 border border-slate-200 rounded-3xl shadow-sm space-y-3">
-                <h3 className="text-xs font-black text-blue-600 uppercase tracking-wider flex items-center gap-2 border-b border-slate-100 pb-2">
-                  <span className="w-2 h-2 rounded-full bg-blue-600" />
-                  Capacidades Técnicas
-                </h3>
-                <ul className="space-y-2">
+              <div className="bg-white p-6 border border-slate-200 rounded-3xl shadow-sm space-y-3 group/panel">
+                <div className="flex justify-between items-center border-b border-slate-100 pb-2">
+                  <h3 className="text-xs font-black text-blue-600 uppercase tracking-wider flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-blue-600" />
+                    Capacidades Técnicas
+                  </h3>
+                  <button
+                    onClick={() => updateUnitField(u => { u.general.technicalCapacities.push('Nova capacidade técnica'); })}
+                    className="opacity-0 group-hover/panel:opacity-100 text-[10px] bg-slate-50 text-slate-400 hover:text-blue-600 hover:bg-blue-50 px-2 py-0.5 rounded-lg transition-all font-bold"
+                  >
+                    + Incluir
+                  </button>
+                </div>
+                <div className="space-y-2">
                   {unit.general.technicalCapacities.map((cap, i) => (
-                    <li key={i} className="text-xs text-slate-700 bg-slate-50/70 p-3 rounded-xl border border-slate-100 font-medium">
-                      {cap}
-                    </li>
+                    <div key={i} className="group/item flex gap-2 items-start bg-slate-50/70 p-2 rounded-xl border border-slate-100">
+                      <textarea
+                        value={cap}
+                        onChange={(e) => updateUnitField(u => { u.general.technicalCapacities[i] = e.target.value; })}
+                        rows={1}
+                        className="flex-1 bg-transparent text-xs text-slate-700 font-medium resize-none focus:outline-none focus:bg-white p-1 rounded border border-transparent focus:border-slate-200"
+                      />
+                      <button
+                        onClick={() => updateUnitField(u => { u.general.technicalCapacities.splice(i, 1); })}
+                        className="opacity-0 group-hover/item:opacity-100 text-[9px] text-slate-300 hover:text-red-500 p-1 self-center transition-all"
+                      >
+                        ✕
+                      </button>
+                    </div>
                   ))}
-                </ul>
+                </div>
               </div>
 
               {/* CAPACIDADES SOCIOEMOCIONAIS */}
-              <div className="bg-white p-6 border border-slate-200 rounded-3xl shadow-sm space-y-3">
-                <h3 className="text-xs font-black text-emerald-600 uppercase tracking-wider flex items-center gap-2 border-b border-slate-100 pb-2">
-                  <span className="w-2 h-2 rounded-full bg-emerald-600" />
-                  Capacidades Socioemocionais / Organizacionais
-                </h3>
-                <ul className="space-y-2">
+              <div className="bg-white p-6 border border-slate-200 rounded-3xl shadow-sm space-y-3 group/panel">
+                <div className="flex justify-between items-center border-b border-slate-100 pb-2">
+                  <h3 className="text-xs font-black text-emerald-600 uppercase tracking-wider flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-emerald-600" />
+                    Capacidades Socioemocionais / Organizacionais
+                  </h3>
+                  <button
+                    onClick={() => updateUnitField(u => { u.general.socioemotionalCapacities.push('Nova capacidade socioemocional'); })}
+                    className="opacity-0 group-hover/panel:opacity-100 text-[10px] bg-slate-50 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 px-2 py-0.5 rounded-lg transition-all font-bold"
+                  >
+                    + Incluir
+                  </button>
+                </div>
+                <div className="space-y-2">
                   {unit.general.socioemotionalCapacities.map((cap, i) => (
-                    <li key={i} className="text-xs text-slate-700 bg-slate-50/70 p-3 rounded-xl border border-slate-100 font-medium">
-                      {cap}
-                    </li>
+                    <div key={i} className="group/item flex gap-2 items-start bg-slate-50/70 p-2 rounded-xl border border-slate-100">
+                      <textarea
+                        value={cap}
+                        onChange={(e) => updateUnitField(u => { u.general.socioemotionalCapacities[i] = e.target.value; })}
+                        rows={1}
+                        className="flex-1 bg-transparent text-xs text-slate-700 font-medium resize-none focus:outline-none focus:bg-white p-1 rounded border border-transparent focus:border-slate-200"
+                      />
+                      <button
+                        onClick={() => updateUnitField(u => { u.general.socioemotionalCapacities.splice(i, 1); })}
+                        className="opacity-0 group-hover/item:opacity-100 text-[9px] text-slate-300 hover:text-red-500 p-1 self-center transition-all"
+                      >
+                        ✕
+                      </button>
+                    </div>
                   ))}
-                </ul>
+                </div>
               </div>
             </div>
 
             {/* CONHECIMENTOS */}
-            <div className="bg-white p-6 border border-slate-200 rounded-3xl shadow-sm space-y-3">
-              <h3 className="text-xs font-black text-slate-700 uppercase tracking-wider flex items-center gap-2 border-b border-slate-100 pb-2">
-                <span className="w-2 h-2 rounded-full bg-slate-500" />
-                Conhecimentos Teóricos e Tecnológicos
-              </h3>
+            <div className="bg-white p-6 border border-slate-200 rounded-3xl shadow-sm space-y-3 group/panel">
+              <div className="flex justify-between items-center border-b border-slate-100 pb-2">
+                <h3 className="text-xs font-black text-slate-700 uppercase tracking-wider flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-slate-500" />
+                  Conhecimentos Teóricos e Tecnológicos
+                </h3>
+                <button
+                  onClick={() => updateUnitField(u => { u.general.knowledge.push('Novo conhecimento ou subitem'); })}
+                  className="opacity-0 group-hover/panel:opacity-100 text-[10px] bg-slate-50 text-slate-400 hover:text-slate-700 hover:bg-slate-100 px-2 py-0.5 rounded-lg transition-all font-bold"
+                >
+                  + Incluir
+                </button>
+              </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {unit.general.knowledge.map((know, i) => (
-                  <div key={i} className="text-xs text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-100 flex items-center gap-3">
-                    <span className="text-[10px] font-black text-slate-400 bg-slate-200/60 w-5 h-5 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <div key={i} className="group/item text-xs text-slate-600 bg-slate-50 p-2 rounded-xl border border-slate-100 flex items-start gap-2">
+                    <span className="text-[10px] font-black text-slate-400 bg-slate-200/60 w-5 h-5 rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
                       {i + 1}
                     </span>
-                    <span className="font-medium">{know}</span>
+                    <textarea
+                      value={know}
+                      onChange={(e) => updateUnitField(u => { u.general.knowledge[i] = e.target.value; })}
+                      rows={2}
+                      className="flex-1 bg-transparent text-xs font-medium text-slate-600 resize-none focus:outline-none focus:bg-white p-1 rounded border border-transparent focus:border-slate-200"
+                    />
+                    <button
+                      onClick={() => updateUnitField(u => { u.general.knowledge.splice(i, 1); })}
+                      className="opacity-0 group-hover/item:opacity-100 text-[9px] text-slate-300 hover:text-red-500 p-1 transition-all"
+                    >
+                      ✕
+                    </button>
                   </div>
                 ))}
               </div>
@@ -377,56 +440,123 @@ const UnitViewer: React.FC<UnitViewerProps> = ({
           </div>
         )}
         
-        {/* ABA: SITUAÇÃO DE APRENDIZAGEM */}
+        {/* ABA: SITUAÇÕES DE APRENDIZAGEM (EDITÁVEL) */}
         {activeTab === 'sa' && (
-          <div className="space-y-6">
-            <div className="space-y-6">
-              {unit.learningSituations.length > 0 ? (
-                unit.learningSituations.map((situation, idx) => (
-                  <div key={situation.id || idx} className="bg-white p-6 border border-slate-200 rounded-3xl shadow-sm space-y-4">
-                    <h3 className="text-sm font-black text-slate-800 uppercase border-b border-slate-100 pb-2">
-                      {idx + 1}. {situation.title}
-                    </h3>
-                    
-                    <div>
-                      <span className="block text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1">Contextualização</span>
-                      <p className="text-sm text-slate-700 bg-slate-50 p-3 rounded-xl whitespace-pre-line border border-slate-100">
-                        {situation.contextualization}
-                      </p>
-                    </div>
-
-                    <div>
-                      <span className="block text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1">Desafio Proposto</span>
-                      <p className="text-sm text-slate-700 bg-slate-50 p-3 rounded-xl whitespace-pre-line border border-slate-100">
-                        {situation.challenge}
-                      </p>
-                    </div>
-
-                    <div>
-                      <span className="block text-[10px] font-black text-slate-400 uppercase tracking-wider mb-2">Resultados Esperados</span>
-                      <ul className="space-y-2">
-                        {situation.expectedResults.map((result, rIdx) => (
-                          <li key={rIdx} className="text-xs text-slate-700 bg-slate-50/60 border border-slate-100 px-3 py-2 rounded-xl flex items-center gap-2">
-                            <span className="w-1.5 h-1.5 bg-blue-500 rounded-full flex-shrink-0" />
-                            {result}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <div className="text-center p-12 bg-white border border-slate-200 rounded-3xl text-xs text-slate-400">
-                  Nenhuma situação de aprendizagem cadastrada para esta unidade.
-                </div>
-              )}
+          <div className="space-y-6 group/panel">
+            <div className="flex justify-end mb-2">
+              <button
+                onClick={() => updateUnitField(u => {
+                  u.learningSituations.push({
+                    id: `sa-${Date.now()}`,
+                    title: `Situação de Aprendizagem ${u.learningSituations.length + 1}: Nova Diretriz`,
+                    contextualization: '',
+                    challenge: '',
+                    expectedResults: ['Resultado esperado inicial']
+                  });
+                })}
+                className="opacity-0 group-hover/panel:opacity-100 text-xs bg-white border border-slate-200 text-slate-500 hover:text-blue-600 px-3 py-1 rounded-xl transition-all font-bold shadow-sm"
+              >
+                + Incluir Nova Situação de Aprendizagem
+              </button>
             </div>
+
+            {unit.learningSituations.length > 0 ? (
+              unit.learningSituations.map((situation, idx) => (
+                <div key={situation.id || idx} className="group/sa bg-white p-6 border border-slate-200 rounded-3xl shadow-sm space-y-4 relative">
+                  <button
+                    onClick={() => updateUnitField(u => { u.learningSituations.splice(idx, 1); })}
+                    className="absolute top-4 right-4 opacity-0 group-hover/sa:opacity-100 text-xs text-slate-300 hover:text-red-500 p-1 transition-all"
+                  >
+                    ✕ Excluir SA
+                  </button>
+
+                  <input
+                    type="text"
+                    value={situation.title}
+                    onChange={(e) => updateUnitField(u => { u.learningSituations[idx].title = e.target.value; })}
+                    className="w-full bg-transparent text-sm font-black text-slate-800 uppercase border-b border-slate-100 pb-1 focus:outline-none focus:border-blue-500"
+                  />
+                  
+                  <div>
+                    <span className="block text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1">Contextualização</span>
+                    <textarea
+                      value={situation.contextualization}
+                      onChange={(e) => updateUnitField(u => { u.learningSituations[idx].contextualization = e.target.value; })}
+                      rows={2}
+                      className="w-full bg-slate-50 text-xs text-slate-700 p-3 rounded-xl border border-slate-100 focus:outline-none focus:bg-white focus:border-slate-300"
+                      placeholder="Insira o contexto técnico/pedagógico..."
+                    />
+                  </div>
+
+                  <div>
+                    <span className="block text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1">Desafio Proposto</span>
+                    <textarea
+                      value={situation.challenge}
+                      onChange={(e) => updateUnitField(u => { u.learningSituations[idx].challenge = e.target.value; })}
+                      rows={2}
+                      className="w-full bg-slate-50 text-xs text-slate-700 p-3 rounded-xl border border-slate-100 focus:outline-none focus:bg-white focus:border-slate-300"
+                      placeholder="Descreva o produto ou operação mecânica a ser executada..."
+                    />
+                  </div>
+
+                  <div className="group/resList">
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="block text-[10px] font-black text-slate-400 uppercase tracking-wider">Resultados Esperados</span>
+                      <button
+                        onClick={() => updateUnitField(u => { u.learningSituations[idx].expectedResults.push('Novo resultado esperado'); })}
+                        className="opacity-0 group-hover/resList:opacity-100 text-[9px] text-slate-400 hover:text-blue-500 font-bold"
+                      >
+                        + Adicionar Item
+                      </button>
+                    </div>
+                    <ul className="space-y-2">
+                      {situation.expectedResults.map((result, rIdx) => (
+                        <li key={rIdx} className="group/resItem flex gap-2 items-center bg-slate-50/60 border border-slate-100 px-2 py-1 rounded-xl">
+                          <span className="w-1.5 h-1.5 bg-blue-500 rounded-full flex-shrink-0 ml-1" />
+                          <input
+                            type="text"
+                            value={result}
+                            onChange={(e) => updateUnitField(u => { u.learningSituations[idx].expectedResults[rIdx] = e.target.value; })}
+                            className="flex-1 bg-transparent text-xs text-slate-700 font-medium focus:outline-none focus:bg-white p-1 rounded"
+                          />
+                          <button
+                            onClick={() => updateUnitField(u => { u.learningSituations[idx].expectedResults.splice(rIdx, 1); })}
+                            className="opacity-0 group-hover/resItem:opacity-100 text-[9px] text-slate-300 hover:text-red-500 px-1"
+                          >
+                            ✕
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="text-center p-12 bg-white border border-slate-200 rounded-3xl text-xs text-slate-400">
+                Nenhuma situação de aprendizagem cadastrada. Passe o mouse acima para incluir.
+              </div>
+            )}
           </div>
         )}
 
-        {/* ABA: RUBRICAS */}
+        {/* ABA: RUBRICAS (EDITÁVEL) */}
         {activeTab === 'rubricas' && (
-          <div className="space-y-6">
+          <div className="space-y-6 group/panel">
+            <div className="flex justify-end">
+              <button
+                onClick={() => updateUnitField(u => {
+                  u.rubrics.push({
+                    id: `rubric-${Date.now()}`,
+                    capacity: 'Nova Capacidade Avaliada',
+                    levels: { nsa: '', apo: '', par: '', aut: '' }
+                  });
+                })}
+                className="opacity-0 group-hover/panel:opacity-100 text-xs bg-white border border-slate-200 text-slate-500 hover:text-blue-600 px-3 py-1 rounded-xl transition-all font-bold"
+              >
+                + Incluir Nova Linha de Rubrica
+              </button>
+            </div>
+            
             <div className="overflow-x-auto border border-slate-200 rounded-3xl bg-white shadow-sm">
               <table className="w-full text-left border-collapse table-fixed">
                 <thead>
@@ -440,18 +570,38 @@ const UnitViewer: React.FC<UnitViewerProps> = ({
                 </thead>
                 <tbody className="divide-y divide-slate-100 text-xs text-slate-700">
                   {unit.rubrics.length > 0 ? (
-                    unit.rubrics.map(rubric => (
-                      <tr key={rubric.id} className="hover:bg-slate-50/50 transition-colors">
-                        <td className="p-4 font-bold bg-slate-50/30">{rubric.capacity}</td>
-                        <td className="p-4 whitespace-pre-line">{rubric.levels.nsa || '—'}</td>
-                        <td className="p-4 whitespace-pre-line">{rubric.levels.apo || '—'}</td>
-                        <td className="p-4 whitespace-pre-line">{rubric.levels.par || '—'}</td>
-                        <td className="p-4 whitespace-pre-line">{rubric.levels.aut || '—'}</td>
+                    unit.rubrics.map((rubric, rIdx) => (
+                      <tr key={rubric.id} className="group/row hover:bg-slate-50/50 transition-colors">
+                        <td className="p-2 font-bold bg-slate-50/30 relative">
+                          <textarea
+                            value={rubric.capacity}
+                            onChange={(e) => updateUnitField(u => { u.rubrics[rIdx].capacity = e.target.value; })}
+                            className="w-full bg-transparent text-xs font-bold text-slate-800 resize-none focus:outline-none p-1"
+                            rows={2}
+                          />
+                          <button
+                            onClick={() => updateUnitField(u => { u.rubrics.splice(rIdx, 1); })}
+                            className="absolute bottom-1 left-2 opacity-0 group-hover/row:opacity-100 text-[9px] text-red-400 hover:text-red-600 font-bold"
+                          >
+                            Excluir
+                          </button>
+                        </td>
+                        {(['nsa', 'apo', 'par', 'aut'] as const).map(lvl => (
+                          <td key={lvl} className="p-2">
+                            <textarea
+                              value={rubric.levels[lvl]}
+                              onChange={(e) => updateUnitField(u => { u.rubrics[rIdx].levels[lvl] = e.target.value; })}
+                              className="w-full bg-transparent text-xs text-slate-600 resize-none focus:outline-none focus:bg-white p-1 rounded border border-transparent focus:border-slate-200"
+                              rows={3}
+                              placeholder="..."
+                            />
+                          </td>
+                        ))}
                       </tr>
                     ))
                   ) : (
                     <tr>
-                      <td colSpan={5} className="text-center p-12 text-slate-400">Nenhuma rubrica cadastrada.</td>
+                      <td colSpan={5} className="text-center p-12 text-slate-400">Nenhuma rubrica cadastrada. Passe o mouse acima da tabela para incluir.</td>
                     </tr>
                   )}
                 </tbody>
@@ -460,51 +610,123 @@ const UnitViewer: React.FC<UnitViewerProps> = ({
           </div>
         )}
 
-        {/* ABA: CRONOGRAMA */}
+        {/* ABA: CRONOGRAMA (EDITÁVEL) */}
         {activeTab === 'cronograma' && (
-          <div className="space-y-6">
+          <div className="space-y-6 group/panel">
+            <div className="flex justify-end">
+              <button
+                onClick={() => updateUnitField(u => {
+                  u.schedule.push({
+                    id: `entry-${Date.now()}`,
+                    date: '2026-02-05',
+                    hours: 4,
+                    capacities: 'Capacidade técnica associada',
+                    knowledge: 'Tópico de conhecimento teórico extraído do plano',
+                    strategy: 'Aulas teóricas e práticas em bancada',
+                    resources: 'Instrumentos, ferramentas manuais, insumos',
+                    completed: false
+                  });
+                })}
+                className="opacity-0 group-hover/panel:opacity-100 text-xs bg-white border border-slate-200 text-slate-500 hover:text-blue-600 px-3 py-1 rounded-xl transition-all font-bold shadow-sm"
+              >
+                + Adicionar Aula ao Cronograma
+              </button>
+            </div>
+
             <div className="overflow-x-auto border border-slate-200 rounded-3xl bg-white shadow-sm">
               <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className="bg-slate-50 border-b border-slate-200 text-[10px] font-black text-slate-500 uppercase tracking-wider">
-                    <th className="p-4 w-32">Data</th>
+                    <th className="p-4 w-36">Data / Dia</th>
                     <th className="p-4 w-20 text-center">Horas</th>
-                    <th className="p-4">Conteúdo / Capacidades</th>
-                    <th className="p-4">Estratégias / Recursos</th>
+                    <th className="p-4 w-1/3">Conteúdo / Capacidades</th>
+                    <th className="p-4 w-1/3">Estratégias / Recursos</th>
                     <th className="p-4 w-24 text-center">Situação</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 text-xs text-slate-700">
                   {unit.schedule.length > 0 ? (
-                    unit.schedule.map((entry) => (
-                      <tr key={entry.id} className="hover:bg-slate-50/50 transition-colors">
-                        <td className="p-4">
-                          <span className="font-bold text-slate-800">{entry.date || 'A definir'}</span>
-                          <span className="block text-[9px] text-slate-400 uppercase font-black tracking-tighter mt-0.5">
-                            {getDayOfWeek(entry.date)}
+                    unit.schedule.map((entry, sIdx) => (
+                      <tr key={entry.id} className="group/row hover:bg-slate-50/50 transition-colors">
+                        {/* INPUT DE DATA */}
+                        <td className="p-3">
+                          <input
+                            type="text"
+                            value={entry.date}
+                            placeholder="AAAA-MM-DD ou DD/MM"
+                            onChange={(e) => updateUnitField(u => { u.schedule[sIdx].date = e.target.value; })}
+                            className="w-full bg-transparent font-bold text-slate-800 focus:outline-none p-1 border border-transparent focus:border-slate-200 rounded"
+                          />
+                          <span className="block text-[9px] text-slate-400 uppercase font-black tracking-tighter ml-1 mt-0.5">
+                            {getDayOfWeek(entry.date) || '—'}
                           </span>
                         </td>
-                        <td className="p-4 text-center font-bold text-blue-600">{entry.hours}h</td>
-                        <td className="p-4 space-y-1">
-                          <div className="font-bold text-slate-800">{entry.capacities || '—'}</div>
-                          <div className="text-slate-500 whitespace-pre-line italic">{entry.knowledge || '—'}</div>
+                        {/* INPUT DE HORAS */}
+                        <td className="p-3 text-center">
+                          <input
+                            type="number"
+                            value={entry.hours}
+                            onChange={(e) => updateUnitField(u => { u.schedule[sIdx].hours = parseInt(e.target.value) || 0; })}
+                            className="w-12 bg-transparent font-bold text-blue-600 text-center focus:outline-none focus:bg-white border border-transparent focus:border-slate-200 rounded"
+                          />
                         </td>
-                        <td className="p-4 space-y-1">
-                          <div className="font-medium text-slate-800">{entry.strategy || '—'}</div>
-                          <div className="text-slate-400">{entry.resources || '—'}</div>
+                        {/* CAPACIDADES E CONHECIMENTOS */}
+                        <td className="p-3 space-y-1">
+                          <input
+                            type="text"
+                            value={entry.capacities}
+                            placeholder="Capacidades alvo..."
+                            onChange={(e) => updateUnitField(u => { u.schedule[sIdx].capacities = e.target.value; })}
+                            className="w-full bg-transparent font-bold text-slate-800 text-xs focus:outline-none focus:bg-white rounded p-0.5"
+                          />
+                          <textarea
+                            value={entry.knowledge}
+                            placeholder="Conhecimentos integrados..."
+                            onChange={(e) => updateUnitField(u => { u.schedule[sIdx].knowledge = e.target.value; })}
+                            rows={2}
+                            className="w-full bg-transparent text-slate-500 text-xs italic resize-none focus:outline-none focus:bg-white rounded p-0.5"
+                          />
                         </td>
-                        <td className="p-4 text-center">
-                          <span className={`px-2 py-1 rounded-lg text-[9px] font-black uppercase ${
-                            entry.completed ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-amber-50 text-amber-700 border border-amber-200'
-                          }`}>
+                        {/* ESTRATÉGIAS E RECURSOS */}
+                        <td className="p-3 space-y-1">
+                          <input
+                            type="text"
+                            value={entry.strategy}
+                            placeholder="Estratégias didáticas..."
+                            onChange={(e) => updateUnitField(u => { u.schedule[sIdx].strategy = e.target.value; })}
+                            className="w-full bg-transparent text-slate-800 text-xs font-medium focus:outline-none focus:bg-white rounded p-0.5"
+                          />
+                          <input
+                            type="text"
+                            value={entry.resources}
+                            placeholder="Recursos/Máquinas..."
+                            onChange={(e) => updateUnitField(u => { u.schedule[sIdx].resources = e.target.value; })}
+                            className="w-full bg-transparent text-slate-400 text-xs focus:outline-none focus:bg-white rounded p-0.5"
+                          />
+                        </td>
+                        {/* SITUAÇÃO E DELETE */}
+                        <td className="p-3 text-center relative">
+                          <button
+                            type="button"
+                            onClick={() => updateUnitField(u => { u.schedule[sIdx].completed = !u.schedule[sIdx].completed; })}
+                            className={`px-2 py-1 rounded-lg text-[9px] font-black uppercase transition-all ${
+                              entry.completed ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-amber-50 text-amber-700 border border-amber-200'
+                            }`}
+                          >
                             {entry.completed ? 'Realizada' : 'Prevista'}
-                          </span>
+                          </button>
+                          <button
+                            onClick={() => updateUnitField(u => { u.schedule.splice(sIdx, 1); })}
+                            className="absolute bottom-1 right-2 opacity-0 group-hover/row:opacity-100 text-[9px] text-red-300 hover:text-red-500 font-bold transition-all"
+                          >
+                            ✕
+                          </button>
                         </td>
                       </tr>
                     ))
                   ) : (
                     <tr>
-                      <td colSpan={5} className="text-center p-12 text-slate-400">Nenhum plano de aula listado no cronograma.</td>
+                      <td colSpan={5} className="text-center p-12 text-slate-400">Nenhum plano de aula listado no cronograma. Mova o mouse na área superior direita para adicionar.</td>
                     </tr>
                   )}
                 </tbody>
