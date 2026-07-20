@@ -1,6 +1,5 @@
 import React, { useState, useMemo } from 'react';
 
-// Definição dos tipos para garantir consistência dos dados pedagógicos do SENAI
 interface LearningSituation {
   id: string;
   title: string;
@@ -49,7 +48,6 @@ interface UnitViewerProps {
   initialUnit?: LocalUnit;
 }
 
-// Mapas de cores baseados na identidade visual do painel
 const COLOR_MAP: Record<string, string> = {
   blue: '#3b82f6',
   red: '#ef4444',
@@ -70,31 +68,19 @@ const UnitViewer: React.FC<UnitViewerProps> = ({
   unitMeta = { color: 'blue', sigla: 'UC' },
   initialUnit
 }) => {
-  // Estado inicial estruturado para evitar quebras de renderização
-  const [localUnit, setLocalUnit] = useState<LocalUnit>(() => initialUnit || {
-    name: 'Unidade Curricular Padrão',
+  // Dados injetados diretamente (Read-Only)
+  const unit = initialUnit || {
+    name: 'Unidade Curricular',
     semester: 1,
-    learningSituations: [
-      {
-        id: 'sa-1',
-        title: 'Situação de Aprendizagem 1',
-        contextualization: '',
-        challenge: '',
-        expectedResults: ['']
-      }
-    ],
+    learningSituations: [],
     rubrics: [],
     schedule: []
-  });
+  };
 
   const [activeTab, setActiveTab] = useState<'sa' | 'rubricas' | 'cronograma' | 'calendario'>('sa');
-  const [dateError, setDateError] = useState<string | null>(null);
-  
-  // Limites padrão para o ano letivo corrente (2026)
-  const dateRange = { min: '2026-01-01', max: '2026-12-31' };
   const calendarYear = 2026;
 
-  // Funções utilitárias de tratamento de datas
+  // Funções Utilitárias de Data
   const toIsoDate = (dateStr: string) => {
     if (!dateStr) return '';
     const parts = dateStr.split('/');
@@ -109,10 +95,9 @@ const UnitViewer: React.FC<UnitViewerProps> = ({
     return new Intl.DateTimeFormat('pt-BR', { weekday: 'short' }).format(dateObj);
   };
 
-  // Mapeamento das datas do cronograma para otimizar a renderização do calendário
   const scheduleDates = useMemo(() => {
     const map: Record<string, ScheduleEntry[]> = {};
-    localUnit.schedule.forEach(entry => {
+    unit.schedule.forEach(entry => {
       const iso = toIsoDate(entry.date);
       if (iso) {
         if (!map[iso]) map[iso] = [];
@@ -120,117 +105,11 @@ const UnitViewer: React.FC<UnitViewerProps> = ({
       }
     });
     return map;
-  }, [localUnit.schedule]);
+  }, [unit.schedule]);
 
-  // Lista de meses contidos no intervalo letivo para montagem do grid
   const monthsInRange = useMemo(() => {
     return ['2026-01', '2026-02', '2026-03', '2026-04', '2026-05', '2026-06', '2026-07', '2026-08', '2026-09', '2026-10', '2026-11', '2026-12'];
   }, []);
-
-  // Manipuladores de Estado: Situações de Aprendizagem
-  const updateSituation = (id: string, field: keyof LearningSituation, value: any) => {
-    setLocalUnit(prev => ({
-      ...prev,
-      learningSituations: prev.learningSituations.map(sa => 
-        sa.id === id ? { ...sa, [field]: value } : sa
-      )
-    }));
-  };
-
-  const updateExpectedResult = (situationId: string, resultIndex: number, value: string) => {
-    setLocalUnit(prev => ({
-      ...prev,
-      learningSituations: prev.learningSituations.map(sa => {
-        if (sa.id === situationId) {
-          const newResults = [...sa.expectedResults];
-          newResults[resultIndex] = value;
-          return { ...sa, expectedResults: newResults };
-        }
-        return sa;
-      })
-    }));
-  };
-
-  const addExpectedResult = (situationId: string) => {
-    setLocalUnit(prev => ({
-      ...prev,
-      learningSituations: prev.learningSituations.map(sa => 
-        sa.id === situationId ? { ...sa, expectedResults: [...sa.expectedResults, ''] } : sa
-      )
-    }));
-  };
-
-  const removeExpectedResult = (situation: LearningSituation, resultIndex: number) => {
-    const newResults = situation.expectedResults.filter((_, i) => i !== resultIndex);
-    updateSituation(situation.id, 'expectedResults', newResults.length > 0 ? newResults : ['']);
-  };
-
-  // Manipuladores de Estado: Rubricas (Matriz de Avaliação)
-  const addRubric = () => {
-    const newRubric: Rubric = {
-      id: `rubric-${Date.now()}`,
-      capacity: '',
-      levels: { nsa: '', apo: '', par: '', aut: '' }
-    };
-    setLocalUnit(prev => ({ ...prev, rubrics: [...prev.rubrics, newRubric] }));
-  };
-
-  const updateRubric = (id: string, key: string, value: string) => {
-    setLocalUnit(prev => ({
-      ...prev,
-      rubrics: prev.rubrics.map(rub => {
-        if (rub.id !== id) return rub;
-        if (['nsa', 'apo', 'par', 'aut'].includes(key)) {
-          return { ...rub, levels: { ...rub.levels, [key]: value } };
-        }
-        return { ...rub, [key]: value };
-      })
-    }));
-  };
-
-  const removeRubric = (id: string) => {
-    setLocalUnit(prev => ({ ...prev, rubrics: prev.rubrics.filter(rub => rub.id !== id) }));
-  };
-
-  // Manipuladores de Estado: Cronograma
-  const addScheduleEntry = () => {
-    const newEntry: ScheduleEntry = {
-      id: `entry-${Date.now()}`,
-      date: '',
-      hours: 4,
-      capacities: '',
-      knowledge: '',
-      strategy: '',
-      resources: '',
-      completed: false
-    };
-    setLocalUnit(prev => ({ ...prev, schedule: [...prev.schedule, newEntry] }));
-  };
-
-  const updateEntry = (id: string, field: keyof ScheduleEntry, value: any) => {
-    setLocalUnit(prev => ({
-      ...prev,
-      schedule: prev.schedule.map(e => e.id === id ? { ...e, [field]: value } : e)
-    }));
-  };
-
-  const updateScheduleDate = (id: string, isoDate: string) => {
-    if (!isoDate) {
-      updateEntry(id, 'date', '');
-      return;
-    }
-    const [year, month, day] = isoDate.split('-');
-    updateEntry(id, 'date', `${day}/${month}/${year}`);
-  };
-
-  const removeScheduleEntry = (id: string) => {
-    setLocalUnit(prev => ({ ...prev, schedule: prev.schedule.filter(e => e.id !== id) }));
-  };
-
-  const handleResetToTemplate = () => {
-    setLocalUnit(prev => ({ ...prev, schedule: [] }));
-    setDateError(null);
-  };
 
   const handlePrint = () => {
     window.print();
@@ -238,7 +117,7 @@ const UnitViewer: React.FC<UnitViewerProps> = ({
 
   return (
     <div className="w-full bg-slate-50 min-h-screen p-6">
-      {/* NAVEGAÇÃO INTERNA ENTRE ABAS */}
+      {/* NAVEGAÇÃO INTERNA */}
       <div className="flex border-b border-slate-200 mb-6 no-print gap-2">
         {(['sa', 'rubricas', 'cronograma', 'calendario'] as const).map(tab => (
           <button
@@ -258,96 +137,59 @@ const UnitViewer: React.FC<UnitViewerProps> = ({
 
       {/* CONTEÚDO DAS ABAS */}
       <div className="tab-content">
+        
+        {/* ABA: SITUAÇÃO DE APRENDIZAGEM */}
         {activeTab === 'sa' && (
           <div className="space-y-6">
             <div className="no-print space-y-6">
-              {localUnit.learningSituations.map((situation, idx) => (
+              {unit.learningSituations.map((situation, idx) => (
                 <div key={situation.id || idx} className="bg-white p-6 border border-slate-200 rounded-3xl shadow-sm space-y-4">
-                  <h3 className="text-sm font-black text-slate-800 uppercase">
-                    Configuração da Situação de Aprendizagem {idx + 1}
+                  <h3 className="text-sm font-black text-slate-800 uppercase border-b border-slate-100 pb-2">
+                    {idx + 1}. {situation.title || 'Situação de Aprendizagem'}
                   </h3>
                   
                   <div>
-                    <label className="block text-[10px] font-black text-slate-400 uppercase mb-1">Título da SA</label>
-                    <input
-                      type="text"
-                      value={situation.title}
-                      onChange={e => updateSituation(situation.id, 'title', e.target.value)}
-                      className="w-full rounded-xl border border-slate-200 p-2.5 text-sm"
-                    />
+                    <span className="block text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1">Contextualização</span>
+                    <p className="text-sm text-slate-700 bg-slate-50 p-3 rounded-xl whitespace-pre-line border border-slate-100">
+                      {situation.contextualization || 'Nenhuma contextualização informada.'}
+                    </p>
                   </div>
 
                   <div>
-                    <label className="block text-[10px] font-black text-slate-400 uppercase mb-1">Contextualização</label>
-                    <textarea
-                      value={situation.contextualization}
-                      onChange={e => updateSituation(situation.id, 'contextualization', e.target.value)}
-                      rows={3}
-                      className="w-full rounded-xl border border-slate-200 p-2.5 text-sm"
-                    />
+                    <span className="block text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1">Desafio Proposto</span>
+                    <p className="text-sm text-slate-700 bg-slate-50 p-3 rounded-xl whitespace-pre-line border border-slate-100">
+                      {situation.challenge || 'Nenhum desafio informado.'}
+                    </p>
                   </div>
 
                   <div>
-                    <label className="block text-[10px] font-black text-slate-400 uppercase mb-1">Desafio Proposto</label>
-                    <textarea
-                      value={situation.challenge}
-                      onChange={e => updateSituation(situation.id, 'challenge', e.target.value)}
-                      rows={3}
-                      className="w-full rounded-xl border border-slate-200 p-2.5 text-sm"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <div className="flex justify-between items-center">
-                      <label className="block text-[10px] font-black text-slate-400 uppercase">Resultados Esperados</label>
-                      <button
-                        type="button"
-                        onClick={() => addExpectedResult(situation.id)}
-                        className="text-blue-600 hover:underline text-xs font-bold"
-                      >
-                        + Adicionar Resultado
-                      </button>
-                    </div>
-                    <div className="space-y-2">
-                      {situation.expectedResults.map((result, resultIndex) => (
-                        <div key={resultIndex} className="flex gap-2">
-                          <textarea
-                            value={result}
-                            onChange={e => updateExpectedResult(situation.id, resultIndex, e.target.value)}
-                            rows={2}
-                            className="flex-1 rounded-xl border border-slate-200 p-2 text-xs"
-                            placeholder="Descreva o resultado esperado..."
-                          />
-                          <button
-                            type="button"
-                            onClick={() => removeExpectedResult(situation, resultIndex)}
-                            className="bg-red-50 text-red-600 px-3 py-3 rounded-xl text-[8px] font-black uppercase"
-                          >
-                            Remover
-                          </button>
-                        </div>
+                    <span className="block text-[10px] font-black text-slate-400 uppercase tracking-wider mb-2">Resultados Esperados</span>
+                    <ul className="space-y-2">
+                      {situation.expectedResults.map((result, rIdx) => (
+                        <li key={rIdx} className="text-xs text-slate-700 bg-slate-50/60 border border-slate-100 px-3 py-2 rounded-xl flex items-center gap-2">
+                          <span className="w-1.5 h-1.5 bg-blue-500 rounded-full flex-shrink-0" />
+                          {result}
+                        </li>
                       ))}
-                    </div>
+                    </ul>
                   </div>
                 </div>
               ))}
             </div>
 
-            {/* DOCUMENTO IMPRESSO: SITUAÇÃO DE APRENDIZAGEM */}
+            {/* DOCUMENTO IMPRESSO SA */}
             <div className="hidden report-document-sa">
               <div className="report-header">
                 <div className="logo-box">SENAI</div>
                 <div className="info-box">
-                  <h1>{localUnit.name}</h1>
-                  <p>SITUAÇÃO DE APRENDIZAGEM — {localUnit.semester}º SEMESTRE</p>
+                  <h1>{unit.name}</h1>
+                  <p>SITUAÇÃO DE APRENDIZAGEM — {unit.semester}º SEMESTRE</p>
                 </div>
               </div>
               <h2 className="doc-main-title">Planejamento da Situação de Aprendizagem</h2>
-              {localUnit.learningSituations.map((situation, idx) => (
+              {unit.learningSituations.map((situation, idx) => (
                 <div key={situation.id || idx} className="sa-print-block">
-                  <h3 className="sa-print-title">
-                    {idx + 1}. {situation.title}
-                  </h3>
+                  <h3 className="sa-print-title">{idx + 1}. {situation.title}</h3>
                   <div className="sa-print-section">
                     <h4 className="sa-print-section-title">Contextualização</h4>
                     <p className="sa-print-text">{situation.contextualization}</p>
@@ -360,9 +202,7 @@ const UnitViewer: React.FC<UnitViewerProps> = ({
                     <h4 className="sa-print-section-title">Resultados Esperados</h4>
                     <ul className="list-disc pl-5 mt-2 space-y-1">
                       {situation.expectedResults.map((result, rIdx) => (
-                        <li key={rIdx} className="sa-print-text">
-                          {result}
-                        </li>
+                        <li key={rIdx} className="sa-print-text">{result}</li>
                       ))}
                     </ul>
                   </div>
@@ -372,76 +212,31 @@ const UnitViewer: React.FC<UnitViewerProps> = ({
           </div>
         )}
 
+        {/* ABA: RUBRICAS */}
         {activeTab === 'rubricas' && (
           <div className="space-y-6 no-print">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-[11px] font-black text-slate-400 uppercase tracking-[0.3em]">
-                Matriz de Avaliação (Rubricas)
-              </h3>
-              <button
-                type="button"
-                onClick={addRubric}
-                className="bg-blue-600 text-white px-4 py-2 rounded-xl text-[9px] font-black uppercase"
-              >
-                Adicionar rubrica
-              </button>
-            </div>
-
+            <h3 className="text-[11px] font-black text-slate-400 uppercase tracking-[0.3em] mb-4">
+              Matriz de Avaliação (Rubricas)
+            </h3>
             <div className="overflow-x-auto border border-slate-200 rounded-3xl bg-white shadow-sm">
-              <table className="w-full text-left border-collapse">
+              <table className="w-full text-left border-collapse table-fixed">
                 <thead>
                   <tr className="bg-slate-50 border-b border-slate-200">
-                    <th className="p-4 text-[10px] font-black text-slate-500 uppercase tracking-wider w-1/5">
-                      Capacidade / Indicador
-                    </th>
-                    <th className="p-4 text-[10px] font-black text-slate-500 uppercase tracking-wider w-1/5">
-                      NSA (Não Satisfatório)
-                    </th>
-                    <th className="p-4 text-[10px] font-black text-slate-500 uppercase tracking-wider w-1/5">
-                      APO (Apoiado)
-                    </th>
-                    <th className="p-4 text-[10px] font-black text-slate-500 uppercase tracking-wider w-1/5">
-                      PAR (Parcial)
-                    </th>
-                    <th className="p-4 text-[10px] font-black text-slate-500 uppercase tracking-wider w-1/5">
-                      AUT (Autônomo)
-                    </th>
-                    <th className="p-4 w-16"></th>
+                    <th className="p-4 text-[10px] font-black text-slate-500 uppercase tracking-wider w-1/5">Capacidade / Indicador</th>
+                    <th className="p-4 text-[10px] font-black text-slate-500 uppercase tracking-wider w-1/5">NSA (Não Satisfatório)</th>
+                    <th className="p-4 text-[10px] font-black text-slate-500 uppercase tracking-wider w-1/5">APO (Apoiado)</th>
+                    <th className="p-4 text-[10px] font-black text-slate-500 uppercase tracking-wider w-1/5">PAR (Parcial)</th>
+                    <th className="p-4 text-[10px] font-black text-slate-500 uppercase tracking-wider w-1/5">AUT (Autônomo)</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
-                  {localUnit.rubrics.map(rubric => (
+                <tbody className="divide-y divide-slate-100 text-xs text-slate-700">
+                  {unit.rubrics.map(rubric => (
                     <tr key={rubric.id} className="hover:bg-slate-50/50 transition-colors">
-                      <td className="p-3">
-                        <textarea
-                          value={rubric.capacity}
-                          onChange={e => updateRubric(rubric.id, 'capacity', e.target.value)}
-                          placeholder="Descreva a capacidade..."
-                          className="w-full rounded-xl border border-slate-200 p-2 text-xs focus:ring-2 focus:ring-blue-500"
-                          rows={3}
-                        />
-                      </td>
-                      {(['nsa', 'apo', 'par', 'aut'] as const).map(level => (
-                        <td key={level} className="p-3">
-                          <textarea
-                            value={rubric.levels[level] || ''}
-                            onChange={e => updateRubric(rubric.id, level, e.target.value)}
-                            placeholder={`Critério para ${level.toUpperCase()}...`}
-                            className="w-full rounded-xl border border-slate-200 p-2 text-xs focus:ring-2 focus:ring-blue-500"
-                            rows={3}
-                          />
-                        </td>
-                      ))}
-                      <td className="p-3 text-center">
-                        <button
-                          type="button"
-                          onClick={() => removeRubric(rubric.id)}
-                          className="text-red-600 hover:bg-red-50 p-2 rounded-xl transition-colors"
-                          title="Excluir Rubrica"
-                        >
-                          ✕
-                        </button>
-                      </td>
+                      <td className="p-4 font-bold bg-slate-50/30">{rubric.capacity}</td>
+                      <td className="p-4 whitespace-pre-line">{rubric.levels.nsa || '—'}</td>
+                      <td className="p-4 whitespace-pre-line">{rubric.levels.apo || '—'}</td>
+                      <td className="p-4 whitespace-pre-line">{rubric.levels.par || '—'}</td>
+                      <td className="p-4 whitespace-pre-line">{rubric.levels.aut || '—'}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -450,145 +245,71 @@ const UnitViewer: React.FC<UnitViewerProps> = ({
           </div>
         )}
 
+        {/* ABA: CRONOGRAMA */}
         {activeTab === 'cronograma' && (
           <div className="space-y-6">
-            <div className="flex flex-wrap justify-between items-center gap-4 mb-4 no-print">
-              <div>
-                <h3 className="text-[11px] font-black text-slate-400 uppercase tracking-[0.3em]">
-                  Plano de Aula Semanal
-                </h3>
-                {dateError && <p className="text-red-500 text-xs mt-1 font-bold">{dateError}</p>}
-              </div>
-              <div className="flex gap-2">
-                <button
-                  type="button"
-                  onClick={handleResetToTemplate}
-                  className="bg-slate-800 text-white px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-wider"
-                >
-                  Restaurar Modelo
-                </button>
-                <button
-                  type="button"
-                  onClick={addScheduleEntry}
-                  className="bg-blue-600 text-white px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-wider"
-                >
-                  Adicionar Aula
-                </button>
-                <button
-                  type="button"
-                  onClick={handlePrint}
-                  className="bg-red-600 text-white px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-wider"
-                >
-                  Imprimir Plano
-                </button>
-              </div>
+            <div className="flex justify-between items-center mb-4 no-print">
+              <h3 className="text-[11px] font-black text-slate-400 uppercase tracking-[0.3em]">
+                Plano de Aula Semanal
+              </h3>
+              <button
+                type="button"
+                onClick={handlePrint}
+                className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-wider transition-colors"
+              >
+                Imprimir Plano
+              </button>
             </div>
 
-            {/* TABELA DE VISUALIZAÇÃO/EDIÇÃO EM TELA */}
+            {/* TABELA DE TELA (NÃO EDITÁVEL) */}
             <div className="overflow-x-auto border border-slate-200 rounded-3xl bg-white shadow-sm no-print">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="bg-slate-50 border-b border-slate-200 whitespace-nowrap">
-                    <th className="p-4 text-[10px] font-black text-slate-500 uppercase tracking-wider w-32">Data</th>
-                    <th className="p-4 text-[10px] font-black text-slate-500 uppercase tracking-wider w-20">Horas</th>
-                    <th className="p-4 text-[10px] font-black text-slate-500 uppercase tracking-wider">Conteúdo / Capacidades</th>
-                    <th className="p-4 text-[10px] font-black text-slate-500 uppercase tracking-wider">Estratégias / Recursos</th>
-                    <th className="p-4 text-[10px] font-black text-slate-500 uppercase tracking-wider w-20 text-center">Status</th>
-                    <th className="p-4 w-12"></th>
+                  <tr className="bg-slate-50 border-b border-slate-200 text-[10px] font-black text-slate-500 uppercase tracking-wider">
+                    <th className="p-4 w-32">Data</th>
+                    <th className="p-4 w-20 text-center">Horas</th>
+                    <th className="p-4">Conteúdo / Capacidades</th>
+                    <th className="p-4">Estratégias / Recursos</th>
+                    <th className="p-4 w-24 text-center">Situação</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
-                  {localUnit.schedule.map((entry) => {
-                    const isoDate = toIsoDate(entry.date);
-                    const dayOfWeek = getDayOfWeek(entry.date);
-                    return (
-                      <tr key={entry.id} className="hover:bg-slate-50/50 transition-colors">
-                        <td className="p-3">
-                          <input
-                            type="date"
-                            value={isoDate}
-                            min={dateRange.min}
-                            max={dateRange.max}
-                            onChange={e => updateScheduleDate(entry.id, e.target.value)}
-                            className="w-full rounded-xl border border-slate-200 p-2 text-xs font-bold"
-                          />
-                          {dayOfWeek && (
-                            <span className="text-[9px] text-slate-400 block mt-1 uppercase font-black tracking-tighter">
-                              {dayOfWeek}
-                            </span>
-                          )}
-                        </td>
-                        <td className="p-3">
-                          <input
-                            type="number"
-                            value={entry.hours}
-                            onChange={e => updateEntry(entry.id, 'hours', Number(e.target.value))}
-                            className="w-full rounded-xl border border-slate-200 p-2 text-xs font-bold text-center"
-                            min={0}
-                          />
-                        </td>
-                        <td className="p-3 space-y-2">
-                          <input
-                            type="text"
-                            value={entry.capacities || ''}
-                            onChange={e => updateEntry(entry.id, 'capacities', e.target.value)}
-                            placeholder="Capacidades trabalhadas..."
-                            className="w-full rounded-xl border border-slate-200 p-2 text-xs"
-                          />
-                          <textarea
-                            value={entry.knowledge || ''}
-                            onChange={e => updateEntry(entry.id, 'knowledge', e.target.value)}
-                            placeholder="Detalhamento dos saberes..."
-                            className="w-full rounded-xl border border-slate-200 p-2 text-xs"
-                            rows={2}
-                          />
-                        </td>
-                        <td className="p-3 space-y-2">
-                          <input
-                            type="text"
-                            value={entry.strategy || ''}
-                            onChange={e => updateEntry(entry.id, 'strategy', e.target.value)}
-                            placeholder="Estratégia didática (ex: SMO)"
-                            className="w-full rounded-xl border border-slate-200 p-2 text-xs"
-                          />
-                          <input
-                            type="text"
-                            value={entry.resources || ''}
-                            onChange={e => updateEntry(entry.id, 'resources', e.target.value)}
-                            placeholder="Recursos necessários"
-                            className="w-full rounded-xl border border-slate-200 p-2 text-xs"
-                          />
-                        </td>
-                        <td className="p-3 text-center">
-                          <input
-                            type="checkbox"
-                            checked={entry.completed}
-                            onChange={e => updateEntry(entry.id, 'completed', e.target.checked)}
-                            className="w-5 h-5 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
-                          />
-                        </td>
-                        <td className="p-3 text-center">
-                          <button
-                            type="button"
-                            onClick={() => removeScheduleEntry(entry.id)}
-                            className="text-slate-400 hover:text-red-600 p-1"
-                          >
-                            ✕
-                          </button>
-                        </td>
-                      </tr>
-                    );
-                  })}
+                <tbody className="divide-y divide-slate-100 text-xs text-slate-700">
+                  {unit.schedule.map((entry) => (
+                    <tr key={entry.id} className="hover:bg-slate-50/50 transition-colors">
+                      <td className="p-4">
+                        <span className="font-bold text-slate-800">{entry.date || 'A definir'}</span>
+                        <span className="block text-[9px] text-slate-400 uppercase font-black tracking-tighter mt-0.5">
+                          {getDayOfWeek(entry.date)}
+                        </span>
+                      </td>
+                      <td className="p-4 text-center font-bold text-blue-600">{entry.hours}h</td>
+                      <td className="p-4 space-y-1">
+                        <div className="font-bold text-slate-800">{entry.capacities || '—'}</div>
+                        <div className="text-slate-500 whitespace-pre-line italic">{entry.knowledge || '—'}</div>
+                      </td>
+                      <td className="p-4 space-y-1">
+                        <div className="font-medium text-slate-800">{entry.strategy || '—'}</div>
+                        <div className="text-slate-400">{entry.resources || '—'}</div>
+                      </td>
+                      <td className="p-4 text-center">
+                        <span className={`px-2 py-1 rounded-lg text-[9px] font-black uppercase ${
+                          entry.completed ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-amber-50 text-amber-700 border border-amber-200'
+                        }`}>
+                          {entry.completed ? 'Realizada' : 'Prevista'}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>
 
-            {/* DOCUMENTO IMPRESSO: CRONOGRAMA OFICIAL */}
+            {/* DOCUMENTO IMPRESSO CRONOGRAMA */}
             <div className="hidden report-document">
               <div className="report-header">
                 <div className="logo-box">SENAI</div>
                 <div className="info-box">
-                  <h1>{localUnit.name}</h1>
+                  <h1>{unit.name}</h1>
                   <p>CRONOGRAMA DE EXECUÇÃO DA UNIDADE CURRICULAR</p>
                 </div>
               </div>
@@ -603,7 +324,7 @@ const UnitViewer: React.FC<UnitViewerProps> = ({
                   </tr>
                 </thead>
                 <tbody>
-                  {localUnit.schedule.map((entry, index) => (
+                  {unit.schedule.map((entry, index) => (
                     <tr key={entry.id || index}>
                       <td>
                         <strong>{entry.date || 'A definir'}</strong>
@@ -628,6 +349,7 @@ const UnitViewer: React.FC<UnitViewerProps> = ({
           </div>
         )}
 
+        {/* ABA: CALENDÁRIO MENSAL */}
         {activeTab === 'calendario' && (
           <div className="space-y-8 no-print animate-fadeIn">
             <div>
@@ -635,7 +357,7 @@ const UnitViewer: React.FC<UnitViewerProps> = ({
                 Distribuição Mensal no Calendário
               </h3>
               <p className="text-xs text-slate-500 mt-1">
-                Exibição das aulas programadas para o ano letivo de <strong>{calendarYear}</strong>.
+                Visualização estática das aulas alocadas para o ano de <strong>{calendarYear}</strong>.
               </p>
             </div>
 
@@ -668,10 +390,8 @@ const UnitViewer: React.FC<UnitViewerProps> = ({
                         return (
                           <div
                             key={currentIso}
-                            className={`rounded-xl border p-1 flex flex-col justify-between transition-all relative ${
-                              entries.length > 0
-                                ? 'border-blue-200 bg-blue-50/40 shadow-sm'
-                                : 'border-slate-100 bg-white hover:border-slate-300'
+                            className={`rounded-xl border p-1 flex flex-col justify-between relative ${
+                              entries.length > 0 ? 'border-blue-200 bg-blue-50/40 shadow-sm' : 'border-slate-100 bg-white'
                             }`}
                           >
                             <span className={`text-[10px] font-bold ${entries.length > 0 ? 'text-blue-700' : 'text-slate-600'}`}>
@@ -708,48 +428,5 @@ const UnitViewer: React.FC<UnitViewerProps> = ({
     </div>
   );
 };
-
-interface EditableListProps {
-  title: string;
-  values: string[];
-  onChange: (index: number, value: string) => void;
-  onAdd: () => void;
-  onRemove: (index: number) => void;
-}
-
-export const EditableList: React.FC<EditableListProps> = ({ title, values, onChange, onAdd, onRemove }) => (
-  <section className="space-y-4">
-    <div className="flex items-center justify-between gap-4">
-      <h3 className="text-[11px] font-black text-slate-400 uppercase tracking-[0.3em]">{title}</h3>
-      <button
-        type="button"
-        onClick={onAdd}
-        className="bg-slate-100 text-slate-600 hover:bg-slate-200 px-3 py-1.5 rounded-xl text-[8px] font-black uppercase transition-colors"
-      >
-        Adicionar item
-      </button>
-    </div>
-    <div className="space-y-3">
-      {values.map((value, index) => (
-        <div key={index} className="flex items-start gap-3 bg-white p-2 border border-slate-200 rounded-2xl shadow-sm">
-          <textarea
-            value={value}
-            onChange={e => onChange(index, e.target.value)}
-            rows={2}
-            className="flex-1 border-0 bg-transparent resize-none text-sm p-1 focus:ring-0 text-slate-800"
-            placeholder="Descreva o item..."
-          />
-          <button
-            type="button"
-            onClick={() => onRemove(index)}
-            className="text-slate-400 hover:text-red-600 text-xs px-2 py-1 align-middle transition-colors mt-1"
-          >
-            ✕
-          </button>
-        </div>
-      ))}
-    </div>
-  </section>
-);
 
 export default UnitViewer;
