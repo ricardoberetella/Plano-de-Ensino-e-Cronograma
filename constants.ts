@@ -22,7 +22,7 @@ export const LIDT_SCHEDULE = [
   { id: 'l12', date: '2026-04-27', hours: 2, capacities: 'Interpretar especificações de tolerâncias dimensionais e sistemas de ajuste ISO.', knowledge: '6.1. Tolerância dimensional (campos, ISO).', strategy: '• Introdução aos conceitos de tolerância e ajustes.', resources: 'Tabelas de tolerância ISO.' },
   { id: 'l13', date: '2026-05-04', hours: 2, capacities: 'Interpretar indicações de tolerâncias geométricas.', knowledge: '6.2. Tolerância geométrica (forma, posição).', strategy: '• Apresentação dos símbolos e significados.', resources: 'Quadro de tolerâncias geométricas.' },
   { id: 'l14', date: '2026-05-11', hours: 2, capacities: 'Interpretar especificações de acabamento superficial (rugosidade).', knowledge: '6.3. Acabamento superficial (rugosidade).', strategy: '• Explicação dos símbolos de acabamento.', resources: 'Tabela de símbolos.' },
-  { id: 'l15', date: '2026-05-18', hours: 2, capacities: 'Elaborar croquis à mão livre em projeção ortogonal e perspectiva.', knowledge: 'Todos os conhecimentos da SA.', strategy: '• Início da elaboration dos croquis detalhados.', resources: 'Papel, instrumentos de desenho.' },
+  { id: 'l15', date: '2026-05-18', hours: 2, capacities: 'Elaborar croquis à mão livre em projeção ortogonal e perspectiva.', knowledge: 'Todos os conhecimentos da SA.', strategy: '• Início da elaboração dos croquis detalhados.', resources: 'Papel, instrumentos de desenho.' },
   { id: 'l16', date: '2026-05-25', hours: 2, capacities: 'Interpretar desenhos técnicos e tolerâncias dimensionais/geométricas.', knowledge: 'Todos os conhecimentos da SA.', strategy: '• Continuação e refinamento dos croquis.', resources: 'Dossiê em fase de conclusão.' },
   { id: 'l17', date: '2026-06-01', hours: 2, capacities: 'Elaborar croquis à mão livre e relatórios técnicos normativos.', knowledge: 'Todos os conhecimentos da SA.', strategy: '• Finalização dos croquis e do dossiê técnico.', resources: 'Dossiê técnico.' },
   { id: 'l18', date: '2026-06-08', hours: 2, capacities: 'Demonstrar capacidades analíticas aplicadas ao projeto metalmecânico.', knowledge: 'Todos os conhecimentos da SA.', strategy: '• Apresentação dos Resultados e Dossiês.', resources: 'Projetor.' },
@@ -85,7 +85,7 @@ export const FUSI_SCHEDULE_GEA = [
   { id: 'g31', hours: 4, date: '2026-04-06', capacities: 'Tornear corpos e executar roscagem com cossinete.', knowledge: 'PRÁTICA (PRAT)', strategy: 'Tarefa Reforço: Repetição do Eixo Roscado.', resources: 'Oficina de usinagem, Torno.' },
   { id: 'g32', hours: 4, date: '2026-04-07', capacities: 'Fresar e ajustar blocos respeitando simetria e tolerâncias.', knowledge: 'PRÁTICA (PRAT)', strategy: 'Tarefa Reforço: Ajuste de blocos paralelos.', resources: 'Oficina de usinagem, Fresadora.' },
   { id: 'g33', hours: 4, date: '2026-04-08', capacities: 'Otimizar setups de fixação e alinhamento de componentes.', knowledge: 'TEORIA (TEOR)', strategy: 'Debate técnico: Otimização de tempo no setup de máquinas.', resources: 'Sala de aula.' },
-  { id: 'g34', hours: 4, date: '2026-04-13', capacities: 'Refinar dimensionalmente diâmetros em níveis centesimais.', knowledge: 'PRÁTICA (PRAT)', strategy: 'Desafio 1: Refino dimensional das peças cilíndricas.', resources: 'Oficina de usinagem, Torno.' },
+  { id: 'g34', hours: 4, date: '2026-04-13', capacities: 'Refinar dimensionalmente diâmetros in níveis centesimais.', knowledge: 'PRÁTICA (PRAT)', strategy: 'Desafio 1: Refino dimensional das peças cilíndricas.', resources: 'Oficina de usinagem, Torno.' },
   { id: 'g35', hours: 4, date: '2026-04-14', capacities: 'Refinar dimensionalmente blocos fresados centesimalmente.', knowledge: 'PRÁTICA (PRAT)', strategy: 'Desafio 1: Refino dimensional do bloco fresado.', resources: 'Oficina de usinagem, Fresadora.' },
   { id: 'g36', hours: 4, date: '2026-04-15', capacities: 'Controlar vida útil de ferramentas e organizar o ferramental.', knowledge: 'TEORIA (TEOR)', strategy: 'Organização e controle de vida útil das ferramentas.', resources: 'Sala de aula.' },
   { id: 'g37', hours: 4, date: '2026-04-22', capacities: 'Montar conjuntos mecânicos aplicando ajustes prensados e livres.', knowledge: 'TEORIA (TEOR)', strategy: 'Teoria de montagem e tipos de ajustes (Prensado/Folga).', resources: 'Sala de aula.' },
@@ -114,7 +114,7 @@ export const FUSI_SCHEDULE_GEA = [
   { id: 'g60', hours: 4, date: '2026-06-22', capacities: 'Validar funcionalmente o lote piloto montado finalizado.', knowledge: 'PRÁTICA (PRAT)', strategy: 'Finalização de todas as atividades de oficina.', resources: 'Oficina de usinagem.' }
 ];
 
-// --- CRONOGRAMA FUSI (PADRÃO BERETELLA - COMPLETADO E CORRIGIDO) ---
+// --- CRONOGRAMA FUSI (PADRÃO BERETELLA) ---
 export const FUSI_SCHEDULE = [
   { id: 'f01', hours: 4, date: '2026-01-26', capacities: 'Definir parâmetros de corte baseando-se em especificações técnicas.', knowledge: 'TEORIA (TEOR)', strategy: 'Exposição dialogada: Apresentação da SA2 e cálculos técnicos.', resources: 'Sala de aula, projetor.' },
   { id: 'f02', hours: 4, date: '2026-01-28', capacities: 'Organizar ambiente de trabalho; Facear no torno; Executar furo de centro.', knowledge: 'PRÁTICA (PRAT)', strategy: 'Tarefa: Eixo 4 Corpos. Prática de fixação e faceamento.', resources: 'Oficina de usinagem, Torno.' },
@@ -124,7 +124,7 @@ export const FUSI_SCHEDULE = [
   { id: 'f06', hours: 4, date: '2026-02-05', capacities: 'Fresar superfícies paralelas e esquadrejar componentes mecânicos.', knowledge: 'PRÁTICA (PRAT)', strategy: 'Tarefa: Bloco Fresado. Esquadrejamento e faceamento.', resources: 'Oficina de usinagem, Fresadora.' },
   { id: 'f07', hours: 4, date: '2026-02-09', capacities: 'Identificar desvios dimensionais comparando com o projeto original.', knowledge: 'TEORIA (TEOR)', strategy: 'Teoria sobre Metrologia aplicada e tolerâncias ISO.', resources: 'Sala de aula, Projetor.' },
   { id: 'f08', hours: 4, date: '2026-02-11', capacities: 'Tornear corpos múltiplos; Cortar componentes mecânicos no torno com bedame.', knowledge: 'PRÁTICA (PRAT)', strategy: 'Tarefa: Eixo 4 Corpos. Acabamento e sangramento (corte).', resources: 'Oficina de usinagem, Torno.' },
-  { id: 'f09', hours: 4, date: '2026-02-12', capacities: 'Executar controle e inspeção dimensional com micrômetro.', knowledge: 'PRÁTICA (PRAT)', strategy: 'Tarefa: Eixo 4 Corpos. Controle final e organization.', resources: 'Oficina de usinagem, Micrômetro.' },
+  { id: 'f09', hours: 4, date: '2026-02-12', capacities: 'Executar controle e inspeção dimensional com micrômetro.', knowledge: 'PRÁTICA (PRAT)', strategy: 'Tarefa: Eixo 4 Corpos. Controle final e organização.', resources: 'Oficina de usinagem, Micrômetro.' },
   { id: 'f10', hours: 4, date: '2026-02-18', capacities: 'Fresar rebaixos e canais utilizando fresas de topo retas.', knowledge: 'PRÁTICA (PRAT)', strategy: 'Tarefa: Bloco Fresado. Usinagem de rebaixos e controle.', resources: 'Oficina de usinagem, Fresadora.' },
   { id: 'f11', hours: 4, date: '2026-02-19', capacities: 'Aplicar refrigeração e zelar pela vida útil das ferramentas.', knowledge: 'PRÁTICA (PRAT)', strategy: 'Tarefa: Bloco Fresado. Prática de acabamento em fresa.', resources: 'Oficina de usinagem, Fresadora.' },
   { id: 'f12', hours: 4, date: '2026-02-23', capacities: 'Calcular diâmetros de furação prévia para rosqueamentos manuais.', knowledge: 'TEORIA (TEOR)', strategy: 'Teoria de cálculos para furação de roscas e tipos de roscas.', resources: 'Sala de aula.' },
@@ -162,7 +162,7 @@ export const FUSI_SCHEDULE = [
   { id: 'f44', hours: 4, date: '2026-05-20', capacities: 'Fresar superfícies perpendiculares mantendo precisão geométrica.', knowledge: 'PRÁTICA (PRAT)', strategy: 'Prática de esquadrejamento de precisão.', resources: 'Oficina de usinagem, Fresadora.' },
   { id: 'f45', hours: 4, date: '2026-05-21', capacities: 'Abrir canais externos e executar sangramentos com bedame.', knowledge: 'PRÁTICA (PRAT)', strategy: 'Operações de sangramento e canais técnicos.', resources: 'Oficina de usinagem, Torno.' },
   { id: 'f46', hours: 4, date: '2026-05-27', capacities: 'Documentar não conformidades e propor ações de recuperação.', knowledge: 'TEORIA (TEOR)', strategy: 'Como documentar erros e recuperar peças.', resources: 'Sala de aula.' },
-  { id: 'f47', hours: 4, date: '2026-05-28', capacities: 'Rosquear manualmente com jogo de machos em furos cegos.', knowledge: 'PRÁTICA (PRAT)', strategy: 'Prática intensiva de roscagem em furos cegos.', resources: 'Oficina de usinagem, Bancada.' },
+  { id: 'f47', hours: 4, date: '2026-05-28', capacities: 'Rosquear manualmente com jogo de machos in furos cegos.', knowledge: 'PRÁTICA (PRAT)', strategy: 'Prática intensiva de roscagem em furos cegos.', resources: 'Oficina de usinagem, Bancada.' },
   { id: 'f48', hours: 4, date: '2026-06-03', capacities: 'Executar limagem plana técnica respeitando limites de acabamento.', knowledge: 'PRÁTICA (PRAT)', strategy: 'Prática de ajustagem ao banco (precisão manual).', resources: 'Bancada, Limas.' },
   { id: 'f49', hours: 4, date: '2026-06-04', capacities: 'Identificar perfis de chavetas e eixos estriados comerciais.', knowledge: 'TEORIA (TEOR)', strategy: 'Estudo sobre chavetas e eixos estriados.', resources: 'Sala de aula.' },
   { id: 'f50', hours: 4, date: '2026-06-10', capacities: 'Realizar testes funcionais e de concentricidade em conjuntos.', knowledge: 'PRÁTICA (PRAT)', strategy: 'Testes funcionais e ajustes de interferência.', resources: 'Oficina de usinagem.' },
@@ -176,4 +176,37 @@ export const FUSI_SCHEDULE = [
   { id: 'f58', hours: 4, date: '2026-07-08', capacities: 'Auditar documentações técnicas e diários de processos.', knowledge: 'TEORIA (TEOR)', strategy: 'Conferência de diários e fichas técnicas.', resources: 'Sala de aula.' },
   { id: 'f59', hours: 4, date: '2026-07-09', capacities: 'Avaliar o progresso de aprendizagem com feedbacks construtivos.', knowledge: 'TEORIA (TEOR)', strategy: 'Encerramento letivo em sala de aula.', resources: 'Sala de aula.' },
   { id: 'f60', hours: 4, date: '2026-07-15', capacities: 'Validar funcionalmente o lote piloto montado finalizado.', knowledge: 'PRÁTICA (PRAT)', strategy: 'Finalização de todas as atividades de oficina.', resources: 'Oficina de usinagem.' }
+];
+
+// --- ADIÇÃO COMPATIBILIDADE (Ajuste para o UnitViewer.tsx) ---
+// Mapeamos os cronogramas estruturados originais aqui para que o build passe com sucesso
+export const SAMPLE_PLANS: TeachingPlan[] = [
+  {
+    id: "lidt",
+    ucName: "Leitura e Interpretação de Desenho Técnico (LIDT)",
+    workload: 40,
+    situation: "Decifrando o Projeto",
+    calendar: LIDT_SCHEDULE
+  },
+  {
+    id: "crd",
+    ucName: "Controle Dimensional (CRD)",
+    workload: 40,
+    situation: "Inspeção Dimensional do Lote Piloto",
+    calendar: CRD_SCHEDULE
+  },
+  {
+    id: "fusi",
+    ucName: "Fabricação por Usinagem Convencional (FUSI) - Beretella",
+    workload: 240,
+    situation: "Calculador de Usinagem Mecânica",
+    calendar: FUSI_SCHEDULE
+  },
+  {
+    id: "fusi-gea",
+    ucName: "Fabricação por Usinagem Convencional (FUSI) - Gea",
+    workload: 240,
+    situation: "Calculador de Usinagem Mecânica",
+    calendar: FUSI_SCHEDULE_GEA
+  }
 ];
