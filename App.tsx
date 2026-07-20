@@ -6,7 +6,7 @@ import UnitViewer from './components/UnitViewer';
 import Login from './components/Login';
 import GeneralCalendar from './components/GeneralCalendar';
 import { TeachingPlan, ViewType, CurricularUnit, ScheduleEntry, UnitCalendar, CalendarMarking, CalendarColor } from './types';
-import { SAMPLE_PLANS, SCHEDULE_VERSION } from './constants';
+import { SAMPLE_PLANS, SCHEDULE_VERSION } from './constants.tsx';
 import { FirebaseService } from './services/firebase';
 
 const App: React.FC = () => {
