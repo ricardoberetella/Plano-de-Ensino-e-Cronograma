@@ -123,7 +123,7 @@ const CURRICULUM_DATABASE: Record<'LIDT' | 'CDMAT' | 'CRD' | 'FUSI', FullUnitDat
         'Demonstrar proatividade na busca de alternativas técnicas para a substituição de materiais de alta pegada de carbono.'
       ],
       knowledge: [
-        'Estrutura cristalina e propriedades físicas e mecânicas dos metals.',
+        'Estrutura cristalina e propriedades físicas e mecânicas dos metais.',
         'Aços-carbono e aços-liga: Classificação, ligas principais e suas influências.',
         'Ferros fundidos e metais não ferrosos (Alumínio, Cobre, Latão e Bronze).',
         'Introdução aos tratamentos térmicos e termoquímicos (têmpera, revenimento, cementação).'
@@ -199,22 +199,28 @@ const CURRICULUM_DATABASE: Record<'LIDT' | 'CDMAT' | 'CRD' | 'FUSI', FullUnitDat
         '5. Demonstrar visão sistêmica (Pensamento analítico)'
       ],
       knowledge: [
-        '1. Elementos de máquina (Fixação, Transmissão, Vedação, Apoio, Instalação, Elásticos)',
-        '2. Ferramentas (Manuais, Elétricas/Eletrônicas, Pneumáticas, Portáteis)',
-        '3. Processos de fabricação (Injeção, Manufatura Subtrativa, Aditiva, Conformação)',
-        '4. Manutenção (Corretiva, Preventiva, Preditiva, Prescritiva, Emergencial, Defeito/Falha, Documentação)',
-        '5. Plano de trabalho (Definição, Tipos, Características)',
-        '6. Segurança (Riscos físicos/mecânicos/térmicos/elétricos, EPI/EPC, NR, Sinalização, ART, APR, FDS)',
-        '7. Meio Ambiente (Definição, Normalização, Segregação e descarte de resíduos)',
-        '8. Parâmetros de corte para usinagem (Cálculos de RPM, Vc, f, ap)',
-        '9. Parâmetros de ferramenta (Material, Geometria, Número de insertos/dentes z, Raio de ponta)',
-        '10. Torneamento (Tornos convencionais/CNC, Ferramentas, Acessórios, Cálculos técnicos e Operações da SMO)',
-        '11. Fresagem (Tipos de fresadoras, Ferramentas, Acessórios e Operações de superfícies/rebaixos/rasgos)',
-        '12. Furação (Tipos de furadeira, Ferramentas, Acessórios, Parâmetros e Operações)',
-        '13. Rosqueamento (Macho, Cossinete, Desandador, Sistemas de roscas, Tabelas e Rosqueadeira)',
-        '14. Ajustagem (Limas, Riscadores, Punção, Morsa, Desempeno, Moto esmeril e Técnicas operacionais)',
-        '15. Controle da qualidade (Inspeção visual de rebarbas/oxidação, Inspeção dimensional e Ficha de autoinspeção)',
-        '16. Refrigeração (Fluidos de corte, Aplicações, Tipos, Mecanismos e Propriedades)'
+        '1.1 Elementos de fixação: Porcas, parafusos, arruelas, contra pino ou cupilha, rebites, pinos e cavilhas.',
+        '1.2 Elementos de transmissão: Chavetas, engrenagens, polias, correias, acoplamentos, roscas de transmissão, corrente, eixos, sistemas de transmissão, redutores e variadores de velocidade.',
+        '1.3 Elementos de vedação: Juntas, retentores, selos mecânicos e O-Rings.',
+        '1.4 Elementos de apoio: Guias lineares, barramentos, mancais de deslizamento, mancais de rolamentos e buchas.',
+        '1.5 Elementos de instalação e elásticos: Válvula, tubulação, conexão, molas, anéis elásticos e pinos elásticos.',
+        '2. Ferramentas: Manuais, elétricas ou eletrônicas, pneumáticas e portáteis.',
+        '3. Processos de fabricação: Injeção (metais/plásticos), manufatura subtrativa (torneamento, furação, fresamento, retificação), manufatura aditiva (soldagem, impressão 3D) e conformação mecânica (laminação, trefilação, extrusão, forjamento, repuxo, dobramento, corte).',
+        '4. Manutenção: Definição, aplicação, intervenções (corretiva, preventiva, preditiva, prescritiva, emergencial), ocorrências (defeito/falha) e documentação técnica.',
+        '5. Plano de trabalho: Definição, tipos e características organizacionais.',
+        '6. Segurança no trabalho: Riscos (físicos, mecânicos, térmicos, elétricos), EPI, EPC, normas regulamentadoras, sinalização, ART, APR e Ficha de Dados de Segurança (FDS).',
+        '7. Meio ambiente: Definição, normalização, segregação e descarte correto de resíduos industriais.',
+        '8. Parâmetros de corte para usinagem: Cálculos de Rotação por minuto (RPM), Velocidade de corte (Vc), Avanço (f) e Profundidade de corte (ap).',
+        '9. Parâmetros de ferramenta: Material, geometria, número de insertos/dentes (z) e raio de ponta (rε).',
+        '10. Torneamento: Definição, tipos de tornos (horizontal, vertical, de placa, revólver, automático, copiador, CNC), ferramentas (alargador, bedame, brocas, cossinete, escareador, macho, recartilha), acessórios e cálculos técnicos (conicidade, rosca triangular).',
+        '10.6 Operações de Torneamento: Facear, tornear superfície cilíndrica, facear rebaixo, chanfrar, fazer furo de centro, tornear canal, furar com cabeçote móvel, roscar com cossinete, tornear cônico, recartilhar, cortar, alargar e tornear roscas.',
+        '11. Fresagem: Definição, tipos de fresadoras (universal, ferramenteira, pantográfica, copiadora, CNC, centros de usinagem), ferramentas (cabeçote faceador, fresa de topo) e acessórios (morsas, cantoneiras, calços).',
+        '11.5 Operações de Fresagem: Fresar superfície plana, paralela, perpendicular, rebaixos, rasgos e superfícies planas inclinadas.',
+        '12. Furação: Definição, tipos de furadeira (coluna de piso, bancada, radial, portátil), ferramentas, acessórios e operações (furar, rebaixar e escarear).',
+        '13. Rosqueamento: Definição, ferramentas (macho, cossinete), acessórios (desandador, porta cossinete), características (sistemas de roscas, tabelas) e rosqueadeiras.',
+        '14. Ajustagem: Definição, ferramentas manuais (limas, riscadores, martelos, punção), acessórios (morsa de bancada, mordentes, desempeno, cepo, traçador de altura), esmerilhamento e operações (limar, traçar, puncionar, serrar e dobrar).',
+        '15. Controle da qualidade: Inspeção visual (rebarbas, oxidação, marcas, riscos) e inspeção dimensional (ficha de autoinspeção e técnicas de medição).',
+        '16. Refrigeração: Definição, fluidos de corte (aplicações, tipos, mecanismos, propriedades) e procedimentos operacionais.'
       ]
     },
     learningSituations: [
@@ -248,12 +254,9 @@ const UnitViewer: React.FC<UnitViewerProps> = ({
   unitMeta = { color: 'blue', sigla: 'LIDT' },
   selectedUcSigla = 'LIDT'
 }) => {
-  // Carrega os dados estáticos baseados na sigla ativa
   const unit = CURRICULUM_DATABASE[selectedUcSigla] || CURRICULUM_DATABASE.LIDT;
-
   const [activeTab, setActiveTab] = useState<'geral' | 'sa' | 'rubricas' | 'cronograma' | 'calendario'>('geral');
 
-  // Funções Utilitárias de Data
   const toIsoDate = (dateStr: string) => {
     if (!dateStr) return '';
     const parts = dateStr.split('/');
