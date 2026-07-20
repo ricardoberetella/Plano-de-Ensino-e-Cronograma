@@ -44,16 +44,18 @@ const getUnitSigla = (unit: CurricularUnit): string => {
     .slice(0, 8);
 };
 
-const sortUnits = (units: CurricularUnit[]) =>
-  [...units].sort((a, b) => {
+const sortUnits = (units: CurricularUnit[]) => {
+  const safeUnits = Array.isArray(units) ? units : [];
+  return [...safeUnits].sort((a, b) => {
     const semesterDiff = Number(a.semester || 1) - Number(b.semester || 1);
     if (semesterDiff !== 0) return semesterDiff;
 
     const orderDiff = Number(a.order || 0) - Number(b.order || 0);
     if (orderDiff !== 0) return orderDiff;
 
-    return a.name.localeCompare(b.name, 'pt-BR');
+    return (a.name || '').localeCompare(b.name || '', 'pt-BR');
   });
+};
 
 const mergeUnitWithTemplate = (
   existingUnit: CurricularUnit,
@@ -77,27 +79,27 @@ const mergeUnitWithTemplate = (
   basicCapacities:
     existingUnit.basicCapacities?.length
       ? existingUnit.basicCapacities
-      : templateUnit.basicCapacities,
+      : templateUnit.basicCapacities || [],
   socioemocionalCapacities:
     existingUnit.socioemocionalCapacities?.length
       ? existingUnit.socioemocionalCapacities
-      : templateUnit.socioemocionalCapacities,
+      : templateUnit.socioemocionalCapacities || [],
   knowledge:
     existingUnit.knowledge?.length
       ? existingUnit.knowledge
-      : templateUnit.knowledge,
+      : templateUnit.knowledge || [],
   learningSituations:
     existingUnit.learningSituations?.length
       ? existingUnit.learningSituations
-      : templateUnit.learningSituations,
+      : templateUnit.learningSituations || [],
   rubrics:
     existingUnit.rubrics?.length
       ? existingUnit.rubrics
-      : templateUnit.rubrics,
+      : templateUnit.rubrics || [],
   schedule:
     existingUnit.schedule?.length
       ? existingUnit.schedule
-      : templateUnit.schedule
+      : templateUnit.schedule || []
 });
 
 const App: React.FC = () => {
@@ -111,23 +113,24 @@ const App: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   const currentPlanSemesters = useMemo(() => {
-    if (!currentPlan) return [];
+    if (!currentPlan || !Array.isArray(currentPlan.units)) return [];
 
     return Array.from(
       new Set(
         currentPlan.units
-          .filter(unit => unit.active !== false)
+          .filter(unit => unit && unit.active !== false)
           .map(unit => Number(unit.semester || 1))
       )
     ).sort((a, b) => a - b);
   }, [currentPlan]);
 
   const visibleUnits = useMemo(() => {
-    if (!currentPlan) return [];
+    if (!currentPlan || !Array.isArray(currentPlan.units)) return [];
 
     return sortUnits(
       currentPlan.units.filter(
         unit =>
+          unit &&
           unit.active !== false &&
           Number(unit.semester || 1) === Number(selectedSemester)
       )
@@ -137,14 +140,18 @@ const App: React.FC = () => {
   const normalizePlan = useCallback(
     (plan: TeachingPlan, template: TeachingPlan) => {
       let updated = false;
+      const templateUnits = Array.isArray(template?.units) ? template.units : [];
+      const planUnits = Array.isArray(plan?.units) ? plan.units : [];
+
       const templateBySigla = new Map(
-        template.units.map(unit => [getUnitSigla(unit), unit])
+        templateUnits.map(unit => [getUnitSigla(unit), unit])
       );
 
       const seen = new Set<string>();
       const cleanedUnits: CurricularUnit[] = [];
 
-      for (const originalUnit of plan.units || []) {
+      for (const originalUnit of planUnits) {
+        if (!originalUnit) continue;
         const sigla = getUnitSigla(originalUnit);
 
         if (!sigla || seen.has(sigla) || originalUnit.id === '04' || originalUnit.id === '05') {
@@ -178,7 +185,7 @@ const App: React.FC = () => {
         cleanedUnits.push(normalizedUnit);
       }
 
-      for (const templateUnit of template.units) {
+      for (const templateUnit of templateUnits) {
         const sigla = getUnitSigla(templateUnit);
         const alreadyExists = cleanedUnits.some(
           unit => getUnitSigla(unit) === sigla
@@ -201,7 +208,7 @@ const App: React.FC = () => {
 
       const orderedUnits = sortUnits(cleanedUnits);
 
-      if (JSON.stringify(orderedUnits) !== JSON.stringify(plan.units)) {
+      if (JSON.stringify(orderedUnits) !== JSON.stringify(planUnits)) {
         updated = true;
       }
 
@@ -244,7 +251,7 @@ const App: React.FC = () => {
             profileId,
             version: SCHEDULE_VERSION,
             updatedAt: new Date().toISOString(),
-            units: sortUnits(template.units)
+            units: sortUnits(template?.units || [])
           };
 
           await FirebaseService.savePlan(defaultPlan);
@@ -253,7 +260,8 @@ const App: React.FC = () => {
           setCurrentPlan(defaultPlan);
 
           const firstSemester = Math.min(
-            ...defaultPlan.units.map(unit => Number(unit.semester || 1))
+            ...defaultPlan.units.map(unit => Number(unit.semester || 1)),
+            1
           );
           setSelectedSemester(firstSemester);
 
@@ -287,8 +295,8 @@ const App: React.FC = () => {
 
         const availableSemesters = Array.from(
           new Set(
-            nextCurrent.units
-              .filter(unit => unit.active !== false)
+            (nextCurrent?.units || [])
+              .filter(unit => unit && unit.active !== false)
               .map(unit => Number(unit.semester || 1))
           )
         ).sort((a, b) => a - b);
@@ -302,12 +310,13 @@ const App: React.FC = () => {
         setSelectedSemester(nextSemester);
 
         const nextSelected =
-          nextCurrent.units.find(unit => unit.id === selectedUnit?.id) ||
-          sortUnits(nextCurrent.units).find(
+          nextCurrent?.units?.find(unit => unit.id === selectedUnit?.id) ||
+          sortUnits(nextCurrent?.units || []).find(
             unit =>
+              unit &&
               unit.active !== false &&
               Number(unit.semester || 1) === nextSemester
-          ) ||
+            ) ||
           null;
 
         setSelectedUnit(nextSelected);
