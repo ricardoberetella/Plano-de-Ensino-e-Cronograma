@@ -72,7 +72,7 @@ const TEXT_COLOR_MAP: Record<string, string> = {
   slate: '#ffffff',
 };
 
-// BANCO DE DADOS COMPLETO E DEFINITIVO DO 1º SEMESTRE (Não editável)
+// BANCO DE DADOS COMPLETO E DEFINITIVO DO 1º SEMESTRE
 const CURRICULUM_DATABASE: Record<'LIDT' | 'CDMAT' | 'CRD' | 'FUSI', FullUnitData> = {
   LIDT: {
     name: 'Leitura e Interpretação de Desenho Técnico',
@@ -123,7 +123,7 @@ const CURRICULUM_DATABASE: Record<'LIDT' | 'CDMAT' | 'CRD' | 'FUSI', FullUnitDat
         'Demonstrar proatividade na busca de alternativas técnicas para a substituição de materiais de alta pegada de carbono.'
       ],
       knowledge: [
-        'Estrutura cristalina e propriedades físicas e mecânicas dos metais.',
+        'Estrutura cristalina e propriedades físicas e mecânicas dos metals.',
         'Aços-carbono e aços-liga: Classificação, ligas principais e suas influências.',
         'Ferros fundidos e metais não ferrosos (Alumínio, Cobre, Latão e Bronze).',
         'Introdução aos tratamentos térmicos e termoquímicos (têmpera, revenimento, cementação).'
@@ -174,33 +174,69 @@ const CURRICULUM_DATABASE: Record<'LIDT' | 'CDMAT' | 'CRD' | 'FUSI', FullUnitDat
     schedule: []
   },
   FUSI: {
-    name: 'Fundamentos de Usinagem Inicial',
+    name: 'Fundamentos da Usinagem',
     semester: 1,
     general: {
       technicalCapacities: [
-        'Operar máquinas-ferramentas convencionais (furadeira de bancada/coluna e prensa hidromecânica) de forma segura.',
-        'Selecionar e afiar ferramentas de corte de aço rápido (HSS) para operações de furação e escareamento.',
-        'Calcular parâmetros de corte essenciais (RPM e avanço) baseando-se no diâmetro da ferramenta e material da peça.',
-        'Executar operações de traçagem de coordenadas em bancada ajustando superfícies com limas manuais.'
+        '1. Selecionar ferramentas aplicadas na montagem e desmontagem de elementos de máquina.',
+        '2. Relacionar os processos de fabricação à sua aplicação na indústria.',
+        '3. Relacionar os tipos de manutenção à sua aplicação na indústria.',
+        '4. Elaborar plano de trabalho de acordo com normas e procedimentos de meio ambiente, de saúde e segurança no trabalho.',
+        '5. Definir os parâmetros de usinagem de torneamento e fresagem convencional de acordo com as especificações técnicas.',
+        '6. Realizar operações de baixa complexidade em torno convencional de acordo com as especificações, normas técnicas e de saúde e segurança no trabalho.',
+        '7. Realizar operações de baixa complexidade em fresadora convencional de acordo com as especificações, normas técnicas e de saúde e segurança no trabalho.',
+        '8. Realizar operações de furação de acordo com as especificações, normas técnicas e de saúde e segurança no trabalho.',
+        '9. Realizar operações de rosqueamento de acordo com as especificações, normas técnicas e de saúde e segurança no trabalho.',
+        '10. Realizar operações de ajustagem em peças por meio de ferramentas manuais de acordo com as especificações e normas técnicas e de saúde e segurança no trabalho.',
+        '11. Controlar a qualidade das peças usinadas em tornos e fresadoras convencionais, visualmente e por meio de instrumentos de acordo com as especificações técnicas.',
+        '12. Aplicar os procedimentos de refrigeração nos processos de torneamento e fresagem convencional.'
       ],
       socioemotionalCapacities: [
-        'Adotar comportamento preventivo rigoroso quanto ao uso de EPIs e cumprimento das normas regulamentadoras (NR-12).',
-        'Manter o posto de trabalho limpo, organizado e livre de riscos operacionais (Filosofia 5S).'
+        '1. Planejar ações (Autogestão)',
+        '2. Organizar o ambiente de trabalho e as atividades (Autogestão)',
+        '3. Zelar pelo uso de equipamentos, instrumentos, ferramentas e materiais (Autogestão)',
+        '4. Demonstrar responsabilidade (Autogestão)',
+        '5. Demonstrar visão sistêmica (Pensamento analítico)'
       ],
       knowledge: [
-        'Normas de Segurança do Trabalho aplicadas a ambientes metalmecânicos (NR-6, NR-12).',
-        'Fluidos de corte: Tipos, funções, refrigeração, lubrificação e impacto ambiental.',
-        'Geometria das ferramentas de corte de aço rápido (HSS) e ângulos de afiação.',
-        'Técnicas de ajustagem manual: Limagem, traçagem, furação, escareamento e rosqueamento manual com machos/cossinetes.'
+        '1. Elementos de máquina (Fixação, Transmissão, Vedação, Apoio, Instalação, Elásticos)',
+        '2. Ferramentas (Manuais, Elétricas/Eletrônicas, Pneumáticas, Portáteis)',
+        '3. Processos de fabricação (Injeção, Manufatura Subtrativa, Aditiva, Conformação)',
+        '4. Manutenção (Corretiva, Preventiva, Preditiva, Prescritiva, Emergencial, Defeito/Falha, Documentação)',
+        '5. Plano de trabalho (Definição, Tipos, Características)',
+        '6. Segurança (Riscos físicos/mecânicos/térmicos/elétricos, EPI/EPC, NR, Sinalização, ART, APR, FDS)',
+        '7. Meio Ambiente (Definição, Normalização, Segregação e descarte de resíduos)',
+        '8. Parâmetros de corte para usinagem (Cálculos de RPM, Vc, f, ap)',
+        '9. Parâmetros de ferramenta (Material, Geometria, Número de insertos/dentes z, Raio de ponta)',
+        '10. Torneamento (Tornos convencionais/CNC, Ferramentas, Acessórios, Cálculos técnicos e Operações da SMO)',
+        '11. Fresagem (Tipos de fresadoras, Ferramentas, Acessórios e Operações de superfícies/rebaixos/rasgos)',
+        '12. Furação (Tipos de furadeira, Ferramentas, Acessórios, Parâmetros e Operações)',
+        '13. Rosqueamento (Macho, Cossinete, Desandador, Sistemas de roscas, Tabelas e Rosqueadeira)',
+        '14. Ajustagem (Limas, Riscadores, Punção, Morsa, Desempeno, Moto esmeril e Técnicas operacionais)',
+        '15. Controle da qualidade (Inspeção visual de rebarbas/oxidação, Inspeção dimensional e Ficha de autoinspeção)',
+        '16. Refrigeração (Fluidos de corte, Aplicações, Tipos, Mecanismos e Propriedades)'
       ]
     },
     learningSituations: [
       {
         id: 'fusi-sa1',
-        title: 'Confecção do Bloco de Ajustagem e Traçagem Inicial',
-        contextualization: 'No processo de integração na oficina mecânica, o estudante recebe uma barra bruta de aço SAE 1020 cortada no oxigênio.',
-        challenge: 'Efetuar a ajustagem manual das faces de referência no esquadro de 90° com tolerância de ±0,2mm e traçar o centro para furação.',
-        expectedResults: ['Bloco prismático ajustado nas dimensões nominais do desenho técnico.', 'Operação de furação executada sem desvios de concentricidade.']
+        title: 'Situação de Aprendizagem 1: Torneamento Convencional (Diretriz SMO)',
+        contextualization: 'Conforme recomendações do plano de curso, o aluno deverá elaborar o plano de trabalho (folha de processo) estimando 2h para estudo da tarefa mecânica.',
+        challenge: 'Elaborar o plano e realizar operações de faceamento, torneamento cilíndrico na placa e contraponta, chanframento e furos de centro no torno convencional.',
+        expectedResults: [
+          'Plano de trabalho/Folha de processo estruturada (2h).',
+          'Peça usinada no torno conforme tolerâncias e normas de segurança vigentes.'
+        ]
+      },
+      {
+        id: 'fusi-sa2',
+        title: 'Situação de Aprendizagem 2: Fresamento Convencional (Diretriz SMO)',
+        contextualization: 'Seguindo a rotação de postos simultâneos na oficina convencional e aplicando a filosofia de Autogestão e Organização do ambiente.',
+        challenge: 'Fresar superfícies planas, paralelas, perpendiculares e executar rebaixos/rasgos utilizando a fresadora universal ou ferramenteira.',
+        expectedResults: [
+          'Plano de trabalho técnico preenchido com parâmetros de corte calculados (RPM e Avanço).',
+          'Bloco prismático fresado em conformidade com o esquadro e dimensões nominais.'
+        ]
       }
     ],
     rubrics: [],
@@ -216,7 +252,6 @@ const UnitViewer: React.FC<UnitViewerProps> = ({
   const unit = CURRICULUM_DATABASE[selectedUcSigla] || CURRICULUM_DATABASE.LIDT;
 
   const [activeTab, setActiveTab] = useState<'geral' | 'sa' | 'rubricas' | 'cronograma' | 'calendario'>('geral');
-  const calendarYear = 2026;
 
   // Funções Utilitárias de Data
   const toIsoDate = (dateStr: string) => {
@@ -285,7 +320,7 @@ const UnitViewer: React.FC<UnitViewerProps> = ({
         
         {/* ABA: GERAL (CAPACIDADES E CONHECIMENTOS) */}
         {activeTab === 'geral' && (
-          <div className="space-y-6 animate-fadeIn">
+          <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               
               {/* CAPACIDADES TÉCNICAS */}
@@ -477,7 +512,7 @@ const UnitViewer: React.FC<UnitViewerProps> = ({
 
         {/* ABA: CALENDÁRIO */}
         {activeTab === 'calendario' && (
-          <div className="space-y-8 animate-fadeIn">
+          <div className="space-y-8">
             <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
               {monthsInRange.map(monthStr => {
                 const [year, month] = monthStr.split('-').map(Number);
