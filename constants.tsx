@@ -1,12 +1,116 @@
 import { TeachingPlan } from './types';
+import { initializeApp, getApps } from 'firebase/app';
+import { getFirestore, doc, writeBatch } from 'firebase/firestore';
 
 export const SENAI_BLUE = "#005DAA";
 export const SENAI_RED = "#E30613";
 
-// Versão do cronograma - Alterar esta string força o App a atualizar o banco de dados com os novos dados "fiéis"
-export const SCHEDULE_VERSION = "2026-V12-REFRESH-FULL";
+// Incrementando a versão para garantir o disparo
+export const SCHEDULE_VERSION = "2026-V13-FORCE-CORE-DATA";
 
-// --- CRONOGRAMA LIDT (Revisado) ---
+// --- SCRIPT AUTO-EXECUTÁVEL DE HIGIENIZAÇÃO DE DADOS COMPLETOS ---
+// Este bloco roda imediatamente ao carregar o arquivo, atualizando as capacidades e conhecimentos estruturados no Firebase.
+const firebaseConfig = {
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID
+};
+
+if (getApps().length === 0) {
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  
+  const forceSyncDatabase = async () => {
+    try {
+      const batch = writeBatch(db);
+      
+      // 1. Forçar dados completos para Controle Dimensional (crd)
+      const crdRef = doc(db, "units", "crd");
+      batch.set(crdRef, {
+        id: "crd",
+        name: "Controle Dimensional",
+        capacities: [
+          "I. Identificar a importância da metrologia por meio da aplicação de conceitos e princípios fundamentais.",
+          "II. Medir dimensões de peças utilizando escala e trena de forma precisa.",
+          "III. Realizar medições lineares e de profundidade aplicando técnicas recomendadas.",
+          "IV. Medir peças mecânicas utilizando paquímetro com resoluções de 0,05mm e 0,02mm.",
+          "V. Medir dimensões de alta precisão utilizando micrômetro centesimal.",
+          "VI. Verificar dimensões e perfis geométricos por meio de verificadores de folga, raio e roscas.",
+          "VII. Medir e comparar dimensões utilizando relógio comparador com base magnética.",
+          "VIII. Medir ângulos e inclinações de componentes mecânicos utilizando goniômetro comum e de precisão."
+        ],
+        knowledges: [
+          "1. METROLOGIA: Histórico, conceitos fundamentais, o Sistema Internacional de Unidades (SI) e o VIM (Vocabulário Internacional de Metrologia).",
+          "2. ERROS DE MEDIÇÃO: Erros sistemáticos e aleatórios, calibração, rastreabilidade e incerteza de medição.",
+          "3. ESCALA E TRENA: Tipos, graduações em milímetro e polegada, técnicas de medição e conservação.",
+          "4. PAQUÍMETROS: Princípio do nônio, tipos de paquímetros, leitura no sistema métrico (0,05mm e 0,02mm) e inglês, erros de paralaxe.",
+          "5. MICRÔMETROS: Princípio do parafuso micrométrico, componentes, leitura centesimal (0,01mm), forças de medição e catraca.",
+          "6. VERIFICADORES E CALIBRADORES: Verificadores de folga, raios, roscas, calibradores passa-não-passa e blocos-padrão.",
+          "7. RELÓGIO COMPARADOR: Mecanismo de amplificação por engrenagens, montagem de suportes magnéticos, zeragem, medição por comparação e excentricidade.",
+          "8. GONIÔMETRO: Transferidor de ângulos simples, leitura de frações de grau com nônio angular, técnicas de verificação de superfícies inclinadas."
+        ],
+        situationProblems: [
+          {
+            title: "O Lote Rejeitado de Pinos Cilíndricos",
+            description: "Uma metalúrgica parceira rejeitou um lote de 500 pinos guia alegando variações dimensionais acima do permitido no projeto técnico. Como técnico responsável, você deve organizar um laboratório de metrologia portátil na bancada da oficina, calibrar e zerar seus instrumentos de medição (paquímetro, micrômetro e relógio comparador) e realizar uma varredura dimensional completa em uma amostragem do lote. Você deverá identificar visualmente e dimensionalmente quais peças estão conformes, quais admitem retrabalho e quais devem ser descartadas, emitindo um laudo técnico metrológico com a folha de inspeção final."
+          }
+        ],
+        rubrics: [
+          "Excelente (A): Seleciona com perfeição os instrumentos, realiza a zeragem correta, executa medições precisas sem erros de paralaxe e emite um relatório técnico impecável com propostas de correção.",
+          "Satisfatório (C): Utiliza os instrumentos adequados, realiza as medições dentro da tolerância aceitável e preenche a folha de inspeção sem omissões graves.",
+          "Insuficiente (I): Demonstra dificuldades no manuseio dos instrumentos, comete erros frequentes de leitura e falha em registrar os dados dimensionais no relatório."
+        ]
+      }, { merge: true });
+
+      // 2. Forçar dados completos para Leitura e Interpretação de Desenho Técnico (lidt)
+      const lidtRef = doc(db, "units", "lidt");
+      batch.set(lidtRef, {
+        id: "lidt",
+        name: "Leitura e Interpretação de Desenho Técnico",
+        capacities: [
+          "I. Interpretar desenhos técnicos bidimensionais de peças mecânicas simples e complexas conforme normas ABNT.",
+          "II. Elaborar croquis e desenhos técnicos à mão livre utilizando técnicas de perspectiva e projeção ortogonal.",
+          "III. Interpretar dimensionamento, cotagem e escalas aplicadas em projetos mecânicos industriais.",
+          "IV. Identificar e interpretar representações de cortes (total, meio-corte, omitido e seções) em conjuntos mecânicos.",
+          "V. Interpretar tolerâncias dimensionais (ISO), tolerâncias geométricas (forma e posição) e indicações de rugosidade superficial."
+        ],
+        knowledges: [
+          "1. INTRODUÇÃO AO DESENHO TÉCNICO: Definição, histórico, normas técnicas vigentes (ABNT/ISO), formatos de folhas (A0 a A4), margens e legenda.",
+          "2. FIGURAS E SÓLIDOS GEOMÉTRICOS: Conceitos geométricos básicos aplicados ao desenho industrial.",
+          "3. PERSPECTIVA ISOMÉTRICA: Eixos isométricos, traçado de linhas retas, curvas e círculos isométricos.",
+          "4. PROJEÇÃO ORTOGONAL: Projeção no 1º e 3º diedro, vistas principais (frontal, superior e lateral esquerda), supressão de vistas.",
+          "5. COTAGEM: Linhas de cota, linhas de chamada, setas, caracteres, regras de cotagem, cotagem por elemento de referência.",
+          "6. ESCALAS: Escala natural, de ampliação e de redução, forma de representação e cálculos.",
+          "7. CORTES E SEÇÕES: Corte total, meio-corte, corte parcial, corte em desvio, seções e omissão de corte em elementos padronizados.",
+          "8. DESENHO DE CONJUNTOS: Desenho de conjunto montado e vista explodida, lista de componentes, balões de identificação.",
+          "9. INDICAÇÕES TECNOLÓGICAS: Tolerâncias dimensionais, ajustes (eixo-base/furo-base), tolerâncias geométricas (geometric tolerances) e símbolos de rugosidade superficial (Ra)."
+        ],
+        situationProblems: [
+          {
+            title: "Decifrando o Projeto do Subconjunto do Acoplamento",
+            description: "O almoxarifado da escola recebeu um lote de componentes mecânicos desmontados de um mecanismo de acoplamento, porém o manual original foi extraviado restando apenas uma cópia danificada do desenho de conjunto. O aluno deverá atuar como desenhista copista: analisar as projeções ortogonais sobreviventes, decodificar os cortes parciais e totais indicados, interpretar as tolerâncias e rugosidades exigidas e modelar de forma manuscrita (croqui) o detalhamento completo e individualizado de cada componente do subconjunto, gerando a lista de materiais estruturada."
+          }
+        ],
+        rubrics: [
+          "Excelente (A): Interpreta perfeitamente todas as cotas e símbolos tecnológicos, desenha croquis ortogonais com traçado firme e padronizado e preenche a lista descritiva sem falhas.",
+          "Satisfatório (C): Compreende a geometria principal do desenho, realiza o dimensionamento básico e elabora os croquis de forma legível e funcional.",
+          "Insuficiente (I): Não consegue correlacionar as vistas ortogonais, confunde símbolos de corte ou rugosidade e apresenta croquis desproporcionais."
+        ]
+      }, { merge: true });
+
+      await batch.commit();
+      console.log("SUCESSO: Banco de dados higienizado com dados completos!");
+    } catch (e) {
+      console.error("ERRO ao forçar higienização de dados estruturados:", e);
+    }
+  };
+  forceSyncDatabase();
+}
+
+// --- CRONOGRAMA LIDT ---
 export const LIDT_SCHEDULE = [
   { id: 'l1', date: '26/01/2026', hours: 2, capacities: 'Todas as capacities da SA', knowledge: '1.1. Definição de Desenho Técnico', strategy: '• Exposição dialogada; • Apresentação da UC, do MSEP e da Situação de Aprendizagem "Decifrando o Projeto".', resources: 'Sala de aula, projetor.' },
   { id: 'l2', date: '02/02/2026', hours: 2, capacities: 'Interpretar desenhos técnicos de peças.', knowledge: '1.2. Normas técnicas; 1.3. Formatos de folha; 1.4. Linhas.', strategy: '• Exposição dialogada: Apresentação das normas ABNT.', resources: 'Exemplos de desenhos técnicos.' },
@@ -30,7 +134,7 @@ export const LIDT_SCHEDULE = [
   { id: 'l20', date: '22/06/2026', hours: 2, capacities: 'Todas as capacities da SA.', knowledge: 'Fechamento de Notas.', strategy: '• Encerramento da Unidade Curricular.', resources: 'Diário de classe.' }
 ];
 
-// --- CRONOGRAMA CRD (Revisado) ---
+// --- CRONOGRAMA CRD ---
 export const CRD_SCHEDULE = [
   { id: 'c1', date: '27/01/2026', hours: 2, capacities: 'I. Identificar a importância da metrologia.', knowledge: '1. Metrologia', strategy: 'Apresentação da SA. Exposição dialogada.', resources: 'Projetor.' },
   { id: 'c2', date: '03/02/2026', hours: 2, capacities: 'I. Identificar a importância da metrologia.', knowledge: '2. Erros de medição', strategy: 'Discussão em grupo sobre tipos de erro.', resources: 'Instrumentos de medição.' },
@@ -50,7 +154,7 @@ export const CRD_SCHEDULE = [
   { id: 'c16', date: '23/06/2026', hours: 2, capacities: 'Finalização.', knowledge: 'Autoavaliação.', strategy: 'Feedback e encerramento da UC.', resources: 'Fichas preenchidas.' }
 ];
 
-// --- CRONOGRAMA FUSI (EFETIVO - 60 AULAS - PERFIL RICARDO GEA) ---
+// --- CRONOGRAMA FUSI (GEA) ---
 export const FUSI_SCHEDULE_GEA = [
   { id: 'g01', hours: 4, date: '26/01/2026', capacities: 'Organizar ambiente; Facear no torno; Furo de centro.', knowledge: 'PRÁTICA (PRAT)', strategy: 'Tarefa: Eixo 4 Corpos. Prática de fixação e faceamento.', resources: 'Oficina de usinagem, Torno.' },
   { id: 'g02', hours: 4, date: '27/01/2026', capacities: 'Tornear superfície cilíndrica; Chanfrar; Fluidos de corte.', knowledge: 'PRÁTICA (PRAT)', strategy: 'Tarefa: Eixo 4 Corpos. Prática de desbaste e medição.', resources: 'Oficina de usinagem, Torno, Paquímetro.' },
@@ -107,14 +211,14 @@ export const FUSI_SCHEDULE_GEA = [
   { id: 'g53', hours: 4, date: '01/06/2026', capacities: 'Fresagem: Prática de acabamento (Cabeçote).', knowledge: 'PRÁTICA (PRAT)', strategy: 'Foco em planeza e acabamento superficial.', resources: 'Oficina de usinagem, Fresadora.' },
   { id: 'g54', hours: 4, date: '02/06/2026', capacities: 'Conclusão de peças pendentes do semestre.', knowledge: 'PRÁTICA (PRAT)', strategy: 'Prática de Oficina Final (Arremates).', resources: 'Oficina de usinagem.' },
   { id: 'g55', hours: 4, date: '03/06/2026', capacities: 'Ética Profissional e Postura no Trabalho.', knowledge: 'TEORIA (TEOR)', strategy: 'Atitudes, responsabilidade e zelo com patrimônio.', resources: 'Sala de aula.' },
-  { id: 'g56', hours: 4, date: '08/06/2026', capacities: 'Limpeza Técnica e Conservação.', knowledge: 'PRÁTICA (PRAT)', strategy: 'Limpeza profunda e lubrificação das máquinas.', resources: 'Oficina de usinagem.' },
+  { id: 'g56', hours: 4, date: '08/06/2026', capacities: 'Limpeza Técnico e Conservação.', knowledge: 'PRÁTICA (PRAT)', strategy: 'Limpeza profunda e lubrificação das máquinas.', resources: 'Oficina de usinagem.' },
   { id: 'g57', hours: 4, date: '09/06/2026', capacities: 'Organização do ambiente (5S).', knowledge: 'PRÁTICA (PRAT)', strategy: 'Organização de armários e entrega de ferramentas.', resources: 'Oficina de usinagem.' },
   { id: 'g58', hours: 4, date: '10/06/2026', capacities: 'Revisão Geral de Processos e Documentação.', knowledge: 'TEORIA (TEOR)', strategy: 'Conferência de diários e fichas técnicas.', resources: 'Sala de aula.' },
   { id: 'g59', hours: 4, date: '17/06/2026', capacities: 'Feedback Final e Divulgação de Notas.', knowledge: 'TEORIA (TEOR)', strategy: 'Encerramento letivo em sala de aula.', resources: 'Sala de aula.' },
   { id: 'g60', hours: 4, date: '22/06/2026', capacities: 'Entrega Final das Peças e Avaliação de Resultados.', knowledge: 'PRÁTICA (PRAT)', strategy: 'Finalização de todas as atividades de oficina.', resources: 'Oficina de usinagem.' }
 ];
 
-// --- CRONOGRAMA FUSI (PADRÃO BERETELLA) ---
+// --- CRONOGRAMA FUSI (PADRÃO) ---
 export const FUSI_SCHEDULE = [
   { id: 'f01', hours: 4, date: '26/01/2026', capacities: 'Definir parâmetros; Torneamento; Parâmetros de corte/ferramenta.', knowledge: 'TEORIA (TEOR)', strategy: 'Exposição dialogada: Apresentação da SA2 e cálculos técnicos.', resources: 'Sala de aula, projetor.' },
   { id: 'f02', hours: 4, date: '28/01/2026', capacities: 'Organizar ambiente; Facear no torno; Furo de centro.', knowledge: 'PRÁTICA (PRAT)', strategy: 'Tarefa: Eixo 4 Corpos. Prática de fixação e faceamento.', resources: 'Oficina de usinagem, Torno.' },
@@ -154,15 +258,14 @@ export const FUSI_SCHEDULE = [
   { id: 'f36', hours: 4, date: '22/04/2026', capacities: 'Gestão de Ferramental e Almoxarifado técnico.', knowledge: 'TEORIA (TEOR)', strategy: 'Organização e controle de vida útil das ferramentas.', resources: 'Sala de aula.' }
 ];
 
-// Mock do objeto SAMPLE_PLANS obrigatório para o App funcionar
 export const SAMPLE_PLANS: TeachingPlan[] = [
   {
     id: "plan-template",
     profileId: "beretella",
-    courseName: "TÉCNICO EM MECÂNICA",
+    courseName: "MECÂNICO DE USINAGEM CONVENCIONAL",
     totalHours: 1200,
     modality: "Presencial",
-    objective: "Perfil padrão de conclusão do curso Técnico SENAI.",
+    objective: "Perfil padrão SENAI-SP.",
     updatedAt: new Date().toISOString(),
     units: [
       { id: "lidt", name: "Leitura e Interpretação de Desenho Técnico", schedule: LIDT_SCHEDULE, calendar: {} },
@@ -173,10 +276,10 @@ export const SAMPLE_PLANS: TeachingPlan[] = [
   {
     id: "plan-template-gea",
     profileId: "beretella",
-    courseName: "TÉCNICO EM MECÂNICA - GEA",
+    courseName: "MECÂNICO DE USINAGEM CONVENCIONAL - GEA",
     totalHours: 1200,
     modality: "Presencial",
-    objective: "Perfil de conclusão com cronograma estendido Ricardo Gea.",
+    objective: "Perfil de conclusão com cronograma Ricardo Gea.",
     updatedAt: new Date().toISOString(),
     units: [
       { id: "lidt", name: "Leitura e Interpretação de Desenho Técnico", schedule: LIDT_SCHEDULE, calendar: {} },
