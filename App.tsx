@@ -95,14 +95,12 @@ const App: React.FC = () => {
 
         let dbPlans = await FirebaseService.getPlans(profileId);
 
-        // Se estiver forçando o reset ou se os dados da nuvem estiverem corrompidos/vazios
         const isCorrupted =
           !dbPlans ||
           dbPlans.length === 0 ||
           dbPlans.some(p => !p.courseName || p.totalHours === 0 || !p.units?.length);
 
         if ((isCorrupted || forceReset) && isAdmin) {
-          // Remove itens antigos corrompidos da nuvem para evitar duplicidade
           if (dbPlans && dbPlans.length > 0) {
             for (const oldPlan of dbPlans) {
               if (oldPlan.id) {
@@ -111,7 +109,6 @@ const App: React.FC = () => {
             }
           }
 
-          // Cria o plano limpo baseado no template oficial
           const freshPlan: TeachingPlan = {
             ...template,
             id: `plan-usinagem-${profileId}-${Date.now()}`,
@@ -494,4 +491,4 @@ const App: React.FC = () => {
   );
 };
 
-export_default App;
+export default App;
