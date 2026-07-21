@@ -48,51 +48,6 @@ const sortUnits = (units: CurricularUnit[]) => {
   });
 };
 
-const mergeUnitWithTemplate = (
-  existingUnit: CurricularUnit,
-  templateUnit: CurricularUnit
-): CurricularUnit => ({
-  ...templateUnit,
-  ...existingUnit,
-  code: existingUnit.code || templateUnit.code,
-  semester: existingUnit.semester || templateUnit.semester,
-  order: existingUnit.order || templateUnit.order,
-  active: existingUnit.active ?? templateUnit.active ?? true,
-  calendar: {
-    ...templateUnit.calendar,
-    ...existingUnit.calendar,
-    semester:
-      existingUnit.calendar?.semester ||
-      existingUnit.semester ||
-      templateUnit.calendar?.semester ||
-      existingUnit.semester
-  },
-  basicCapacities:
-    existingUnit.basicCapacities?.length
-      ? existingUnit.basicCapacities
-      : templateUnit.basicCapacities || [],
-  socioemocionalCapacities:
-    existingUnit.socioemocionalCapacities?.length
-      ? existingUnit.socioemocionalCapacities
-      : templateUnit.socioemocionalCapacities || [],
-  knowledge:
-    existingUnit.knowledge?.length
-      ? existingUnit.knowledge
-      : templateUnit.knowledge || [],
-  learningSituations:
-    existingUnit.learningSituations?.length
-      ? existingUnit.learningSituations
-      : templateUnit.learningSituations || [],
-  rubrics:
-    existingUnit.rubrics?.length
-      ? existingUnit.rubrics
-      : templateUnit.rubrics || [],
-  schedule:
-    existingUnit.schedule?.length
-      ? existingUnit.schedule
-      : templateUnit.schedule || []
-});
-
 const App: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
@@ -129,103 +84,8 @@ const App: React.FC = () => {
     );
   }, [currentPlan, selectedSemester]);
 
-  const normalizePlan = useCallback(
-    (plan: TeachingPlan, template: TeachingPlan) => {
-      let updated = false;
-      const templateUnits = Array.isArray(template?.units) ? template.units : [];
-      const planUnits = Array.isArray(plan?.units) ? plan.units : [];
-
-      // Se o plano da nuvem estiver corrompido (sem nome ou sem unidades), força restaurar do template completo
-      if (!plan.courseName || plan.totalHours === 0 || planUnits.length === 0) {
-        return { normalizedPlan: { ...template, profileId: activeProfileId, version: SCHEDULE_VERSION, updatedAt: new Date().toISOString() }, updated: true };
-      }
-
-      const templateBySigla = new Map(
-        templateUnits.map(unit => [getUnitSigla(unit), unit])
-      );
-
-      const seen = new Set<string>();
-      const cleanedUnits: CurricularUnit[] = [];
-
-      for (const originalUnit of planUnits) {
-        if (!originalUnit) continue;
-        const sigla = getUnitSigla(originalUnit);
-
-        if (!sigla || seen.has(sigla)) {
-          updated = true;
-          continue;
-        }
-
-        seen.add(sigla);
-        const templateUnit = templateBySigla.get(sigla);
-
-        const normalizedUnit: CurricularUnit = templateUnit
-          ? mergeUnitWithTemplate(originalUnit, templateUnit)
-          : {
-              ...originalUnit,
-              code: originalUnit.code || sigla,
-              semester: Number(originalUnit.semester || 1),
-              order: Number(originalUnit.order || cleanedUnits.length + 1),
-              active: originalUnit.active ?? true,
-              calendar: {
-                ...originalUnit.calendar,
-                semester:
-                  originalUnit.calendar?.semester ||
-                  Number(originalUnit.semester || 1)
-              }
-            };
-
-        if (JSON.stringify(normalizedUnit) !== JSON.stringify(originalUnit)) {
-          updated = true;
-        }
-
-        cleanedUnits.push(normalizedUnit);
-      }
-
-      for (const templateUnit of templateUnits) {
-        const sigla = getUnitSigla(templateUnit);
-        const alreadyExists = cleanedUnits.some(
-          unit => getUnitSigla(unit) === sigla
-        );
-
-        if (!alreadyExists) {
-          cleanedUnits.push({
-            ...templateUnit,
-            active: templateUnit.active ?? true,
-            calendar: {
-              ...templateUnit.calendar,
-              semester:
-                templateUnit.calendar?.semester ||
-                templateUnit.semester
-            }
-          });
-          updated = true;
-        }
-      }
-
-      const orderedUnits = sortUnits(cleanedUnits);
-
-      if (JSON.stringify(orderedUnits) !== JSON.stringify(planUnits)) {
-        updated = true;
-      }
-
-      const normalizedPlan: TeachingPlan = {
-        ...template,
-        ...plan,
-        profileId: activeProfileId,
-        totalHours: plan.totalHours || template.totalHours,
-        version: SCHEDULE_VERSION,
-        units: orderedUnits,
-        updatedAt: updated ? new Date().toISOString() : plan.updatedAt
-      };
-
-      return { normalizedPlan, updated };
-    },
-    [activeProfileId]
-  );
-
   const loadPlans = useCallback(
-    async (profileId: string) => {
+    async (profileId: string, forceReset = false) => {
       setIsLoading(true);
 
       try {
@@ -233,58 +93,45 @@ const App: React.FC = () => {
           SAMPLE_PLANS.find(plan => plan.profileId === profileId) ||
           SAMPLE_PLANS[0];
 
-        const dbPlans = await FirebaseService.getPlans(profileId);
+        let dbPlans = await FirebaseService.getPlans(profileId);
 
-        if (!dbPlans || dbPlans.length === 0) {
-          const defaultPlan: TeachingPlan = {
+        // Se estiver forçando o reset ou se os dados da nuvem estiverem corrompidos/vazios
+        const isCorrupted =
+          !dbPlans ||
+          dbPlans.length === 0 ||
+          dbPlans.some(p => !p.courseName || p.totalHours === 0 || !p.units?.length);
+
+        if ((isCorrupted || forceReset) && isAdmin) {
+          // Remove itens antigos corrompidos da nuvem para evitar duplicidade
+          if (dbPlans && dbPlans.length > 0) {
+            for (const oldPlan of dbPlans) {
+              if (oldPlan.id) {
+                await FirebaseService.deletePlan(oldPlan.id);
+              }
+            }
+          }
+
+          // Cria o plano limpo baseado no template oficial
+          const freshPlan: TeachingPlan = {
             ...template,
-            id: `plan-usinagem-${profileId}`,
+            id: `plan-usinagem-${profileId}-${Date.now()}`,
             profileId,
             version: SCHEDULE_VERSION,
             updatedAt: new Date().toISOString(),
             units: sortUnits(template?.units || [])
           };
 
-          if (isAdmin) {
-            await FirebaseService.savePlan(defaultPlan);
-          }
-
-          setPlans([defaultPlan]);
-          setCurrentPlan(defaultPlan);
-
-          const firstSemester = Math.min(
-            ...defaultPlan.units.map(unit => Number(unit.semester || 1)),
-            1
-          );
-          setSelectedSemester(firstSemester);
-
-          const firstUnit = sortUnits(defaultPlan.units).find(
-            unit => Number(unit.semester || 1) === firstSemester
-          ) || null;
-
-          setSelectedUnit(firstUnit);
-          setIsLoading(false);
-          return;
+          await FirebaseService.savePlan(freshPlan);
+          dbPlans = [freshPlan];
         }
 
-        const processedPlans: TeachingPlan[] = [];
+        const validPlans = (dbPlans || []).filter(
+          p => p && p.courseName && p.totalHours > 0 && p.units?.length > 0
+        );
 
-        for (const plan of dbPlans) {
-          const { normalizedPlan, updated } = normalizePlan(plan, template);
+        setPlans(validPlans);
 
-          if (updated && isAdmin) {
-            await FirebaseService.savePlan(normalizedPlan);
-          }
-
-          processedPlans.push(normalizedPlan);
-        }
-
-        setPlans(processedPlans);
-
-        const nextCurrent =
-          processedPlans.find(plan => plan.id === currentPlan?.id) ||
-          processedPlans[0];
-
+        const nextCurrent = validPlans[0] || template;
         setCurrentPlan(nextCurrent);
 
         const availableSemesters = Array.from(
@@ -295,23 +142,16 @@ const App: React.FC = () => {
           )
         ).sort((a, b) => a - b);
 
-        const nextSemester = availableSemesters.includes(
-          Number(selectedSemester)
-        )
-          ? Number(selectedSemester)
-          : availableSemesters[0] || 1;
-
+        const nextSemester = availableSemesters[0] || 1;
         setSelectedSemester(nextSemester);
 
         const nextSelected =
-          nextCurrent?.units?.find(unit => unit.id === selectedUnit?.id) ||
           sortUnits(nextCurrent?.units || []).find(
             unit =>
               unit &&
               unit.active !== false &&
               Number(unit.semester || 1) === nextSemester
-          ) ||
-          null;
+          ) || null;
 
         setSelectedUnit(nextSelected);
       } catch (error) {
@@ -320,7 +160,7 @@ const App: React.FC = () => {
         setIsLoading(false);
       }
     },
-    [currentPlan?.id, normalizePlan, selectedSemester, selectedUnit?.id, isAdmin]
+    [isAdmin]
   );
 
   useEffect(() => {
@@ -478,30 +318,47 @@ const App: React.FC = () => {
       ) : (
         <>
           {view === 'dashboard' && (
-            <Dashboard
-              plans={plans}
-              isAdmin={isAdmin} // <--- Passando o parâmetro isAdmin para o Dashboard ocultar botões de edição/lixeira se for visualizador
-              onEdit={plan => {
-                if (!isAdmin) {
-                  alert("Acesso restrito: Apenas o administrador pode editar.");
-                  return;
-                }
-                setCurrentPlan(plan);
-                setView('editor' as ViewType);
-              }}
-              onView={openPlan}
-              onRefresh={() => loadPlans(activeProfileId)}
-              onDeletePlan={async (planId) => {
-                if (!isAdmin) {
-                  alert("Acesso restrito: O visualizador não pode excluir planos.");
-                  return;
-                }
-                if (window.confirm("Deseja realmente excluir este plano?")) {
-                  await FirebaseService.deletePlan(planId);
-                  loadPlans(activeProfileId);
-                }
-              }}
-            />
+            <div className="space-y-6">
+              {isAdmin && (
+                <div className="flex justify-end">
+                  <button
+                    onClick={() => {
+                      if (window.confirm("Deseja restaurar e limpar os dados duplicados/corrompidos da nuvem para o padrão oficial?")) {
+                        loadPlans(activeProfileId, true);
+                      }
+                    }}
+                    className="bg-red-600 text-white px-4 py-2 rounded-xl text-xs font-bold uppercase hover:bg-red-700 transition-all shadow-md"
+                  >
+                    Restaurar e Limpar Duplicados da Nuvem
+                  </button>
+                </div>
+              )}
+
+              <Dashboard
+                plans={plans}
+                isAdmin={isAdmin}
+                onEdit={plan => {
+                  if (!isAdmin) {
+                    alert("Acesso restrito: Apenas o administrador pode editar.");
+                    return;
+                  }
+                  setCurrentPlan(plan);
+                  setView('editor' as ViewType);
+                }}
+                onView={openPlan}
+                onRefresh={() => loadPlans(activeProfileId)}
+                onDeletePlan={async (planId) => {
+                  if (!isAdmin) {
+                    alert("Acesso restrito: O visualizador não pode excluir planos.");
+                    return;
+                  }
+                  if (window.confirm("Deseja realmente excluir este plano?")) {
+                    await FirebaseService.deletePlan(planId);
+                    loadPlans(activeProfileId);
+                  }
+                }}
+              />
+            </div>
           )}
 
           {view === ('plano-curso' as ViewType) && currentPlan && (
@@ -637,4 +494,4 @@ const App: React.FC = () => {
   );
 };
 
-export default App;
+export_default App;
