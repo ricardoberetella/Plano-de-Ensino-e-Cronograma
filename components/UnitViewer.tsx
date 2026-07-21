@@ -121,20 +121,6 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
     markings: []
   }, [localUnit.calendar]);
 
-  const handleResetToTemplate = () => {
-    if (confirm("Deseja restaurar este cronograma para o padrão oficial?")) {
-      const templatePlan = SAMPLE_PLANS[0];
-      const templateUnit = templatePlan.units.find(u => 
-        u.id.toLowerCase().includes(localUnit.id.split('-')[1] || 'lidt') || 
-        u.name.toUpperCase().includes(localUnit.name.split(' ')[0] || '')
-      );
-      if (templateUnit) {
-        setLocalSchedule(templateUnit.schedule);
-        onUpdateSchedule?.(templateUnit.schedule);
-      }
-    }
-  };
-
   const getDayOfWeek = (dateStr: string) => {
     if (!dateStr || !dateStr.includes('/')) return "";
     const [d, m, y] = dateStr.split('/').map(Number);
@@ -576,12 +562,6 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
                   </svg>
                   Imprimir Cronograma
-                </button>
-                <button 
-                  onClick={handleResetToTemplate} 
-                  className="bg-slate-100 text-slate-600 px-4 py-3 rounded-xl text-xs font-black uppercase hover:bg-slate-200 transition-all"
-                >
-                  Restaurar Padrão
                 </button>
               </div>
             </div>
