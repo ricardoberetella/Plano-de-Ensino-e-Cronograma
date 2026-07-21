@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { CurricularUnit, ScheduleEntry, UnitCalendar, CalendarColor } from '../types';
 import { SAMPLE_PLANS } from '../constants';
 
@@ -15,6 +15,47 @@ const COLOR_MAP: Record<CalendarColor, string> = {
 
 const TEXT_COLOR_MAP: Record<CalendarColor, string> = {
   yellow: '#0f172a', green: '#ffffff', blue: '#ffffff', red: '#ffffff', cyan: '#ffffff', orange: '#ffffff', purple: '#ffffff', pink: '#ffffff', white: '#1e293b', none: 'inherit'
+};
+
+// Componente isolado para evitar a perda de foco durante a digitação
+const EditableArea: React.FC<{
+  value: string;
+  onChange: (val: string) => void;
+  placeholder?: string;
+  className?: string;
+  rows?: number;
+}> = ({ value, onChange, placeholder, className, rows = 2 }) => {
+  const [val, setVal] = useState(value || '');
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    setVal(value || '');
+  }, [value]);
+
+  const adjustHeight = () => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+    }
+  };
+
+  useEffect(() => {
+    adjustHeight();
+  }, [val]);
+
+  return (
+    <textarea
+      ref={textareaRef}
+      value={val}
+      onChange={(e) => {
+        setVal(e.target.value);
+        onChange(e.target.value);
+      }}
+      placeholder={placeholder}
+      rows={rows}
+      className={`resize-none overflow-hidden ${className || ''}`}
+    />
+  );
 };
 
 const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar, onUpdateUnit }) => {
@@ -378,10 +419,10 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                   <div className="space-y-8">
                     <div className="border-l-2 border-slate-100 pl-6">
                       <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">I. Contextualização / Situação-Problema</p>
-                      <textarea
+                      <EditableArea
                         value={sa.context}
-                        onChange={(e) => updateSAField(saIdx, 'context', e.target.value)}
-                        rows={4}
+                        onChange={(val) => updateSAField(saIdx, 'context', val)}
+                        rows={3}
                         placeholder="Descreva aqui o contexto ou problema apresentado ao aluno..."
                         className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 text-slate-600 text-sm leading-relaxed font-medium focus:outline-none focus:border-blue-500"
                       />
@@ -389,10 +430,10 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                     
                     <div className="bg-slate-900 p-8 rounded-[2.5rem] text-white shadow-lg">
                       <p className="text-[10px] font-black text-red-500 uppercase mb-4 tracking-widest">II. Desafio Proposto</p>
-                      <textarea
+                      <EditableArea
                         value={sa.challenge}
-                        onChange={(e) => updateSAField(saIdx, 'challenge', e.target.value)}
-                        rows={3}
+                        onChange={(val) => updateSAField(saIdx, 'challenge', val)}
+                        rows={2}
                         placeholder="Desafio pedagógico do aluno..."
                         className="w-full bg-slate-800 border border-slate-700 text-slate-200 text-sm italic font-medium leading-relaxed rounded-xl p-3 focus:outline-none focus:border-red-500"
                       />
@@ -432,58 +473,58 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
 
         {/* ABA RUBRICAS */}
         {activeTab === 'rubricas' && (
-          <div className="overflow-x-auto rounded-[2rem] border border-slate-200 bg-white p-2 no-print">
-            <table className="w-full text-left border-collapse min-w-[800px]">
+          <div className="w-full rounded-[2rem] border border-slate-200 bg-white p-2 no-print overflow-hidden">
+            <table className="w-full table-fixed text-left border-collapse">
               <thead>
                 <tr className="bg-slate-900 text-white">
-                  <th className="p-6 text-[10px] font-black uppercase border border-slate-800">Referência / Capacidade</th>
-                  <th className="p-6 text-[10px] font-black uppercase border border-slate-800 text-red-400">NSA</th>
-                  <th className="p-6 text-[10px] font-black uppercase border border-slate-800 text-orange-400">APO</th>
-                  <th className="p-6 text-[10px] font-black uppercase border border-slate-800 text-blue-400">PAR</th>
-                  <th className="p-6 text-[10px] font-black uppercase border border-slate-800 text-green-400">AUT</th>
+                  <th className="p-4 w-1/5 text-[10px] font-black uppercase border border-slate-800">Referência / Capacidade</th>
+                  <th className="p-4 w-1/5 text-[10px] font-black uppercase border border-slate-800 text-red-400">NSA</th>
+                  <th className="p-4 w-1/5 text-[10px] font-black uppercase border border-slate-800 text-orange-400">APO</th>
+                  <th className="p-4 w-1/5 text-[10px] font-black uppercase border border-slate-800 text-blue-400">PAR</th>
+                  <th className="p-4 w-1/5 text-[10px] font-black uppercase border border-slate-800 text-green-400">AUT</th>
                 </tr>
               </thead>
               <tbody className="text-[11px] font-bold">
                 {(localUnit.rubrics || []).map((row, i) => (
                   <tr key={i} className="hover:bg-slate-50 transition-colors">
-                    <td className="p-4 border border-slate-100 bg-slate-50/50 w-64">
-                      <textarea
+                    <td className="p-3 border border-slate-100 bg-slate-50/50 vertical-top">
+                      <EditableArea
                         value={row.capacity}
-                        onChange={(e) => updateRubric(i, 'capacity', e.target.value)}
-                        rows={3}
+                        onChange={(val) => updateRubric(i, 'capacity', val)}
+                        rows={2}
                         className="w-full bg-transparent border-none outline-none font-bold text-slate-900 text-xs"
                       />
                     </td>
-                    <td className="p-4 border border-slate-100">
-                      <textarea
+                    <td className="p-3 border border-slate-100 vertical-top">
+                      <EditableArea
                         value={row.nsa}
-                        onChange={(e) => updateRubric(i, 'nsa', e.target.value)}
-                        rows={3}
-                        className="w-full bg-slate-50 border border-slate-100 rounded p-2 text-slate-500 italic text-[11px] focus:outline-none focus:border-red-300"
+                        onChange={(val) => updateRubric(i, 'nsa', val)}
+                        rows={2}
+                        className="w-full bg-slate-50 border border-slate-100 rounded p-2 text-slate-600 italic text-[11px] focus:outline-none focus:border-red-300"
                       />
                     </td>
-                    <td className="p-4 border border-slate-100">
-                      <textarea
+                    <td className="p-3 border border-slate-100 vertical-top">
+                      <EditableArea
                         value={row.apo}
-                        onChange={(e) => updateRubric(i, 'apo', e.target.value)}
-                        rows={3}
-                        className="w-full bg-slate-50 border border-slate-100 rounded p-2 text-slate-500 italic text-[11px] focus:outline-none focus:border-orange-300"
+                        onChange={(val) => updateRubric(i, 'apo', val)}
+                        rows={2}
+                        className="w-full bg-slate-50 border border-slate-100 rounded p-2 text-slate-600 italic text-[11px] focus:outline-none focus:border-orange-300"
                       />
                     </td>
-                    <td className="p-4 border border-slate-100">
-                      <textarea
+                    <td className="p-3 border border-slate-100 vertical-top">
+                      <EditableArea
                         value={row.par}
-                        onChange={(e) => updateRubric(i, 'par', e.target.value)}
-                        rows={3}
-                        className="w-full bg-slate-50 border border-slate-100 rounded p-2 text-slate-500 italic text-[11px] focus:outline-none focus:border-blue-300"
+                        onChange={(val) => updateRubric(i, 'par', val)}
+                        rows={2}
+                        className="w-full bg-slate-50 border border-slate-100 rounded p-2 text-slate-600 italic text-[11px] focus:outline-none focus:border-blue-300"
                       />
                     </td>
-                    <td className="p-4 border border-slate-100">
-                      <textarea
+                    <td className="p-3 border border-slate-100 vertical-top">
+                      <EditableArea
                         value={row.aut}
-                        onChange={(e) => updateRubric(i, 'aut', e.target.value)}
-                        rows={3}
-                        className="w-full bg-slate-50 border border-slate-100 rounded p-2 text-slate-500 italic text-[11px] focus:outline-none focus:border-green-300"
+                        onChange={(val) => updateRubric(i, 'aut', val)}
+                        rows={2}
+                        className="w-full bg-slate-50 border border-slate-100 rounded p-2 text-slate-600 italic text-[11px] focus:outline-none focus:border-green-300"
                       />
                     </td>
                   </tr>
@@ -530,18 +571,18 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                       <div className="text-slate-800 text-[10px] font-bold space-y-2">
                         <div>
                           <span className="text-[9px] text-slate-400 block font-black">C:</span>
-                          <textarea
+                          <EditableArea
                             value={entry.knowledge}
-                            onChange={(e) => updateEntry(entry.id, 'knowledge', e.target.value)}
+                            onChange={(val) => updateEntry(entry.id, 'knowledge', val)}
                             rows={2}
                             className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 text-[10px] font-bold focus:outline-none focus:border-blue-500"
                           />
                         </div>
                         <div>
                           <span className="text-[9px] text-slate-400 block font-black">Cap:</span>
-                          <textarea
+                          <EditableArea
                             value={entry.capacities}
-                            onChange={(e) => updateEntry(entry.id, 'capacities', e.target.value)}
+                            onChange={(val) => updateEntry(entry.id, 'capacities', val)}
                             rows={2}
                             className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 text-[10px] font-bold focus:outline-none focus:border-blue-500"
                           />
@@ -553,18 +594,18 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                       <div className="text-slate-600 text-[10px] font-medium space-y-2">
                         <div>
                           <span className="text-[9px] text-slate-400 block font-black uppercase">Estratégia:</span>
-                          <textarea
+                          <EditableArea
                             value={entry.strategy}
-                            onChange={(e) => updateEntry(entry.id, 'strategy', e.target.value)}
+                            onChange={(val) => updateEntry(entry.id, 'strategy', val)}
                             rows={2}
                             className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 text-[10px] font-medium focus:outline-none focus:border-orange-500"
                           />
                         </div>
                         <div>
                           <span className="text-[9px] text-slate-400 block font-black uppercase">Recursos:</span>
-                          <textarea
+                          <EditableArea
                             value={entry.resources}
-                            onChange={(e) => updateEntry(entry.id, 'resources', e.target.value)}
+                            onChange={(val) => updateEntry(entry.id, 'resources', val)}
                             rows={2}
                             className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 text-[10px] font-medium focus:outline-none focus:border-orange-500"
                           />
