@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { CurricularUnit, ScheduleEntry, UnitCalendar, CalendarColor } from '../types';
-import { SAMPLE_PLANS } from '../constants';
 
 interface Props {
   unit: CurricularUnit;
@@ -95,11 +94,11 @@ const EditableArea: React.FC<{
 
 const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar, onUpdateUnit }) => {
   const [activeTab, setActiveTab] = useState<'geral' | 'sa' | 'rubricas' | 'cronograma' | 'calendario'>('geral');
-  const [localSchedule, setLocalSchedule] = useState<ScheduleEntry[]>(unit.schedule);
+  const [localSchedule, setLocalSchedule] = useState<ScheduleEntry[]>(unit.schedule || []);
   const [localUnit, setLocalUnit] = useState<CurricularUnit>(unit);
 
   useEffect(() => {
-    setLocalSchedule(unit.schedule);
+    setLocalSchedule(unit.schedule || []);
   }, [unit.schedule]);
 
   useEffect(() => {
@@ -110,10 +109,6 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
     setLocalUnit(newUnit);
     onUpdateUnit?.(newUnit);
   };
-
-  const isCRD = localUnit.id.toLowerCase().includes('crd') || localUnit.name.toLowerCase().includes('dimensional');
-  const isFUSI = localUnit.id.toLowerCase().includes('fusi') || localUnit.name.toLowerCase().includes('usinagem');
-  const scheduleColor: CalendarColor = isCRD ? 'pink' : (isFUSI ? 'orange' : 'blue');
 
   const calendar = useMemo(() => localUnit.calendar || {
     startDate: '2026-01-26',
@@ -318,7 +313,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                         rows={1}
                         className="flex-1 bg-transparent border-none text-xs font-bold text-slate-800 focus:outline-none"
                       />
-                      <button onClick={() => removeGeneralFieldItem('technicalCapacities', idx)} className="text-slate-300 hover:text-red-500 text-xs font-bold transition-all p-1">
+                      <button onClick={() => removeGeneralFieldItem('technicalCapacities', idx)} className="text-slate-400 hover:text-red-500 text-xs font-bold transition-all p-1">
                         ✕
                       </button>
                     </div>
@@ -348,7 +343,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                         rows={1}
                         className="flex-1 bg-transparent border-none text-xs font-bold text-slate-800 focus:outline-none"
                       />
-                      <button onClick={() => removeGeneralFieldItem('socialCapacities', idx)} className="text-slate-300 hover:text-red-500 text-xs font-bold transition-all p-1">
+                      <button onClick={() => removeGeneralFieldItem('socialCapacities', idx)} className="text-slate-400 hover:text-red-500 text-xs font-bold transition-all p-1">
                         ✕
                       </button>
                     </div>
@@ -378,7 +373,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                         rows={1}
                         className="flex-1 bg-transparent border-none text-xs font-bold text-slate-800 focus:outline-none"
                       />
-                      <button onClick={() => removeGeneralFieldItem('knowledges', idx)} className="text-slate-300 hover:text-red-500 text-xs font-bold transition-all p-1">
+                      <button onClick={() => removeGeneralFieldItem('knowledges', idx)} className="text-slate-400 hover:text-red-500 text-xs font-bold transition-all p-1">
                         ✕
                       </button>
                     </div>
@@ -423,7 +418,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                         className="text-2xl font-black text-slate-900 uppercase tracking-tight leading-none italic w-full bg-transparent border-b border-slate-200 focus:border-blue-500 outline-none pb-2"
                       />
                     </div>
-                    <button onClick={() => removeLearningSituation(saIdx)} className="text-slate-300 hover:text-red-600 p-2 text-sm font-black transition-all" title="Excluir Fase">
+                    <button onClick={() => removeLearningSituation(saIdx)} className="text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 px-4 py-2 rounded-xl text-xs font-black transition-all shadow-sm" title="Excluir Fase">
                       Excluir Fase ✕
                     </button>
                   </div>
@@ -468,7 +463,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                               placeholder="Descreva o resultado ou produto esperado..."
                               className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-slate-700 text-sm font-bold focus:outline-none focus:border-blue-500"
                             />
-                            <button onClick={() => removeSAResult(saIdx, rIdx)} className="text-slate-300 hover:text-red-500 p-2 text-xs font-bold transition-all">
+                            <button onClick={() => removeSAResult(saIdx, rIdx)} className="text-slate-400 hover:text-red-500 p-2 text-xs font-bold transition-all">
                               ✕
                             </button>
                           </li>
@@ -668,7 +663,6 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                 const monthDate = new Date(y, m - 1, 1);
                 const monthName = new Intl.DateTimeFormat('pt-BR', { month: 'long', year: 'numeric' }).format(monthDate);
                 
-                // Gerar dias do mês
                 const daysInMonth = new Date(y, m, 0).getDate();
                 const firstDayIndex = new Date(y, m - 1, 1).getDay();
 
