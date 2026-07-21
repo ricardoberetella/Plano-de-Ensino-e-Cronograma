@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useMemo } from 'react';
 
 // Tipos e Interfaces
 type SemesterType = '1' | '2' | 'both';
@@ -18,18 +18,20 @@ interface LearningSituation {
 
 interface ScheduleEntry {
   id: string;
-  date: string;
+  date: string; // Formato DD/MM/AAAA
   hours: number;
   capacities: string;
   knowledge: string;
   strategy: string;
   resources: string;
+  completed: boolean;
 }
 
 interface FullUnitData {
   id: string;
   name: string;
   semesters: SemesterType;
+  color: string;
   general: GeneralCompetencies;
   learningSituations: LearningSituation[];
   schedule: ScheduleEntry[];
@@ -42,6 +44,7 @@ const INITIAL_DATABASE: Record<string, FullUnitData> = {
     id: 'LIDT',
     name: 'LEITURA E INTERPRETAÇÃO DE DESENHO TÉCNICO',
     semesters: '1',
+    color: 'bg-blue-500 text-white border-blue-600',
     general: {
       technicalCapacities: ['Interpretar projeções ortogonais (1º e 3º diedro).', 'Identificar escalas, cortes e seções.'],
       socioemotionalCapacities: ['Rigor técnico e atenção aos detalhes.'],
@@ -50,28 +53,33 @@ const INITIAL_DATABASE: Record<string, FullUnitData> = {
     learningSituations: [
       {
         id: 'SA1',
-        title: 'Situação de Aprendizagem 1 - Leitura de Desenho do Conjunto Mecânico',
+        title: 'Situação de Aprendizagem 1 - Leitura de Desenho Técnico',
         contextualization: 'O aluno recebe uma folha de desenho técnico de um conjunto usinado.',
         challenge: 'Identificar as cotas e rugosidades solicitadas pelo cliente.'
       }
     ],
     schedule: [
-      { id: '1', date: '10/02/2026', hours: 4, capacities: 'Interpretar projeções', knowledge: 'Normas ABNT', strategy: 'Aula Prática em Sala', resources: 'Folhas de Desenho, Régua, Paquímetro' }
+      { id: '1', date: '10/02/2026', hours: 4, capacities: 'Interpretar projeções', knowledge: 'Normas ABNT', strategy: 'Aula Prática', resources: 'Folhas de Desenho, Paquímetro', completed: false },
+      { id: '2', date: '12/02/2026', hours: 4, capacities: 'Escalas e Cortes', knowledge: 'Cortes Ortogonais', strategy: 'Exercício Prático', resources: 'Prancheta', completed: true }
     ]
   },
   CDMAT: {
     id: 'CDMAT',
     name: 'CIÊNCIAS DOS MATERIAIS',
     semesters: '1',
-    general: { technicalCapacities: ['Identificar propriedades mecânicas dos metais.'], socioemotionalCapacities: ['Organização'], knowledge: ['Ensaios mecânicos'] },
+    color: 'bg-emerald-500 text-white border-emerald-600',
+    general: { technicalCapacities: ['Identificar propriedades dos metais.'], socioemotionalCapacities: ['Organização'], knowledge: ['Ensaios mecânicos'] },
     learningSituations: [],
-    schedule: []
+    schedule: [
+      { id: '3', date: '11/02/2026', hours: 4, capacities: 'Propriedades dos Metais', knowledge: 'Ligas Metálicas', strategy: 'Análise de Amostras', resources: 'Laboratório', completed: false }
+    ]
   },
   CRD: {
     id: 'CRD',
     name: 'CONTROLE DIMENSIONAL',
     semesters: '2',
-    general: { technicalCapacities: ['Realizar medições com paquímetro e micrometro.'], socioemotionalCapacities: ['Precisão'], knowledge: ['Metrologia dimensional'] },
+    color: 'bg-purple-500 text-white border-purple-600',
+    general: { technicalCapacities: ['Realizar medições com paquímetro.'], socioemotionalCapacities: ['Precisão'], knowledge: ['Metrologia dimensional'] },
     learningSituations: [],
     schedule: []
   },
@@ -79,13 +87,14 @@ const INITIAL_DATABASE: Record<string, FullUnitData> = {
     id: 'FUSI',
     name: 'FUNDAMENTOS DA USINAGEM',
     semesters: 'both',
-    general: { technicalCapacities: ['Operar torno e fresadora convencional.'], socioemotionalCapacities: ['Segurança no trabalho'], knowledge: ['Parâmetros de corte'] },
+    color: 'bg-orange-500 text-white border-orange-600',
+    general: { technicalCapacities: ['Operar torno convencional.'], socioemotionalCapacities: ['Segurança no trabalho'], knowledge: ['Parâmetros de corte'] },
     learningSituations: [],
     schedule: []
   }
 };
 
-// Componente para Edição de Texto com Foco
+// Componente para Edição de Texto com Preservação de Foco
 const RichEditable: React.FC<{
   html: string;
   onChange: (newHtml: string) => void;
@@ -103,7 +112,7 @@ const RichEditable: React.FC<{
         if (editorRef.current && !disabled) onChange(editorRef.current.innerHTML);
       }}
       className={`w-full min-h-[1.5rem] bg-transparent transition-all rounded px-2 py-1 break-words ${
-        disabled ? 'cursor-default opacity-90' : 'bg-white focus:ring-2 focus:ring-blue-400 focus:outline-none'
+        disabled ? 'cursor-default opacity-90' : 'bg-white focus:ring-2 focus:ring-blue-400 focus:outline-none border border-slate-200'
       } ${className}`}
       dangerouslySetInnerHTML={{ __html: html }}
     />
@@ -113,9 +122,9 @@ const RichEditable: React.FC<{
 export default function SmoothManager() {
   const [db, setDb] = useState<Record<string, FullUnitData>>(INITIAL_DATABASE);
   const [currentUc, setCurrentUc] = useState<string>('LIDT');
-  const [activeTab, setActiveTab] = useState<'geral' | 'sa' | 'cronograma'>('geral');
+  const [activeTab, setActiveTab] = useState<'geral' | 'sa' | 'cronograma' | 'calendario'>('geral');
 
-  // Estado de Bloqueio por Senha
+  // Trava de Segurança / Senha
   const [isEditable, setIsEditable] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [passwordInput, setPasswordInput] = useState('');
@@ -125,7 +134,7 @@ export default function SmoothManager() {
 
   const handleUnlockRequest = () => {
     if (isEditable) {
-      setIsEditable(false); // Trava novamente sem pedir senha
+      setIsEditable(false);
     } else {
       setPasswordInput('');
       setAuthError(false);
@@ -163,6 +172,7 @@ export default function SmoothManager() {
         id,
         name: 'NOVA UNIDADE CURRICULAR',
         semesters: semester,
+        color: 'bg-slate-700 text-white border-slate-800',
         general: { technicalCapacities: [], socioemotionalCapacities: [], knowledge: [] },
         learningSituations: [],
         schedule: []
@@ -182,33 +192,59 @@ export default function SmoothManager() {
     if (remainingKeys.length > 0) setCurrentUc(remainingKeys[0]);
   };
 
-  // Separação das UCs por semestre
+  // Mapeamento dinâmico de datas para o Calendário Escolar
+  const { scheduledMap, monthList } = useMemo(() => {
+    const map: Record<string, Array<{ ucName: string; color: string; capacity: string; hours: number }>> = {};
+    const months = new Set<string>();
+
+    Object.values(db).forEach(u => {
+      u.schedule.forEach(entry => {
+        const cleanDate = entry.date.replace(/<[^>]*>/g, '').trim();
+        const parts = cleanDate.split('/');
+        if (parts.length === 3) {
+          const formattedKey = `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+          const monthKey = `${parts[2]}-${parts[1].padStart(2, '0')}`;
+          
+          months.add(monthKey);
+
+          if (!map[cleanDate]) map[cleanDate] = [];
+          map[cleanDate].push({
+            ucName: u.name,
+            color: u.color,
+            capacity: entry.capacities,
+            hours: entry.hours
+          });
+        }
+      });
+    });
+
+    if (months.size === 0) months.add('2026-02');
+
+    return { scheduledMap: map, monthList: Array.from(months).sort() };
+  }, [db]);
+
   const sem1Units = Object.keys(db).filter(k => db[k].semesters === '1' || db[k].semesters === 'both');
   const sem2Units = Object.keys(db).filter(k => db[k].semesters === '2' || db[k].semesters === 'both');
 
   return (
     <div className="w-full bg-slate-100 min-h-screen p-6 font-sans">
       
-      {/* PAINEL PRINCIPAL */}
       <div className="max-w-5xl mx-auto bg-white rounded-3xl shadow-xl p-8 border border-slate-200">
         
-        {/* CABEÇALHO DA SMO E BOTÃO DE BLOQUEIO */}
+        {/* CABEÇALHO */}
         <div className="border-b border-slate-100 pb-6 mb-6">
           <div className="flex justify-between items-center mb-4">
             <div>
-              <h1 className="text-xl font-black text-slate-800 tracking-tight">EDITAR PLANO DE ENSINO</h1>
+              <h1 className="text-xl font-black text-slate-800 tracking-tight">EDITAR PLANO DE ENSINO E CRONOGRAMA</h1>
               <p className="text-xs text-slate-400 uppercase font-bold">SMO - Modelo SENAI de Educação</p>
             </div>
             
             <div className="flex items-center gap-3">
-              {/* STATUS DE MODO DE EDIÇÃO COM SENHA */}
               <button
                 type="button"
                 onClick={handleUnlockRequest}
                 className={`flex items-center gap-2 text-xs font-black px-4 py-2 rounded-xl transition-all shadow-sm ${
-                  isEditable 
-                    ? 'bg-emerald-500 hover:bg-emerald-600 text-white' 
-                    : 'bg-amber-500 hover:bg-amber-600 text-white'
+                  isEditable ? 'bg-emerald-500 hover:bg-emerald-600 text-white' : 'bg-amber-500 hover:bg-amber-600 text-white'
                 }`}
               >
                 <span>{isEditable ? '🔓 Edição Liberada' : '🔒 Modo Leitura (Bloqueado)'}</span>
@@ -226,10 +262,10 @@ export default function SmoothManager() {
           </div>
         </div>
 
-        {/* III. ESTRUTURA DE UNIDADES CURRICULARES (DIVIDIDA POR SEMESTRES) */}
+        {/* III. ESTRUTURA DE UNIDADES CURRICULARES */}
         <div className="mb-8">
           <h2 className="text-xs font-black text-slate-500 uppercase tracking-wider mb-4">
-            III. Estrutura de Unidades Curriculares
+            III. Estrutura de Unidades Curriculares (Organizadas por Semestre)
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -239,10 +275,7 @@ export default function SmoothManager() {
               <div className="flex justify-between items-center mb-3">
                 <h3 className="text-xs font-black text-blue-700 uppercase tracking-wider">1º Semestre</h3>
                 {isEditable && (
-                  <button
-                    onClick={() => handleAddUc('1')}
-                    className="bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-bold px-2.5 py-1 rounded-lg transition-all"
-                  >
+                  <button onClick={() => handleAddUc('1')} className="bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-bold px-2.5 py-1 rounded-lg">
                     + Nova UC
                   </button>
                 )}
@@ -261,13 +294,7 @@ export default function SmoothManager() {
                         isSelected ? 'border-blue-500 bg-white shadow-md ring-2 ring-blue-100' : 'border-slate-200 bg-white hover:border-slate-300'
                       }`}
                     >
-                      <RichEditable
-                        html={item.name}
-                        onChange={(val) => updateUnitField(u => { u.name = val; })}
-                        disabled={!isEditable}
-                        className="font-bold text-xs text-slate-800"
-                      />
-
+                      <RichEditable html={item.name} onChange={(val) => updateUnitField(u => { u.name = val; })} disabled={!isEditable} className="font-bold text-xs text-slate-800" />
                       {isEditable && (
                         <div className="flex items-center gap-2 ml-2">
                           <select
@@ -277,20 +304,13 @@ export default function SmoothManager() {
                               setDb(prev => ({ ...prev, [key]: { ...prev[key], semesters: val } }));
                             }}
                             onClick={(e) => e.stopPropagation()}
-                            className="text-[10px] font-bold bg-slate-100 border border-slate-200 rounded px-1.5 py-1 text-slate-700"
+                            className="text-[10px] font-bold bg-slate-100 border border-slate-200 rounded px-1.5 py-1"
                           >
                             <option value="1">1º Sem</option>
                             <option value="2">2º Sem</option>
                             <option value="both">Ambos</option>
                           </select>
-
-                          <button
-                            type="button"
-                            onClick={(e) => { e.stopPropagation(); handleDeleteUc(key); }}
-                            className="text-red-400 hover:text-red-600 font-bold text-xs px-1"
-                          >
-                            ✕
-                          </button>
+                          <button type="button" onClick={(e) => { e.stopPropagation(); handleDeleteUc(key); }} className="text-red-400 hover:text-red-600 font-bold text-xs">✕</button>
                         </div>
                       )}
                     </div>
@@ -304,10 +324,7 @@ export default function SmoothManager() {
               <div className="flex justify-between items-center mb-3">
                 <h3 className="text-xs font-black text-purple-700 uppercase tracking-wider">2º Semestre</h3>
                 {isEditable && (
-                  <button
-                    onClick={() => handleAddUc('2')}
-                    className="bg-purple-600 hover:bg-purple-700 text-white text-[11px] font-bold px-2.5 py-1 rounded-lg transition-all"
-                  >
+                  <button onClick={() => handleAddUc('2')} className="bg-purple-600 hover:bg-purple-700 text-white text-[11px] font-bold px-2.5 py-1 rounded-lg">
                     + Nova UC
                   </button>
                 )}
@@ -326,13 +343,7 @@ export default function SmoothManager() {
                         isSelected ? 'border-purple-500 bg-white shadow-md ring-2 ring-purple-100' : 'border-slate-200 bg-white hover:border-slate-300'
                       }`}
                     >
-                      <RichEditable
-                        html={item.name}
-                        onChange={(val) => updateUnitField(u => { u.name = val; })}
-                        disabled={!isEditable}
-                        className="font-bold text-xs text-slate-800"
-                      />
-
+                      <RichEditable html={item.name} onChange={(val) => updateUnitField(u => { u.name = val; })} disabled={!isEditable} className="font-bold text-xs text-slate-800" />
                       {isEditable && (
                         <div className="flex items-center gap-2 ml-2">
                           <select
@@ -342,20 +353,13 @@ export default function SmoothManager() {
                               setDb(prev => ({ ...prev, [key]: { ...prev[key], semesters: val } }));
                             }}
                             onClick={(e) => e.stopPropagation()}
-                            className="text-[10px] font-bold bg-slate-100 border border-slate-200 rounded px-1.5 py-1 text-slate-700"
+                            className="text-[10px] font-bold bg-slate-100 border border-slate-200 rounded px-1.5 py-1"
                           >
                             <option value="1">1º Sem</option>
                             <option value="2">2º Sem</option>
                             <option value="both">Ambos</option>
                           </select>
-
-                          <button
-                            type="button"
-                            onClick={(e) => { e.stopPropagation(); handleDeleteUc(key); }}
-                            className="text-red-400 hover:text-red-600 font-bold text-xs px-1"
-                          >
-                            ✕
-                          </button>
+                          <button type="button" onClick={(e) => { e.stopPropagation(); handleDeleteUc(key); }} className="text-red-400 hover:text-red-600 font-bold text-xs">✕</button>
                         </div>
                       )}
                     </div>
@@ -367,18 +371,18 @@ export default function SmoothManager() {
           </div>
         </div>
 
-        {/* NAVEGAÇÃO DE ABAS REESTABELECIDA */}
+        {/* MENU DE ABAS COMPLETO */}
         <div className="border-t border-slate-200 pt-6">
-          <div className="flex border-b border-slate-200 mb-6 gap-2">
-            {(['geral', 'sa', 'cronograma'] as const).map(tab => (
+          <div className="flex border-b border-slate-200 mb-6 gap-2 overflow-x-auto">
+            {(['geral', 'sa', 'cronograma', 'calendario'] as const).map(tab => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`px-4 py-2 text-xs font-black uppercase tracking-wider border-b-2 transition-all ${
+                className={`px-4 py-2 text-xs font-black uppercase tracking-wider border-b-2 transition-all whitespace-nowrap ${
                   activeTab === tab ? 'border-slate-900 text-slate-900' : 'border-transparent text-slate-400 hover:text-slate-600'
                 }`}
               >
-                {tab === 'geral' ? 'Estrutura Geral' : tab === 'sa' ? 'Situações de Aprendizagem' : 'Cronograma'}
+                {tab === 'geral' ? 'Estrutura Geral' : tab === 'sa' ? 'Situações de Aprendizagem' : tab === 'cronograma' ? 'Cronograma' : 'Calendário Escolar'}
               </button>
             ))}
           </div>
@@ -390,30 +394,13 @@ export default function SmoothManager() {
                 <div className="flex justify-between items-center mb-2">
                   <h4 className="text-xs font-black text-slate-700 uppercase">Capacidades Técnicas</h4>
                   {isEditable && (
-                    <button
-                      onClick={() => updateUnitField(u => { u.general.technicalCapacities.push('Nova Capacidade'); })}
-                      className="text-[10px] bg-slate-200 hover:bg-slate-300 px-2 py-0.5 rounded font-bold"
-                    >
-                      + Add
-                    </button>
+                    <button onClick={() => updateUnitField(u => { u.general.technicalCapacities.push('Nova Capacidade'); })} className="text-[10px] bg-slate-200 px-2 py-0.5 rounded font-bold">+ Add</button>
                   )}
                 </div>
                 {unit.general.technicalCapacities.map((cap, i) => (
                   <div key={i} className="flex items-center gap-1 my-1">
-                    <RichEditable
-                      html={cap}
-                      onChange={(val) => updateUnitField(u => { u.general.technicalCapacities[i] = val; })}
-                      disabled={!isEditable}
-                      className="text-xs bg-white rounded border border-slate-200"
-                    />
-                    {isEditable && (
-                      <button
-                        onClick={() => updateUnitField(u => { u.general.technicalCapacities.splice(i, 1); })}
-                        className="text-red-400 hover:text-red-600 text-xs font-bold"
-                      >
-                        ✕
-                      </button>
-                    )}
+                    <RichEditable html={cap} onChange={(val) => updateUnitField(u => { u.general.technicalCapacities[i] = val; })} disabled={!isEditable} className="text-xs" />
+                    {isEditable && <button onClick={() => updateUnitField(u => { u.general.technicalCapacities.splice(i, 1); })} className="text-red-400 font-bold text-xs">✕</button>}
                   </div>
                 ))}
               </div>
@@ -422,30 +409,13 @@ export default function SmoothManager() {
                 <div className="flex justify-between items-center mb-2">
                   <h4 className="text-xs font-black text-slate-700 uppercase">Socioemocionais</h4>
                   {isEditable && (
-                    <button
-                      onClick={() => updateUnitField(u => { u.general.socioemotionalCapacities.push('Nova Capacidade'); })}
-                      className="text-[10px] bg-slate-200 hover:bg-slate-300 px-2 py-0.5 rounded font-bold"
-                    >
-                      + Add
-                    </button>
+                    <button onClick={() => updateUnitField(u => { u.general.socioemotionalCapacities.push('Nova Capacidade'); })} className="text-[10px] bg-slate-200 px-2 py-0.5 rounded font-bold">+ Add</button>
                   )}
                 </div>
                 {unit.general.socioemotionalCapacities.map((cap, i) => (
                   <div key={i} className="flex items-center gap-1 my-1">
-                    <RichEditable
-                      html={cap}
-                      onChange={(val) => updateUnitField(u => { u.general.socioemotionalCapacities[i] = val; })}
-                      disabled={!isEditable}
-                      className="text-xs bg-white rounded border border-slate-200"
-                    />
-                    {isEditable && (
-                      <button
-                        onClick={() => updateUnitField(u => { u.general.socioemotionalCapacities.splice(i, 1); })}
-                        className="text-red-400 hover:text-red-600 text-xs font-bold"
-                      >
-                        ✕
-                      </button>
-                    )}
+                    <RichEditable html={cap} onChange={(val) => updateUnitField(u => { u.general.socioemotionalCapacities[i] = val; })} disabled={!isEditable} className="text-xs" />
+                    {isEditable && <button onClick={() => updateUnitField(u => { u.general.socioemotionalCapacities.splice(i, 1); })} className="text-red-400 font-bold text-xs">✕</button>}
                   </div>
                 ))}
               </div>
@@ -454,30 +424,13 @@ export default function SmoothManager() {
                 <div className="flex justify-between items-center mb-2">
                   <h4 className="text-xs font-black text-slate-700 uppercase">Conhecimentos</h4>
                   {isEditable && (
-                    <button
-                      onClick={() => updateUnitField(u => { u.general.knowledge.push('Novo Conhecimento'); })}
-                      className="text-[10px] bg-slate-200 hover:bg-slate-300 px-2 py-0.5 rounded font-bold"
-                    >
-                      + Add
-                    </button>
+                    <button onClick={() => updateUnitField(u => { u.general.knowledge.push('Novo Conhecimento'); })} className="text-[10px] bg-slate-200 px-2 py-0.5 rounded font-bold">+ Add</button>
                   )}
                 </div>
                 {unit.general.knowledge.map((know, i) => (
                   <div key={i} className="flex items-center gap-1 my-1">
-                    <RichEditable
-                      html={know}
-                      onChange={(val) => updateUnitField(u => { u.general.knowledge[i] = val; })}
-                      disabled={!isEditable}
-                      className="text-xs bg-white rounded border border-slate-200"
-                    />
-                    {isEditable && (
-                      <button
-                        onClick={() => updateUnitField(u => { u.general.knowledge.splice(i, 1); })}
-                        className="text-red-400 hover:text-red-600 text-xs font-bold"
-                      >
-                        ✕
-                      </button>
-                    )}
+                    <RichEditable html={know} onChange={(val) => updateUnitField(u => { u.general.knowledge[i] = val; })} disabled={!isEditable} className="text-xs" />
+                    {isEditable && <button onClick={() => updateUnitField(u => { u.general.knowledge.splice(i, 1); })} className="text-red-400 font-bold text-xs">✕</button>}
                   </div>
                 ))}
               </div>
@@ -490,17 +443,7 @@ export default function SmoothManager() {
               <div className="flex justify-between items-center mb-2">
                 <h3 className="text-xs font-black text-slate-700 uppercase">Situações de Aprendizagem Cadastradas</h3>
                 {isEditable && (
-                  <button
-                    onClick={() => updateUnitField(u => {
-                      u.learningSituations.push({
-                        id: `SA_${Date.now().toString().slice(-3)}`,
-                        title: 'Nova Situação de Aprendizagem',
-                        contextualization: 'Descrição do contexto...',
-                        challenge: 'Descrição do desafio...'
-                      });
-                    })}
-                    className="text-xs bg-blue-600 text-white font-bold px-3 py-1.5 rounded-xl hover:bg-blue-700"
-                  >
+                  <button onClick={() => updateUnitField(u => { u.learningSituations.push({ id: `SA_${Date.now().toString().slice(-3)}`, title: 'Nova Situação', contextualization: 'Contexto...', challenge: 'Desafio...' }); })} className="text-xs bg-blue-600 text-white font-bold px-3 py-1.5 rounded-xl">
                     + Criar S.A.
                   </button>
                 )}
@@ -509,64 +452,32 @@ export default function SmoothManager() {
               {unit.learningSituations.map((sa, index) => (
                 <div key={sa.id} className="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-2">
                   <div className="flex justify-between items-center">
-                    <RichEditable
-                      html={sa.title}
-                      onChange={(val) => updateUnitField(u => { u.learningSituations[index].title = val; })}
-                      disabled={!isEditable}
-                      className="font-bold text-sm text-slate-800"
-                    />
-                    {isEditable && (
-                      <button
-                        onClick={() => updateUnitField(u => { u.learningSituations.splice(index, 1); })}
-                        className="text-red-400 hover:text-red-600 text-xs font-bold"
-                      >
-                        Excluir S.A.
-                      </button>
-                    )}
+                    <RichEditable html={sa.title} onChange={(val) => updateUnitField(u => { u.learningSituations[index].title = val; })} disabled={!isEditable} className="font-bold text-sm" />
+                    {isEditable && <button onClick={() => updateUnitField(u => { u.learningSituations.splice(index, 1); })} className="text-red-400 font-bold text-xs">Excluir</button>}
                   </div>
                   <div className="text-xs">
                     <strong className="text-slate-500 uppercase block mb-1">Contextualização:</strong>
-                    <RichEditable
-                      html={sa.contextualization}
-                      onChange={(val) => updateUnitField(u => { u.learningSituations[index].contextualization = val; })}
-                      disabled={!isEditable}
-                      className="bg-white border border-slate-200 rounded"
-                    />
+                    <RichEditable html={sa.contextualization} onChange={(val) => updateUnitField(u => { u.learningSituations[index].contextualization = val; })} disabled={!isEditable} />
                   </div>
                   <div className="text-xs">
                     <strong className="text-slate-500 uppercase block mb-1">Desafio / Problema:</strong>
-                    <RichEditable
-                      html={sa.challenge}
-                      onChange={(val) => updateUnitField(u => { u.learningSituations[index].challenge = val; })}
-                      disabled={!isEditable}
-                      className="bg-white border border-slate-200 rounded"
-                    />
+                    <RichEditable html={sa.challenge} onChange={(val) => updateUnitField(u => { u.learningSituations[index].challenge = val; })} disabled={!isEditable} />
                   </div>
                 </div>
               ))}
             </div>
           )}
 
-          {/* ABA 3: CRONOGRAMA DE AULAS */}
+          {/* ABA 3: CRONOGRAMA */}
           {activeTab === 'cronograma' && (
             <div className="space-y-4">
               <div className="flex justify-between items-center">
-                <h3 className="text-xs font-black text-slate-700 uppercase">Detalhamento das Aulas</h3>
+                <div>
+                  <h3 className="text-xs font-black text-slate-700 uppercase">Detalhamento das Aulas ({unit.name})</h3>
+                  <p className="text-[11px] text-slate-400">As datas abaixo sincronizam automaticamente com o Calendário Escolar.</p>
+                </div>
                 {isEditable && (
-                  <button
-                    onClick={() => updateUnitField(u => {
-                      u.schedule.push({
-                        id: Date.now().toString(),
-                        date: '00/00/0000',
-                        hours: 4,
-                        capacities: 'Capacidade abordada',
-                        knowledge: 'Conhecimento abordado',
-                        strategy: 'Estratégia docente',
-                        resources: 'Recursos didáticos'
-                      });
-                    })}
-                    className="text-xs bg-blue-600 text-white font-bold px-3 py-1.5 rounded-xl hover:bg-blue-700"
-                  >
+                  <button onClick={() => updateUnitField(u => { u.schedule.push({ id: Date.now().toString(), date: '15/02/2026', hours: 4, capacities: 'Nova Capacidade', knowledge: 'Novo Conteúdo', strategy: 'Prática', resources: 'Material', completed: false }); })} className="text-xs bg-blue-600 text-white font-bold px-3 py-1.5 rounded-xl">
                     + Adicionar Aula
                   </button>
                 )}
@@ -576,20 +487,20 @@ export default function SmoothManager() {
                 <table className="w-full text-xs text-left border-collapse bg-white rounded-xl overflow-hidden shadow-sm">
                   <thead>
                     <tr className="bg-slate-100 text-slate-600 font-black uppercase border-b border-slate-200">
-                      <th className="p-3">Data</th>
-                      <th className="p-3">Carga (h)</th>
+                      <th className="p-3">Data (DD/MM/AAAA)</th>
+                      <th className="p-3">Horas</th>
                       <th className="p-3">Capacidade</th>
                       <th className="p-3">Conhecimento</th>
                       <th className="p-3">Estratégia</th>
-                      <th className="p-3">Recursos</th>
+                      <th className="p-3">Status</th>
                       {isEditable && <th className="p-3">Ações</th>}
                     </tr>
                   </thead>
                   <tbody>
                     {unit.schedule.map((row, index) => (
                       <tr key={row.id} className="border-b border-slate-100 hover:bg-slate-50">
-                        <td className="p-2">
-                          <RichEditable html={row.date} onChange={v => updateUnitField(u => { u.schedule[index].date = v; })} disabled={!isEditable} />
+                        <td className="p-2 w-32">
+                          <RichEditable html={row.date} onChange={v => updateUnitField(u => { u.schedule[index].date = v; })} disabled={!isEditable} className="font-bold text-blue-700" />
                         </td>
                         <td className="p-2 w-16">
                           <RichEditable html={row.hours.toString()} onChange={v => updateUnitField(u => { u.schedule[index].hours = Number(v) || 0; })} disabled={!isEditable} />
@@ -603,17 +514,17 @@ export default function SmoothManager() {
                         <td className="p-2">
                           <RichEditable html={row.strategy} onChange={v => updateUnitField(u => { u.schedule[index].strategy = v; })} disabled={!isEditable} />
                         </td>
-                        <td className="p-2">
-                          <RichEditable html={row.resources} onChange={v => updateUnitField(u => { u.schedule[index].resources = v; })} disabled={!isEditable} />
+                        <td className="p-2 w-20">
+                          <button
+                            onClick={() => updateUnitField(u => { u.schedule[index].completed = !u.schedule[index].completed; })}
+                            className={`px-2 py-1 rounded font-black text-[10px] uppercase ${row.completed ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-600'}`}
+                          >
+                            {row.completed ? 'OK' : 'PREV'}
+                          </button>
                         </td>
                         {isEditable && (
                           <td className="p-2">
-                            <button
-                              onClick={() => updateUnitField(u => { u.schedule.splice(index, 1); })}
-                              className="text-red-400 hover:text-red-600 font-bold"
-                            >
-                              ✕
-                            </button>
+                            <button onClick={() => updateUnitField(u => { u.schedule.splice(index, 1); })} className="text-red-400 hover:text-red-600 font-bold">✕</button>
                           </td>
                         )}
                       </tr>
@@ -624,6 +535,62 @@ export default function SmoothManager() {
             </div>
           )}
 
+          {/* ABA 4: CALENDÁRIO ESCOLAR (TOTALMENTE SINCRONIZADO COM O CRONOGRAMA) */}
+          {activeTab === 'calendario' && (
+            <div className="space-y-6">
+              <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                <h3 className="text-xs font-black text-slate-700 uppercase mb-2">Visão Geral do Calendário Escolar</h3>
+                <p className="text-xs text-slate-500">As aulas agendadas em todas as UCs são exibidas abaixo sincronizadas por mês.</p>
+              </div>
+
+              {monthList.map(monthKey => {
+                const [yearStr, monthStr] = monthKey.split('-');
+                const year = parseInt(yearStr);
+                const month = parseInt(monthStr) - 1;
+
+                const firstDayIndex = new Date(year, month, 1).getDay();
+                const daysInMonth = new Date(year, month + 1, 0).getDate();
+                const monthName = new Intl.DateTimeFormat('pt-BR', { month: 'long' }).format(new Date(year, month));
+
+                return (
+                  <div key={monthKey} className="bg-white p-6 border border-slate-200 rounded-3xl shadow-sm">
+                    <div className="mb-4 text-center border-b border-slate-100 pb-3">
+                      <h4 className="text-base font-black text-slate-800 uppercase tracking-widest">{monthName} / {year}</h4>
+                    </div>
+
+                    <div className="grid grid-cols-7 gap-2 text-center text-xs">
+                      {['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SÁB'].map(d => (
+                        <div key={d} className="font-black text-slate-400 p-2 uppercase text-[10px]">{d}</div>
+                      ))}
+
+                      {Array.from({ length: firstDayIndex }).map((_, i) => (
+                        <div key={`empty-${i}`} className="p-3 opacity-0" />
+                      ))}
+
+                      {Array.from({ length: daysInMonth }).map((_, i) => {
+                        const dayNum = i + 1;
+                        const formattedDate = `${String(dayNum).padStart(2, '0')}/${String(month + 1).padStart(2, '0')}/${year}`;
+                        const events = scheduledMap[formattedDate] || [];
+
+                        return (
+                          <div key={dayNum} className={`p-2 min-h-[50px] rounded-xl border flex flex-col items-center justify-between transition-all ${events.length > 0 ? 'bg-slate-50 border-blue-200 shadow-sm' : 'bg-white border-slate-100'}`}>
+                            <span className="text-xs font-bold text-slate-700">{dayNum}</span>
+                            
+                            {events.map((ev, evIdx) => (
+                              <div key={evIdx} className={`w-full mt-1 p-1 rounded text-[9px] font-black truncate ${ev.color}`} title={`${ev.ucName} - ${ev.capacity}`}>
+                                {ev.hours}h
+                              </div>
+                            ))}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
         </div>
 
       </div>
@@ -631,12 +598,10 @@ export default function SmoothManager() {
       {/* MODAL DE AUTENTICAÇÃO POR SENHA */}
       {isAuthModalOpen && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-3xl p-6 w-full max-w-sm shadow-2xl border border-slate-100 text-center animate-in fade-in zoom-in duration-150">
-            <div className="w-12 h-12 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto mb-3 font-black text-lg">
-              🔒
-            </div>
-            <h3 className="text-base font-black text-slate-800 uppercase tracking-tight">Acesso de Edição</h3>
-            <p className="text-xs text-slate-500 mt-1 mb-4">Digite a senha para desbloquear a edição e exclusão de itens.</p>
+          <div className="bg-white rounded-3xl p-6 w-full max-w-sm shadow-2xl border border-slate-100 text-center">
+            <div className="w-12 h-12 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto mb-3 font-black text-lg">🔒</div>
+            <h3 className="text-base font-black text-slate-800 uppercase">Acesso de Edição</h3>
+            <p className="text-xs text-slate-500 mt-1 mb-4">Digite a senha para liberar edições no Cronograma e SMO.</p>
 
             <input
               type="password"
@@ -644,32 +609,14 @@ export default function SmoothManager() {
               value={passwordInput}
               onChange={(e) => setPasswordInput(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleConfirmPassword()}
-              className={`w-full p-3 rounded-xl border text-center font-mono text-sm outline-none transition-all ${
-                authError ? 'border-red-500 bg-red-50 text-red-900' : 'border-slate-200 focus:border-blue-500 bg-slate-50'
-              }`}
+              className={`w-full p-3 rounded-xl border text-center font-mono text-sm outline-none ${authError ? 'border-red-500 bg-red-50' : 'border-slate-200 bg-slate-50'}`}
             />
 
-            {authError && (
-              <span className="text-[11px] font-bold text-red-500 block mt-2">
-                Senha incorreta! Tente novamente.
-              </span>
-            )}
+            {authError && <span className="text-[11px] font-bold text-red-500 block mt-2">Senha incorreta!</span>}
 
             <div className="flex gap-2 mt-5">
-              <button
-                type="button"
-                onClick={() => setIsAuthModalOpen(false)}
-                className="flex-1 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-50"
-              >
-                Cancelar
-              </button>
-              <button
-                type="button"
-                onClick={handleConfirmPassword}
-                className="flex-1 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition-all shadow-md"
-              >
-                Liberar
-              </button>
+              <button type="button" onClick={() => setIsAuthModalOpen(false)} className="flex-1 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-600">Cancelar</button>
+              <button type="button" onClick={handleConfirmPassword} className="flex-1 py-2.5 rounded-xl bg-slate-900 text-white text-xs font-bold">Liberar</button>
             </div>
           </div>
         </div>
