@@ -18,7 +18,7 @@ const TEXT_COLOR_MAP: Record<CalendarColor, string> = {
 };
 
 const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar, onUpdateUnit }) => {
-  // Inicializa diretamente na aba 'sa' (Situação-Problema) sem a aba 'geral'
+  // Inicializa diretamente na aba 'sa' (Situação-Problema)
   const [activeTab, setActiveTab] = useState<'sa' | 'rubricas' | 'cronograma' | 'calendario'>('sa');
   const [localSchedule, setLocalSchedule] = useState<ScheduleEntry[]>(unit.schedule);
 
@@ -172,7 +172,6 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
             page-break-inside: auto !important;
           }
           
-          /* OBRIGA A SEGUNDA SA (OFICINA LIMPA) A IR PARA PÁGINA 2 */
           .sa-print-block:nth-of-type(2) {
             page-break-before: always !important;
             break-before: page !important;
