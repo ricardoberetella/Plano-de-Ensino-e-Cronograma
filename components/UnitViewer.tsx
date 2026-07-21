@@ -1,27 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 
-// Tipos
 type SemesterType = '1' | '2' | 'both';
 
-interface GeneralCompetencies {
-  technicalCapacities: string[];
-  socioemotionalCapacities: string[];
-  knowledge: string[];
-}
-
-interface LearningSituation {
-  id: string;
-  title: string;
-  contextualization: string;
-  challenge: string;
-}
-
 interface FullUnitData {
-  id: string; // Sigla definida pelo usuário (ex: LIDT)
+  id: string; // Sigla da UC (ex: LIDT)
   name: string; // Nome completo
-  semesters: SemesterType; // 1, 2 ou Ambos
-  general: GeneralCompetencies;
-  learningSituations: LearningSituation[];
+  semesters: SemesterType; // 1, 2 ou both
 }
 
 const PASSWORD_REQUIRED = 'mecanicatop';
@@ -30,39 +14,31 @@ const INITIAL_DATABASE: Record<string, FullUnitData> = {
   LIDT: {
     id: 'LIDT',
     name: 'LEITURA E INTERPRETAÇÃO DE DESENHO TÉCNICO',
-    semesters: '1',
-    general: {
-      technicalCapacities: ['Interpretar projeções ortogonais (1º e 3º diedro).'],
-      socioemotionalCapacities: ['Rigor técnico e atenção aos detalhes.'],
-      knowledge: ['Formatos de papel e normas ABNT.']
-    },
-    learningSituations: []
+    semesters: '1'
   },
   CDMAT: {
     id: 'CDMAT',
     name: 'CIÊNCIAS DOS MATERIAIS',
-    semesters: '1',
-    general: { technicalCapacities: [], socioemotionalCapacities: [], knowledge: [] },
-    learningSituations: []
+    semesters: '1'
   },
   CRD: {
     id: 'CRD',
     name: 'CONTROLE DIMENSIONAL',
-    semesters: '2',
-    general: { technicalCapacities: [], socioemotionalCapacities: [], knowledge: [] },
-    learningSituations: []
+    semesters: '2'
   },
   FUSI: {
     id: 'FUSI',
     name: 'FUNDAMENTOS DA USINAGEM',
-    semesters: 'both',
-    general: { technicalCapacities: [], socioemotionalCapacities: [], knowledge: [] },
-    learningSituations: []
+    semesters: 'both' // Aparece em ambos os semestres
   }
 };
 
 export default function App() {
   const [db, setDb] = useState<Record<string, FullUnitData>>(INITIAL_DATABASE);
+  
+  // ABA DE SEMESTRE SELECIONADA (Filtra a tela totalmente)
+  const [activeTabSemester, setActiveTabSemester] = useState<'1' | '2'>('1');
+  
   const [selectedUcId, setSelectedUcId] = useState<string | null>('LIDT');
 
   // SEGURANÇA E SENHA
@@ -74,12 +50,12 @@ export default function App() {
 
   // MODAL DE CRIAR / EDITAR UC
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [editingUcKey, setEditingUcKey] = useState<string | null>(null); // null = criar, string = editar existente
+  const [editingUcKey, setEditingUcKey] = useState<string | null>(null);
   const [inputSigla, setInputSigla] = useState('');
   const [inputName, setInputName] = useState('');
   const [inputSemester, setInputSemester] = useState<SemesterType>('1');
 
-  // Execução com verificação de senha
+  // Autenticação
   const executeWithAuth = (action: () => void) => {
     if (isEditable) {
       action();
@@ -105,18 +81,24 @@ export default function App() {
     }
   };
 
-  // Abrir Modal para Criar
+  // FILTRAGEM RIGOROSA POR SEMESTRE SELECIONADO
+  const filteredUnits = useMemo(() => {
+    return Object.values(db).filter(
+      unit => unit.semesters === activeTabSemester || unit.semesters === 'both'
+    );
+  }, [db, activeTabSemester]);
+
+  // Modal handlers
   const handleOpenCreateModal = () => {
     executeWithAuth(() => {
       setEditingUcKey(null);
       setInputSigla('');
       setInputName('');
-      setInputSemester('1');
+      setInputSemester(activeTabSemester); // Já sugere o semestre que está aberto
       setIsCreateModalOpen(true);
     });
   };
 
-  // Abrir Modal para Editar Sigla/Nome/Semestre
   const handleOpenEditModal = (uc: FullUnitData) => {
     executeWithAuth(() => {
       setEditingUcKey(uc.id);
@@ -127,48 +109,25 @@ export default function App() {
     });
   };
 
-  // Salvar Criação ou Edição de UC
   const handleSaveUcModal = () => {
     const cleanSigla = inputSigla.trim().toUpperCase();
     const cleanName = inputName.trim().toUpperCase();
 
     if (!cleanSigla || !cleanName) {
-      alert('Por favor, informe a Sigla e o Nome da Unidade Curricular.');
+      alert('Preencha a Sigla e o Nome Completo da Unidade Curricular.');
       return;
     }
 
     setDb(prev => {
       const copy = { ...prev };
-
-      if (editingUcKey) {
-        // Se mudou a sigla, remove a antiga chave
-        if (editingUcKey !== cleanSigla) {
-          const oldData = copy[editingUcKey];
-          delete copy[editingUcKey];
-          copy[cleanSigla] = {
-            ...oldData,
-            id: cleanSigla,
-            name: cleanName,
-            semesters: inputSemester
-          };
-        } else {
-          copy[cleanSigla] = {
-            ...copy[cleanSigla],
-            name: cleanName,
-            semesters: inputSemester
-          };
-        }
-      } else {
-        // Criar Novo
-        copy[cleanSigla] = {
-          id: cleanSigla,
-          name: cleanName,
-          semesters: inputSemester,
-          general: { technicalCapacities: [], socioemotionalCapacities: [], knowledge: [] },
-          learningSituations: []
-        };
+      if (editingUcKey && editingUcKey !== cleanSigla) {
+        delete copy[editingUcKey];
       }
-
+      copy[cleanSigla] = {
+        id: cleanSigla,
+        name: cleanName,
+        semesters: inputSemester
+      };
       return copy;
     });
 
@@ -176,7 +135,6 @@ export default function App() {
     setIsCreateModalOpen(false);
   };
 
-  // Excluir UC
   const handleDeleteUc = (id: string) => {
     executeWithAuth(() => {
       setDb(prev => {
@@ -188,113 +146,166 @@ export default function App() {
     });
   };
 
-  const activeUnit = selectedUcId && db[selectedUcId] ? db[selectedUcId] : null;
-
   return (
     <div className="w-full bg-slate-100 min-h-screen p-4 md:p-8 font-sans">
+      
+      {/* BARRA SUPERIOR DE CONTEXTO */}
+      <div className="max-w-4xl mx-auto mb-4 flex justify-between items-center px-2">
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-black text-slate-400 uppercase">UNIDADES CURRICULARES</span>
+          <span className="text-slate-300">|</span>
+          <span className="bg-blue-100 text-blue-700 text-[10px] font-black px-2.5 py-1 rounded-full uppercase">
+            Mecânico de Usinagem Convencional
+          </span>
+        </div>
+
+        <button
+          onClick={() => executeWithAuth(() => {})}
+          className={`text-xs font-black px-4 py-2 rounded-xl transition-all ${
+            isEditable ? 'bg-emerald-500 text-white' : 'bg-amber-500 text-white shadow-sm'
+          }`}
+        >
+          {isEditable ? '🔓 Modo Edição (Liberado)' : '🔒 Modo Leitura (Bloqueado)'}
+        </button>
+      </div>
+
+      {/* CARD PRINCIPAL */}
       <div className="max-w-4xl mx-auto bg-white rounded-3xl shadow-xl p-6 md:p-8 border border-slate-200">
         
-        {/* CABEÇALHO COM MODO EDICÃO */}
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-xl font-black text-slate-900 tracking-tight">EDITAR PLANO DE ENSINO</h1>
+        </div>
+
+        {/* NAVEGAÇÃO CLARA DE SEMESTRES (DIVISÃO TOTAL) */}
+        <div className="bg-slate-100 p-1.5 rounded-2xl flex gap-2 mb-6 border border-slate-200">
           <button
-            onClick={() => executeWithAuth(() => {})}
-            className={`text-xs font-black px-4 py-2 rounded-xl transition-all ${
-              isEditable ? 'bg-emerald-500 text-white' : 'bg-amber-500 text-white'
+            type="button"
+            onClick={() => setActiveTabSemester('1')}
+            className={`flex-1 py-3 rounded-xl font-black text-xs uppercase transition-all flex items-center justify-center gap-2 ${
+              activeTabSemester === '1'
+                ? 'bg-blue-600 text-white shadow-md'
+                : 'text-slate-500 hover:text-slate-800'
             }`}
           >
-            {isEditable ? '🔓 Modo Edição (Liberado)' : '🔒 Modo Leitura (Bloqueado)'}
+            📘 1º SEMESTRE
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTabSemester('2')}
+            className={`flex-1 py-3 rounded-xl font-black text-xs uppercase transition-all flex items-center justify-center gap-2 ${
+              activeTabSemester === '2'
+                ? 'bg-purple-600 text-white shadow-md'
+                : 'text-slate-500 hover:text-slate-800'
+            }`}
+          >
+            📙 2º SEMESTRE
           </button>
         </div>
 
-        {/* ESTRUTURA DE UNIDADES (EXATAMENTE COMO NO SEU PRINT) */}
+        {/* CONTAINER DA ESTRUTURA SEPARADA POR SEMESTRE */}
         <div className="bg-slate-50/70 p-6 rounded-3xl border border-slate-200 mb-8">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-xs font-black text-slate-400 uppercase tracking-widest">
-              III. ESTRUTURA DE UNIDADES
-            </h2>
+            <div>
+              <span className="text-[10px] font-black text-slate-400 uppercase block">Visualizando:</span>
+              <h2 className="text-xs font-black text-slate-800 uppercase tracking-widest">
+                III. ESTRUTURA DE UNIDADES — {activeTabSemester}º SEMESTRE
+              </h2>
+            </div>
 
             <button
               type="button"
               onClick={handleOpenCreateModal}
-              className="bg-blue-600 hover:bg-blue-700 text-white text-xs font-black px-4 py-2 rounded-xl transition-all shadow-sm flex items-center gap-1"
+              className={`text-white text-xs font-black px-4 py-2.5 rounded-xl transition-all shadow-md ${
+                activeTabSemester === '1' ? 'bg-blue-600 hover:bg-blue-700' : 'bg-purple-600 hover:bg-purple-700'
+              }`}
             >
-              + NOVA UC
+              + NOVA UC ({activeTabSemester}º SEM)
             </button>
           </div>
 
-          {/* LISTA DE UCs */}
-          <div className="space-y-3">
-            {Object.values(db).map((unit, index) => {
-              const isSelected = selectedUcId === unit.id;
+          {/* LISTA FILTRADA DE UCs DO SEMESTRE SELECIONADO */}
+          {filteredUnits.length === 0 ? (
+            <div className="text-center py-8 text-xs font-bold text-slate-400 bg-white rounded-2xl border border-dashed border-slate-200">
+              Nenhuma Unidade Curricular vinculada ao {activeTabSemester}º Semestre.
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {filteredUnits.map((unit, index) => {
+                const isSelected = selectedUcId === unit.id;
 
-              return (
-                <div
-                  key={unit.id}
-                  onClick={() => setSelectedUcId(unit.id)}
-                  className={`p-4 rounded-2xl border transition-all flex items-center justify-between cursor-pointer ${
-                    isSelected
-                      ? 'border-blue-500 bg-white shadow-md ring-2 ring-blue-100'
-                      : 'border-slate-200 bg-white hover:border-slate-300'
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <span className="text-xs font-black text-slate-300 font-mono">
-                      {String(index + 1).padStart(2, '0')}
-                    </span>
-                    
-                    {/* SIGLA E NOME */}
-                    <div className="flex items-center gap-2">
-                      <span className="bg-slate-100 border border-slate-200 text-slate-700 px-2 py-0.5 rounded text-[10px] font-black font-mono">
-                        {unit.id}
+                return (
+                  <div
+                    key={unit.id}
+                    onClick={() => setSelectedUcId(unit.id)}
+                    className={`p-4 rounded-2xl border transition-all flex items-center justify-between cursor-pointer ${
+                      isSelected
+                        ? activeTabSemester === '1'
+                          ? 'border-blue-500 bg-white shadow-md ring-2 ring-blue-100'
+                          : 'border-purple-500 bg-white shadow-md ring-2 ring-purple-100'
+                        : 'border-slate-200 bg-white hover:border-slate-300'
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs font-black text-slate-300 font-mono">
+                        {String(index + 1).padStart(2, '0')}
                       </span>
-                      <span className="font-extrabold text-xs text-slate-800 uppercase">
-                        {unit.name}
-                      </span>
+                      
+                      {/* SIGLA E NOME */}
+                      <div className="flex items-center gap-2">
+                        <span className="bg-slate-100 border border-slate-200 text-slate-700 px-2 py-0.5 rounded text-[10px] font-black font-mono">
+                          {unit.id}
+                        </span>
+                        <span className="font-extrabold text-xs text-slate-800 uppercase">
+                          {unit.name}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-3" onClick={(e) => e.stopPropagation()}>
+                      {/* INDICAÇÃO DE PERTENCIMENTO */}
+                      {unit.semesters === 'both' ? (
+                        <span className="text-[9px] font-black px-2.5 py-1 rounded-lg uppercase bg-emerald-100 text-emerald-700">
+                          Ambos Semestres
+                        </span>
+                      ) : (
+                        <span
+                          className={`text-[9px] font-black px-2.5 py-1 rounded-lg uppercase ${
+                            unit.semesters === '1' ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700'
+                          }`}
+                        >
+                          {unit.semesters}º Semestre
+                        </span>
+                      )}
+
+                      {/* EDITAR */}
+                      <button
+                        type="button"
+                        title="Editar UC"
+                        onClick={() => handleOpenEditModal(unit)}
+                        className="text-slate-400 hover:text-blue-600 p-1 text-xs"
+                      >
+                        ✏️
+                      </button>
+
+                      {/* EXCLUIR */}
+                      <button
+                        type="button"
+                        title="Excluir UC"
+                        onClick={() => handleDeleteUc(unit.id)}
+                        className="text-slate-300 hover:text-red-500 font-bold p-1 text-base leading-none"
+                      >
+                        ✕
+                      </button>
                     </div>
                   </div>
-
-                  <div className="flex items-center gap-3" onClick={(e) => e.stopPropagation()}>
-                    {/* BADGE DO SEMESTRE */}
-                    <span
-                      className={`text-[9px] font-black px-2.5 py-1 rounded-lg uppercase ${
-                        unit.semesters === '1'
-                          ? 'bg-blue-100 text-blue-700'
-                          : unit.semesters === '2'
-                          ? 'bg-purple-100 text-purple-700'
-                          : 'bg-emerald-100 text-emerald-700'
-                      }`}
-                    >
-                      {unit.semesters === '1' ? '1º Semestre' : unit.semesters === '2' ? '2º Semestre' : 'Ambos'}
-                    </span>
-
-                    {/* EDITAR */}
-                    <button
-                      type="button"
-                      title="Editar Unidade"
-                      onClick={() => handleOpenEditModal(unit)}
-                      className="text-slate-400 hover:text-blue-600 p-1 text-xs"
-                    >
-                      ✏️
-                    </button>
-
-                    {/* EXCLUIR (ÍCONE DE 'X' IGUAL AO PRINT) */}
-                    <button
-                      type="button"
-                      title="Excluir Unidade"
-                      onClick={() => handleDeleteUc(unit.id)}
-                      className="text-slate-300 hover:text-red-500 font-bold p-1 text-base leading-none"
-                    >
-                      ✕
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+                );
+              })}
+            </div>
+          )}
         </div>
 
-        {/* BOTOES INFERIORES DA PÁGINA */}
+        {/* RODAPÉ */}
         <div className="flex justify-end gap-3 pt-4 border-t border-slate-200">
           <button type="button" className="px-5 py-2.5 rounded-xl text-xs font-black text-slate-400 uppercase hover:bg-slate-100">
             DESCARTAR
@@ -306,7 +317,7 @@ export default function App() {
 
       </div>
 
-      {/* MODAL PARA CRIAR / EDITAR UC (SIGLA + NOME + SEMESTRE) */}
+      {/* MODAL DE CRIAR / EDITAR UC */}
       {isCreateModalOpen && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-3xl p-6 w-full max-w-md shadow-2xl border border-slate-100">
@@ -321,7 +332,7 @@ export default function App() {
                 </label>
                 <input
                   type="text"
-                  placeholder="Ex: LIDT, FUSI, CRD"
+                  placeholder="Ex: LIDT, CRD, FUSI"
                   value={inputSigla}
                   onChange={(e) => setInputSigla(e.target.value)}
                   className="w-full p-3 rounded-xl border border-slate-200 text-xs font-mono font-bold uppercase outline-none focus:ring-2 focus:ring-blue-500"
@@ -388,13 +399,13 @@ export default function App() {
         </div>
       )}
 
-      {/* MODAL DE SENHA */}
+      {/* MODAL DE AUTENTICAÇÃO */}
       {isAuthModalOpen && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-3xl p-6 w-full max-w-sm shadow-2xl text-center">
             <div className="w-12 h-12 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto mb-3 font-black text-lg">🔒</div>
             <h3 className="text-base font-black text-slate-800 uppercase">Acesso Restrito</h3>
-            <p className="text-xs text-slate-500 mt-1 mb-4">Digite a senha para gerenciar as Unidades Curriculares.</p>
+            <p className="text-xs text-slate-500 mt-1 mb-4">Digite a senha para realizar edições no plano.</p>
 
             <input
               type="password"
