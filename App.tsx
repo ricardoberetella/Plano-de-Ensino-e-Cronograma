@@ -323,16 +323,6 @@ const App: React.FC = () => {
               }}
               onView={openPlan}
               onRefresh={() => loadPlans(activeProfileId)}
-              onDeletePlan={async (planId) => {
-                if (!isAdmin) {
-                  alert("Acesso restrito: O visualizador não pode excluir planos.");
-                  return;
-                }
-                if (window.confirm("Deseja realmente excluir este plano?")) {
-                  await FirebaseService.deletePlan(planId);
-                  loadPlans(activeProfileId);
-                }
-              }}
             />
           )}
 
