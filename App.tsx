@@ -95,8 +95,8 @@ const App: React.FC = () => {
 
         let dbPlans = await FirebaseService.getPlans(profileId);
 
-        // Se o Firebase estiver vazio, recria imediatamente com o template oficial e salva na nuvem
-        if (!dbPlans || dbPlans.length === 0 || dbPlans.every(p => !p.courseName || !p.units?.length)) {
+        // Se não houver nenhum plano na nuvem para este perfil, cria e salva o template imediatamente
+        if (!dbPlans || dbPlans.length === 0) {
           const freshPlan: TeachingPlan = {
             ...template,
             id: `plan-usinagem-${profileId}-${Date.now()}`,
@@ -110,13 +110,9 @@ const App: React.FC = () => {
           dbPlans = [freshPlan];
         }
 
-        const validPlans = (dbPlans || []).filter(
-          p => p && p.courseName && p.units?.length > 0
-        );
+        setPlans(dbPlans);
 
-        setPlans(validPlans);
-
-        const nextCurrent = validPlans[0] || template;
+        const nextCurrent = dbPlans[0] || template;
         setCurrentPlan(nextCurrent);
 
         const availableSemesters = Array.from(
