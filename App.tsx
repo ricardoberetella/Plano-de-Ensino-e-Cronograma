@@ -27,15 +27,6 @@ const getUnitSigla = (unit: CurricularUnit): string => {
   if (unit.code?.trim()) return unit.code.trim().toUpperCase();
 
   const name = normalizeText(unit.name || '');
-  const id = normalizeText(unit.id || '');
-
-  if (name.includes('LEITURA') || name.includes('DESENHO') || id.includes('LIDT')) return 'LIDT';
-  if (name.includes('CIENCIAS DOS MATERIAIS') || id.includes('CDMAT')) return 'CDMAT';
-  if (name.includes('CONTROLE DIMENSIONAL') || id.includes('CRD')) return 'CRD';
-  if (name.includes('FUNDAMENTOS DA USINAGEM') || id.includes('FUSI')) return 'FUSI';
-  if (name.includes('PROCESSOS DE USINAGEM CONVENCIONAL') || id.includes('PRUSC')) return 'PRUSC';
-  if (name.includes('METROLOGIA INDUSTRIAL') || id.includes('METIND')) return 'METIND';
-
   return name
     .split(/\s+/)
     .filter(Boolean)
@@ -154,7 +145,7 @@ const App: React.FC = () => {
         if (!originalUnit) continue;
         const sigla = getUnitSigla(originalUnit);
 
-        if (!sigla || seen.has(sigla) || originalUnit.id === '04' || originalUnit.id === '05') {
+        if (!sigla || seen.has(sigla)) {
           updated = true;
           continue;
         }
@@ -316,7 +307,7 @@ const App: React.FC = () => {
               unit &&
               unit.active !== false &&
               Number(unit.semester || 1) === nextSemester
-            ) ||
+          ) ||
           null;
 
         setSelectedUnit(nextSelected);
