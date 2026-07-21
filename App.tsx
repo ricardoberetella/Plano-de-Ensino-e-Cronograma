@@ -65,7 +65,7 @@ const mergeUnitWithTemplate = (
       existingUnit.calendar?.semester ||
       existingUnit.semester ||
       templateUnit.calendar?.semester ||
-      templateUnit.semester
+      existingUnit.semester
   },
   basicCapacities:
     existingUnit.basicCapacities?.length
@@ -134,6 +134,11 @@ const App: React.FC = () => {
       let updated = false;
       const templateUnits = Array.isArray(template?.units) ? template.units : [];
       const planUnits = Array.isArray(plan?.units) ? plan.units : [];
+
+      // Se o plano da nuvem estiver corrompido (sem nome ou sem unidades), força restaurar do template completo
+      if (!plan.courseName || plan.totalHours === 0 || planUnits.length === 0) {
+        return { normalizedPlan: { ...template, profileId: activeProfileId, version: SCHEDULE_VERSION, updatedAt: new Date().toISOString() }, updated: true };
+      }
 
       const templateBySigla = new Map(
         templateUnits.map(unit => [getUnitSigla(unit), unit])
@@ -214,12 +219,6 @@ const App: React.FC = () => {
         updatedAt: updated ? new Date().toISOString() : plan.updatedAt
       };
 
-      if (plan.version !== SCHEDULE_VERSION) {
-        normalizedPlan.version = SCHEDULE_VERSION;
-        normalizedPlan.updatedAt = new Date().toISOString();
-        updated = true;
-      }
-
       return { normalizedPlan, updated };
     },
     [activeProfileId]
@@ -246,8 +245,9 @@ const App: React.FC = () => {
             units: sortUnits(template?.units || [])
           };
 
-          // Apenas grava o padrão inicial se necessário, mas podemos condicionar ou deixar livres para leitura
-          await FirebaseService.savePlan(defaultPlan);
+          if (isAdmin) {
+            await FirebaseService.savePlan(defaultPlan);
+          }
 
           setPlans([defaultPlan]);
           setCurrentPlan(defaultPlan);
@@ -263,6 +263,7 @@ const App: React.FC = () => {
           ) || null;
 
           setSelectedUnit(firstUnit);
+          setIsLoading(false);
           return;
         }
 
@@ -271,7 +272,6 @@ const App: React.FC = () => {
         for (const plan of dbPlans) {
           const { normalizedPlan, updated } = normalizePlan(plan, template);
 
-          // Se for admin e houver atualização automática estrutural, salva. Usuário comum apenas lê.
           if (updated && isAdmin) {
             await FirebaseService.savePlan(normalizedPlan);
           }
@@ -329,22 +329,9 @@ const App: React.FC = () => {
     }
   }, [activeProfileId, isAuthenticated, loadPlans]);
 
-  useEffect(() => {
-    if (!visibleUnits.length) return;
-
-    const selectedIsVisible = visibleUnits.some(
-      unit => unit.id === selectedUnit?.id
-    );
-
-    if (!selectedIsVisible) {
-      setSelectedUnit(visibleUnits[0]);
-    }
-  }, [visibleUnits, selectedUnit?.id]);
-
   const persistPlan = async (updatedPlan: TeachingPlan) => {
-    // Trava de segurança rigorosa: se não for admin, impede a persistência
     if (!isAdmin) {
-      alert('Acesso negado: A senha utilizada permite apenas visualização.');
+      alert('Acesso negado: O perfil de visualização não pode alterar dados.');
       throw new Error('Unauthorized');
     }
 
@@ -366,10 +353,7 @@ const App: React.FC = () => {
   };
 
   const handleSave = async (updatedPlan: TeachingPlan) => {
-    if (!isAdmin) {
-      alert('Acesso negado: Apenas o administrador pode salvar alterações.');
-      return;
-    }
+    if (!isAdmin) return;
     try {
       await persistPlan(updatedPlan);
       const refreshed = await FirebaseService.getPlans(activeProfileId);
@@ -384,21 +368,11 @@ const App: React.FC = () => {
     unitId: string,
     newSchedule: ScheduleEntry[]
   ) => {
-    if (!isAdmin) {
-      alert('Acesso negado: Modo de visualização.');
-      return;
-    }
-    if (!currentPlan) return;
-
+    if (!isAdmin || !currentPlan) return;
     const updatedUnits = currentPlan.units.map(unit =>
       unit.id === unitId ? { ...unit, schedule: newSchedule } : unit
     );
-
-    const updatedPlan = await persistPlan({
-      ...currentPlan,
-      units: updatedUnits
-    });
-
+    const updatedPlan = await persistPlan({ ...currentPlan, units: updatedUnits });
     const updatedUnit = updatedPlan.units.find(unit => unit.id === unitId);
     if (updatedUnit) setSelectedUnit(updatedUnit);
   };
@@ -407,69 +381,32 @@ const App: React.FC = () => {
     unitId: string,
     newCalendar: UnitCalendar
   ) => {
-    if (!isAdmin) {
-      alert('Acesso negado: Modo de visualização.');
-      return;
-    }
-    if (!currentPlan) return;
-
+    if (!isAdmin || !currentPlan) return;
     const updatedUnits = currentPlan.units.map(unit =>
       unit.id === unitId
-        ? {
-            ...unit,
-            calendar: {
-              ...newCalendar,
-              semester:
-                newCalendar.semester ||
-                unit.semester
-            }
-          }
+        ? { ...unit, calendar: { ...newCalendar, semester: newCalendar.semester || unit.semester } }
         : unit
     );
-
-    const updatedPlan = await persistPlan({
-      ...currentPlan,
-      units: updatedUnits
-    });
-
+    const updatedPlan = await persistPlan({ ...currentPlan, units: updatedUnits });
     const updatedUnit = updatedPlan.units.find(unit => unit.id === unitId);
     if (updatedUnit) setSelectedUnit(updatedUnit);
   };
 
   const handleUpdateUnit = async (updatedUnit: CurricularUnit) => {
-    if (!isAdmin) {
-      alert('Acesso negado: Modo de visualização.');
-      return;
-    }
-    if (!currentPlan) return;
-
+    if (!isAdmin || !currentPlan) return;
     const normalizedUnit: CurricularUnit = {
       ...updatedUnit,
       code: updatedUnit.code || getUnitSigla(updatedUnit),
       semester: Number(updatedUnit.semester || 1),
       order: Number(updatedUnit.order || 1),
       active: updatedUnit.active ?? true,
-      calendar: {
-        ...updatedUnit.calendar,
-        semester:
-          updatedUnit.calendar?.semester ||
-          Number(updatedUnit.semester || 1)
-      }
+      calendar: { ...updatedUnit.calendar, semester: updatedUnit.calendar?.semester || Number(updatedUnit.semester || 1) }
     };
-
     const updatedUnits = currentPlan.units.map(unit =>
       unit.id === normalizedUnit.id ? normalizedUnit : unit
     );
-
-    const updatedPlan = await persistPlan({
-      ...currentPlan,
-      units: updatedUnits
-    });
-
-    const savedUnit = updatedPlan.units.find(
-      unit => unit.id === normalizedUnit.id
-    );
-
+    const updatedPlan = await persistPlan({ ...currentPlan, units: updatedUnits });
+    const savedUnit = updatedPlan.units.find(unit => unit.id === normalizedUnit.id);
     if (savedUnit) {
       setSelectedUnit(savedUnit);
       setSelectedSemester(savedUnit.semester);
@@ -506,7 +443,7 @@ const App: React.FC = () => {
   };
 
   const openPlan = (plan: TeachingPlan) => {
-    const orderedUnits = sortUnits(plan.units);
+    const orderedUnits = sortUnits(plan.units || []);
     const firstUnit = orderedUnits.find(unit => unit.active !== false) || null;
     const firstSemester = Number(firstUnit?.semester || 1);
 
@@ -529,7 +466,7 @@ const App: React.FC = () => {
       onViewChange={setView}
       onLogout={handleLogout}
       activeProfileId={activeProfileId}
-      onProfileChange={handleProfileChange}
+      onProfileCardChange={handleProfileChange}
     >
       {isLoading ? (
         <div className="flex flex-col items-center justify-center h-full space-y-4">
@@ -543,9 +480,10 @@ const App: React.FC = () => {
           {view === 'dashboard' && (
             <Dashboard
               plans={plans}
+              isAdmin={isAdmin} // <--- Passando o parâmetro isAdmin para o Dashboard ocultar botões de edição/lixeira se for visualizador
               onEdit={plan => {
                 if (!isAdmin) {
-                  alert("Acesso restrito: A senha de usuário comum permite apenas visualização.");
+                  alert("Acesso restrito: Apenas o administrador pode editar.");
                   return;
                 }
                 setCurrentPlan(plan);
@@ -553,6 +491,16 @@ const App: React.FC = () => {
               }}
               onView={openPlan}
               onRefresh={() => loadPlans(activeProfileId)}
+              onDeletePlan={async (planId) => {
+                if (!isAdmin) {
+                  alert("Acesso restrito: O visualizador não pode excluir planos.");
+                  return;
+                }
+                if (window.confirm("Deseja realmente excluir este plano?")) {
+                  await FirebaseService.deletePlan(planId);
+                  loadPlans(activeProfileId);
+                }
+              }}
             />
           )}
 
@@ -560,53 +508,36 @@ const App: React.FC = () => {
             <div className="max-w-5xl mx-auto space-y-10 animate-fadeIn pb-20">
               <div className="bg-white rounded-[2.5rem] p-8 md:p-16 border border-slate-200 shadow-2xl relative overflow-hidden">
                 <div className="absolute top-0 left-0 w-2 h-full bg-[#E30613]" />
-
                 <div className="mb-12 flex justify-between items-start">
                   <div>
                     <span className="bg-slate-900 text-white px-3 py-1 rounded text-[10px] font-black uppercase tracking-[0.2em] mb-4 inline-block">
                       MSEP - Modelo SENAI
                     </span>
                     <h2 className="text-3xl md:text-5xl font-[1000] text-slate-900 tracking-tighter uppercase leading-[0.9]">
-                      {currentPlan.courseName}
+                      {currentPlan.courseName || "Curso de Usinagem"}
                     </h2>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
                   <div className="p-6 bg-slate-50 rounded-3xl border border-slate-100">
-                    <p className="text-[9px] font-black text-slate-400 uppercase mb-2">
-                      Carga Total
-                    </p>
-                    <p className="text-2xl font-black text-slate-800 italic">
-                      {currentPlan.totalHours} HORAS
-                    </p>
+                    <p className="text-[9px] font-black text-slate-400 uppercase mb-2">Carga Total</p>
+                    <p className="text-2xl font-black text-slate-800 italic">{currentPlan.totalHours || 1400} HORAS</p>
                   </div>
-
                   <div className="p-6 bg-slate-50 rounded-3xl border border-slate-100">
-                    <p className="text-[9px] font-black text-slate-400 uppercase mb-2">
-                      Modalidade
-                    </p>
-                    <p className="text-2xl font-black text-slate-800 italic uppercase">
-                      {currentPlan.modality}
-                    </p>
+                    <p className="text-[9px] font-black text-slate-400 uppercase mb-2">Modalidade</p>
+                    <p className="text-2xl font-black text-slate-800 italic uppercase">{currentPlan.modality || "Presencial"}</p>
                   </div>
                 </div>
 
                 <section>
-                  <h3 className="text-[10px] font-black uppercase text-blue-600 tracking-[0.3em] mb-4">
-                    I. Perfil de Conclusão
-                  </h3>
-                  <p className="text-slate-600 text-sm leading-relaxed font-medium">
-                    {currentPlan.objective}
-                  </p>
+                  <h3 className="text-[10px] font-black uppercase text-blue-600 tracking-[0.3em] mb-4">I. Perfil de Conclusão</h3>
+                  <p className="text-slate-600 text-sm leading-relaxed font-medium">{currentPlan.objective || "Perfil padrão do curso."}</p>
                 </section>
               </div>
 
               <div className="bg-slate-900 rounded-[2.5rem] p-8 md:p-12 text-white shadow-2xl">
-                <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 mb-8">
-                  III. Unidades Curriculares
-                </h3>
-
+                <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 mb-8">III. Unidades Curriculares</h3>
                 <div className="flex flex-wrap gap-3 mb-8">
                   {currentPlanSemesters.map(semester => (
                     <button
@@ -634,15 +565,9 @@ const App: React.FC = () => {
                       }}
                       className="bg-slate-800 p-8 rounded-3xl text-left hover:bg-blue-600 transition-all group relative overflow-hidden"
                     >
-                      <span className="text-6xl font-black opacity-5 absolute -right-2 -bottom-2">
-                        {String(index + 1).padStart(2, '0')}
-                      </span>
-                      <p className="text-[9px] font-black text-blue-400 mb-2">
-                        {getUnitSigla(unit)}
-                      </p>
-                      <h4 className="font-black text-lg leading-tight uppercase line-clamp-2">
-                        {unit.name}
-                      </h4>
+                      <span className="text-6xl font-black opacity-5 absolute -right-2 -bottom-2">{String(index + 1).padStart(2, '0')}</span>
+                      <p className="text-[9px] font-black text-blue-400 mb-2">{getUnitSigla(unit)}</p>
+                      <h4 className="font-black text-lg leading-tight uppercase line-clamp-2">{unit.name}</h4>
                     </button>
                   ))}
                 </div>
@@ -650,55 +575,49 @@ const App: React.FC = () => {
             </div>
           )}
 
-          {view === ('plano-ensino' as ViewType) &&
-            currentPlan &&
-            selectedUnit && (
-              <div className="space-y-8 max-w-7xl mx-auto pb-20">
-                <div className="flex flex-wrap gap-3 px-1">
-                  {currentPlanSemesters.map(semester => (
-                    <button
-                      key={semester}
-                      onClick={() => setSelectedSemester(semester)}
-                      className={`px-6 py-3 rounded-2xl text-[10px] font-black uppercase transition-all border-2 ${
-                        Number(selectedSemester) === Number(semester)
-                          ? 'bg-slate-900 border-slate-900 text-white shadow-lg'
-                          : 'bg-white border-slate-200 text-slate-400 hover:border-blue-300'
-                      }`}
-                    >
-                      {semester}º semestre
-                    </button>
-                  ))}
-                </div>
-
-                <div className="flex gap-2 overflow-x-auto pb-4 scrollbar-hide px-1">
-                  {visibleUnits.map(unit => (
-                    <button
-                      key={unit.id}
-                      onClick={() => setSelectedUnit(unit)}
-                      className={`flex-shrink-0 px-8 py-4 rounded-2xl text-[10px] font-black uppercase transition-all border-2 ${
-                        selectedUnit.id === unit.id
-                          ? 'bg-blue-600 border-blue-600 text-white shadow-xl scale-105'
-                          : 'bg-white border-slate-200 text-slate-400 hover:border-blue-100'
-                      }`}
-                    >
-                      {getUnitSigla(unit)}
-                    </button>
-                  ))}
-                </div>
-
-                <UnitViewer
-                  unit={selectedUnit}
-                  isAdmin={isAdmin}
-                  onUpdateSchedule={newSchedule =>
-                    handleUpdateSchedule(selectedUnit.id, newSchedule)
-                  }
-                  onUpdateCalendar={newCalendar =>
-                    handleUpdateCalendar(selectedUnit.id, newCalendar)
-                  }
-                  onUpdateUnit={handleUpdateUnit}
-                />
+          {view === ('plano-ensino' as ViewType) && currentPlan && selectedUnit && (
+            <div className="space-y-8 max-w-7xl mx-auto pb-20">
+              <div className="flex flex-wrap gap-3 px-1">
+                {currentPlanSemesters.map(semester => (
+                  <button
+                    key={semester}
+                    onClick={() => setSelectedSemester(semester)}
+                    className={`px-6 py-3 rounded-2xl text-[10px] font-black uppercase transition-all border-2 ${
+                      Number(selectedSemester) === Number(semester)
+                        ? 'bg-slate-900 border-slate-900 text-white shadow-lg'
+                        : 'bg-white border-slate-200 text-slate-400 hover:border-blue-300'
+                    }`}
+                  >
+                    {semester}º semestre
+                  </button>
+                ))}
               </div>
-            )}
+
+              <div className="flex gap-2 overflow-x-auto pb-4 scrollbar-hide px-1">
+                {visibleUnits.map(unit => (
+                  <button
+                    key={unit.id}
+                    onClick={() => setSelectedUnit(unit)}
+                    className={`flex-shrink-0 px-8 py-4 rounded-2xl text-[10px] font-black uppercase transition-all border-2 ${
+                      selectedUnit.id === unit.id
+                        ? 'bg-blue-600 border-blue-600 text-white shadow-xl scale-105'
+                        : 'bg-white border-slate-200 text-slate-400 hover:border-blue-100'
+                    }`}
+                  >
+                    {getUnitSigla(unit)}
+                  </button>
+                ))}
+              </div>
+
+              <UnitViewer
+                unit={selectedUnit}
+                isAdmin={isAdmin}
+                onUpdateSchedule={newSchedule => handleUpdateSchedule(selectedUnit.id, newSchedule)}
+                onUpdateCalendar={newCalendar => handleUpdateCalendar(selectedUnit.id, newCalendar)}
+                onUpdateUnit={handleUpdateUnit}
+              />
+            </div>
+          )}
 
           {view === ('calendario' as ViewType) && currentPlan && (
             <GeneralCalendar plan={currentPlan} />
