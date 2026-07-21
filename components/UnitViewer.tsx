@@ -15,12 +15,6 @@ interface LearningSituation {
   expectedResults: string[];
 }
 
-interface Rubric {
-  id: string;
-  capacity: string;
-  levels: { nsa: string; apo: string; par: string; aut: string };
-}
-
 interface ScheduleEntry {
   id: string;
   date: string; // DD/MM/AAAA
@@ -37,7 +31,6 @@ interface FullUnitData {
   semester: number;
   general: GeneralCompetencies;
   learningSituations: LearningSituation[];
-  rubrics: Rubric[];
   schedule: ScheduleEntry[];
 }
 
@@ -52,9 +45,30 @@ const INITIAL_DATABASE: Record<'LIDT' | 'CDMAT' | 'CRD' | 'FUSI', FullUnitData> 
   LIDT: {
     name: 'Leitura e Interpretação de Desenho Técnico',
     semester: 1,
-    general: { technicalCapacities: [], socioemotionalCapacities: [], knowledge: [] },
-    learningSituations: [],
-    rubrics: [],
+    general: {
+      technicalCapacities: [
+        'Interpretar projeções ortogonais (1º e 3º diedro) de peças mecânicas.',
+        'Identificar e aplicar escalas numéricas, hachuras, cortes e seções.',
+        'Interpretar cotagem, tolerâncias dimensionais e geométricas.'
+      ],
+      socioemotionalCapacities: [
+        'Demonstrar rigor técnico e atenção aos detalhes.',
+        'Trabalhar de forma colaborativa.'
+      ],
+      knowledge: [
+        'Formatos de papel, legenda e dobramento de desenhos (Normas ABNT).',
+        'Sistemas de projeção ortográfica e representação em perspectiva.'
+      ]
+    },
+    learningSituations: [
+      {
+        id: 'lidt-sa1',
+        title: 'Detecção de Falhas de Fabricação por Erro de Desenho',
+        contextualization: 'O setor de controle de qualidade identificou um lote de eixos escalonados fora dos limites.',
+        challenge: 'Interpretar e corrigir o desenho técnico do eixo escalonado.',
+        expectedResults: ['Desenho técnico corrigido conforme ISO.']
+      }
+    ],
     schedule: [
       {
         id: 'e1',
@@ -68,17 +82,18 @@ const INITIAL_DATABASE: Record<'LIDT' | 'CDMAT' | 'CRD' | 'FUSI', FullUnitData> 
       }
     ]
   },
-  CDMAT: { name: 'Ciência e Tecnologia dos Materiais', semester: 1, general: { technicalCapacities: [], socioemotionalCapacities: [], knowledge: [] }, learningSituations: [], rubrics: [], schedule: [{ id: 'e2', date: '11/02/2026', hours: 4, capacities: 'Identificar ligas metálicas', knowledge: 'Diagrama Ferro-Carbono', strategy: 'Análise metalográfica', resources: 'Laboratório', completed: false }] },
-  CRD: { name: 'Controle Dimensional', semester: 1, general: { technicalCapacities: [], socioemotionalCapacities: [], knowledge: [] }, learningSituations: [], rubrics: [], schedule: [{ id: 'e3', date: '12/02/2026', hours: 4, capacities: 'Medição com Paquímetro', knowledge: 'Metrologia básica', strategy: 'Prática de medição', resources: 'Blocos padrão', completed: true }] },
-  FUSI: { name: 'Fundamentos da Usinagem', semester: 1, general: { technicalCapacities: [], socioemotionalCapacities: [], knowledge: [] }, learningSituations: [], rubrics: [], schedule: [{ id: 'e4', date: '13/02/2026', hours: 4, capacities: 'Calcular parâmetros de corte', knowledge: 'Geometria da ferramenta', strategy: 'Exercícios práticos', resources: 'Tabelas técnicas', completed: false }] }
+  CDMAT: { name: 'Ciência e Tecnologia dos Materiais', semester: 1, general: { technicalCapacities: ['Identificar ligas metálicas'], socioemotionalCapacities: ['Responsabilidade ambiental'], knowledge: ['Diagrama Ferro-Carbono'] }, learningSituations: [], schedule: [{ id: 'e2', date: '11/02/2026', hours: 4, capacities: 'Identificar ligas metálicas', knowledge: 'Diagrama Ferro-Carbono', strategy: 'Análise metalográfica', resources: 'Laboratório', completed: false }] },
+  CRD: { name: 'Controle Dimensional', semester: 1, general: { technicalCapacities: ['Medição com Paquímetro'], socioemotionalCapacities: ['Atenção aos detalhes'], knowledge: ['Metrologia básica'] }, learningSituations: [], schedule: [{ id: 'e3', date: '12/02/2026', hours: 4, capacities: 'Medição com Paquímetro', knowledge: 'Metrologia básica', strategy: 'Prática de medição', resources: 'Blocos padrão', completed: true }] },
+  FUSI: { name: 'Fundamentos da Usinagem', semester: 1, general: { technicalCapacities: ['Calcular parâmetros de corte'], socioemotionalCapacities: ['Segurança no trabalho'], knowledge: ['Geometria da ferramenta'] }, learningSituations: [], schedule: [{ id: 'e4', date: '13/02/2026', hours: 4, capacities: 'Calcular parâmetros de corte', knowledge: 'Geometria da ferramenta', strategy: 'Exercícios práticos', resources: 'Tabelas técnicas', completed: false }] }
 };
 
-// Componente Editor Editável
+// Componente Editor Editável que preserva foco e edita diretamente
 const RichEditable: React.FC<{
   html: string;
   onChange: (newHtml: string) => void;
   className?: string;
-}> = ({ html, onChange, className = '' }) => {
+  placeholder?: string;
+}> = ({ html, onChange, className = '', placeholder = 'Clique para editar...' }) => {
   const [showToolbar, setShowToolbar] = useState(false);
   const editorRef = useRef<HTMLDivElement>(null);
 
@@ -105,8 +120,8 @@ const RichEditable: React.FC<{
           setTimeout(() => setShowToolbar(false), 200);
           if (editorRef.current) onChange(editorRef.current.innerHTML);
         }}
-        className={`w-full min-h-[1.2rem] bg-transparent focus:outline-none rounded px-1 break-words ${className}`}
-        dangerouslySetInnerHTML={{ __html: html }}
+        className={`w-full min-h-[1.5rem] bg-transparent focus:bg-white/80 focus:ring-2 focus:ring-blue-400 focus:outline-none rounded px-2 py-1 break-words transition-all ${className}`}
+        dangerouslySetInnerHTML={{ __html: html || placeholder }}
       />
     </div>
   );
@@ -115,7 +130,7 @@ const RichEditable: React.FC<{
 const UnitViewer: React.FC = () => {
   const [db, setDb] = useState<Record<'LIDT' | 'CDMAT' | 'CRD' | 'FUSI', FullUnitData>>(INITIAL_DATABASE);
   const [currentUc, setCurrentUc] = useState<'LIDT' | 'CDMAT' | 'CRD' | 'FUSI'>('LIDT');
-  const [activeTab, setActiveTab] = useState<'geral' | 'sa' | 'cronograma' | 'calendario'>('cronograma');
+  const [activeTab, setActiveTab] = useState<'geral' | 'sa' | 'cronograma' | 'calendario'>('geral');
 
   const unit = db[currentUc];
   const theme = UC_THEMES[currentUc];
@@ -123,7 +138,9 @@ const UnitViewer: React.FC = () => {
   const updateUnitField = (updater: (draft: FullUnitData) => void) => {
     setDb(prev => {
       const copy = { ...prev };
-      updater(copy[currentUc]);
+      const currentDraft = { ...copy[currentUc] };
+      updater(currentDraft);
+      copy[currentUc] = currentDraft;
       return copy;
     });
   };
@@ -137,7 +154,6 @@ const UnitViewer: React.FC = () => {
     return new Intl.DateTimeFormat('pt-BR', { weekday: 'short' }).format(dateObj);
   };
 
-  // Mapeia todas as datas de todas as UCs e extrai os meses/anos dinamicamente
   const { allScheduledDates, monthsList } = useMemo(() => {
     const datesMap: Record<string, { uc: 'LIDT' | 'CDMAT' | 'CRD' | 'FUSI'; task: string }> = {};
     const monthsSet = new Set<string>();
@@ -148,21 +164,18 @@ const UnitViewer: React.FC = () => {
         const parts = cleanDate.split('/');
         if (parts.length === 3) {
           datesMap[cleanDate] = { uc: ucKey, task: item.capacities.replace(/<[^>]*>/g, '') };
-          // Formato chave para mes/ano: YYYY-MM
           const monthKey = `${parts[2]}-${parts[1].padStart(2, '0')}`;
           monthsSet.add(monthKey);
         }
       });
     });
 
-    // Se nenhuma data cadastrada, garante o mês atual no calendário
     if (monthsSet.size === 0) {
       const today = new Date();
       monthsSet.add(`${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`);
     }
 
-    const sortedMonths = Array.from(monthsSet).sort();
-    return { allScheduledDates: datesMap, monthsList: sortedMonths };
+    return { allScheduledDates: datesMap, monthsList: Array.from(monthsSet).sort() };
   }, [db]);
 
   return (
@@ -185,7 +198,7 @@ const UnitViewer: React.FC = () => {
         ))}
       </div>
 
-      {/* CABEÇALHO DA UNIDADE ATIVA */}
+      {/* CABEÇALHO EDITÁVEL DA UNIDADE ATIVA */}
       <div className={`mb-6 p-4 bg-white border-l-4 ${theme.border} rounded-r-3xl shadow-sm flex items-center justify-between`}>
         <div className="flex-1 mr-4">
           <span className={`text-[9px] font-black uppercase tracking-wider block mb-0.5 ${theme.text}`}>
@@ -208,7 +221,7 @@ const UnitViewer: React.FC = () => {
         </div>
       </div>
 
-      {/* NAVEGAÇÃO INTERNA */}
+      {/* NAVEGAÇÃO DE ABAS */}
       <div className="flex border-b border-slate-200 mb-6 no-print gap-2">
         {(['geral', 'sa', 'cronograma', 'calendario'] as const).map(tab => (
           <button
@@ -226,11 +239,200 @@ const UnitViewer: React.FC = () => {
       {/* CONTEÚDO DAS ABAS */}
       <div className="tab-content">
         
-        {/* CRONOGRAMA */}
-        {activeTab === 'cronograma' && (
-          <div className="space-y-4 group/panel">
+        {/* ABA: ESTRUTURA GERAL (EDITÁVEL) */}
+        {activeTab === 'geral' && (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            
+            {/* CAPACIDADES TÉCNICAS */}
+            <div className="bg-white p-5 border border-slate-200 rounded-3xl shadow-sm space-y-3">
+              <div className="flex justify-between items-center border-b pb-2">
+                <h3 className="text-xs font-black text-slate-800 uppercase tracking-wider">Capacidades Técnicas</h3>
+                <button
+                  type="button"
+                  onClick={() => updateUnitField(u => { u.general.technicalCapacities.push('Nova Capacidade Técnica'); })}
+                  className="text-[10px] bg-slate-100 hover:bg-slate-200 text-slate-700 px-2 py-0.5 rounded-lg font-bold"
+                >
+                  + Add
+                </button>
+              </div>
+              {unit.general.technicalCapacities.map((cap, i) => (
+                <div key={i} className="flex items-start gap-1 group/item">
+                  <RichEditable
+                    html={cap}
+                    onChange={(val) => updateUnitField(u => { u.general.technicalCapacities[i] = val; })}
+                    className="text-xs text-slate-700 bg-slate-50 border border-slate-100 rounded-xl"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => updateUnitField(u => { u.general.technicalCapacities.splice(i, 1); })}
+                    className="opacity-0 group-hover/item:opacity-100 text-red-400 hover:text-red-600 font-bold text-xs p-1"
+                  >
+                    ✕
+                  </button>
+                </div>
+              ))}
+            </div>
+
+            {/* CAPACIDADES SOCIOEMOCIONAIS */}
+            <div className="bg-white p-5 border border-slate-200 rounded-3xl shadow-sm space-y-3">
+              <div className="flex justify-between items-center border-b pb-2">
+                <h3 className="text-xs font-black text-slate-800 uppercase tracking-wider">Socioemocionais</h3>
+                <button
+                  type="button"
+                  onClick={() => updateUnitField(u => { u.general.socioemotionalCapacities.push('Nova Capacidade Socioemocional'); })}
+                  className="text-[10px] bg-slate-100 hover:bg-slate-200 text-slate-700 px-2 py-0.5 rounded-lg font-bold"
+                >
+                  + Add
+                </button>
+              </div>
+              {unit.general.socioemotionalCapacities.map((cap, i) => (
+                <div key={i} className="flex items-start gap-1 group/item">
+                  <RichEditable
+                    html={cap}
+                    onChange={(val) => updateUnitField(u => { u.general.socioemotionalCapacities[i] = val; })}
+                    className="text-xs text-slate-700 bg-slate-50 border border-slate-100 rounded-xl"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => updateUnitField(u => { u.general.socioemotionalCapacities.splice(i, 1); })}
+                    className="opacity-0 group-hover/item:opacity-100 text-red-400 hover:text-red-600 font-bold text-xs p-1"
+                  >
+                    ✕
+                  </button>
+                </div>
+              ))}
+            </div>
+
+            {/* CONHECIMENTOS */}
+            <div className="bg-white p-5 border border-slate-200 rounded-3xl shadow-sm space-y-3">
+              <div className="flex justify-between items-center border-b pb-2">
+                <h3 className="text-xs font-black text-slate-800 uppercase tracking-wider">Conhecimentos</h3>
+                <button
+                  type="button"
+                  onClick={() => updateUnitField(u => { u.general.knowledge.push('Novo Conhecimento'); })}
+                  className="text-[10px] bg-slate-100 hover:bg-slate-200 text-slate-700 px-2 py-0.5 rounded-lg font-bold"
+                >
+                  + Add
+                </button>
+              </div>
+              {unit.general.knowledge.map((know, i) => (
+                <div key={i} className="flex items-start gap-1 group/item">
+                  <RichEditable
+                    html={know}
+                    onChange={(val) => updateUnitField(u => { u.general.knowledge[i] = val; })}
+                    className="text-xs text-slate-700 bg-slate-50 border border-slate-100 rounded-xl"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => updateUnitField(u => { u.general.knowledge.splice(i, 1); })}
+                    className="opacity-0 group-hover/item:opacity-100 text-red-400 hover:text-red-600 font-bold text-xs p-1"
+                  >
+                    ✕
+                  </button>
+                </div>
+              ))}
+            </div>
+
+          </div>
+        )}
+
+        {/* ABA: SITUAÇÕES DE APRENDIZAGEM (EDITÁVEL) */}
+        {activeTab === 'sa' && (
+          <div className="space-y-6">
             <div className="flex justify-end">
               <button
+                type="button"
+                onClick={() => updateUnitField(u => {
+                  u.learningSituations.push({
+                    id: `sa-${Date.now()}`,
+                    title: 'Nova Situação de Aprendizagem',
+                    contextualization: 'Descrição do contexto...',
+                    challenge: 'Desafio proposto...',
+                    expectedResults: ['Resultado esperado 1']
+                  });
+                })}
+                className="text-xs bg-white border border-slate-200 text-slate-700 hover:text-slate-900 px-4 py-1.5 rounded-xl font-bold shadow-sm"
+              >
+                + Nova Situação de Aprendizagem
+              </button>
+            </div>
+
+            {unit.learningSituations.map((situation, idx) => (
+              <div key={situation.id} className="bg-white p-6 border border-slate-200 rounded-3xl shadow-sm space-y-4 relative group/sa">
+                <button
+                  type="button"
+                  onClick={() => updateUnitField(u => { u.learningSituations.splice(idx, 1); })}
+                  className="absolute top-4 right-4 text-xs text-red-400 hover:text-red-600 font-bold opacity-0 group-hover/sa:opacity-100 transition-opacity"
+                >
+                  Excluir SA ✕
+                </button>
+
+                <div>
+                  <label className="text-[10px] font-black uppercase text-slate-400">Título da SA</label>
+                  <RichEditable
+                    html={situation.title}
+                    onChange={(val) => updateUnitField(u => { u.learningSituations[idx].title = val; })}
+                    className="text-sm font-black text-slate-800 bg-slate-50 border border-slate-100 rounded-xl"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-[10px] font-black uppercase text-slate-400">Contextualização</label>
+                  <RichEditable
+                    html={situation.contextualization}
+                    onChange={(val) => updateUnitField(u => { u.learningSituations[idx].contextualization = val; })}
+                    className="text-xs text-slate-600 bg-slate-50 border border-slate-100 rounded-xl"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-[10px] font-black uppercase text-slate-400">Desafio</label>
+                  <RichEditable
+                    html={situation.challenge}
+                    onChange={(val) => updateUnitField(u => { u.learningSituations[idx].challenge = val; })}
+                    className="text-xs text-slate-600 bg-slate-50 border border-slate-100 rounded-xl"
+                  />
+                </div>
+
+                <div>
+                  <div className="flex justify-between items-center mb-1">
+                    <label className="text-[10px] font-black uppercase text-slate-400">Resultados Esperados</label>
+                    <button
+                      type="button"
+                      onClick={() => updateUnitField(u => { u.learningSituations[idx].expectedResults.push('Novo resultado'); })}
+                      className="text-[9px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-bold"
+                    >
+                      + Add Resultado
+                    </button>
+                  </div>
+                  {situation.expectedResults.map((res, rIdx) => (
+                    <div key={rIdx} className="flex items-center gap-1 my-1">
+                      <RichEditable
+                        html={res}
+                        onChange={(val) => updateUnitField(u => { u.learningSituations[idx].expectedResults[rIdx] = val; })}
+                        className="text-xs text-slate-600 bg-slate-50 border border-slate-100 rounded-xl"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => updateUnitField(u => { u.learningSituations[idx].expectedResults.splice(rIdx, 1); })}
+                        className="text-red-400 hover:text-red-600 font-bold text-xs p-1"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* ABA: CRONOGRAMA (EDITÁVEL) */}
+        {activeTab === 'cronograma' && (
+          <div className="space-y-4">
+            <div className="flex justify-end">
+              <button
+                type="button"
                 onClick={() => updateUnitField(u => {
                   u.schedule.push({
                     id: `entry-${Date.now()}`,
@@ -243,7 +445,7 @@ const UnitViewer: React.FC = () => {
                     completed: false
                   });
                 })}
-                className="text-xs bg-white border border-slate-200 text-slate-600 hover:text-slate-900 px-3 py-1 rounded-xl font-bold shadow-sm transition-all"
+                className="text-xs bg-white border border-slate-200 text-slate-600 hover:text-slate-900 px-3 py-1 rounded-xl font-bold shadow-sm"
               >
                 + Adicionar Aula
               </button>
@@ -264,7 +466,6 @@ const UnitViewer: React.FC = () => {
                   {unit.schedule.map((entry, sIdx) => (
                     <tr key={entry.id} className="group/row hover:bg-slate-50/50 transition-colors">
                       
-                      {/* DATA */}
                       <td className="p-3 align-top whitespace-nowrap">
                         <RichEditable
                           html={entry.date}
@@ -276,7 +477,6 @@ const UnitViewer: React.FC = () => {
                         </span>
                       </td>
 
-                      {/* HORAS */}
                       <td className="p-3 text-center align-top">
                         <input
                           type="number"
@@ -286,7 +486,6 @@ const UnitViewer: React.FC = () => {
                         />
                       </td>
 
-                      {/* CONTEÚDOS */}
                       <td className="p-3 space-y-1 align-top h-auto">
                         <RichEditable
                           html={entry.capacities}
@@ -300,7 +499,6 @@ const UnitViewer: React.FC = () => {
                         />
                       </td>
 
-                      {/* ESTRATÉGIAS */}
                       <td className="p-3 space-y-1 align-top h-auto">
                         <RichEditable
                           html={entry.strategy}
@@ -314,7 +512,6 @@ const UnitViewer: React.FC = () => {
                         />
                       </td>
 
-                      {/* SITUAÇÃO CLICÁVEL (ALTERA PREV / OK AO CLICAR) */}
                       <td className="p-3 text-center align-top relative">
                         <button
                           type="button"
@@ -328,6 +525,7 @@ const UnitViewer: React.FC = () => {
                           {entry.completed ? 'OK' : 'PREV'}
                         </button>
                         <button
+                          type="button"
                           onClick={() => updateUnitField(u => { u.schedule.splice(sIdx, 1); })}
                           className="absolute bottom-2 right-2 opacity-0 group-hover/row:opacity-100 text-[9px] text-red-400 font-bold"
                         >
@@ -342,7 +540,7 @@ const UnitViewer: React.FC = () => {
           </div>
         )}
 
-        {/* ABA: CALENDÁRIO DINÂMICO GERADO A PARTIR DOS MESES DO CRONOGRAMA */}
+        {/* ABA: CALENDÁRIO */}
         {activeTab === 'calendario' && (
           <div className="space-y-8">
             <div className="bg-white p-4 border border-slate-200 rounded-2xl shadow-sm flex flex-wrap gap-4 text-[10px] font-black uppercase tracking-wider text-slate-500">
@@ -352,38 +550,32 @@ const UnitViewer: React.FC = () => {
               <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-md bg-orange-500" /> FUSI</span>
             </div>
 
-            {/* LOOP DINÂMICO POR MÊS/ANO */}
             {monthsList.map(monthKey => {
               const [yearStr, monthStr] = monthKey.split('-');
               const year = parseInt(yearStr);
-              const month = parseInt(monthStr) - 1; // 0-indexed
+              const month = parseInt(monthStr) - 1;
 
-              const firstDayIndex = new Date(year, month, 1).getDay(); // Dia da semana do 1º dia
-              const daysInMonth = new Date(year, month + 1, 0).getDate(); // Total de dias no mês
+              const firstDayIndex = new Date(year, month, 1).getDay();
+              const daysInMonth = new Date(year, month + 1, 0).getDate();
               const monthName = new Intl.DateTimeFormat('pt-BR', { month: 'long' }).format(new Date(year, month));
 
               return (
                 <div key={monthKey} className="bg-white p-6 border border-slate-200 rounded-3xl shadow-sm">
-                  
-                  {/* CABEÇALHO DO MÊS E ANO */}
                   <div className="mb-4 text-center border-b border-slate-100 pb-3">
                     <h2 className="text-base font-black text-slate-800 uppercase tracking-widest">
                       {monthName} / {year}
                     </h2>
                   </div>
 
-                  {/* GRID DOS DIAS DA SEMANA */}
                   <div className="grid grid-cols-7 gap-2 text-center text-xs">
                     {['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SÁB'].map(d => (
                       <div key={d} className="font-black text-slate-400 p-2 uppercase text-[10px] tracking-wider">{d}</div>
                     ))}
 
-                    {/* DDL VAZIOS ANTES DO PRIMEIRO DIA DO MÊS */}
                     {Array.from({ length: firstDayIndex }).map((_, i) => (
                       <div key={`empty-${i}`} className="p-3 rounded-xl bg-slate-50/20 opacity-0" />
                     ))}
 
-                    {/* DIAS DO MÊS */}
                     {Array.from({ length: daysInMonth }).map((_, i) => {
                       const dayNum = i + 1;
                       const formattedDate = `${String(dayNum).padStart(2, '0')}/${String(month + 1).padStart(2, '0')}/${year}`;
@@ -411,36 +603,6 @@ const UnitViewer: React.FC = () => {
                 </div>
               );
             })}
-          </div>
-        )}
-
-        {/* ESTRUTURA GERAL */}
-        {activeTab === 'geral' && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="bg-white p-6 border border-slate-200 rounded-3xl shadow-sm space-y-2">
-              <h3 className="text-xs font-black text-slate-800 uppercase tracking-wider">Capacidades Técnicas</h3>
-              {unit.general.technicalCapacities.map((cap, i) => (
-                <RichEditable key={i} html={cap} onChange={(val) => updateUnitField(u => { u.general.technicalCapacities[i] = val; })} className="text-xs text-slate-600 bg-slate-50 p-2 rounded-xl" />
-              ))}
-            </div>
-            <div className="bg-white p-6 border border-slate-200 rounded-3xl shadow-sm space-y-2">
-              <h3 className="text-xs font-black text-slate-800 uppercase tracking-wider">Conhecimentos</h3>
-              {unit.general.knowledge.map((know, i) => (
-                <RichEditable key={i} html={know} onChange={(val) => updateUnitField(u => { u.general.knowledge[i] = val; })} className="text-xs text-slate-600 bg-slate-50 p-2 rounded-xl" />
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* SITUAÇÕES DE APRENDIZAGEM */}
-        {activeTab === 'sa' && (
-          <div className="space-y-4">
-            {unit.learningSituations.map((situation, idx) => (
-              <div key={situation.id} className="bg-white p-6 border border-slate-200 rounded-3xl shadow-sm space-y-3">
-                <RichEditable html={situation.title} onChange={(val) => updateUnitField(u => { u.learningSituations[idx].title = val; })} className="text-xs font-black uppercase text-slate-800" />
-                <RichEditable html={situation.contextualization} onChange={(val) => updateUnitField(u => { u.learningSituations[idx].contextualization = val; })} className="text-xs text-slate-600 bg-slate-50 p-3 rounded-xl" />
-              </div>
-            ))}
           </div>
         )}
 
