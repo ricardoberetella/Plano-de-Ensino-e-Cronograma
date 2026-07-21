@@ -213,29 +213,6 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
     window.print();
   };
 
-  const scheduleDates = useMemo(() => {
-    const dates: Record<string, boolean> = {};
-    localSchedule.forEach(s => {
-      const parts = s.date.split('/');
-      if (parts.length === 3) {
-        dates[`${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`] = true;
-      }
-    });
-    return dates;
-  }, [localSchedule]);
-
-  const monthsInRange = useMemo(() => {
-    const start = new Date(calendar.startDate + 'T00:00:00');
-    const end = new Date(calendar.endDate + 'T00:00:00');
-    const months: string[] = [];
-    const current = new Date(start.getFullYear(), start.getMonth(), 1);
-    while (current <= end) {
-      months.push(current.toISOString().substring(0, 7));
-      current.setMonth(current.getMonth() + 1);
-    }
-    return months;
-  }, [calendar.startDate, calendar.endDate]);
-
   return (
     <div className="bg-white rounded-[2.5rem] shadow-2xl border border-slate-200 overflow-hidden animate-fadeIn printable-unit-module" data-active-tab={activeTab}>
       <style>{`
@@ -243,10 +220,13 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
           @page { size: A4 portrait; margin: 1.0cm !important; }
           aside, header, nav, .tabs-header, .no-print, button { display: none !important; }
           html, body, #root, main, .printable-unit-module, .content-area { display: block !important; height: auto !important; overflow: visible !important; background: white !important; margin: 0 !important; padding: 0 !important; box-shadow: none !important; position: static !important; }
+          
           .report-document, .report-document-sa { display: none !important; }
+          
           [data-active-tab="cronograma"] .report-document { display: block !important; }
           [data-active-tab="sa"] .report-document-sa { display: block !important; }
-          .report-header { display: flex !important; justify-between: space-between !important; align-items: center !important; border-bottom: 2pt solid #E30613 !important; padding-bottom: 10pt !important; margin-bottom: 15pt !important; }
+          
+          .report-header { display: flex !important; justify-content: space-between !important; align-items: center !important; border-bottom: 2pt solid #E30613 !important; padding-bottom: 10pt !important; margin-bottom: 15pt !important; }
           .logo-box { background: #E30613 !important; color: white !important; padding: 10pt 20pt !important; font-size: 24pt !important; font-weight: 900 !important; font-style: italic !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
           .info-box { text-align: right !important; color: #000 !important; }
           .info-box h1 { font-size: 10pt !important; font-weight: 900 !important; margin: 0 !important; text-transform: uppercase !important; }
@@ -391,7 +371,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
 
         {/* ABA SITUAÇÃO-PROBLEMA */}
         {activeTab === 'sa' && (
-          <div className="max-w-4xl mx-auto space-y-8">
+          <div className="max-w-4xl mx-auto space-y-8 report-document-sa">
             <div className="flex justify-between items-center gap-6 border-b border-slate-100 pb-8 no-print">
               <div>
                 <h3 className="text-3xl font-[1000] text-slate-900 uppercase italic">Situações de Aprendizagem / Fases</h3>
@@ -408,7 +388,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
               </div>
             </div>
 
-            <div className="space-y-12 pb-10 no-print">
+            <div className="space-y-12 pb-10">
               {(localUnit.learningSituations || []).map((sa, saIdx) => (
                 <div key={sa.id || saIdx} className="p-10 bg-white border border-slate-200 rounded-[3rem] shadow-xl relative overflow-hidden transition-all hover:border-blue-200">
                   <div className="absolute top-0 left-0 w-2 h-full bg-blue-600"></div>
@@ -423,7 +403,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                         className="text-2xl font-black text-slate-900 uppercase tracking-tight leading-none italic w-full bg-transparent border-b border-slate-200 focus:border-blue-500 outline-none pb-2"
                       />
                     </div>
-                    <button onClick={() => removeLearningSituation(saIdx)} className="text-slate-300 hover:text-red-600 p-2 text-sm font-black transition-all" title="Excluir Fase">
+                    <button onClick={() => removeLearningSituation(saIdx)} className="text-slate-300 hover:text-red-600 p-2 text-sm font-black transition-all no-print" title="Excluir Fase">
                       Excluir Fase ✕
                     </button>
                   </div>
@@ -454,7 +434,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                     <div className="border-t border-slate-100 pt-8">
                       <div className="flex justify-between items-center mb-4">
                         <p className="text-[10px] font-black text-blue-600 uppercase tracking-widest">III. Resultados Esperados / Entregas da Fase</p>
-                        <button onClick={() => addSAResult(saIdx)} className="text-[10px] font-black uppercase text-blue-600 bg-blue-50 px-3 py-1.5 rounded-lg hover:bg-blue-600 hover:text-white transition-all">
+                        <button onClick={() => addSAResult(saIdx)} className="text-[10px] font-black uppercase text-blue-600 bg-blue-50 px-3 py-1.5 rounded-lg hover:bg-blue-600 hover:text-white transition-all no-print">
                           + Adicionar Entrega
                         </button>
                       </div>
@@ -468,7 +448,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                               placeholder="Descreva o resultado ou produto esperado..."
                               className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-slate-700 text-sm font-bold focus:outline-none focus:border-blue-500"
                             />
-                            <button onClick={() => removeSAResult(saIdx, rIdx)} className="text-slate-300 hover:text-red-500 p-2 text-xs font-bold transition-all">
+                            <button onClick={() => removeSAResult(saIdx, rIdx)} className="text-slate-300 hover:text-red-500 p-2 text-xs font-bold transition-all no-print">
                               ✕
                             </button>
                           </li>
@@ -547,7 +527,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
 
         {/* ABA CRONOGRAMA - TABELA PADRÃO SENAI */}
         {activeTab === 'cronograma' && (
-          <div className="space-y-6">
+          <div className="space-y-6 report-document">
             <div className="flex justify-between items-center gap-6 border-b border-slate-200 pb-4 no-print">
               <div>
                 <h3 className="text-2xl font-[1000] text-slate-900 uppercase italic">Plano de aula | Cronograma</h3>
