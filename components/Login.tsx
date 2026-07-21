@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 
 interface LoginProps {
@@ -11,7 +10,8 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (password === 'ianes662') {
+    // Aceita tanto a senha de usuário quanto a do administrador
+    if (password === 'ianes662' || password === 'bere662') {
       onLogin(password);
     } else {
       setError(true);
