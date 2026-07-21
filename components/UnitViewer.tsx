@@ -1,4 +1,5 @@
-import React, { useState, useRef } from 'react';
+
+import React, { useState, useRef, useMemo } from 'react';
 
 // Interfaces estruturais do padrão técnico
 interface GeneralCompetencies {
@@ -246,7 +247,7 @@ const UnitViewer: React.FC = () => {
       {/* CONTEÚDO DAS ABAS */}
       <div className="tab-content">
         
-        {/* CRONOGRAMA CORRIGIDO (ESPAÇO OTIMIZADO ENTRE DATA E HORA + FORMATO XX/XX/XXXX) */}
+        {/* CRONOGRAMA */}
         {activeTab === 'cronograma' && (
           <div className="space-y-4 group/panel">
             <div className="flex justify-end">
@@ -273,7 +274,6 @@ const UnitViewer: React.FC = () => {
               <table className="w-full text-left border-collapse table-fixed">
                 <thead>
                   <tr className="bg-slate-50 border-b border-slate-200 text-[10px] font-black text-slate-500 uppercase tracking-wider">
-                    {/* OTIMIZAÇÃO: w-32 alinha perfeitamente com o formato xx/xx/xxxx sem sobrar espaço até a hora */}
                     <th className="p-3 w-32">Data (xx/xx/xxxx)</th>
                     <th className="p-3 w-16 text-center">Horas</th>
                     <th className="p-3 w-5/12">Conteúdo / Capacidades</th>
@@ -284,8 +284,6 @@ const UnitViewer: React.FC = () => {
                 <tbody className="divide-y divide-slate-100 text-xs text-slate-700">
                   {unit.schedule.map((entry, sIdx) => (
                     <tr key={entry.id} className="group/row hover:bg-slate-50/50 transition-colors">
-                      
-                      {/* CAMPO DATA OTIMIZADO */}
                       <td className="p-3 align-top whitespace-nowrap">
                         <RichEditable
                           html={entry.date}
@@ -297,7 +295,6 @@ const UnitViewer: React.FC = () => {
                         </span>
                       </td>
 
-                      {/* COLUNA HORAS COLADA NA DATA */}
                       <td className="p-3 text-center align-top">
                         <input
                           type="number"
@@ -307,7 +304,6 @@ const UnitViewer: React.FC = () => {
                         />
                       </td>
 
-                      {/* CONTEÚDOS */}
                       <td className="p-3 space-y-1 align-top h-auto">
                         <RichEditable
                           html={entry.capacities}
@@ -321,7 +317,6 @@ const UnitViewer: React.FC = () => {
                         />
                       </td>
 
-                      {/* ESTRATÉGIAS */}
                       <td className="p-3 space-y-1 align-top h-auto">
                         <RichEditable
                           html={entry.strategy}
@@ -335,7 +330,6 @@ const UnitViewer: React.FC = () => {
                         />
                       </td>
 
-                      {/* STATUS E OPERAÇÕES */}
                       <td className="p-3 text-center align-top relative">
                         <span className={`inline-block px-2 py-0.5 rounded-lg text-[9px] font-black uppercase ${
                           entry.completed ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-slate-100 text-slate-600'
@@ -367,13 +361,11 @@ const UnitViewer: React.FC = () => {
               <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded bg-orange-500" /> FUSI</span>
             </div>
 
-            {/* Simulação do grid de calendário (Fevereiro 2026 como base) */}
             <div className="grid grid-cols-7 gap-2 text-center text-xs border border-slate-100 p-2 rounded-2xl">
               {['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'].map(d => (
                 <div key={d} className="font-black text-slate-400 p-2 uppercase text-[10px]">{d}</div>
               ))}
               
-              {/* Espaçadores iniciais para alinhar o dia da semana */}
               <div className="p-4 bg-slate-50/40 rounded-xl text-transparent">25</div>
               <div className="p-4 bg-slate-50/40 rounded-xl text-transparent">26</div>
               <div className="p-4 bg-slate-50/40 rounded-xl text-transparent">27</div>
@@ -381,7 +373,6 @@ const UnitViewer: React.FC = () => {
               <div className="p-4 bg-slate-50/40 rounded-xl text-transparent">29</div>
               <div className="p-4 bg-slate-50/40 rounded-xl text-transparent">30</div>
 
-              {/* Geração dos dias do mês simulados e validação das cores das UCs */}
               {Array.from({ length: 28 }).map((_, i) => {
                 const dayStr = String(i + 1).padStart(2, '0');
                 const fullDateKey = `${dayStr}/02/2026`;
@@ -390,7 +381,6 @@ const UnitViewer: React.FC = () => {
                 let dayStyle = "bg-slate-50 text-slate-700 hover:bg-slate-100";
                 if (matchedDate) {
                   const ucTheme = UC_THEMES[matchedDate.uc];
-                  // Aplica a cor de fundo e borda específica da UC mapeada
                   dayStyle = `${ucTheme.bg} ${ucTheme.text} border-2 ${ucTheme.border} font-black shadow-sm`;
                 }
 
@@ -410,7 +400,7 @@ const UnitViewer: React.FC = () => {
           </div>
         )}
 
-        {/* DEMAIS ABAS COMPLEMENTARES (ESTRUTURA GERAL / SA) */}
+        {/* ESTRUTURA GERAL */}
         {activeTab === 'geral' && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="bg-white p-6 border border-slate-200 rounded-3xl shadow-sm space-y-2">
@@ -428,6 +418,7 @@ const UnitViewer: React.FC = () => {
           </div>
         )}
 
+        {/* SITUAÇÕES DE APRENDIZAGEM */}
         {activeTab === 'sa' && (
           <div className="space-y-4">
             {unit.learningSituations.map((situation, idx) => (
