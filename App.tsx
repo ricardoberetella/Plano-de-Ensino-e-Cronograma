@@ -95,7 +95,6 @@ const App: React.FC = () => {
 
         let dbPlans = await FirebaseService.getPlans(profileId);
 
-        // Se não houver nenhum plano na nuvem para este perfil, cria e salva o template imediatamente
         if (!dbPlans || dbPlans.length === 0) {
           const freshPlan: TeachingPlan = {
             ...template,
@@ -174,7 +173,10 @@ const App: React.FC = () => {
   };
 
   const handleSave = async (updatedPlan: TeachingPlan) => {
-    if (!isAdmin) return;
+    if (!isAdmin) {
+      alert('Acesso negado: O perfil de visualização não pode salvar alterações.');
+      return;
+    }
     try {
       await persistPlan(updatedPlan);
       const refreshed = await FirebaseService.getPlans(activeProfileId);
@@ -189,7 +191,10 @@ const App: React.FC = () => {
     unitId: string,
     newSchedule: ScheduleEntry[]
   ) => {
-    if (!isAdmin || !currentPlan) return;
+    if (!isAdmin || !currentPlan) {
+      alert('Acesso negado: Apenas o administrador pode editar o cronograma.');
+      return;
+    }
     const updatedUnits = currentPlan.units.map(unit =>
       unit.id === unitId ? { ...unit, schedule: newSchedule } : unit
     );
@@ -202,7 +207,10 @@ const App: React.FC = () => {
     unitId: string,
     newCalendar: UnitCalendar
   ) => {
-    if (!isAdmin || !currentPlan) return;
+    if (!isAdmin || !currentPlan) {
+      alert('Acesso negado: Apenas o administrador pode editar o calendário.');
+      return;
+    }
     const updatedUnits = currentPlan.units.map(unit =>
       unit.id === unitId
         ? { ...unit, calendar: { ...newCalendar, semester: newCalendar.semester || unit.semester } }
@@ -214,7 +222,10 @@ const App: React.FC = () => {
   };
 
   const handleUpdateUnit = async (updatedUnit: CurricularUnit) => {
-    if (!isAdmin || !currentPlan) return;
+    if (!isAdmin || !currentPlan) {
+      alert('Acesso negado: Apenas o administrador pode atualizar unidades.');
+      return;
+    }
     const normalizedUnit: CurricularUnit = {
       ...updatedUnit,
       code: updatedUnit.code || getUnitSigla(updatedUnit),
