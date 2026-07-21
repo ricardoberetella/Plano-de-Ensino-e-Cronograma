@@ -95,7 +95,7 @@ const mergeUnitWithTemplate = (
 
 const App: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false); // <--- Estado para controlar se é admin ou usuário comum
+  const [isAdmin, setIsAdmin] = useState(false);
   const [activeProfileId, setActiveProfileId] = useState('beretella');
   const [view, setView] = useState<ViewType>('dashboard');
   const [plans, setPlans] = useState<TeachingPlan[]>([]);
@@ -246,6 +246,7 @@ const App: React.FC = () => {
             units: sortUnits(template?.units || [])
           };
 
+          // Apenas grava o padrão inicial se necessário, mas podemos condicionar ou deixar livres para leitura
           await FirebaseService.savePlan(defaultPlan);
 
           setPlans([defaultPlan]);
@@ -270,7 +271,8 @@ const App: React.FC = () => {
         for (const plan of dbPlans) {
           const { normalizedPlan, updated } = normalizePlan(plan, template);
 
-          if (updated) {
+          // Se for admin e houver atualização automática estrutural, salva. Usuário comum apenas lê.
+          if (updated && isAdmin) {
             await FirebaseService.savePlan(normalizedPlan);
           }
 
@@ -318,7 +320,7 @@ const App: React.FC = () => {
         setIsLoading(false);
       }
     },
-    [currentPlan?.id, normalizePlan, selectedSemester, selectedUnit?.id]
+    [currentPlan?.id, normalizePlan, selectedSemester, selectedUnit?.id, isAdmin]
   );
 
   useEffect(() => {
@@ -340,6 +342,12 @@ const App: React.FC = () => {
   }, [visibleUnits, selectedUnit?.id]);
 
   const persistPlan = async (updatedPlan: TeachingPlan) => {
+    // Trava de segurança rigorosa: se não for admin, impede a persistência
+    if (!isAdmin) {
+      alert('Acesso negado: A senha utilizada permite apenas visualização.');
+      throw new Error('Unauthorized');
+    }
+
     const planToSave: TeachingPlan = {
       ...updatedPlan,
       profileId: activeProfileId,
@@ -358,7 +366,10 @@ const App: React.FC = () => {
   };
 
   const handleSave = async (updatedPlan: TeachingPlan) => {
-    if (!isAdmin) return; // Segurança extra
+    if (!isAdmin) {
+      alert('Acesso negado: Apenas o administrador pode salvar alterações.');
+      return;
+    }
     try {
       await persistPlan(updatedPlan);
       const refreshed = await FirebaseService.getPlans(activeProfileId);
@@ -366,7 +377,6 @@ const App: React.FC = () => {
       setView('dashboard');
     } catch (error) {
       console.error('Erro ao salvar dados:', error);
-      throw error;
     }
   };
 
@@ -374,7 +384,11 @@ const App: React.FC = () => {
     unitId: string,
     newSchedule: ScheduleEntry[]
   ) => {
-    if (!isAdmin || !currentPlan) return; // Bloqueia usuário comum
+    if (!isAdmin) {
+      alert('Acesso negado: Modo de visualização.');
+      return;
+    }
+    if (!currentPlan) return;
 
     const updatedUnits = currentPlan.units.map(unit =>
       unit.id === unitId ? { ...unit, schedule: newSchedule } : unit
@@ -393,7 +407,11 @@ const App: React.FC = () => {
     unitId: string,
     newCalendar: UnitCalendar
   ) => {
-    if (!isAdmin || !currentPlan) return; // Bloqueia usuário comum
+    if (!isAdmin) {
+      alert('Acesso negado: Modo de visualização.');
+      return;
+    }
+    if (!currentPlan) return;
 
     const updatedUnits = currentPlan.units.map(unit =>
       unit.id === unitId
@@ -419,7 +437,11 @@ const App: React.FC = () => {
   };
 
   const handleUpdateUnit = async (updatedUnit: CurricularUnit) => {
-    if (!isAdmin || !currentPlan) return; // Bloqueia usuário comum
+    if (!isAdmin) {
+      alert('Acesso negado: Modo de visualização.');
+      return;
+    }
+    if (!currentPlan) return;
 
     const normalizedUnit: CurricularUnit = {
       ...updatedUnit,
@@ -454,7 +476,6 @@ const App: React.FC = () => {
     }
   };
 
-  // Função que recebe a senha informada no componente Login
   const handleLoginSubmit = (passwordEntered: string) => {
     if (passwordEntered === 'bere662') {
       setIsAdmin(true);
@@ -462,6 +483,8 @@ const App: React.FC = () => {
     } else if (passwordEntered === 'ianes662') {
       setIsAdmin(false);
       setIsAuthenticated(true);
+    } else {
+      alert('Senha incorreta!');
     }
   };
 
@@ -522,7 +545,7 @@ const App: React.FC = () => {
               plans={plans}
               onEdit={plan => {
                 if (!isAdmin) {
-                  alert("Acesso restrito: Apenas o administrador pode editar os planos.");
+                  alert("Acesso restrito: A senha de usuário comum permite apenas visualização.");
                   return;
                 }
                 setCurrentPlan(plan);
@@ -665,7 +688,7 @@ const App: React.FC = () => {
 
                 <UnitViewer
                   unit={selectedUnit}
-                  isAdmin={isAdmin} // Passando a regra de admin para o visualizador de unidades se necessário
+                  isAdmin={isAdmin}
                   onUpdateSchedule={newSchedule =>
                     handleUpdateSchedule(selectedUnit.id, newSchedule)
                   }
@@ -684,7 +707,7 @@ const App: React.FC = () => {
           {view === ('editor' as ViewType) && (
             <PlanForm
               initialPlan={currentPlan || undefined}
-              isAdmin={isAdmin} // Passando a trava de administrador para o formulário
+              isAdmin={isAdmin}
               onSave={handleSave}
               onCancel={() => setView('dashboard')}
             />
