@@ -153,8 +153,9 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
       capacities: '',
       knowledges: '',
       strategy: '',
-      resources: ''
-    };
+      resources: '',
+      completed: false
+    } as any;
     const updated = [...localSchedule, newEntry];
     setLocalSchedule(updated);
     onUpdateSchedule?.(updated);
@@ -665,13 +666,16 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                     <th className="p-3 w-1/4 text-xs font-black uppercase border-r border-black text-center align-middle">
                       Estratégias / Atividades
                     </th>
-                    <th className="p-3 w-1/4 text-xs font-black uppercase text-center align-middle">
+                    <th className="p-3 w-1/4 text-xs font-black uppercase border-r border-black text-center align-middle">
                       Recursos / Avaliação
+                    </th>
+                    <th className="p-3 w-24 text-xs font-black uppercase text-center align-middle">
+                      Status
                     </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-black text-xs font-medium">
-                  {localSchedule.map((entry) => (
+                  {localSchedule.map((entry: any) => (
                     <tr key={entry.id} className="hover:bg-slate-50/50 group relative">
                       <td className="p-2 border-r border-black align-top text-center bg-slate-50/30">
                         <div className="px-1 overflow-hidden">
@@ -726,7 +730,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                           rows={3}
                         />
                       </td>
-                      <td className="p-2 align-top relative">
+                      <td className="p-2 border-r border-black align-top relative">
                         <EditableArea
                           value={entry.resources}
                           onChange={(val) => updateEntry(entry.id, 'resources', val)}
@@ -744,6 +748,20 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                             ✕
                           </button>
                         )}
+                      </td>
+                      <td className="p-2 align-middle text-center bg-slate-50/20">
+                        <button
+                          type="button"
+                          onClick={() => updateEntry(entry.id, 'completed', !entry.completed)}
+                          className={`px-3 py-2 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all shadow-sm ${
+                            entry.completed 
+                              ? 'bg-green-500 text-white shadow-green-200' 
+                              : 'bg-slate-200 text-slate-600 hover:bg-slate-300'
+                          }`}
+                          title="Clique para marcar/desmarcar conteúdo como passado"
+                        >
+                          {entry.completed ? 'OK' : 'Pendente'}
+                        </button>
                       </td>
                     </tr>
                   ))}
