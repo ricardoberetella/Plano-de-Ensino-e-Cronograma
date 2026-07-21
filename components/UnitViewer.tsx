@@ -17,7 +17,38 @@ const TEXT_COLOR_MAP: Record<CalendarColor, string> = {
   yellow: '#0f172a', green: '#ffffff', blue: '#ffffff', red: '#ffffff', cyan: '#ffffff', orange: '#ffffff', purple: '#ffffff', pink: '#ffffff', white: '#1e293b', none: 'inherit'
 };
 
-// Componente isolado para evitar a perda de foco durante a digitação
+// Componente para Inputs simples que previne perda de foco e bug de digitação
+const DebouncedInput: React.FC<{
+  value: string;
+  onChange: (val: string) => void;
+  placeholder?: string;
+  className?: string;
+}> = ({ value, onChange, placeholder, className }) => {
+  const [localValue, setLocalValue] = useState(value || '');
+
+  useEffect(() => {
+    setLocalValue(value || '');
+  }, [value]);
+
+  const handleBlur = () => {
+    if (localValue !== value) {
+      onChange(localValue);
+    }
+  };
+
+  return (
+    <input
+      type="text"
+      value={localValue}
+      onChange={(e) => setLocalValue(e.target.value)}
+      onBlur={handleBlur}
+      placeholder={placeholder}
+      className={className}
+    />
+  );
+};
+
+// Componente isolado para Textareas sem perda de foco e sem rolagem interna
 const EditableArea: React.FC<{
   value: string;
   onChange: (val: string) => void;
@@ -43,14 +74,20 @@ const EditableArea: React.FC<{
     adjustHeight();
   }, [val]);
 
+  const handleBlur = () => {
+    if (val !== value) {
+      onChange(val);
+    }
+  };
+
   return (
     <textarea
       ref={textareaRef}
       value={val}
       onChange={(e) => {
         setVal(e.target.value);
-        onChange(e.target.value);
       }}
+      onBlur={handleBlur}
       placeholder={placeholder}
       rows={rows}
       className={`resize-none overflow-hidden ${className || ''}`}
@@ -250,10 +287,9 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
       <div className="bg-slate-900 p-8 text-white flex justify-between items-center no-print">
         <div className="w-full">
           <span className="bg-blue-600 px-3 py-1 rounded text-[9px] font-black uppercase tracking-widest mb-2 inline-block">MSEP - Unidade Curricular</span>
-          <input
-            type="text"
+          <DebouncedInput
             value={localUnit.name}
-            onChange={(e) => updateUnitState({ ...localUnit, name: e.target.value })}
+            onChange={(val) => updateUnitState({ ...localUnit, name: val })}
             className="text-3xl font-black tracking-tighter uppercase leading-none bg-transparent text-white border-b border-transparent hover:border-slate-700 focus:border-blue-500 outline-none w-full transition-all"
           />
         </div>
@@ -276,102 +312,107 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
 
       <div className="p-6 md:p-10 max-h-[75vh] overflow-y-auto custom-scrollbar bg-[#FDFDFD] content-area">
 
-        {/* ABA GERAL */}
+        {/* ABA GERAL EM COLUNAS */}
         {activeTab === 'geral' && (
-          <div className="space-y-10 max-w-5xl mx-auto">
+          <div className="space-y-10 max-w-7xl mx-auto">
             <div className="border-b border-slate-100 pb-6">
               <h3 className="text-3xl font-[1000] text-slate-900 uppercase italic">Geral & Matriz Pedagógica</h3>
-              <p className="text-xs text-slate-400 font-bold uppercase tracking-wider mt-1">Gerais da Unidade Curricular</p>
+              <p className="text-xs text-slate-400 font-bold uppercase tracking-wider mt-1">Gerais da Unidade Curricular Organizadas em Colunas</p>
             </div>
 
-            {/* CAPACIDADES TÉCNICAS */}
-            <div className="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-lg space-y-4">
-              <div className="flex justify-between items-center border-b border-slate-100 pb-4">
-                <h4 className="text-sm font-black uppercase tracking-wider text-blue-600 flex items-center gap-2">
-                  <span className="w-3 h-3 bg-blue-600 rounded-full inline-block"></span>
-                  Capacidades Técnicas
-                </h4>
-                <button onClick={() => addGeneralFieldItem('technicalCapacities')} className="bg-blue-50 text-blue-600 px-3 py-1.5 rounded-xl text-[10px] font-black uppercase hover:bg-blue-600 hover:text-white transition-all">
-                  + Adicionar Capacidade
-                </button>
-              </div>
-              <div className="space-y-3">
-                {(localUnit.technicalCapacities || []).map((cap, idx) => (
-                  <div key={idx} className="flex gap-3 items-center">
-                    <span className="text-[10px] font-black text-slate-300 w-6">{idx + 1}.</span>
-                    <input
-                      type="text"
-                      value={cap}
-                      onChange={(e) => updateGeneralFieldList('technicalCapacities', idx, e.target.value)}
-                      placeholder="Descreva a capacidade técnica..."
-                      className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs font-bold text-slate-800 focus:outline-none focus:border-blue-500 transition-all"
-                    />
-                    <button onClick={() => removeGeneralFieldItem('technicalCapacities', idx)} className="text-slate-300 hover:text-red-500 p-2 text-xs font-bold transition-all">
-                      ✕
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div>
+            {/* CONTAINER DAS COLUNAS (GRID 3 COLUNAS) */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
 
-            {/* CAPACIDADES SOCIOEMOCIONAIS */}
-            <div className="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-lg space-y-4">
-              <div className="flex justify-between items-center border-b border-slate-100 pb-4">
-                <h4 className="text-sm font-black uppercase tracking-wider text-purple-600 flex items-center gap-2">
-                  <span className="w-3 h-3 bg-purple-600 rounded-full inline-block"></span>
-                  Capacidades Socioemocionais / Atitudinais
-                </h4>
-                <button onClick={() => addGeneralFieldItem('socialCapacities')} className="bg-purple-50 text-purple-600 px-3 py-1.5 rounded-xl text-[10px] font-black uppercase hover:bg-purple-600 hover:text-white transition-all">
-                  + Adicionar Capacidade
-                </button>
+              {/* COLUNA 1: CAPACIDADES TÉCNICAS */}
+              <div className="bg-white p-6 rounded-[2rem] border border-slate-200 shadow-lg space-y-4 flex flex-col h-full">
+                <div className="flex justify-between items-center border-b border-slate-100 pb-4">
+                  <h4 className="text-xs font-black uppercase tracking-wider text-blue-600 flex items-center gap-2">
+                    <span className="w-2.5 h-2.5 bg-blue-600 rounded-full inline-block"></span>
+                    Capacidades Técnicas
+                  </h4>
+                  <button onClick={() => addGeneralFieldItem('technicalCapacities')} className="bg-blue-50 text-blue-600 px-2.5 py-1 rounded-xl text-[9px] font-black uppercase hover:bg-blue-600 hover:text-white transition-all">
+                    + Item
+                  </button>
+                </div>
+                <div className="space-y-3 flex-1">
+                  {(localUnit.technicalCapacities || []).map((cap, idx) => (
+                    <div key={idx} className="flex gap-2 items-start bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                      <span className="text-[10px] font-black text-slate-400 mt-1">{idx + 1}.</span>
+                      <EditableArea
+                        value={cap}
+                        onChange={(val) => updateGeneralFieldList('technicalCapacities', idx, val)}
+                        placeholder="Descreva a capacidade técnica..."
+                        rows={2}
+                        className="flex-1 bg-transparent border-none text-xs font-bold text-slate-800 focus:outline-none"
+                      />
+                      <button onClick={() => removeGeneralFieldItem('technicalCapacities', idx)} className="text-slate-300 hover:text-red-500 text-xs font-bold transition-all p-1">
+                        ✕
+                      </button>
+                    </div>
+                  ))}
+                </div>
               </div>
-              <div className="space-y-3">
-                {(localUnit.socialCapacities || []).map((cap, idx) => (
-                  <div key={idx} className="flex gap-3 items-center">
-                    <span className="text-[10px] font-black text-slate-300 w-6">{idx + 1}.</span>
-                    <input
-                      type="text"
-                      value={cap}
-                      onChange={(e) => updateGeneralFieldList('socialCapacities', idx, e.target.value)}
-                      placeholder="Descreva a capacidade socioemocional..."
-                      className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs font-bold text-slate-800 focus:outline-none focus:border-purple-500 transition-all"
-                    />
-                    <button onClick={() => removeGeneralFieldItem('socialCapacities', idx)} className="text-slate-300 hover:text-red-500 p-2 text-xs font-bold transition-all">
-                      ✕
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div>
 
-            {/* CONHECIMENTOS */}
-            <div className="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-lg space-y-4">
-              <div className="flex justify-between items-center border-b border-slate-100 pb-4">
-                <h4 className="text-sm font-black uppercase tracking-wider text-orange-600 flex items-center gap-2">
-                  <span className="w-3 h-3 bg-orange-600 rounded-full inline-block"></span>
-                  Conhecimentos
-                </h4>
-                <button onClick={() => addGeneralFieldItem('knowledges')} className="bg-orange-50 text-orange-600 px-3 py-1.5 rounded-xl text-[10px] font-black uppercase hover:bg-orange-600 hover:text-white transition-all">
-                  + Adicionar Conhecimento
-                </button>
+              {/* COLUNA 2: CAPACIDADES SOCIOEMOCIONAIS */}
+              <div className="bg-white p-6 rounded-[2rem] border border-slate-200 shadow-lg space-y-4 flex flex-col h-full">
+                <div className="flex justify-between items-center border-b border-slate-100 pb-4">
+                  <h4 className="text-xs font-black uppercase tracking-wider text-purple-600 flex items-center gap-2">
+                    <span className="w-2.5 h-2.5 bg-purple-600 rounded-full inline-block"></span>
+                    Socioemocionais
+                  </h4>
+                  <button onClick={() => addGeneralFieldItem('socialCapacities')} className="bg-purple-50 text-purple-600 px-2.5 py-1 rounded-xl text-[9px] font-black uppercase hover:bg-purple-600 hover:text-white transition-all">
+                    + Item
+                  </button>
+                </div>
+                <div className="space-y-3 flex-1">
+                  {(localUnit.socialCapacities || []).map((cap, idx) => (
+                    <div key={idx} className="flex gap-2 items-start bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                      <span className="text-[10px] font-black text-slate-400 mt-1">{idx + 1}.</span>
+                      <EditableArea
+                        value={cap}
+                        onChange={(val) => updateGeneralFieldList('socialCapacities', idx, val)}
+                        placeholder="Descreva a capacidade socioemocional..."
+                        rows={2}
+                        className="flex-1 bg-transparent border-none text-xs font-bold text-slate-800 focus:outline-none"
+                      />
+                      <button onClick={() => removeGeneralFieldItem('socialCapacities', idx)} className="text-slate-300 hover:text-red-500 text-xs font-bold transition-all p-1">
+                        ✕
+                      </button>
+                    </div>
+                  ))}
+                </div>
               </div>
-              <div className="space-y-3">
-                {(localUnit.knowledges || []).map((know, idx) => (
-                  <div key={idx} className="flex gap-3 items-center">
-                    <span className="text-[10px] font-black text-slate-300 w-6">{idx + 1}.</span>
-                    <input
-                      type="text"
-                      value={know}
-                      onChange={(e) => updateGeneralFieldList('knowledges', idx, e.target.value)}
-                      placeholder="Descreva o conhecimento..."
-                      className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs font-bold text-slate-800 focus:outline-none focus:border-orange-500 transition-all"
-                    />
-                    <button onClick={() => removeGeneralFieldItem('knowledges', idx)} className="text-slate-300 hover:text-red-500 p-2 text-xs font-bold transition-all">
-                      ✕
-                    </button>
-                  </div>
-                ))}
+
+              {/* COLUNA 3: CONHECIMENTOS */}
+              <div className="bg-white p-6 rounded-[2rem] border border-slate-200 shadow-lg space-y-4 flex flex-col h-full">
+                <div className="flex justify-between items-center border-b border-slate-100 pb-4">
+                  <h4 className="text-xs font-black uppercase tracking-wider text-orange-600 flex items-center gap-2">
+                    <span className="w-2.5 h-2.5 bg-orange-600 rounded-full inline-block"></span>
+                    Conhecimentos
+                  </h4>
+                  <button onClick={() => addGeneralFieldItem('knowledges')} className="bg-orange-50 text-orange-600 px-2.5 py-1 rounded-xl text-[9px] font-black uppercase hover:bg-orange-600 hover:text-white transition-all">
+                    + Item
+                  </button>
+                </div>
+                <div className="space-y-3 flex-1">
+                  {(localUnit.knowledges || []).map((know, idx) => (
+                    <div key={idx} className="flex gap-2 items-start bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                      <span className="text-[10px] font-black text-slate-400 mt-1">{idx + 1}.</span>
+                      <EditableArea
+                        value={know}
+                        onChange={(val) => updateGeneralFieldList('knowledges', idx, val)}
+                        placeholder="Descreva o conhecimento..."
+                        rows={2}
+                        className="flex-1 bg-transparent border-none text-xs font-bold text-slate-800 focus:outline-none"
+                      />
+                      <button onClick={() => removeGeneralFieldItem('knowledges', idx)} className="text-slate-300 hover:text-red-500 text-xs font-bold transition-all p-1">
+                        ✕
+                      </button>
+                    </div>
+                  ))}
+                </div>
               </div>
+
             </div>
           </div>
         )}
@@ -403,10 +444,9 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                   <div className="flex justify-between items-start gap-4 mb-6">
                     <div className="flex-1">
                       <span className="text-[10px] font-black uppercase text-blue-600 tracking-widest block mb-1">FASE / ETAPA {saIdx + 1}</span>
-                      <input
-                        type="text"
+                      <DebouncedInput
                         value={sa.title}
-                        onChange={(e) => updateSAField(saIdx, 'title', e.target.value)}
+                        onChange={(val) => updateSAField(saIdx, 'title', val)}
                         placeholder="Título da Situação de Aprendizagem / Fase..."
                         className="text-2xl font-black text-slate-900 uppercase tracking-tight leading-none italic w-full bg-transparent border-b border-slate-200 focus:border-blue-500 outline-none pb-2"
                       />
@@ -450,10 +490,9 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                         {(sa.expectedResults || []).map((result, rIdx) => (
                           <li key={rIdx} className="flex gap-3 items-center">
                             <span className="w-6 h-6 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center shrink-0 text-[10px] font-black">{rIdx + 1}</span>
-                            <input
-                              type="text"
+                            <DebouncedInput
                               value={result}
-                              onChange={(e) => updateSAResult(saIdx, rIdx, e.target.value)}
+                              onChange={(val) => updateSAResult(saIdx, rIdx, val)}
                               placeholder="Descreva o resultado ou produto esperado..."
                               className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-slate-700 text-sm font-bold focus:outline-none focus:border-blue-500"
                             />
@@ -553,7 +592,11 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                 <div key={entry.id} className="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-lg grid grid-cols-1 lg:grid-cols-12 gap-8">
                   <div className="lg:col-span-3">
                     <p className="text-[9px] font-black text-slate-400 uppercase mb-1">AULA {idx+1}</p>
-                    <input type="text" value={entry.date} onChange={(e) => updateEntry(entry.id, 'date', e.target.value)} className="text-blue-600 font-[1000] text-xl w-full bg-transparent border-b border-dashed border-blue-200 focus:border-blue-500 outline-none" />
+                    <DebouncedInput
+                      value={entry.date}
+                      onChange={(val) => updateEntry(entry.id, 'date', val)}
+                      className="text-blue-600 font-[1000] text-xl w-full bg-transparent border-b border-dashed border-blue-200 focus:border-blue-500 outline-none"
+                    />
                     <p className="text-[10px] font-black uppercase text-slate-400 mt-1 italic">{getDayOfWeek(entry.date)}</p>
                     <div className="flex items-center gap-2 mt-2">
                       <input
