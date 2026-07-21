@@ -18,8 +18,7 @@ const TEXT_COLOR_MAP: Record<CalendarColor, string> = {
 };
 
 const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar, onUpdateUnit }) => {
-  // Inicializa diretamente na aba 'sa' (Situação-Problema)
-  const [activeTab, setActiveTab] = useState<'sa' | 'rubricas' | 'cronograma' | 'calendario'>('sa');
+  const [activeTab, setActiveTab] = useState<'geral' | 'sa' | 'rubricas' | 'cronograma' | 'calendario'>('geral');
   const [localSchedule, setLocalSchedule] = useState<ScheduleEntry[]>(unit.schedule);
 
   const isCRD = unit.id.toLowerCase().includes('crd') || unit.name.toLowerCase().includes('dimensional');
@@ -59,6 +58,62 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
     const updated = localSchedule.map(entry => entry.id === id ? { ...entry, [field]: value } : entry);
     setLocalSchedule(updated);
     onUpdateSchedule?.(updated);
+  };
+
+  // Funções para edição dinâmica dos campos de Geral
+  const updateGeneralFieldList = (field: 'technicalCapacities' | 'socialCapacities' | 'knowledges', index: number, value: string) => {
+    const currentList = unit[field] ? [...unit[field]!] : [];
+    currentList[index] = value;
+    onUpdateUnit?.({ ...unit, [field]: currentList });
+  };
+
+  const addGeneralFieldItem = (field: 'technicalCapacities' | 'socialCapacities' | 'knowledges') => {
+    const currentList = unit[field] ? [...unit[field]!] : [];
+    currentList.push('');
+    onUpdateUnit?.({ ...unit, [field]: currentList });
+  };
+
+  const removeGeneralFieldItem = (field: 'technicalCapacities' | 'socialCapacities' | 'knowledges', index: number) => {
+    const currentList = unit[field] ? [...unit[field]!] : [];
+    currentList.splice(index, 1);
+    onUpdateUnit?.({ ...unit, [field]: currentList });
+  };
+
+  // Funções para edição das Situações de Aprendizagem
+  const updateSAField = (saIndex: number, field: string, value: any) => {
+    const updatedSAs = [...unit.learningSituations];
+    updatedSAs[saIndex] = { ...updatedSAs[saIndex], [field]: value };
+    onUpdateUnit?.({ ...unit, learningSituations: updatedSAs });
+  };
+
+  const updateSAResult = (saIndex: number, resultIndex: number, value: string) => {
+    const updatedSAs = [...unit.learningSituations];
+    const results = [...updatedSAs[saIndex].expectedResults];
+    results[resultIndex] = value;
+    updatedSAs[saIndex] = { ...updatedSAs[saIndex], expectedResults: results };
+    onUpdateUnit?.({ ...unit, learningSituations: updatedSAs });
+  };
+
+  const addSAResult = (saIndex: number) => {
+    const updatedSAs = [...unit.learningSituations];
+    const results = [...updatedSAs[saIndex].expectedResults, ''];
+    updatedSAs[saIndex] = { ...updatedSAs[saIndex], expectedResults: results };
+    onUpdateUnit?.({ ...unit, learningSituations: updatedSAs });
+  };
+
+  const removeSAResult = (saIndex: number, resultIndex: number) => {
+    const updatedSAs = [...unit.learningSituations];
+    const results = [...updatedSAs[saIndex].expectedResults];
+    results.splice(resultIndex, 1);
+    updatedSAs[saIndex] = { ...updatedSAs[saIndex], expectedResults: results };
+    onUpdateUnit?.({ ...unit, learningSituations: updatedSAs });
+  };
+
+  // Funções para edição das Rubricas
+  const updateRubric = (index: number, field: string, value: string) => {
+    const updatedRubrics = [...unit.rubrics];
+    updatedRubrics[index] = { ...updatedRubrics[index], [field]: value };
+    onUpdateUnit?.({ ...unit, rubrics: updatedRubrics });
   };
 
   const handlePrint = () => {
@@ -216,27 +271,151 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
 
       {/* VISÃO WEB */}
       <div className="bg-slate-900 p-8 text-white flex justify-between items-center no-print">
-        <div>
+        <div className="w-full">
           <span className="bg-blue-600 px-3 py-1 rounded text-[9px] font-black uppercase tracking-widest mb-2 inline-block">MSEP - Unidade Curricular</span>
-          <h2 className="text-3xl font-black tracking-tighter uppercase leading-none">{unit.name}</h2>
+          <input
+            type="text"
+            value={unit.name}
+            onChange={(e) => onUpdateUnit?.({ ...unit, name: e.target.value })}
+            className="text-3xl font-black tracking-tighter uppercase leading-none bg-transparent text-white border-b border-transparent hover:border-slate-700 focus:border-blue-500 outline-none w-full transition-all"
+          />
         </div>
       </div>
 
+      {/* MENU DE NAVEGAÇÃO COM ABA GERAL EM PRIMEIRA POSIÇÃO */}
       <div className="flex border-b border-slate-200 bg-slate-50 overflow-x-auto scrollbar-hide no-print tabs-header">
-        {(['sa', 'rubricas', 'cronograma', 'calendario'] as const).map(tab => (
+        {(['geral', 'sa', 'rubricas', 'cronograma', 'calendario'] as const).map(tab => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
             className={`px-8 py-5 transition-all border-b-4 ${activeTab === tab ? 'border-blue-600 bg-white' : 'border-transparent text-slate-400 hover:bg-slate-100'}`}
           >
             <span className="text-[10px] font-black uppercase tracking-widest block">
-              {tab === 'sa' ? 'Situação-Problema' : tab === 'rubricas' ? 'Rubricas' : tab === 'cronograma' ? 'Plano de Aula' : 'Calendário'}
+              {tab === 'geral' ? 'Geral' : tab === 'sa' ? 'Situação-Problema' : tab === 'rubricas' ? 'Rubricas' : tab === 'cronograma' ? 'Plano de Aula' : 'Calendário'}
             </span>
           </button>
         ))}
       </div>
 
       <div className="p-6 md:p-10 max-h-[75vh] overflow-y-auto custom-scrollbar bg-[#FDFDFD] content-area">
+
+        {/* ABA GERAL: CAPACIDADES TÉCNICAS, SOCIOEMOCIONAIS E CONHECIMENTOS */}
+        {activeTab === 'geral' && (
+          <div className="space-y-10 max-w-5xl mx-auto">
+            <div className="border-b border-slate-100 pb-6">
+              <h3 className="text-3xl font-[1000] text-slate-900 uppercase italic">Geral & Matriz Pedagógica</h3>
+              <p className="text-xs text-slate-400 font-bold uppercase tracking-wider mt-1">Gerais da Unidade Curricular</p>
+            </div>
+
+            {/* CAPACIDADES TÉCNICAS */}
+            <div className="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-lg space-y-4">
+              <div className="flex justify-between items-center border-b border-slate-100 pb-4">
+                <h4 className="text-sm font-black uppercase tracking-wider text-blue-600 flex items-center gap-2">
+                  <span className="w-3 h-3 bg-blue-600 rounded-full inline-block"></span>
+                  Capacidades Técnicas
+                </h4>
+                <button
+                  onClick={() => addGeneralFieldItem('technicalCapacities')}
+                  className="bg-blue-50 text-blue-600 px-3 py-1.5 rounded-xl text-[10px] font-black uppercase hover:bg-blue-600 hover:text-white transition-all"
+                >
+                  + Adicionar Capacidade
+                </button>
+              </div>
+              <div className="space-y-3">
+                {(unit.technicalCapacities || []).map((cap, idx) => (
+                  <div key={idx} className="flex gap-3 items-center">
+                    <span className="text-[10px] font-black text-slate-300 w-6">{idx + 1}.</span>
+                    <input
+                      type="text"
+                      value={cap}
+                      onChange={(e) => updateGeneralFieldList('technicalCapacities', idx, e.target.value)}
+                      placeholder="Descreva a capacidade técnica..."
+                      className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs font-bold text-slate-800 focus:outline-none focus:border-blue-500 transition-all"
+                    />
+                    <button
+                      onClick={() => removeGeneralFieldItem('technicalCapacities', idx)}
+                      className="text-slate-300 hover:text-red-500 p-2 text-xs font-bold transition-all"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* CAPACIDADES SOCIOEMOCIONAIS */}
+            <div className="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-lg space-y-4">
+              <div className="flex justify-between items-center border-b border-slate-100 pb-4">
+                <h4 className="text-sm font-black uppercase tracking-wider text-purple-600 flex items-center gap-2">
+                  <span className="w-3 h-3 bg-purple-600 rounded-full inline-block"></span>
+                  Capacidades Socioemocionais / Atitudinais
+                </h4>
+                <button
+                  onClick={() => addGeneralFieldItem('socialCapacities')}
+                  className="bg-purple-50 text-purple-600 px-3 py-1.5 rounded-xl text-[10px] font-black uppercase hover:bg-purple-600 hover:text-white transition-all"
+                >
+                  + Adicionar Capacidade
+                </button>
+              </div>
+              <div className="space-y-3">
+                {(unit.socialCapacities || []).map((cap, idx) => (
+                  <div key={idx} className="flex gap-3 items-center">
+                    <span className="text-[10px] font-black text-slate-300 w-6">{idx + 1}.</span>
+                    <input
+                      type="text"
+                      value={cap}
+                      onChange={(e) => updateGeneralFieldList('socialCapacities', idx, e.target.value)}
+                      placeholder="Descreva a capacidade socioemocional..."
+                      className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs font-bold text-slate-800 focus:outline-none focus:border-purple-500 transition-all"
+                    />
+                    <button
+                      onClick={() => removeGeneralFieldItem('socialCapacities', idx)}
+                      className="text-slate-300 hover:text-red-500 p-2 text-xs font-bold transition-all"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* CONHECIMENTOS */}
+            <div className="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-lg space-y-4">
+              <div className="flex justify-between items-center border-b border-slate-100 pb-4">
+                <h4 className="text-sm font-black uppercase tracking-wider text-orange-600 flex items-center gap-2">
+                  <span className="w-3 h-3 bg-orange-600 rounded-full inline-block"></span>
+                  Conhecimentos
+                </h4>
+                <button
+                  onClick={() => addGeneralFieldItem('knowledges')}
+                  className="bg-orange-50 text-orange-600 px-3 py-1.5 rounded-xl text-[10px] font-black uppercase hover:bg-orange-600 hover:text-white transition-all"
+                >
+                  + Adicionar Conhecimento
+                </button>
+              </div>
+              <div className="space-y-3">
+                {(unit.knowledges || []).map((know, idx) => (
+                  <div key={idx} className="flex gap-3 items-center">
+                    <span className="text-[10px] font-black text-slate-300 w-6">{idx + 1}.</span>
+                    <input
+                      type="text"
+                      value={know}
+                      onChange={(e) => updateGeneralFieldList('knowledges', idx, e.target.value)}
+                      placeholder="Descreva o conhecimento..."
+                      className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs font-bold text-slate-800 focus:outline-none focus:border-orange-500 transition-all"
+                    />
+                    <button
+                      onClick={() => removeGeneralFieldItem('knowledges', idx)}
+                      className="text-slate-300 hover:text-red-500 p-2 text-xs font-bold transition-all"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
         
         {activeTab === 'cronograma' && (
           <div className="space-y-8">
@@ -256,23 +435,63 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                 <div key={entry.id} className="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-lg grid grid-cols-1 lg:grid-cols-12 gap-8">
                   <div className="lg:col-span-3">
                     <p className="text-[9px] font-black text-slate-400 uppercase mb-1">AULA {idx+1}</p>
-                    <input type="text" value={entry.date} onChange={(e) => updateEntry(entry.id, 'date', e.target.value)} className="text-blue-600 font-[1000] text-xl w-full bg-transparent border-none outline-none" />
+                    <input type="text" value={entry.date} onChange={(e) => updateEntry(entry.id, 'date', e.target.value)} className="text-blue-600 font-[1000] text-xl w-full bg-transparent border-b border-dashed border-blue-200 focus:border-blue-500 outline-none" />
                     <p className="text-[10px] font-black uppercase text-slate-400 mt-1 italic">{getDayOfWeek(entry.date)}</p>
-                    <span className="bg-slate-100 text-slate-500 px-3 py-1 rounded-full text-[8px] font-black uppercase inline-block mt-2">{entry.hours} HORAS</span>
+                    <div className="flex items-center gap-2 mt-2">
+                      <input
+                        type="number"
+                        value={entry.hours}
+                        onChange={(e) => updateEntry(entry.id, 'hours', Number(e.target.value))}
+                        className="w-12 bg-slate-100 text-slate-700 font-black text-[10px] text-center rounded px-1 py-0.5"
+                      />
+                      <span className="text-[8px] font-black text-slate-400 uppercase">HORAS</span>
+                    </div>
                   </div>
                   <div className="lg:col-span-9 grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div>
                       <h5 className="text-[9px] font-black text-slate-400 uppercase mb-2 border-l-2 border-blue-500 pl-2">Conhecimentos e Capacidades</h5>
                       <div className="text-slate-800 text-[10px] font-bold space-y-2">
-                        <p><strong>C:</strong> {entry.knowledge}</p>
-                        <p><strong>Cap:</strong> {entry.capacities}</p>
+                        <div>
+                          <span className="text-[9px] text-slate-400 block font-black">C:</span>
+                          <textarea
+                            value={entry.knowledge}
+                            onChange={(e) => updateEntry(entry.id, 'knowledge', e.target.value)}
+                            rows={2}
+                            className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 text-[10px] font-bold focus:outline-none focus:border-blue-500"
+                          />
+                        </div>
+                        <div>
+                          <span className="text-[9px] text-slate-400 block font-black">Cap:</span>
+                          <textarea
+                            value={entry.capacities}
+                            onChange={(e) => updateEntry(entry.id, 'capacities', e.target.value)}
+                            rows={2}
+                            className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 text-[10px] font-bold focus:outline-none focus:border-blue-500"
+                          />
+                        </div>
                       </div>
                     </div>
                     <div>
                       <h5 className="text-[9px] font-black text-slate-400 uppercase mb-2 border-l-2 border-orange-500 pl-2">Estratégias e Recursos</h5>
-                      <div className="text-slate-600 text-[10px] font-medium italic">
-                        <p>{entry.strategy}</p>
-                        <p className="mt-2 text-slate-400">{entry.resources}</p>
+                      <div className="text-slate-600 text-[10px] font-medium space-y-2">
+                        <div>
+                          <span className="text-[9px] text-slate-400 block font-black uppercase">Estratégia:</span>
+                          <textarea
+                            value={entry.strategy}
+                            onChange={(e) => updateEntry(entry.id, 'strategy', e.target.value)}
+                            rows={2}
+                            className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 text-[10px] font-medium focus:outline-none focus:border-orange-500"
+                          />
+                        </div>
+                        <div>
+                          <span className="text-[9px] text-slate-400 block font-black uppercase">Recursos:</span>
+                          <textarea
+                            value={entry.resources}
+                            onChange={(e) => updateEntry(entry.id, 'resources', e.target.value)}
+                            rows={2}
+                            className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 text-[10px] font-medium focus:outline-none focus:border-orange-500"
+                          />
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -338,6 +557,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
           </div>
         )}
 
+        {/* ABA SITUAÇÃO-PROBLEMA EDITÁVEL */}
         {activeTab === 'sa' && (
           <div className="max-w-4xl mx-auto">
             <div className="flex justify-between items-center gap-6 border-b border-slate-100 pb-8 mb-10 no-print">
@@ -349,28 +569,64 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
             </div>
 
             <div className="space-y-12 pb-10 no-print">
-              {unit.learningSituations.map((sa) => (
+              {unit.learningSituations.map((sa, saIdx) => (
                 <div key={sa.id} className="p-10 bg-white border border-slate-200 rounded-[3rem] shadow-xl relative overflow-hidden transition-all hover:border-blue-200">
                   <div className="absolute top-0 left-0 w-2 h-full bg-blue-600"></div>
-                  <h3 className="text-2xl font-black text-slate-900 mb-6 uppercase tracking-tight leading-none italic">{sa.title}</h3>
+                  
+                  <input
+                    type="text"
+                    value={sa.title}
+                    onChange={(e) => updateSAField(saIdx, 'title', e.target.value)}
+                    className="text-2xl font-black text-slate-900 mb-6 uppercase tracking-tight leading-none italic w-full bg-transparent border-b border-slate-200 focus:border-blue-500 outline-none pb-2"
+                  />
+                  
                   <div className="space-y-8">
                     <div className="border-l-2 border-slate-100 pl-6">
                       <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">I. Contextualização</p>
-                      <p className="text-slate-600 text-sm leading-relaxed font-medium">{sa.context}</p>
+                      <textarea
+                        value={sa.context}
+                        onChange={(e) => updateSAField(saIdx, 'context', e.target.value)}
+                        rows={4}
+                        className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 text-slate-600 text-sm leading-relaxed font-medium focus:outline-none focus:border-blue-500"
+                      />
                     </div>
                     
                     <div className="bg-slate-900 p-8 rounded-[2.5rem] text-white shadow-lg">
                       <p className="text-[10px] font-black text-red-500 uppercase mb-4 tracking-widest">II. Desafio Proposto</p>
-                      <p className="text-slate-200 text-sm italic font-medium leading-relaxed">"{sa.challenge}"</p>
+                      <textarea
+                        value={sa.challenge}
+                        onChange={(e) => updateSAField(saIdx, 'challenge', e.target.value)}
+                        rows={3}
+                        className="w-full bg-slate-800 border border-slate-700 text-slate-200 text-sm italic font-medium leading-relaxed rounded-xl p-3 focus:outline-none focus:border-red-500"
+                      />
                     </div>
 
                     <div className="border-t border-slate-100 pt-8">
-                      <p className="text-[10px] font-black text-blue-600 uppercase tracking-widest mb-4">III. Resultados Esperados</p>
+                      <div className="flex justify-between items-center mb-4">
+                        <p className="text-[10px] font-black text-blue-600 uppercase tracking-widest">III. Resultados Esperados</p>
+                        <button
+                          onClick={() => addSAResult(saIdx)}
+                          className="text-[10px] font-black uppercase text-blue-600 bg-blue-50 px-3 py-1 rounded-lg hover:bg-blue-600 hover:text-white transition-all"
+                        >
+                          + Adicionar Resultado
+                        </button>
+                      </div>
                       <ul className="space-y-3">
                         {sa.expectedResults.map((result, rIdx) => (
-                          <li key={rIdx} className="flex gap-4 group">
-                            <span className="w-6 h-6 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center shrink-0 text-[10px] font-black transition-all group-hover:bg-blue-600 group-hover:text-white">{rIdx + 1}</span>
-                            <p className="text-slate-600 text-sm font-bold leading-tight pt-0.5">{result}</p>
+                          <li key={rIdx} className="flex gap-3 items-center">
+                            <span className="w-6 h-6 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center shrink-0 text-[10px] font-black">{rIdx + 1}</span>
+                            <input
+                              type="text"
+                              value={result}
+                              onChange={(e) => updateSAResult(saIdx, rIdx, e.target.value)}
+                              className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-slate-700 text-sm font-bold focus:outline-none focus:border-blue-500"
+                            />
+                            <button
+                              onClick={() => removeSAResult(saIdx, rIdx)}
+                              className="text-slate-300 hover:text-red-500 p-2 text-xs font-bold transition-all"
+                            >
+                              ✕
+                            </button>
                           </li>
                         ))}
                       </ul>
@@ -427,12 +683,13 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
           </div>
         )}
 
+        {/* ABA RUBRICAS EDITÁVEL */}
         {activeTab === 'rubricas' && (
           <div className="overflow-x-auto rounded-[2rem] border border-slate-200 bg-white p-2 no-print">
             <table className="w-full text-left border-collapse min-w-[800px]">
               <thead>
                 <tr className="bg-slate-900 text-white">
-                  <th className="p-6 text-[10px] font-black uppercase border border-slate-800">Referência</th>
+                  <th className="p-6 text-[10px] font-black uppercase border border-slate-800">Referência / Capacidade</th>
                   <th className="p-6 text-[10px] font-black uppercase border border-slate-800 text-red-400">NSA</th>
                   <th className="p-6 text-[10px] font-black uppercase border border-slate-800 text-orange-400">APO</th>
                   <th className="p-6 text-[10px] font-black uppercase border border-slate-800 text-blue-400">PAR</th>
@@ -442,11 +699,46 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
               <tbody className="text-[11px] font-bold">
                 {unit.rubrics.map((row, i) => (
                   <tr key={i} className="hover:bg-slate-50 transition-colors">
-                    <td className="p-6 border border-slate-100 text-slate-900 bg-slate-50/50 w-64">{row.capacity}</td>
-                    <td className="p-6 border border-slate-100 text-slate-500 italic">{row.nsa}</td>
-                    <td className="p-6 border border-slate-100 text-slate-500 italic">{row.apo}</td>
-                    <td className="p-6 border border-slate-100 text-slate-500 italic">{row.par}</td>
-                    <td className="p-6 border border-slate-100 text-slate-500 italic">{row.aut}</td>
+                    <td className="p-4 border border-slate-100 bg-slate-50/50 w-64">
+                      <textarea
+                        value={row.capacity}
+                        onChange={(e) => updateRubric(i, 'capacity', e.target.value)}
+                        rows={3}
+                        className="w-full bg-transparent border-none outline-none font-bold text-slate-900 text-xs"
+                      />
+                    </td>
+                    <td className="p-4 border border-slate-100">
+                      <textarea
+                        value={row.nsa}
+                        onChange={(e) => updateRubric(i, 'nsa', e.target.value)}
+                        rows={3}
+                        className="w-full bg-slate-50 border border-slate-100 rounded p-2 text-slate-500 italic text-[11px] focus:outline-none focus:border-red-300"
+                      />
+                    </td>
+                    <td className="p-4 border border-slate-100">
+                      <textarea
+                        value={row.apo}
+                        onChange={(e) => updateRubric(i, 'apo', e.target.value)}
+                        rows={3}
+                        className="w-full bg-slate-50 border border-slate-100 rounded p-2 text-slate-500 italic text-[11px] focus:outline-none focus:border-orange-300"
+                      />
+                    </td>
+                    <td className="p-4 border border-slate-100">
+                      <textarea
+                        value={row.par}
+                        onChange={(e) => updateRubric(i, 'par', e.target.value)}
+                        rows={3}
+                        className="w-full bg-slate-50 border border-slate-100 rounded p-2 text-slate-500 italic text-[11px] focus:outline-none focus:border-blue-300"
+                      />
+                    </td>
+                    <td className="p-4 border border-slate-100">
+                      <textarea
+                        value={row.aut}
+                        onChange={(e) => updateRubric(i, 'aut', e.target.value)}
+                        rows={3}
+                        className="w-full bg-slate-50 border border-slate-100 rounded p-2 text-slate-500 italic text-[11px] focus:outline-none focus:border-green-300"
+                      />
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -454,6 +746,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
           </div>
         )}
 
+        {/* ABA CALENDÁRIO */}
         {activeTab === 'calendario' && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 no-print">
             {monthsInRange.map(monthStr => {
