@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { TeachingPlan, CurricularUnit } from '../types';
 import { GoogleGenAI } from "@google/genai";
@@ -84,7 +83,6 @@ const PlanForm: React.FC<PlanFormProps> = ({ initialPlan, onSave, onCancel }) =>
         createdAt: formData.createdAt || new Date().toISOString(),
       } as TeachingPlan;
 
-      // Aguarda a conclusão do salvamento no componente pai (Firebase)
       await onSave(planToSave);
     } catch (err: any) {
       console.error("Erro ao salvar plano:", err);
@@ -96,7 +94,9 @@ const PlanForm: React.FC<PlanFormProps> = ({ initialPlan, onSave, onCancel }) =>
   const addUnit = () => {
     const newUnit: CurricularUnit = {
       id: `uc-${Math.random().toString(36).substr(2, 5)}`,
+      code: '',
       name: '',
+      semester: '1º Semestre',
       basicCapacities: [],
       socioemocionalCapacities: [],
       knowledge: [],
@@ -183,7 +183,7 @@ const PlanForm: React.FC<PlanFormProps> = ({ initialPlan, onSave, onCancel }) =>
 
       <div className="mb-10 bg-slate-50 p-8 rounded-3xl border border-slate-100">
         <div className="flex justify-between items-center mb-6">
-          <h3 className="text-xs font-black uppercase tracking-widest text-slate-400">III. Estrutura de Unidades</h3>
+          <h3 className="text-xs font-black uppercase tracking-widest text-slate-400">III. Estrutura de Unidades Curriculares</h3>
           <button 
             type="button"
             onClick={addUnit}
@@ -194,35 +194,74 @@ const PlanForm: React.FC<PlanFormProps> = ({ initialPlan, onSave, onCancel }) =>
           </button>
         </div>
         
-        <div className="space-y-3">
+        <div className="space-y-4">
           {formData.units?.map((unit, index) => (
-            <div key={unit.id} className="flex gap-2 items-center group">
-               <div className="flex-1 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
-                 <span className="text-[10px] font-black text-slate-300">0{index + 1}</span>
+            <div key={unit.id} className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row gap-4 items-center group">
+               <span className="text-[10px] font-black text-slate-300">0{index + 1}</span>
+               
+               {/* Campo de Sigla / Código */}
+               <div className="w-full md:w-32">
                  <input 
-                  type="text" 
-                  placeholder="Nome da Unidade Curricular" 
-                  className="bg-transparent font-bold text-slate-800 outline-none w-full text-sm uppercase"
-                  value={unit.name}
-                  onChange={e => {
-                    const newUnits = [...formData.units!];
-                    newUnits[index].name = e.target.value;
-                    setFormData({ ...formData, units: newUnits });
-                  }}
-                />
+                   type="text" 
+                   placeholder="Sigla (Ex: USI)" 
+                   className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold uppercase text-slate-800 outline-none focus:border-blue-500"
+                   value={unit.code || ''}
+                   onChange={e => {
+                     const newUnits = [...formData.units!];
+                     newUnits[index].code = e.target.value.toUpperCase();
+                     setFormData({ ...formData, units: newUnits });
+                   }}
+                 />
                </div>
+
+               {/* Nome da Unidade Curricular */}
+               <div className="flex-1 w-full">
+                 <input 
+                   type="text" 
+                   placeholder="Nome da Unidade Curricular" 
+                   className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold uppercase text-slate-800 outline-none focus:border-blue-500"
+                   value={unit.name}
+                   onChange={e => {
+                     const newUnits = [...formData.units!];
+                     newUnits[index].name = e.target.value;
+                     setFormData({ ...formData, units: newUnits });
+                   }}
+                 />
+               </div>
+
+               {/* Seletor de Semestre */}
+               <div className="w-full md:w-44">
+                 <select
+                   className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-[10px] font-black uppercase tracking-wider text-slate-700 outline-none focus:border-blue-500"
+                   value={unit.semester || '1º Semestre'}
+                   onChange={e => {
+                     const newUnits = [...formData.units!];
+                     newUnits[index].semester = e.target.value;
+                     setFormData({ ...formData, units: newUnits });
+                   }}
+                 >
+                   <option value="1º Semestre">1º Semestre</option>
+                   <option value="2º Semestre">2º Semestre</option>
+                   <option value="Ambos">Ambos os Semestres</option>
+                 </select>
+               </div>
+
+               {/* Botão de Excluir */}
                <button 
                  type="button"
                  onClick={() => {
                    const newUnits = formData.units?.filter((_, i) => i !== index);
                    setFormData({ ...formData, units: newUnits });
                  }}
-                 className="p-4 text-slate-300 hover:text-red-500 transition-colors"
+                 className="p-3 text-slate-300 hover:text-red-500 transition-colors self-center"
                >
                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"/></svg>
                </button>
             </div>
           ))}
+          {(!formData.units || formData.units.length === 0) && (
+            <p className="text-center text-slate-400 text-xs py-4 uppercase font-bold tracking-widest">Nenhuma Unidade Curricular cadastrada neste plano.</p>
+          )}
         </div>
       </div>
 
