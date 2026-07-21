@@ -6,6 +6,7 @@ interface Props {
   onUpdateSchedule?: (newSchedule: ScheduleEntry[]) => void;
   onUpdateCalendar?: (newCalendar: UnitCalendar) => void;
   onUpdateUnit?: (updatedUnit: CurricularUnit) => void;
+  isAdmin?: boolean; // Prop para controlar se é administrador
 }
 
 const COLOR_MAP: Record<CalendarColor, string> = {
@@ -16,13 +17,14 @@ const TEXT_COLOR_MAP: Record<CalendarColor, string> = {
   yellow: '#0f172a', green: '#ffffff', blue: '#ffffff', red: '#ffffff', cyan: '#ffffff', orange: '#ffffff', purple: '#ffffff', pink: '#ffffff', white: '#1e293b', none: 'inherit'
 };
 
-// Componente para Inputs simples
+// Componente para Inputs simples com trava de permissão
 const DebouncedInput: React.FC<{
   value: string;
   onChange: (val: string) => void;
   placeholder?: string;
   className?: string;
-}> = ({ value, onChange, placeholder, className }) => {
+  disabled?: boolean;
+}> = ({ value, onChange, placeholder, className, disabled }) => {
   const [localValue, setLocalValue] = useState(value || '');
 
   useEffect(() => {
@@ -30,6 +32,7 @@ const DebouncedInput: React.FC<{
   }, [value]);
 
   const handleBlur = () => {
+    if (disabled) return;
     if (localValue !== value) {
       onChange(localValue);
     }
@@ -39,22 +42,24 @@ const DebouncedInput: React.FC<{
     <input
       type="text"
       value={localValue}
-      onChange={(e) => setLocalValue(e.target.value)}
+      onChange={(e) => !disabled && setLocalValue(e.target.value)}
       onBlur={handleBlur}
       placeholder={placeholder}
+      disabled={disabled}
       className={className}
     />
   );
 };
 
-// Componente isolado para Textareas dinâmicas
+// Componente isolado para Textareas dinâmicas com trava de permissão
 const EditableArea: React.FC<{
   value: string;
   onChange: (val: string) => void;
   placeholder?: string;
   className?: string;
   rows?: number;
-}> = ({ value, onChange, placeholder, className, rows = 1 }) => {
+  disabled?: boolean;
+}> = ({ value, onChange, placeholder, className, rows = 1, disabled }) => {
   const [val, setVal] = useState(value || '');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -74,6 +79,7 @@ const EditableArea: React.FC<{
   }, [val]);
 
   const handleBlur = () => {
+    if (disabled) return;
     if (val !== value) {
       onChange(val);
     }
@@ -83,16 +89,17 @@ const EditableArea: React.FC<{
     <textarea
       ref={textareaRef}
       value={val}
-      onChange={(e) => setVal(e.target.value)}
+      onChange={(e) => !disabled && setVal(e.target.value)}
       onBlur={handleBlur}
       placeholder={placeholder}
       rows={rows}
+      disabled={disabled}
       className={`resize-none overflow-hidden block w-full ${className || ''}`}
     />
   );
 };
 
-const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar, onUpdateUnit }) => {
+const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar, onUpdateUnit, isAdmin = true }) => {
   const [activeTab, setActiveTab] = useState<'geral' | 'sa' | 'rubricas' | 'cronograma' | 'calendario'>('geral');
   const [localSchedule, setLocalSchedule] = useState<ScheduleEntry[]>(unit.schedule || []);
   const [localUnit, setLocalUnit] = useState<CurricularUnit>(unit);
@@ -105,7 +112,16 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
     setLocalUnit(unit);
   }, [unit]);
 
+  const checkPermission = () => {
+    if (!isAdmin) {
+      alert("Acesso negado: Apenas o administrador pode atualizar unidades.");
+      return false;
+    }
+    return true;
+  };
+
   const updateUnitState = (newUnit: CurricularUnit) => {
+    if (!checkPermission()) return;
     setLocalUnit(newUnit);
     onUpdateUnit?.(newUnit);
   };
@@ -124,38 +140,42 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
   };
 
   const updateEntry = (id: string, field: keyof ScheduleEntry, value: any) => {
+    if (!checkPermission()) return;
     const updated = localSchedule.map(entry => entry.id === id ? { ...entry, [field]: value } : entry);
     setLocalSchedule(updated);
     onUpdateSchedule?.(updated);
   };
 
-  // Edição dos campos da aba Geral
   const updateGeneralFieldList = (field: 'technicalCapacities' | 'socialCapacities' | 'knowledges', index: number, value: string) => {
+    if (!checkPermission()) return;
     const currentList = localUnit[field] ? [...localUnit[field]!] : [];
     currentList[index] = value;
     updateUnitState({ ...localUnit, [field]: currentList });
   };
 
   const addGeneralFieldItem = (field: 'technicalCapacities' | 'socialCapacities' | 'knowledges') => {
+    if (!checkPermission()) return;
     const currentList = localUnit[field] ? [...localUnit[field]!] : [];
     currentList.push('');
     updateUnitState({ ...localUnit, [field]: currentList });
   };
 
   const removeGeneralFieldItem = (field: 'technicalCapacities' | 'socialCapacities' | 'knowledges', index: number) => {
+    if (!checkPermission()) return;
     const currentList = localUnit[field] ? [...localUnit[field]!] : [];
     currentList.splice(index, 1);
     updateUnitState({ ...localUnit, [field]: currentList });
   };
 
-  // Manipulação das Situações de Aprendizagem / Fases
   const updateSAField = (saIndex: number, field: string, value: any) => {
+    if (!checkPermission()) return;
     const updatedSAs = [...(localUnit.learningSituations || [])];
     updatedSAs[saIndex] = { ...updatedSAs[saIndex], [field]: value };
     updateUnitState({ ...localUnit, learningSituations: updatedSAs });
   };
 
   const addLearningSituation = () => {
+    if (!checkPermission()) return;
     const newSA = {
       id: `sa-${Date.now()}`,
       title: `Situação de Aprendizagem ${(localUnit.learningSituations || []).length + 1}`,
@@ -167,6 +187,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
   };
 
   const removeLearningSituation = (saIndex: number) => {
+    if (!checkPermission()) return;
     if (confirm("Tem certeza que deseja remover esta Situação de Aprendizagem na íntegra?")) {
       const updatedSAs = [...(localUnit.learningSituations || [])];
       updatedSAs.splice(saIndex, 1);
@@ -175,6 +196,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
   };
 
   const updateSAResult = (saIndex: number, resultIndex: number, value: string) => {
+    if (!checkPermission()) return;
     const updatedSAs = [...(localUnit.learningSituations || [])];
     const results = [...(updatedSAs[saIndex].expectedResults || [])];
     results[resultIndex] = value;
@@ -183,6 +205,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
   };
 
   const addSAResult = (saIndex: number) => {
+    if (!checkPermission()) return;
     const updatedSAs = [...(localUnit.learningSituations || [])];
     const results = [...(updatedSAs[saIndex].expectedResults || []), ''];
     updatedSAs[saIndex] = { ...updatedSAs[saIndex], expectedResults: results };
@@ -190,6 +213,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
   };
 
   const removeSAResult = (saIndex: number, resultIndex: number) => {
+    if (!checkPermission()) return;
     const updatedSAs = [...(localUnit.learningSituations || [])];
     const results = [...(updatedSAs[saIndex].expectedResults || [])];
     results.splice(resultIndex, 1);
@@ -197,8 +221,8 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
     updateUnitState({ ...localUnit, learningSituations: updatedSAs });
   };
 
-  // Edição de Rubricas
   const updateRubric = (index: number, field: string, value: string) => {
+    if (!checkPermission()) return;
     const updatedRubrics = [...(localUnit.rubrics || [])];
     updatedRubrics[index] = { ...updatedRubrics[index], [field]: value };
     updateUnitState({ ...localUnit, rubrics: updatedRubrics });
@@ -260,6 +284,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
           <DebouncedInput
             value={localUnit.name}
             onChange={(val) => updateUnitState({ ...localUnit, name: val })}
+            disabled={!isAdmin}
             className="text-3xl font-black tracking-tighter uppercase leading-none bg-transparent text-white border-b border-transparent hover:border-slate-700 focus:border-blue-500 outline-none w-full transition-all"
           />
         </div>
@@ -298,9 +323,11 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                     <span className="w-2.5 h-2.5 bg-blue-600 rounded-full inline-block"></span>
                     Capacidades Técnicas
                   </h4>
-                  <button onClick={() => addGeneralFieldItem('technicalCapacities')} className="bg-blue-50 text-blue-600 px-2.5 py-1 rounded-xl text-[9px] font-black uppercase hover:bg-blue-600 hover:text-white transition-all">
-                    + Item
-                  </button>
+                  {isAdmin && (
+                    <button onClick={() => addGeneralFieldItem('technicalCapacities')} className="bg-blue-50 text-blue-600 px-2.5 py-1 rounded-xl text-[9px] font-black uppercase hover:bg-blue-600 hover:text-white transition-all">
+                      + Item
+                    </button>
+                  )}
                 </div>
                 <div className="space-y-3 flex-1">
                   {(localUnit.technicalCapacities || []).map((cap, idx) => (
@@ -311,11 +338,14 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                         onChange={(val) => updateGeneralFieldList('technicalCapacities', idx, val)}
                         placeholder="Descreva a capacidade técnica..."
                         rows={1}
+                        disabled={!isAdmin}
                         className="flex-1 bg-transparent border-none text-xs font-bold text-slate-800 focus:outline-none"
                       />
-                      <button onClick={() => removeGeneralFieldItem('technicalCapacities', idx)} className="text-slate-400 hover:text-red-500 text-xs font-bold transition-all p-1">
-                        ✕
-                      </button>
+                      {isAdmin && (
+                        <button onClick={() => removeGeneralFieldItem('technicalCapacities', idx)} className="text-slate-400 hover:text-red-500 text-xs font-bold transition-all p-1">
+                          ✕
+                        </button>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -328,9 +358,11 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                     <span className="w-2.5 h-2.5 bg-purple-600 rounded-full inline-block"></span>
                     Socioemocionais
                   </h4>
-                  <button onClick={() => addGeneralFieldItem('socialCapacities')} className="bg-purple-50 text-purple-600 px-2.5 py-1 rounded-xl text-[9px] font-black uppercase hover:bg-purple-600 hover:text-white transition-all">
-                    + Item
-                  </button>
+                  {isAdmin && (
+                    <button onClick={() => addGeneralFieldItem('socialCapacities')} className="bg-purple-50 text-purple-600 px-2.5 py-1 rounded-xl text-[9px] font-black uppercase hover:bg-purple-600 hover:text-white transition-all">
+                      + Item
+                    </button>
+                  )}
                 </div>
                 <div className="space-y-3 flex-1">
                   {(localUnit.socialCapacities || []).map((cap, idx) => (
@@ -341,11 +373,14 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                         onChange={(val) => updateGeneralFieldList('socialCapacities', idx, val)}
                         placeholder="Descreva a capacidade socioemocional..."
                         rows={1}
+                        disabled={!isAdmin}
                         className="flex-1 bg-transparent border-none text-xs font-bold text-slate-800 focus:outline-none"
                       />
-                      <button onClick={() => removeGeneralFieldItem('socialCapacities', idx)} className="text-slate-400 hover:text-red-500 text-xs font-bold transition-all p-1">
-                        ✕
-                      </button>
+                      {isAdmin && (
+                        <button onClick={() => removeGeneralFieldItem('socialCapacities', idx)} className="text-slate-400 hover:text-red-500 text-xs font-bold transition-all p-1">
+                          ✕
+                        </button>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -358,9 +393,11 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                     <span className="w-2.5 h-2.5 bg-orange-600 rounded-full inline-block"></span>
                     Conhecimentos
                   </h4>
-                  <button onClick={() => addGeneralFieldItem('knowledges')} className="bg-orange-50 text-orange-600 px-2.5 py-1 rounded-xl text-[9px] font-black uppercase hover:bg-orange-600 hover:text-white transition-all">
-                    + Item
-                  </button>
+                  {isAdmin && (
+                    <button onClick={() => addGeneralFieldItem('knowledges')} className="bg-orange-50 text-orange-600 px-2.5 py-1 rounded-xl text-[9px] font-black uppercase hover:bg-orange-600 hover:text-white transition-all">
+                      + Item
+                    </button>
+                  )}
                 </div>
                 <div className="space-y-3 flex-1">
                   {(localUnit.knowledges || []).map((know, idx) => (
@@ -371,11 +408,14 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                         onChange={(val) => updateGeneralFieldList('knowledges', idx, val)}
                         placeholder="Descreva o conhecimento..."
                         rows={1}
+                        disabled={!isAdmin}
                         className="flex-1 bg-transparent border-none text-xs font-bold text-slate-800 focus:outline-none"
                       />
-                      <button onClick={() => removeGeneralFieldItem('knowledges', idx)} className="text-slate-400 hover:text-red-500 text-xs font-bold transition-all p-1">
-                        ✕
-                      </button>
+                      {isAdmin && (
+                        <button onClick={() => removeGeneralFieldItem('knowledges', idx)} className="text-slate-400 hover:text-red-500 text-xs font-bold transition-all p-1">
+                          ✕
+                        </button>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -393,9 +433,11 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                 <p className="text-xs text-slate-400 font-bold uppercase tracking-wider mt-1">Gestão e detalhamento das Fases e Projetos da Unidade</p>
               </div>
               <div className="flex items-center gap-4">
-                <button onClick={addLearningSituation} className="bg-blue-600 text-white px-6 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl hover:bg-slate-900 transition-all">
-                  + Nova Fase / SA
-                </button>
+                {isAdmin && (
+                  <button onClick={addLearningSituation} className="bg-blue-600 text-white px-6 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl hover:bg-slate-900 transition-all">
+                    + Nova Fase / SA
+                  </button>
+                )}
                 <button onClick={handlePrint} className="bg-red-600 text-white px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl flex items-center gap-3 hover:bg-slate-900 transition-all">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
                   Imprimir Situações
@@ -415,12 +457,15 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                         value={sa.title}
                         onChange={(val) => updateSAField(saIdx, 'title', val)}
                         placeholder="Título da Situação de Aprendizagem / Fase..."
+                        disabled={!isAdmin}
                         className="text-2xl font-black text-slate-900 uppercase tracking-tight leading-none italic w-full bg-transparent border-b border-slate-200 focus:border-blue-500 outline-none pb-2"
                       />
                     </div>
-                    <button onClick={() => removeLearningSituation(saIdx)} className="text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 px-4 py-2 rounded-xl text-xs font-black transition-all shadow-sm" title="Excluir Fase">
-                      Excluir Fase ✕
-                    </button>
+                    {isAdmin && (
+                      <button onClick={() => removeLearningSituation(saIdx)} className="text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 px-4 py-2 rounded-xl text-xs font-black transition-all shadow-sm" title="Excluir Fase">
+                        Excluir Fase ✕
+                      </button>
+                    )}
                   </div>
                   
                   <div className="space-y-8">
@@ -431,6 +476,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                         onChange={(val) => updateSAField(saIdx, 'context', val)}
                         rows={2}
                         placeholder="Descreva aqui o contexto ou problema apresentado ao aluno..."
+                        disabled={!isAdmin}
                         className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 text-slate-600 text-sm leading-relaxed font-medium focus:outline-none focus:border-blue-500"
                       />
                     </div>
@@ -442,6 +488,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                         onChange={(val) => updateSAField(saIdx, 'challenge', val)}
                         rows={2}
                         placeholder="Desafio pedagógico do aluno..."
+                        disabled={!isAdmin}
                         className="w-full bg-slate-800 border border-slate-700 text-slate-200 text-sm italic font-medium leading-relaxed rounded-xl p-3 focus:outline-none focus:border-red-500"
                       />
                     </div>
@@ -449,9 +496,11 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                     <div className="border-t border-slate-100 pt-8">
                       <div className="flex justify-between items-center mb-4">
                         <p className="text-[10px] font-black text-blue-600 uppercase tracking-widest">III. Resultados Esperados / Entregas da Fase</p>
-                        <button onClick={() => addSAResult(saIdx)} className="text-[10px] font-black uppercase text-blue-600 bg-blue-50 px-3 py-1.5 rounded-lg hover:bg-blue-600 hover:text-white transition-all">
-                          + Adicionar Entrega
-                        </button>
+                        {isAdmin && (
+                          <button onClick={() => addSAResult(saIdx)} className="text-[10px] font-black uppercase text-blue-600 bg-blue-50 px-3 py-1.5 rounded-lg hover:bg-blue-600 hover:text-white transition-all">
+                            + Adicionar Entrega
+                          </button>
+                        )}
                       </div>
                       <ul className="space-y-3">
                         {(sa.expectedResults || []).map((result, rIdx) => (
@@ -461,11 +510,14 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                               value={result}
                               onChange={(val) => updateSAResult(saIdx, rIdx, val)}
                               placeholder="Descreva o resultado ou produto esperado..."
+                              disabled={!isAdmin}
                               className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-slate-700 text-sm font-bold focus:outline-none focus:border-blue-500"
                             />
-                            <button onClick={() => removeSAResult(saIdx, rIdx)} className="text-slate-400 hover:text-red-500 p-2 text-xs font-bold transition-all">
-                              ✕
-                            </button>
+                            {isAdmin && (
+                              <button onClick={() => removeSAResult(saIdx, rIdx)} className="text-slate-400 hover:text-red-500 p-2 text-xs font-bold transition-all">
+                                ✕
+                              </button>
+                            )}
                           </li>
                         ))}
                       </ul>
@@ -498,6 +550,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                         value={row.capacity}
                         onChange={(val) => updateRubric(i, 'capacity', val)}
                         rows={1}
+                        disabled={!isAdmin}
                         className="bg-transparent border-none outline-none font-bold text-slate-900 text-[10px] leading-tight p-0"
                       />
                     </td>
@@ -506,6 +559,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                         value={row.nsa}
                         onChange={(val) => updateRubric(i, 'nsa', val)}
                         rows={1}
+                        disabled={!isAdmin}
                         className="bg-slate-50/60 border border-slate-100 rounded p-1 text-slate-600 italic text-[9.5px] leading-tight focus:outline-none focus:border-red-300 focus:bg-white"
                       />
                     </td>
@@ -514,6 +568,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                         value={row.apo}
                         onChange={(val) => updateRubric(i, 'apo', val)}
                         rows={1}
+                        disabled={!isAdmin}
                         className="bg-slate-50/60 border border-slate-100 rounded p-1 text-slate-600 italic text-[9.5px] leading-tight focus:outline-none focus:border-orange-300 focus:bg-white"
                       />
                     </td>
@@ -522,6 +577,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                         value={row.par}
                         onChange={(val) => updateRubric(i, 'par', val)}
                         rows={1}
+                        disabled={!isAdmin}
                         className="bg-slate-50/60 border border-slate-100 rounded p-1 text-slate-600 italic text-[9.5px] leading-tight focus:outline-none focus:border-blue-300 focus:bg-white"
                       />
                     </td>
@@ -530,6 +586,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                         value={row.aut}
                         onChange={(val) => updateRubric(i, 'aut', val)}
                         rows={1}
+                        disabled={!isAdmin}
                         className="bg-slate-50/60 border border-slate-100 rounded p-1 text-slate-600 italic text-[9.5px] leading-tight focus:outline-none focus:border-green-300 focus:bg-white"
                       />
                     </td>
@@ -540,7 +597,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
           </div>
         )}
 
-        {/* ABA CRONOGRAMA - TABELA PADRÃO SENAI */}
+        {/* ABA CRONOGRAMA */}
         {activeTab === 'cronograma' && (
           <div className="space-y-6">
             <div className="flex justify-between items-center gap-6 border-b border-slate-200 pb-4 no-print">
@@ -561,7 +618,6 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
               </div>
             </div>
 
-            {/* TABELA DE CRONOGRAMA */}
             <div className="w-full bg-white rounded-lg border-2 border-black overflow-hidden shadow-sm">
               <table className="w-full table-fixed border-collapse">
                 <thead>
@@ -590,6 +646,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                         <DebouncedInput
                           value={entry.date}
                           onChange={(val) => updateEntry(entry.id, 'date', val)}
+                          disabled={!isAdmin}
                           className="w-full text-center font-bold text-slate-800 bg-transparent border-b border-transparent hover:border-slate-300 focus:border-blue-500 outline-none text-xs"
                           placeholder="DD/MM/AAAA"
                         />
@@ -600,6 +657,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                           <DebouncedInput
                             value={String(entry.hours || '')}
                             onChange={(val) => updateEntry(entry.id, 'hours', Number(val) || 0)}
+                            disabled={!isAdmin}
                             className="w-12 text-center font-black text-blue-600 bg-blue-50 border border-blue-100 rounded p-0.5 text-xs"
                           />
                           <span className="text-[10px] text-slate-500 font-bold">h</span>
@@ -610,6 +668,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                           value={entry.capacities}
                           onChange={(val) => updateEntry(entry.id, 'capacities', val)}
                           placeholder="Capacidades..."
+                          disabled={!isAdmin}
                           className="w-full bg-transparent border-none focus:outline-none text-slate-800 text-xs leading-relaxed"
                           rows={3}
                         />
@@ -619,6 +678,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                           value={entry.knowledges}
                           onChange={(val) => updateEntry(entry.id, 'knowledges', val)}
                           placeholder="Conhecimentos..."
+                          disabled={!isAdmin}
                           className="w-full bg-transparent border-none focus:outline-none text-slate-800 text-xs leading-relaxed"
                           rows={3}
                         />
@@ -628,6 +688,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                           value={entry.strategy}
                           onChange={(val) => updateEntry(entry.id, 'strategy', val)}
                           placeholder="Estratégias / Atividades..."
+                          disabled={!isAdmin}
                           className="w-full bg-transparent border-none focus:outline-none text-slate-800 text-xs leading-relaxed"
                           rows={3}
                         />
@@ -637,6 +698,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                           value={entry.resources}
                           onChange={(val) => updateEntry(entry.id, 'resources', val)}
                           placeholder="Recursos / Avaliação..."
+                          disabled={!isAdmin}
                           className="w-full bg-transparent border-none focus:outline-none text-slate-800 text-xs leading-relaxed"
                           rows={3}
                         />
