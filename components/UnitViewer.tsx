@@ -6,7 +6,7 @@ interface Props {
   onUpdateSchedule?: (newSchedule: ScheduleEntry[]) => void;
   onUpdateCalendar?: (newCalendar: UnitCalendar) => void;
   onUpdateUnit?: (updatedUnit: CurricularUnit) => void;
-  isAdmin?: boolean; // Prop para controlar se é administrador
+  isAdmin?: boolean;
 }
 
 const COLOR_MAP: Record<CalendarColor, string> = {
@@ -17,7 +17,6 @@ const TEXT_COLOR_MAP: Record<CalendarColor, string> = {
   yellow: '#0f172a', green: '#ffffff', blue: '#ffffff', red: '#ffffff', cyan: '#ffffff', orange: '#ffffff', purple: '#ffffff', pink: '#ffffff', white: '#1e293b', none: 'inherit'
 };
 
-// Componente para Inputs simples com trava de permissão
 const DebouncedInput: React.FC<{
   value: string;
   onChange: (val: string) => void;
@@ -51,7 +50,6 @@ const DebouncedInput: React.FC<{
   );
 };
 
-// Componente isolado para Textareas dinâmicas com trava de permissão
 const EditableArea: React.FC<{
   value: string;
   onChange: (val: string) => void;
@@ -144,6 +142,31 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
     const updated = localSchedule.map(entry => entry.id === id ? { ...entry, [field]: value } : entry);
     setLocalSchedule(updated);
     onUpdateSchedule?.(updated);
+  };
+
+  const addScheduleEntry = () => {
+    if (!checkPermission()) return;
+    const newEntry: ScheduleEntry = {
+      id: `sch-${Date.now()}`,
+      date: '',
+      hours: 2,
+      capacities: '',
+      knowledges: '',
+      strategy: '',
+      resources: ''
+    };
+    const updated = [...localSchedule, newEntry];
+    setLocalSchedule(updated);
+    onUpdateSchedule?.(updated);
+  };
+
+  const removeScheduleEntry = (id: string) => {
+    if (!checkPermission()) return;
+    if (confirm("Deseja realmente excluir esta linha do cronograma?")) {
+      const updated = localSchedule.filter(entry => entry.id !== id);
+      setLocalSchedule(updated);
+      onUpdateSchedule?.(updated);
+    }
   };
 
   const updateGeneralFieldList = (field: 'technicalCapacities' | 'socialCapacities' | 'knowledges', index: number, value: string) => {
@@ -606,6 +629,14 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                 <p className="text-xs text-slate-500 font-semibold">Visualização e edição no formato padrão de tabela pedagógica</p>
               </div>
               <div className="flex gap-3">
+                {isAdmin && (
+                  <button 
+                    onClick={addScheduleEntry}
+                    className="bg-blue-600 text-white px-6 py-3 rounded-xl text-xs font-black uppercase tracking-wider shadow-md flex items-center gap-2 hover:bg-slate-900 transition-all"
+                  >
+                    <span>+ Adicionar Linha</span>
+                  </button>
+                )}
                 <button 
                   onClick={handlePrint} 
                   className="bg-red-600 text-white px-6 py-3 rounded-xl text-xs font-black uppercase tracking-wider shadow-md flex items-center gap-2 hover:bg-slate-900 transition-all"
@@ -641,7 +672,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                 </thead>
                 <tbody className="divide-y divide-black text-xs font-medium">
                   {localSchedule.map((entry) => (
-                    <tr key={entry.id} className="hover:bg-slate-50/50">
+                    <tr key={entry.id} className="hover:bg-slate-50/50 group relative">
                       <td className="p-2 border-r border-black align-top text-center bg-slate-50/30">
                         <DebouncedInput
                           value={entry.date}
@@ -693,15 +724,24 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                           rows={3}
                         />
                       </td>
-                      <td className="p-2 align-top">
+                      <td className="p-2 align-top relative">
                         <EditableArea
                           value={entry.resources}
                           onChange={(val) => updateEntry(entry.id, 'resources', val)}
                           placeholder="Recursos / Avaliação..."
                           disabled={!isAdmin}
-                          className="w-full bg-transparent border-none focus:outline-none text-slate-800 text-xs leading-relaxed"
+                          className="w-full bg-transparent border-none focus:outline-none text-slate-800 text-xs leading-relaxed pr-6"
                           rows={3}
                         />
+                        {isAdmin && (
+                          <button
+                            onClick={() => removeScheduleEntry(entry.id)}
+                            className="absolute top-2 right-2 text-slate-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity p-1"
+                            title="Excluir linha"
+                          >
+                            ✕
+                          </button>
+                        )}
                       </td>
                     </tr>
                   ))}
