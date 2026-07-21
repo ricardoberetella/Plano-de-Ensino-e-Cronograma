@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo } from 'react';
 import { CurricularUnit, ScheduleEntry, UnitCalendar, CalendarMarking, CalendarColor } from '../types';
 import { SAMPLE_PLANS, SCHEDULE_VERSION } from '../constants';
@@ -19,7 +18,8 @@ const TEXT_COLOR_MAP: Record<CalendarColor, string> = {
 };
 
 const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar, onUpdateUnit }) => {
-  const [activeTab, setActiveTab] = useState<'geral' | 'sa' | 'rubricas' | 'cronograma' | 'calendario'>('geral');
+  // Inicializa diretamente na aba 'sa' (Situação-Problema) sem a aba 'geral'
+  const [activeTab, setActiveTab] = useState<'sa' | 'rubricas' | 'cronograma' | 'calendario'>('sa');
   const [localSchedule, setLocalSchedule] = useState<ScheduleEntry[]>(unit.schedule);
 
   const isCRD = unit.id.toLowerCase().includes('crd') || unit.name.toLowerCase().includes('dimensional');
@@ -224,14 +224,14 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
       </div>
 
       <div className="flex border-b border-slate-200 bg-slate-50 overflow-x-auto scrollbar-hide no-print tabs-header">
-        {(['geral', 'sa', 'rubricas', 'cronograma', 'calendario'] as const).map(tab => (
+        {(['sa', 'rubricas', 'cronograma', 'calendario'] as const).map(tab => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
             className={`px-8 py-5 transition-all border-b-4 ${activeTab === tab ? 'border-blue-600 bg-white' : 'border-transparent text-slate-400 hover:bg-slate-100'}`}
           >
             <span className="text-[10px] font-black uppercase tracking-widest block">
-              {tab === 'geral' ? 'Geral' : tab === 'sa' ? 'Situação-Problema' : tab === 'rubricas' ? 'Rubricas' : tab === 'cronograma' ? 'Plano de Aula' : 'Calendário'}
+              {tab === 'sa' ? 'Situação-Problema' : tab === 'rubricas' ? 'Rubricas' : tab === 'cronograma' ? 'Plano de Aula' : 'Calendário'}
             </span>
           </button>
         ))}
@@ -425,34 +425,6 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                 Relatório Pedagógico SENAI - Gerado em {new Date().toLocaleString('pt-BR')}
               </div>
             </div>
-          </div>
-        )}
-
-        {activeTab === 'geral' && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 no-print">
-            <section>
-              <h3 className="text-[11px] font-black text-slate-400 mb-6 uppercase tracking-[0.3em]">Capacidades Técnicas</h3>
-              <div className="space-y-3">
-                {unit.basicCapacities.map((c, i) => (
-                  <div key={i} className="p-4 bg-white border border-slate-100 rounded-2xl shadow-sm font-bold text-sm text-slate-700 flex gap-4 transition-all hover:bg-blue-50">
-                    <span className="text-blue-500 font-black shrink-0">{i+1}.</span>{c}
-                  </div>
-                ))}
-              </div>
-            </section>
-            <section>
-              <h3 className="text-[11px] font-black text-slate-400 mb-6 uppercase tracking-[0.3em]">Conhecimentos</h3>
-              <div className="space-y-4">
-                {unit.knowledge.map((k, i) => (
-                  <div key={i} className="p-5 bg-slate-50 border-l-4 border-blue-600 rounded-r-2xl shadow-sm transition-all hover:bg-white">
-                    <p className="font-black text-slate-900 text-xs uppercase mb-2 tracking-tight">{k.topic}</p>
-                    <div className="space-y-1.5">
-                      {k.subtopics.map((s, si) => <p key={si} className="text-slate-500 text-[10px] font-medium leading-tight">• {s}</p>)}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </section>
           </div>
         )}
 
