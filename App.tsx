@@ -85,7 +85,7 @@ const App: React.FC = () => {
   }, [currentPlan, selectedSemester]);
 
   const loadPlans = useCallback(
-    async (profileId: string, forceReset = false) => {
+    async (profileId: string) => {
       setIsLoading(true);
 
       try {
@@ -95,12 +95,13 @@ const App: React.FC = () => {
 
         let dbPlans = await FirebaseService.getPlans(profileId);
 
-        const isCorrupted =
+        // Se estiver vazio ou corrompido, recria e salva automaticamente na nuvem
+        const isInvalid =
           !dbPlans ||
           dbPlans.length === 0 ||
           dbPlans.some(p => !p.courseName || p.totalHours === 0 || !p.units?.length);
 
-        if ((isCorrupted || forceReset) && isAdmin) {
+        if (isInvalid) {
           if (dbPlans && dbPlans.length > 0) {
             for (const oldPlan of dbPlans) {
               if (oldPlan.id) {
@@ -157,7 +158,7 @@ const App: React.FC = () => {
         setIsLoading(false);
       }
     },
-    [isAdmin]
+    []
   );
 
   useEffect(() => {
@@ -315,47 +316,30 @@ const App: React.FC = () => {
       ) : (
         <>
           {view === 'dashboard' && (
-            <div className="space-y-6">
-              {isAdmin && (
-                <div className="flex justify-end">
-                  <button
-                    onClick={() => {
-                      if (window.confirm("Deseja restaurar e limpar os dados duplicados/corrompidos da nuvem para o padrão oficial?")) {
-                        loadPlans(activeProfileId, true);
-                      }
-                    }}
-                    className="bg-red-600 text-white px-4 py-2 rounded-xl text-xs font-bold uppercase hover:bg-red-700 transition-all shadow-md"
-                  >
-                    Restaurar e Limpar Duplicados da Nuvem
-                  </button>
-                </div>
-              )}
-
-              <Dashboard
-                plans={plans}
-                isAdmin={isAdmin}
-                onEdit={plan => {
-                  if (!isAdmin) {
-                    alert("Acesso restrito: Apenas o administrador pode editar.");
-                    return;
-                  }
-                  setCurrentPlan(plan);
-                  setView('editor' as ViewType);
-                }}
-                onView={openPlan}
-                onRefresh={() => loadPlans(activeProfileId)}
-                onDeletePlan={async (planId) => {
-                  if (!isAdmin) {
-                    alert("Acesso restrito: O visualizador não pode excluir planos.");
-                    return;
-                  }
-                  if (window.confirm("Deseja realmente excluir este plano?")) {
-                    await FirebaseService.deletePlan(planId);
-                    loadPlans(activeProfileId);
-                  }
-                }}
-              />
-            </div>
+            <Dashboard
+              plans={plans}
+              isAdmin={isAdmin}
+              onEdit={plan => {
+                if (!isAdmin) {
+                  alert("Acesso restrito: Apenas o administrador pode editar.");
+                  return;
+                }
+                setCurrentPlan(plan);
+                setView('editor' as ViewType);
+              }}
+              onView={openPlan}
+              onRefresh={() => loadPlans(activeProfileId)}
+              onDeletePlan={async (planId) => {
+                if (!isAdmin) {
+                  alert("Acesso restrito: O visualizador não pode excluir planos.");
+                  return;
+                }
+                if (window.confirm("Deseja realmente excluir este plano?")) {
+                  await FirebaseService.deletePlan(planId);
+                  loadPlans(activeProfileId);
+                }
+              }}
+            />
           )}
 
           {view === ('plano-curso' as ViewType) && currentPlan && (
