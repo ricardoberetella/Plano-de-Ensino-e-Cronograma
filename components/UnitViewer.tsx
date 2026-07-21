@@ -649,23 +649,23 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
               </div>
             </div>
 
-            <div className="w-full bg-white rounded-lg border-2 border-black overflow-hidden shadow-sm">
-              <table className="w-full table-fixed border-collapse">
+            <div className="w-full bg-white rounded-lg border-2 border-black overflow-x-auto shadow-sm">
+              <table className="w-full border-collapse">
                 <thead>
                   <tr className="bg-slate-50 border-b-2 border-black text-slate-900">
-                    <th className="p-3 w-[15%] text-xs font-black uppercase border-r border-black text-center align-middle">
-                      Horas/Aulas/Data
+                    <th className="p-3 w-32 text-xs font-black uppercase border-r border-black text-center align-middle break-words">
+                      Horas / Aulas / Data
                     </th>
-                    <th className="p-3 w-[20%] text-xs font-black uppercase border-r border-black text-center align-middle">
+                    <th className="p-3 w-1/4 text-xs font-black uppercase border-r border-black text-center align-middle">
                       Capacidades
                     </th>
-                    <th className="p-3 w-[20%] text-xs font-black uppercase border-r border-black text-center align-middle">
+                    <th className="p-3 w-1/4 text-xs font-black uppercase border-r border-black text-center align-middle">
                       Conhecimentos
                     </th>
-                    <th className="p-3 w-[25%] text-xs font-black uppercase border-r border-black text-center align-middle">
+                    <th className="p-3 w-1/4 text-xs font-black uppercase border-r border-black text-center align-middle">
                       Estratégias / Atividades
                     </th>
-                    <th className="p-3 w-[20%] text-xs font-black uppercase text-center align-middle">
+                    <th className="p-3 w-1/4 text-xs font-black uppercase text-center align-middle">
                       Recursos / Avaliação
                     </th>
                   </tr>
