@@ -60,7 +60,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
     onUpdateSchedule?.(updated);
   };
 
-  // Funções para edição dinâmica dos campos de Geral
+  // Funções para edição dos campos da aba Geral
   const updateGeneralFieldList = (field: 'technicalCapacities' | 'socialCapacities' | 'knowledges', index: number, value: string) => {
     const currentList = unit[field] ? [...unit[field]!] : [];
     currentList[index] = value;
@@ -79,11 +79,30 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
     onUpdateUnit?.({ ...unit, [field]: currentList });
   };
 
-  // Funções para edição das Situações de Aprendizagem
+  // Funções para manipulação das Situações de Aprendizagem e suas Fases
   const updateSAField = (saIndex: number, field: string, value: any) => {
     const updatedSAs = [...unit.learningSituations];
     updatedSAs[saIndex] = { ...updatedSAs[saIndex], [field]: value };
     onUpdateUnit?.({ ...unit, learningSituations: updatedSAs });
+  };
+
+  const addLearningSituation = () => {
+    const newSA = {
+      id: `sa-${Date.now()}`,
+      title: `Situação de Aprendizagem ${unit.learningSituations.length + 1}`,
+      context: 'Descreva aqui o contexto ou problema apresentado ao aluno...',
+      challenge: 'Defina a proposta do desafio ou projeto pedagógico...',
+      expectedResults: ['Entrega do componente usinado conforme desenho.', 'Relatório de verificação dimensional.']
+    };
+    onUpdateUnit?.({ ...unit, learningSituations: [...unit.learningSituations, newSA] });
+  };
+
+  const removeLearningSituation = (saIndex: number) => {
+    if (confirm("Tem certeza que deseja remover esta Situação de Aprendizagem na íntegra?")) {
+      const updatedSAs = [...unit.learningSituations];
+      updatedSAs.splice(saIndex, 1);
+      onUpdateUnit?.({ ...unit, learningSituations: updatedSAs });
+    }
   };
 
   const updateSAResult = (saIndex: number, resultIndex: number, value: string) => {
@@ -176,7 +195,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
           /* CABEÇALHO PADRÃO */
           .report-header {
             display: flex !important;
-            justify-content: space-between !important;
+            justify-between: space-between !important;
             align-items: center !important;
             border-bottom: 2pt solid #E30613 !important;
             padding-bottom: 10pt !important;
@@ -282,7 +301,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
         </div>
       </div>
 
-      {/* MENU DE NAVEGAÇÃO COM ABA GERAL EM PRIMEIRA POSIÇÃO */}
+      {/* MENU DE NAVEGAÇÃO */}
       <div className="flex border-b border-slate-200 bg-slate-50 overflow-x-auto scrollbar-hide no-print tabs-header">
         {(['geral', 'sa', 'rubricas', 'cronograma', 'calendario'] as const).map(tab => (
           <button
@@ -299,7 +318,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
 
       <div className="p-6 md:p-10 max-h-[75vh] overflow-y-auto custom-scrollbar bg-[#FDFDFD] content-area">
 
-        {/* ABA GERAL: CAPACIDADES TÉCNICAS, SOCIOEMOCIONAIS E CONHECIMENTOS */}
+        {/* ABA GERAL */}
         {activeTab === 'geral' && (
           <div className="space-y-10 max-w-5xl mx-auto">
             <div className="border-b border-slate-100 pb-6">
@@ -417,6 +436,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
           </div>
         )}
         
+        {/* ABA CRONOGRAMA */}
         {activeTab === 'cronograma' && (
           <div className="space-y-8">
             <div className="flex justify-between items-center gap-6 border-b border-slate-100 pb-8 no-print">
@@ -557,36 +577,61 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
           </div>
         )}
 
-        {/* ABA SITUAÇÃO-PROBLEMA EDITÁVEL */}
+        {/* ABA SITUAÇÃO-PROBLEMA TOTALMENTE EDITÁVEL COM GESTÃO DE FASES */}
         {activeTab === 'sa' && (
-          <div className="max-w-4xl mx-auto">
-            <div className="flex justify-between items-center gap-6 border-b border-slate-100 pb-8 mb-10 no-print">
-              <h3 className="text-3xl font-[1000] text-slate-900 uppercase italic">Situações de Aprendizagem</h3>
-              <button onClick={handlePrint} className="bg-red-600 text-white px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl flex items-center gap-3 hover:bg-slate-900 transition-all">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
-                Imprimir Situações
-              </button>
+          <div className="max-w-4xl mx-auto space-y-8">
+            <div className="flex justify-between items-center gap-6 border-b border-slate-100 pb-8 no-print">
+              <div>
+                <h3 className="text-3xl font-[1000] text-slate-900 uppercase italic">Situações de Aprendizagem / Fases</h3>
+                <p className="text-xs text-slate-400 font-bold uppercase tracking-wider mt-1">Gestão e detalhamento das Fases e Projetos da Unidade</p>
+              </div>
+              <div className="flex items-center gap-4">
+                <button
+                  onClick={addLearningSituation}
+                  className="bg-blue-600 text-white px-6 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl hover:bg-slate-900 transition-all"
+                >
+                  + Nova Fase / SA
+                </button>
+                <button onClick={handlePrint} className="bg-red-600 text-white px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl flex items-center gap-3 hover:bg-slate-900 transition-all">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+                  Imprimir Situações
+                </button>
+              </div>
             </div>
 
             <div className="space-y-12 pb-10 no-print">
               {unit.learningSituations.map((sa, saIdx) => (
-                <div key={sa.id} className="p-10 bg-white border border-slate-200 rounded-[3rem] shadow-xl relative overflow-hidden transition-all hover:border-blue-200">
+                <div key={sa.id || saIdx} className="p-10 bg-white border border-slate-200 rounded-[3rem] shadow-xl relative overflow-hidden transition-all hover:border-blue-200">
                   <div className="absolute top-0 left-0 w-2 h-full bg-blue-600"></div>
-                  
-                  <input
-                    type="text"
-                    value={sa.title}
-                    onChange={(e) => updateSAField(saIdx, 'title', e.target.value)}
-                    className="text-2xl font-black text-slate-900 mb-6 uppercase tracking-tight leading-none italic w-full bg-transparent border-b border-slate-200 focus:border-blue-500 outline-none pb-2"
-                  />
+
+                  <div className="flex justify-between items-start gap-4 mb-6">
+                    <div className="flex-1">
+                      <span className="text-[10px] font-black uppercase text-blue-600 tracking-widest block mb-1">FASE / ETAPA {saIdx + 1}</span>
+                      <input
+                        type="text"
+                        value={sa.title}
+                        onChange={(e) => updateSAField(saIdx, 'title', e.target.value)}
+                        placeholder="Título da Situação de Aprendizagem / Fase..."
+                        className="text-2xl font-black text-slate-900 uppercase tracking-tight leading-none italic w-full bg-transparent border-b border-slate-200 focus:border-blue-500 outline-none pb-2"
+                      />
+                    </div>
+                    <button
+                      onClick={() => removeLearningSituation(saIdx)}
+                      className="text-slate-300 hover:text-red-600 p-2 text-sm font-black transition-all"
+                      title="Excluir Fase"
+                    >
+                      Excluir Fase ✕
+                    </button>
+                  </div>
                   
                   <div className="space-y-8">
                     <div className="border-l-2 border-slate-100 pl-6">
-                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">I. Contextualização</p>
+                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">I. Contextualização / Situação-Problema</p>
                       <textarea
                         value={sa.context}
                         onChange={(e) => updateSAField(saIdx, 'context', e.target.value)}
                         rows={4}
+                        placeholder="Contextualização da Situação-Problema..."
                         className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 text-slate-600 text-sm leading-relaxed font-medium focus:outline-none focus:border-blue-500"
                       />
                     </div>
@@ -597,18 +642,19 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                         value={sa.challenge}
                         onChange={(e) => updateSAField(saIdx, 'challenge', e.target.value)}
                         rows={3}
+                        placeholder="Desafio pedagógico do aluno..."
                         className="w-full bg-slate-800 border border-slate-700 text-slate-200 text-sm italic font-medium leading-relaxed rounded-xl p-3 focus:outline-none focus:border-red-500"
                       />
                     </div>
 
                     <div className="border-t border-slate-100 pt-8">
                       <div className="flex justify-between items-center mb-4">
-                        <p className="text-[10px] font-black text-blue-600 uppercase tracking-widest">III. Resultados Esperados</p>
+                        <p className="text-[10px] font-black text-blue-600 uppercase tracking-widest">III. Resultados Esperados / Entregas da Fase</p>
                         <button
                           onClick={() => addSAResult(saIdx)}
-                          className="text-[10px] font-black uppercase text-blue-600 bg-blue-50 px-3 py-1 rounded-lg hover:bg-blue-600 hover:text-white transition-all"
+                          className="text-[10px] font-black uppercase text-blue-600 bg-blue-50 px-3 py-1.5 rounded-lg hover:bg-blue-600 hover:text-white transition-all"
                         >
-                          + Adicionar Resultado
+                          + Adicionar Entrega
                         </button>
                       </div>
                       <ul className="space-y-3">
@@ -619,6 +665,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                               type="text"
                               value={result}
                               onChange={(e) => updateSAResult(saIdx, rIdx, e.target.value)}
+                              placeholder="Descreva o resultado ou produto esperado..."
                               className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-slate-700 text-sm font-bold focus:outline-none focus:border-blue-500"
                             />
                             <button
