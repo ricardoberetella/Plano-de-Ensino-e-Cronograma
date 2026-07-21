@@ -95,21 +95,8 @@ const App: React.FC = () => {
 
         let dbPlans = await FirebaseService.getPlans(profileId);
 
-        // Se estiver vazio ou corrompido, recria e salva automaticamente na nuvem
-        const isInvalid =
-          !dbPlans ||
-          dbPlans.length === 0 ||
-          dbPlans.some(p => !p.courseName || p.totalHours === 0 || !p.units?.length);
-
-        if (isInvalid) {
-          if (dbPlans && dbPlans.length > 0) {
-            for (const oldPlan of dbPlans) {
-              if (oldPlan.id) {
-                await FirebaseService.deletePlan(oldPlan.id);
-              }
-            }
-          }
-
+        // Se o Firebase estiver vazio, recria imediatamente com o template oficial e salva na nuvem
+        if (!dbPlans || dbPlans.length === 0 || dbPlans.every(p => !p.courseName || !p.units?.length)) {
           const freshPlan: TeachingPlan = {
             ...template,
             id: `plan-usinagem-${profileId}-${Date.now()}`,
@@ -124,7 +111,7 @@ const App: React.FC = () => {
         }
 
         const validPlans = (dbPlans || []).filter(
-          p => p && p.courseName && p.totalHours > 0 && p.units?.length > 0
+          p => p && p.courseName && p.units?.length > 0
         );
 
         setPlans(validPlans);
