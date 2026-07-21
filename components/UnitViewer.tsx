@@ -1,7 +1,6 @@
-
 import React, { useState, useRef, useMemo } from 'react';
 
-// Interfaces estruturais do padrão técnico
+// Interfaces
 interface GeneralCompetencies {
   technicalCapacities: string[];
   socioemotionalCapacities: string[];
@@ -19,17 +18,12 @@ interface LearningSituation {
 interface Rubric {
   id: string;
   capacity: string;
-  levels: {
-    nsa: string;
-    apo: string;
-    par: string;
-    aut: string;
-  };
+  levels: { nsa: string; apo: string; par: string; aut: string };
 }
 
 interface ScheduleEntry {
   id: string;
-  date: string; // Formato esperado: DD/MM/AAAA
+  date: string; // DD/MM/AAAA
   hours: number;
   capacities: string;
   knowledge: string;
@@ -47,7 +41,6 @@ interface FullUnitData {
   schedule: ScheduleEntry[];
 }
 
-// Configuração de cores institucionais por UC para o Calendário e Interface
 const UC_THEMES: Record<'LIDT' | 'CDMAT' | 'CRD' | 'FUSI', { bg: string; text: string; border: string; accent: string }> = {
   LIDT: { bg: 'bg-blue-50', text: 'text-blue-700', border: 'border-blue-200', accent: 'bg-blue-600' },
   CDMAT: { bg: 'bg-emerald-50', text: 'text-emerald-700', border: 'border-emerald-200', accent: 'bg-emerald-600' },
@@ -59,35 +52,13 @@ const INITIAL_DATABASE: Record<'LIDT' | 'CDMAT' | 'CRD' | 'FUSI', FullUnitData> 
   LIDT: {
     name: 'Leitura e Interpretação de Desenho Técnico',
     semester: 1,
-    general: {
-      technicalCapacities: [
-        'Interpretar projeções ortogonais (1º e 3º diedro) de peças mecânicas.',
-        'Identificar e aplicar escalas numéricas, hachuras, cortes e seções.',
-        'Interpretar cotagem, tolerâncias dimensionais e geométricas.'
-      ],
-      socioemotionalCapacities: [
-        'Demonstrar rigor técnico e atenção aos detalhes.',
-        'Trabalhar de forma colaborativa.'
-      ],
-      knowledge: [
-        'Formatos de papel, legenda e dobramento de desenhos (Normas ABNT).',
-        'Sistemas de projeção ortográfica e representação em perspectiva.'
-      ]
-    },
-    learningSituations: [
-      {
-        id: 'lidt-sa1',
-        title: 'Detecção de Falhas de Fabricação por Erro de Desenho',
-        contextualization: 'O setor de controle de qualidade identificou um lote de eixos escalonados fora dos limites.',
-        challenge: 'Interpretar e corrigir o desenho técnico do eixo escalonado.',
-        expectedResults: ['<span>Desenho técnico corrigido conforme ISO.</span>']
-      }
-    ],
+    general: { technicalCapacities: [], socioemotionalCapacities: [], knowledge: [] },
+    learningSituations: [],
     rubrics: [],
     schedule: [
       {
         id: 'e1',
-        date: '10/02/2026',
+        date: '10/01/2026',
         hours: 4,
         capacities: 'Interpretar projeções ortogonais',
         knowledge: 'Formatos de papel e legenda',
@@ -102,7 +73,7 @@ const INITIAL_DATABASE: Record<'LIDT' | 'CDMAT' | 'CRD' | 'FUSI', FullUnitData> 
   FUSI: { name: 'Fundamentos da Usinagem', semester: 1, general: { technicalCapacities: [], socioemotionalCapacities: [], knowledge: [] }, learningSituations: [], rubrics: [], schedule: [{ id: 'e4', date: '13/02/2026', hours: 4, capacities: 'Calcular parâmetros de corte', knowledge: 'Geometria da ferramenta', strategy: 'Exercícios práticos', resources: 'Tabelas técnicas', completed: false }] }
 };
 
-// Componente de entrada rica nativa expansível e customizável
+// Componente Editor Editável
 const RichEditable: React.FC<{
   html: string;
   onChange: (newHtml: string) => void;
@@ -119,16 +90,10 @@ const RichEditable: React.FC<{
   return (
     <div className="relative w-full group/rich">
       {showToolbar && (
-        <div className="absolute -top-9 left-0 bg-slate-900 text-white flex items-center gap-1 p-1 rounded-xl shadow-xl z-50 no-print scale-90 origin-bottom-left border border-slate-800 animate-fadeIn">
+        <div className="absolute -top-9 left-0 bg-slate-900 text-white flex items-center gap-1 p-1 rounded-xl shadow-xl z-50 no-print scale-90 origin-bottom-left border border-slate-800">
           <button type="button" onClick={() => execCmd('bold')} className="p-1 px-2 hover:bg-slate-800 rounded font-bold text-xs">B</button>
           <button type="button" onClick={() => execCmd('fontSize', '4')} className="p-1 hover:bg-slate-800 rounded text-xs font-medium">A+</button>
           <button type="button" onClick={() => execCmd('fontSize', '2')} className="p-1 hover:bg-slate-800 rounded text-xs font-medium">A-</button>
-          <div className="w-px h-4 bg-slate-700 mx-1" />
-          <button type="button" onClick={() => execCmd('foreColor', '#3b82f6')} className="w-4 h-4 rounded-full bg-blue-500 border border-white/20 m-0.5" />
-          <button type="button" onClick={() => execCmd('foreColor', '#10b981')} className="w-4 h-4 rounded-full bg-emerald-500 border border-white/20 m-0.5" />
-          <button type="button" onClick={() => execCmd('foreColor', '#8b5cf6')} className="w-4 h-4 rounded-full bg-purple-500 border border-white/20 m-0.5" />
-          <button type="button" onClick={() => execCmd('foreColor', '#f97316')} className="w-4 h-4 rounded-full bg-orange-500 border border-white/20 m-0.5" />
-          <button type="button" onClick={() => execCmd('foreColor', '#1e293b')} className="w-4 h-4 rounded-full bg-slate-800 border border-white/20 m-0.5" />
         </div>
       )}
       <div
@@ -140,7 +105,7 @@ const RichEditable: React.FC<{
           setTimeout(() => setShowToolbar(false), 200);
           if (editorRef.current) onChange(editorRef.current.innerHTML);
         }}
-        className={`w-full min-h-[1.2rem] bg-transparent focus:outline-none focus:bg-white/90 rounded px-1 break-words transition-all ${className}`}
+        className={`w-full min-h-[1.2rem] bg-transparent focus:outline-none rounded px-1 break-words ${className}`}
         dangerouslySetInnerHTML={{ __html: html }}
       />
     </div>
@@ -167,23 +132,37 @@ const UnitViewer: React.FC = () => {
     const cleanStr = dateStr.replace(/<[^>]*>/g, '').trim();
     const parts = cleanStr.split('/');
     if (parts.length !== 3) return '';
-    const dateObj = new Date(`${parts[2]}-${parts[1]}-${parts[0]}T00:00:00`);
+    const dateObj = new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
     if (isNaN(dateObj.getTime())) return '';
     return new Intl.DateTimeFormat('pt-BR', { weekday: 'short' }).format(dateObj);
   };
 
-  // Consolidação de todas as datas de todas as UCs para exibição no Calendário Integrado
-  const allScheduledDates = useMemo(() => {
+  // Mapeia todas as datas de todas as UCs e extrai os meses/anos dinamicamente
+  const { allScheduledDates, monthsList } = useMemo(() => {
     const datesMap: Record<string, { uc: 'LIDT' | 'CDMAT' | 'CRD' | 'FUSI'; task: string }> = {};
+    const monthsSet = new Set<string>();
+
     (Object.keys(db) as Array<'LIDT' | 'CDMAT' | 'CRD' | 'FUSI'>).forEach(ucKey => {
       db[ucKey].schedule.forEach(item => {
         const cleanDate = item.date.replace(/<[^>]*>/g, '').trim();
-        if (cleanDate) {
+        const parts = cleanDate.split('/');
+        if (parts.length === 3) {
           datesMap[cleanDate] = { uc: ucKey, task: item.capacities.replace(/<[^>]*>/g, '') };
+          // Formato chave para mes/ano: YYYY-MM
+          const monthKey = `${parts[2]}-${parts[1].padStart(2, '0')}`;
+          monthsSet.add(monthKey);
         }
       });
     });
-    return datesMap;
+
+    // Se nenhuma data cadastrada, garante o mês atual no calendário
+    if (monthsSet.size === 0) {
+      const today = new Date();
+      monthsSet.add(`${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`);
+    }
+
+    const sortedMonths = Array.from(monthsSet).sort();
+    return { allScheduledDates: datesMap, monthsList: sortedMonths };
   }, [db]);
 
   return (
@@ -255,7 +234,7 @@ const UnitViewer: React.FC = () => {
                 onClick={() => updateUnitField(u => {
                   u.schedule.push({
                     id: `entry-${Date.now()}`,
-                    date: '01/02/2026',
+                    date: '10/01/2026',
                     hours: 4,
                     capacities: 'Nova Capacidade',
                     knowledge: 'Novo Conhecimento',
@@ -264,7 +243,7 @@ const UnitViewer: React.FC = () => {
                     completed: false
                   });
                 })}
-                className="opacity-0 group-hover/panel:opacity-100 text-xs bg-white border border-slate-200 text-slate-600 hover:text-slate-900 px-3 py-1 rounded-xl font-bold shadow-sm transition-all"
+                className="text-xs bg-white border border-slate-200 text-slate-600 hover:text-slate-900 px-3 py-1 rounded-xl font-bold shadow-sm transition-all"
               >
                 + Adicionar Aula
               </button>
@@ -284,6 +263,8 @@ const UnitViewer: React.FC = () => {
                 <tbody className="divide-y divide-slate-100 text-xs text-slate-700">
                   {unit.schedule.map((entry, sIdx) => (
                     <tr key={entry.id} className="group/row hover:bg-slate-50/50 transition-colors">
+                      
+                      {/* DATA */}
                       <td className="p-3 align-top whitespace-nowrap">
                         <RichEditable
                           html={entry.date}
@@ -295,6 +276,7 @@ const UnitViewer: React.FC = () => {
                         </span>
                       </td>
 
+                      {/* HORAS */}
                       <td className="p-3 text-center align-top">
                         <input
                           type="number"
@@ -304,6 +286,7 @@ const UnitViewer: React.FC = () => {
                         />
                       </td>
 
+                      {/* CONTEÚDOS */}
                       <td className="p-3 space-y-1 align-top h-auto">
                         <RichEditable
                           html={entry.capacities}
@@ -317,6 +300,7 @@ const UnitViewer: React.FC = () => {
                         />
                       </td>
 
+                      {/* ESTRATÉGIAS */}
                       <td className="p-3 space-y-1 align-top h-auto">
                         <RichEditable
                           html={entry.strategy}
@@ -330,12 +314,19 @@ const UnitViewer: React.FC = () => {
                         />
                       </td>
 
+                      {/* SITUAÇÃO CLICÁVEL (ALTERA PREV / OK AO CLICAR) */}
                       <td className="p-3 text-center align-top relative">
-                        <span className={`inline-block px-2 py-0.5 rounded-lg text-[9px] font-black uppercase ${
-                          entry.completed ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-slate-100 text-slate-600'
-                        }`}>
-                          {entry.completed ? 'Ok' : 'Prev'}
-                        </span>
+                        <button
+                          type="button"
+                          onClick={() => updateUnitField(u => { u.schedule[sIdx].completed = !u.schedule[sIdx].completed; })}
+                          className={`px-3 py-1 rounded-xl text-[10px] font-black uppercase transition-all cursor-pointer shadow-sm ${
+                            entry.completed
+                              ? 'bg-emerald-100 text-emerald-800 border border-emerald-300 hover:bg-emerald-200'
+                              : 'bg-slate-100 text-slate-600 border border-slate-200 hover:bg-slate-200'
+                          }`}
+                        >
+                          {entry.completed ? 'OK' : 'PREV'}
+                        </button>
                         <button
                           onClick={() => updateUnitField(u => { u.schedule.splice(sIdx, 1); })}
                           className="absolute bottom-2 right-2 opacity-0 group-hover/row:opacity-100 text-[9px] text-red-400 font-bold"
@@ -351,52 +342,75 @@ const UnitViewer: React.FC = () => {
           </div>
         )}
 
-        {/* ABA: CALENDÁRIO COM CORES DISTINTAS POR UNIDADE CURRICULAR */}
+        {/* ABA: CALENDÁRIO DINÂMICO GERADO A PARTIR DOS MESES DO CRONOGRAMA */}
         {activeTab === 'calendario' && (
-          <div className="bg-white p-6 border border-slate-200 rounded-3xl shadow-sm">
-            <div className="mb-4 flex flex-wrap gap-4 text-[10px] font-black uppercase tracking-wider text-slate-500">
-              <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded bg-blue-500" /> LIDT</span>
-              <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded bg-emerald-500" /> CDMAT</span>
-              <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded bg-purple-500" /> CRD</span>
-              <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded bg-orange-500" /> FUSI</span>
+          <div className="space-y-8">
+            <div className="bg-white p-4 border border-slate-200 rounded-2xl shadow-sm flex flex-wrap gap-4 text-[10px] font-black uppercase tracking-wider text-slate-500">
+              <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-md bg-blue-500" /> LIDT</span>
+              <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-md bg-emerald-500" /> CDMAT</span>
+              <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-md bg-purple-500" /> CRD</span>
+              <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-md bg-orange-500" /> FUSI</span>
             </div>
 
-            <div className="grid grid-cols-7 gap-2 text-center text-xs border border-slate-100 p-2 rounded-2xl">
-              {['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'].map(d => (
-                <div key={d} className="font-black text-slate-400 p-2 uppercase text-[10px]">{d}</div>
-              ))}
-              
-              <div className="p-4 bg-slate-50/40 rounded-xl text-transparent">25</div>
-              <div className="p-4 bg-slate-50/40 rounded-xl text-transparent">26</div>
-              <div className="p-4 bg-slate-50/40 rounded-xl text-transparent">27</div>
-              <div className="p-4 bg-slate-50/40 rounded-xl text-transparent">28</div>
-              <div className="p-4 bg-slate-50/40 rounded-xl text-transparent">29</div>
-              <div className="p-4 bg-slate-50/40 rounded-xl text-transparent">30</div>
+            {/* LOOP DINÂMICO POR MÊS/ANO */}
+            {monthsList.map(monthKey => {
+              const [yearStr, monthStr] = monthKey.split('-');
+              const year = parseInt(yearStr);
+              const month = parseInt(monthStr) - 1; // 0-indexed
 
-              {Array.from({ length: 28 }).map((_, i) => {
-                const dayStr = String(i + 1).padStart(2, '0');
-                const fullDateKey = `${dayStr}/02/2026`;
-                const matchedDate = allScheduledDates[fullDateKey];
-                
-                let dayStyle = "bg-slate-50 text-slate-700 hover:bg-slate-100";
-                if (matchedDate) {
-                  const ucTheme = UC_THEMES[matchedDate.uc];
-                  dayStyle = `${ucTheme.bg} ${ucTheme.text} border-2 ${ucTheme.border} font-black shadow-sm`;
-                }
+              const firstDayIndex = new Date(year, month, 1).getDay(); // Dia da semana do 1º dia
+              const daysInMonth = new Date(year, month + 1, 0).getDate(); // Total de dias no mês
+              const monthName = new Intl.DateTimeFormat('pt-BR', { month: 'long' }).format(new Date(year, month));
 
-                return (
-                  <div key={i} className={`p-3 rounded-xl transition-all relative group/day ${dayStyle}`}>
-                    <span>{i + 1}</span>
-                    {matchedDate && (
-                      <div className="absolute top-full left-1/2 -translate-x-1/2 mt-1 bg-slate-900 text-white text-[9px] p-1.5 rounded-lg shadow-xl hidden group-hover/day:block w-32 z-50 text-center font-normal">
-                        <span className="block font-black border-b border-white/20 mb-0.5">{matchedDate.uc}</span>
-                        {matchedDate.task}
-                      </div>
-                    )}
+              return (
+                <div key={monthKey} className="bg-white p-6 border border-slate-200 rounded-3xl shadow-sm">
+                  
+                  {/* CABEÇALHO DO MÊS E ANO */}
+                  <div className="mb-4 text-center border-b border-slate-100 pb-3">
+                    <h2 className="text-base font-black text-slate-800 uppercase tracking-widest">
+                      {monthName} / {year}
+                    </h2>
                   </div>
-                );
-              })}
-            </div>
+
+                  {/* GRID DOS DIAS DA SEMANA */}
+                  <div className="grid grid-cols-7 gap-2 text-center text-xs">
+                    {['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SÁB'].map(d => (
+                      <div key={d} className="font-black text-slate-400 p-2 uppercase text-[10px] tracking-wider">{d}</div>
+                    ))}
+
+                    {/* DDL VAZIOS ANTES DO PRIMEIRO DIA DO MÊS */}
+                    {Array.from({ length: firstDayIndex }).map((_, i) => (
+                      <div key={`empty-${i}`} className="p-3 rounded-xl bg-slate-50/20 opacity-0" />
+                    ))}
+
+                    {/* DIAS DO MÊS */}
+                    {Array.from({ length: daysInMonth }).map((_, i) => {
+                      const dayNum = i + 1;
+                      const formattedDate = `${String(dayNum).padStart(2, '0')}/${String(month + 1).padStart(2, '0')}/${year}`;
+                      const matchedDate = allScheduledDates[formattedDate];
+
+                      let dayStyle = "bg-slate-50 text-slate-700 hover:bg-slate-100 border border-slate-100";
+                      if (matchedDate) {
+                        const ucTheme = UC_THEMES[matchedDate.uc];
+                        dayStyle = `${ucTheme.bg} ${ucTheme.text} border-2 ${ucTheme.border} font-black shadow-sm`;
+                      }
+
+                      return (
+                        <div key={dayNum} className={`p-3 rounded-xl transition-all relative group/day ${dayStyle}`}>
+                          <span className="text-xs font-bold">{dayNum}</span>
+                          {matchedDate && (
+                            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-slate-900 text-white text-[9px] p-2 rounded-xl shadow-2xl hidden group-hover/day:block w-36 z-50 text-center font-normal">
+                              <span className="block font-black border-b border-white/20 pb-0.5 mb-1 text-slate-200">{matchedDate.uc}</span>
+                              {matchedDate.task}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })}
           </div>
         )}
 
