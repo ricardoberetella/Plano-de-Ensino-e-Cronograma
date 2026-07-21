@@ -88,7 +88,7 @@ const EditableArea: React.FC<{
       onBlur={handleBlur}
       placeholder={placeholder}
       rows={rows}
-      className={`resize-none overflow-hidden ${className || ''}`}
+      className={`resize-none overflow-hidden block w-full ${className || ''}`}
     />
   );
 };
@@ -260,7 +260,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
           .report-document, .report-document-sa { display: none !important; }
           [data-active-tab="cronograma"] .report-document { display: block !important; }
           [data-active-tab="sa"] .report-document-sa { display: block !important; }
-          .report-header { display: flex !important; justify-content: space-between !important; align-items: center !important; border-bottom: 2pt solid #E30613 !important; padding-bottom: 10pt !important; margin-bottom: 15pt !important; }
+          .report-header { display: flex !important; justify-between: space-between !important; align-items: center !important; border-bottom: 2pt solid #E30613 !important; padding-bottom: 10pt !important; margin-bottom: 15pt !important; }
           .logo-box { background: #E30613 !important; color: white !important; padding: 10pt 20pt !important; font-size: 24pt !important; font-weight: 900 !important; font-style: italic !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
           .info-box { text-align: right !important; color: #000 !important; }
           .info-box h1 { font-size: 10pt !important; font-weight: 900 !important; margin: 0 !important; text-transform: uppercase !important; }
@@ -496,10 +496,10 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
           </div>
         )}
 
-        {/* ABA RUBRICAS (TOTALMENTE COMPACTA) */}
+        {/* ABA RUBRICAS */}
         {activeTab === 'rubricas' && (
           <div className="w-full rounded-2xl border border-slate-200 bg-white p-2 no-print overflow-hidden shadow-sm">
-            <table className="w-full table-fixed text-left border-collapse">
+            <table className="w-full table-fixed text-left border-collapse border-spacing-0">
               <thead>
                 <tr className="bg-slate-900 text-white">
                   <th className="p-2 w-1/5 text-[9px] font-black uppercase border border-slate-800">Referência / Capacidade</th>
@@ -512,44 +512,44 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
               <tbody className="text-[10px] font-bold">
                 {(localUnit.rubrics || []).map((row, i) => (
                   <tr key={i} className="hover:bg-slate-50/80 transition-colors">
-                    <td className="p-1.5 border border-slate-100 bg-slate-50/50 align-top">
+                    <td className="p-1 border border-slate-200 bg-slate-50/50 align-top h-1">
                       <EditableArea
                         value={row.capacity}
                         onChange={(val) => updateRubric(i, 'capacity', val)}
                         rows={1}
-                        className="w-full bg-transparent border-none outline-none font-bold text-slate-900 text-[11px] leading-tight"
+                        className="bg-transparent border-none outline-none font-bold text-slate-900 text-[10px] leading-tight p-0"
                       />
                     </td>
-                    <td className="p-1.5 border border-slate-100 align-top">
+                    <td className="p-1 border border-slate-200 align-top h-1">
                       <EditableArea
                         value={row.nsa}
                         onChange={(val) => updateRubric(i, 'nsa', val)}
                         rows={1}
-                        className="w-full bg-slate-50/60 border border-slate-100 rounded p-1.5 text-slate-600 italic text-[10px] leading-tight focus:outline-none focus:border-red-300 focus:bg-white"
+                        className="bg-slate-50/60 border border-slate-100 rounded p-1 text-slate-600 italic text-[9.5px] leading-tight focus:outline-none focus:border-red-300 focus:bg-white"
                       />
                     </td>
-                    <td className="p-1.5 border border-slate-100 align-top">
+                    <td className="p-1 border border-slate-200 align-top h-1">
                       <EditableArea
                         value={row.apo}
                         onChange={(val) => updateRubric(i, 'apo', val)}
                         rows={1}
-                        className="w-full bg-slate-50/60 border border-slate-100 rounded p-1.5 text-slate-600 italic text-[10px] leading-tight focus:outline-none focus:border-orange-300 focus:bg-white"
+                        className="bg-slate-50/60 border border-slate-100 rounded p-1 text-slate-600 italic text-[9.5px] leading-tight focus:outline-none focus:border-orange-300 focus:bg-white"
                       />
                     </td>
-                    <td className="p-1.5 border border-slate-100 align-top">
+                    <td className="p-1 border border-slate-200 align-top h-1">
                       <EditableArea
                         value={row.par}
                         onChange={(val) => updateRubric(i, 'par', val)}
                         rows={1}
-                        className="w-full bg-slate-50/60 border border-slate-100 rounded p-1.5 text-slate-600 italic text-[10px] leading-tight focus:outline-none focus:border-blue-300 focus:bg-white"
+                        className="bg-slate-50/60 border border-slate-100 rounded p-1 text-slate-600 italic text-[9.5px] leading-tight focus:outline-none focus:border-blue-300 focus:bg-white"
                       />
                     </td>
-                    <td className="p-1.5 border border-slate-100 align-top">
+                    <td className="p-1 border border-slate-200 align-top h-1">
                       <EditableArea
                         value={row.aut}
                         onChange={(val) => updateRubric(i, 'aut', val)}
                         rows={1}
-                        className="w-full bg-slate-50/60 border border-slate-100 rounded p-1.5 text-slate-600 italic text-[10px] leading-tight focus:outline-none focus:border-green-300 focus:bg-white"
+                        className="bg-slate-50/60 border border-slate-100 rounded p-1 text-slate-600 italic text-[9.5px] leading-tight focus:outline-none focus:border-green-300 focus:bg-white"
                       />
                     </td>
                   </tr>
@@ -559,91 +559,131 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
           </div>
         )}
 
-        {/* ABA CRONOGRAMA */}
+        {/* ABA CRONOGRAMA - TABELA PADRÃO SENAI */}
         {activeTab === 'cronograma' && (
-          <div className="space-y-8">
-            <div className="flex justify-between items-center gap-6 border-b border-slate-100 pb-8 no-print">
-              <h3 className="text-3xl font-[1000] text-slate-900 uppercase italic">Plano de Aula</h3>
-              <div className="flex gap-4">
-                <button onClick={handlePrint} className="bg-red-600 text-white px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl flex items-center gap-3 hover:bg-slate-900 transition-all">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+          <div className="space-y-6">
+            <div className="flex justify-between items-center gap-6 border-b border-slate-200 pb-4 no-print">
+              <div>
+                <h3 className="text-2xl font-[1000] text-slate-900 uppercase italic">Plano de aula | Cronograma</h3>
+                <p className="text-xs text-slate-500 font-semibold">Visualização e edição no formato padrão de tabela pedagógica</p>
+              </div>
+              <div className="flex gap-3">
+                <button 
+                  onClick={handlePrint} 
+                  className="bg-red-600 text-white px-6 py-3 rounded-xl text-xs font-black uppercase tracking-wider shadow-md flex items-center gap-2 hover:bg-slate-900 transition-all"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
+                  </svg>
                   Imprimir Cronograma
                 </button>
-                <button onClick={handleResetToTemplate} className="bg-slate-100 text-slate-500 px-4 py-2 rounded-xl text-[8px] font-black uppercase hover:bg-slate-200">Restaurar Padrão</button>
+                <button 
+                  onClick={handleResetToTemplate} 
+                  className="bg-slate-100 text-slate-600 px-4 py-3 rounded-xl text-xs font-black uppercase hover:bg-slate-200 transition-all"
+                >
+                  Restaurar Padrão
+                </button>
               </div>
             </div>
 
-            <div className="no-print space-y-6">
-              {localSchedule.map((entry, idx) => (
-                <div key={entry.id} className="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-lg grid grid-cols-1 lg:grid-cols-12 gap-8">
-                  <div className="lg:col-span-3">
-                    <p className="text-[9px] font-black text-slate-400 uppercase mb-1">AULA {idx+1}</p>
-                    <DebouncedInput
-                      value={entry.date}
-                      onChange={(val) => updateEntry(entry.id, 'date', val)}
-                      className="text-blue-600 font-[1000] text-xl w-full bg-transparent border-b border-dashed border-blue-200 focus:border-blue-500 outline-none"
-                    />
-                    <p className="text-[10px] font-black uppercase text-slate-400 mt-1 italic">{getDayOfWeek(entry.date)}</p>
-                    <div className="flex items-center gap-2 mt-2">
-                      <input
-                        type="number"
-                        value={entry.hours}
-                        onChange={(e) => updateEntry(entry.id, 'hours', Number(e.target.value))}
-                        className="w-12 bg-slate-100 text-slate-700 font-black text-[10px] text-center rounded px-1 py-0.5"
-                      />
-                      <span className="text-[8px] font-black text-slate-400 uppercase">HORAS</span>
-                    </div>
-                  </div>
-                  <div className="lg:col-span-9 grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div>
-                      <h5 className="text-[9px] font-black text-slate-400 uppercase mb-2 border-l-2 border-blue-500 pl-2">Conhecimentos e Capacidades</h5>
-                      <div className="text-slate-800 text-[10px] font-bold space-y-2">
-                        <div>
-                          <span className="text-[9px] text-slate-400 block font-black">C:</span>
-                          <EditableArea
-                            value={entry.knowledge}
-                            onChange={(val) => updateEntry(entry.id, 'knowledge', val)}
-                            rows={1}
-                            className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 text-[10px] font-bold focus:outline-none focus:border-blue-500"
+            {/* TABELA ESTILO PRINT 1 */}
+            <div className="w-full bg-white rounded-lg border-2 border-black overflow-hidden shadow-sm">
+              <table className="w-full table-fixed border-collapse">
+                <thead>
+                  <tr className="bg-slate-50 border-b-2 border-black text-slate-900">
+                    <th className="p-3 w-[15%] text-xs font-black uppercase border-r border-black text-center align-middle">
+                      Horas/Aulas/Data
+                    </th>
+                    <th className="p-3 w-[20%] text-xs font-black uppercase border-r border-black text-center align-middle">
+                      Capacidades
+                    </th>
+                    <th className="p-3 w-[20%] text-xs font-black uppercase border-r border-black text-center align-middle">
+                      Conhecimentos
+                    </th>
+                    <th className="p-3 w-[25%] text-xs font-black uppercase border-r border-black text-center align-middle">
+                      Estratégias
+                    </th>
+                    <th className="p-3 w-[20%] text-xs font-black uppercase text-center align-middle">
+                      Recursos/Ambientes
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="text-xs font-medium text-slate-900 divide-y border-black">
+                  {localSchedule.map((entry) => (
+                    <tr key={entry.id} className="border-b border-black hover:bg-slate-50/50 transition-colors">
+                      
+                      {/* COLUNA 1: HORAS / DATA */}
+                      <td className="p-2 border-r border-black align-top bg-slate-50/30">
+                        <div className="flex flex-col gap-1.5">
+                          <div className="flex items-center gap-1 text-[11px] font-bold">
+                            <input
+                              type="number"
+                              value={entry.hours}
+                              onChange={(e) => updateEntry(entry.id, 'hours', Number(e.target.value))}
+                              className="w-8 bg-transparent border-b border-slate-400 font-bold text-center focus:outline-none focus:border-black"
+                            />
+                            <span>horas -</span>
+                          </div>
+                          <DebouncedInput
+                            value={entry.date}
+                            onChange={(val) => updateEntry(entry.id, 'date', val)}
+                            placeholder="DD/MM/AAAA"
+                            className="w-full bg-transparent border-b border-dashed border-slate-300 font-bold text-xs focus:outline-none focus:border-black"
                           />
+                          <span className="text-[9px] font-black uppercase text-slate-400 italic">
+                            {getDayOfWeek(entry.date)}
+                          </span>
                         </div>
-                        <div>
-                          <span className="text-[9px] text-slate-400 block font-black">Cap:</span>
-                          <EditableArea
-                            value={entry.capacities}
-                            onChange={(val) => updateEntry(entry.id, 'capacities', val)}
-                            rows={1}
-                            className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 text-[10px] font-bold focus:outline-none focus:border-blue-500"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                    <div>
-                      <h5 className="text-[9px] font-black text-slate-400 uppercase mb-2 border-l-2 border-orange-500 pl-2">Estratégias e Recursos</h5>
-                      <div className="text-slate-600 text-[10px] font-medium space-y-2">
-                        <div>
-                          <span className="text-[9px] text-slate-400 block font-black uppercase">Estratégia:</span>
-                          <EditableArea
-                            value={entry.strategy}
-                            onChange={(val) => updateEntry(entry.id, 'strategy', val)}
-                            rows={1}
-                            className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 text-[10px] font-medium focus:outline-none focus:border-orange-500"
-                          />
-                        </div>
-                        <div>
-                          <span className="text-[9px] text-slate-400 block font-black uppercase">Recursos:</span>
-                          <EditableArea
-                            value={entry.resources}
-                            onChange={(val) => updateEntry(entry.id, 'resources', val)}
-                            rows={1}
-                            className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 text-[10px] font-medium focus:outline-none focus:border-orange-500"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
+                      </td>
+
+                      {/* COLUNA 2: CAPACIDADES */}
+                      <td className="p-2 border-r border-black align-top">
+                        <EditableArea
+                          value={entry.capacities}
+                          onChange={(val) => updateEntry(entry.id, 'capacities', val)}
+                          rows={2}
+                          placeholder="Capacidades..."
+                          className="w-full bg-transparent border-none text-xs leading-relaxed focus:outline-none focus:bg-slate-50 rounded p-1"
+                        />
+                      </td>
+
+                      {/* COLUNA 3: CONHECIMENTOS */}
+                      <td className="p-2 border-r border-black align-top">
+                        <EditableArea
+                          value={entry.knowledge}
+                          onChange={(val) => updateEntry(entry.id, 'knowledge', val)}
+                          rows={2}
+                          placeholder="Conhecimentos..."
+                          className="w-full bg-transparent border-none text-xs leading-relaxed focus:outline-none focus:bg-slate-50 rounded p-1"
+                        />
+                      </td>
+
+                      {/* COLUNA 4: ESTRATÉGIAS */}
+                      <td className="p-2 border-r border-black align-top">
+                        <EditableArea
+                          value={entry.strategy}
+                          onChange={(val) => updateEntry(entry.id, 'strategy', val)}
+                          rows={3}
+                          placeholder="Estratégias pedagógicas..."
+                          className="w-full bg-transparent border-none text-xs leading-relaxed focus:outline-none focus:bg-slate-50 rounded p-1"
+                        />
+                      </td>
+
+                      {/* COLUNA 5: RECURSOS/AMBIENTES */}
+                      <td className="p-2 align-top">
+                        <EditableArea
+                          value={entry.resources}
+                          onChange={(val) => updateEntry(entry.id, 'resources', val)}
+                          rows={2}
+                          placeholder="Recursos e ambientes..."
+                          className="w-full bg-transparent border-none text-xs leading-relaxed focus:outline-none focus:bg-slate-50 rounded p-1"
+                        />
+                      </td>
+
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </div>
         )}
