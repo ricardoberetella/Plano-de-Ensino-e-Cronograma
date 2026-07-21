@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TeachingPlan, CurricularUnit } from '../types';
+import { TeachingPlan, CurricularUnit, SemesterNumber } from '../types';
 import { GoogleGenAI } from "@google/genai";
 
 interface PlanFormProps {
@@ -96,7 +96,7 @@ const PlanForm: React.FC<PlanFormProps> = ({ initialPlan, onSave, onCancel }) =>
       id: `uc-${Math.random().toString(36).substr(2, 5)}`,
       code: '',
       name: '',
-      semester: '1º Semestre',
+      semester: 1 as SemesterNumber,
       basicCapacities: [],
       socioemocionalCapacities: [],
       knowledge: [],
@@ -229,20 +229,19 @@ const PlanForm: React.FC<PlanFormProps> = ({ initialPlan, onSave, onCancel }) =>
                  />
                </div>
 
-               {/* Seletor de Semestre */}
+               {/* Seletor de Semestre (Numérico 1 ou 2) */}
                <div className="w-full md:w-44">
                  <select
                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-[10px] font-black uppercase tracking-wider text-slate-700 outline-none focus:border-blue-500"
-                   value={unit.semester || '1º Semestre'}
+                   value={Number(unit.semester || 1)}
                    onChange={e => {
                      const newUnits = [...formData.units!];
-                     newUnits[index].semester = e.target.value;
+                     newUnits[index].semester = Number(e.target.value) as SemesterNumber;
                      setFormData({ ...formData, units: newUnits });
                    }}
                  >
-                   <option value="1º Semestre">1º Semestre</option>
-                   <option value="2º Semestre">2º Semestre</option>
-                   <option value="Ambos">Ambos os Semestres</option>
+                   <option value={1}>1º Semestre</option>
+                   <option value={2}>2º Semestre</option>
                  </select>
                </div>
 
