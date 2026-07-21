@@ -668,49 +668,84 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
           </div>
         )}
 
-        {/* ABA CALENDÁRIO */}
+        {/* ABA CALENDÁRIO REDESENHADA E ALINHADA */}
         {activeTab === 'calendario' && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 no-print">
-            {monthsInRange.map(monthStr => {
-              const [year, month] = monthStr.split('-').map(Number);
-              const firstDay = new Date(year, month - 1, 1);
-              const lastDay = new Date(year, month, 0);
-              const monthName = firstDay.toLocaleDateString('pt-BR', { month: 'long' });
-              const days = [];
-              for (let i = 0; i < firstDay.getDay(); i++) days.push(null);
-              for (let i = 1; i <= lastDay.getDate(); i++) {
-                const d = i < 10 ? `0${i}` : i;
-                days.push(`${monthStr}-${d}`);
-              }
-              return (
-                <div key={monthStr} className="space-y-3">
-                  <div className="bg-slate-900 text-white py-2 px-4 rounded-xl text-center shadow-lg border border-slate-800">
-                    <h4 className="text-[10px] font-black uppercase tracking-widest italic">{monthName} {year}</h4>
-                  </div>
-                  <div className="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-xl">
-                    <div className="grid grid-cols-7 text-center bg-slate-50 border-b border-slate-100">
-                      {['D','S','T','Q','Q','S','S'].map((d, i) => (
-                        <div key={i} className={`py-2 text-[8px] font-black ${i === 0 ? 'text-red-500' : 'text-slate-400'}`}>{d}</div>
-                      ))}
+          <div className="space-y-6 no-print">
+            <div className="flex justify-between items-center border-b border-slate-200 pb-4">
+              <div>
+                <h3 className="text-2xl font-[1000] text-slate-900 uppercase italic">Calendário de Aulas</h3>
+                <p className="text-xs text-slate-500 font-semibold">Distribuição temporal das aulas e encontros previstos</p>
+              </div>
+              <div className="flex items-center gap-2 bg-slate-100 px-3 py-1.5 rounded-full border border-slate-200">
+                <span className="w-3 h-3 rounded-full shadow-sm" style={{ backgroundColor: COLOR_MAP[scheduleColor] }}></span>
+                <span className="text-[10px] font-black text-slate-700 uppercase tracking-wider">{localUnit.name}</span>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {monthsInRange.map(monthStr => {
+                const [year, month] = monthStr.split('-').map(Number);
+                const firstDay = new Date(year, month - 1, 1);
+                const lastDay = new Date(year, month, 0);
+                const monthName = firstDay.toLocaleDateString('pt-BR', { month: 'long' });
+                
+                const days: (string | null)[] = [];
+                for (let i = 0; i < firstDay.getDay(); i++) days.push(null);
+                for (let i = 1; i <= lastDay.getDate(); i++) {
+                  const d = i < 10 ? `0${i}` : `${i}`;
+                  days.push(`${monthStr}-${d}`);
+                }
+
+                return (
+                  <div key={monthStr} className="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-lg flex flex-col justify-between">
+                    <div className="bg-slate-900 text-white py-3 px-4 text-center border-b border-slate-800">
+                      <h4 className="text-xs font-black uppercase tracking-widest italic">{monthName} {year}</h4>
                     </div>
-                    <div className="grid grid-cols-7">
-                      {days.map((day, idx) => {
-                        if (!day) return <div key={`empty-${idx}`} className="p-1 border-b border-r border-slate-50 h-10 md:h-12"></div>;
-                        const hasClass = scheduleDates[day];
-                        const isSunday = idx % 7 === 0;
-                        return (
-                          <div key={day} className={`p-1 h-10 md:h-12 flex items-center justify-center text-[10px] font-black border-b border-r border-slate-50 transition-colors hover:bg-slate-50`} style={{ backgroundColor: hasClass ? COLOR_MAP[scheduleColor] : 'transparent', color: hasClass ? TEXT_COLOR_MAP[scheduleColor] : (isSunday ? '#ef4444' : '#1e293b') }}>
-                            {day.split('-')[2]}
+                    
+                    <div className="p-3">
+                      {/* DIAS DA SEMANA */}
+                      <div className="grid grid-cols-7 gap-1 text-center mb-2">
+                        {['D','S','T','Q','Q','S','S'].map((d, i) => (
+                          <div key={i} className={`text-[10px] font-black ${i === 0 ? 'text-red-500' : 'text-slate-400'}`}>
+                            {d}
                           </div>
-                        );
-                      })}
+                        ))}
+                      </div>
+
+                      {/* DIAS DO MÊS ALINHADOS */}
+                      <div className="grid grid-cols-7 gap-1 text-center">
+                        {days.map((day, idx) => {
+                          if (!day) return <div key={`empty-${idx}`} className="aspect-square"></div>;
+                          
+                          const hasClass = scheduleDates[day];
+                          const isSunday = idx % 7 === 0;
+
+                          return (
+                            <div
+                              key={day}
+                              className={`aspect-square flex items-center justify-center rounded-xl text-xs font-black transition-all ${
+                                hasClass 
+                                  ? 'shadow-sm ring-1 ring-black/10 scale-105' 
+                                  : 'hover:bg-slate-100 text-slate-700'
+                              }`}
+                              style={{
+                                backgroundColor: hasClass ? COLOR_MAP[scheduleColor] : 'transparent',
+                                color: hasClass ? TEXT_COLOR_MAP[scheduleColor] : (isSunday ? '#ef4444' : '#1e293b')
+                              }}
+                            >
+                              {day.split('-')[2]}
+                            </div>
+                          );
+                        })}
+                      </div>
                     </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
         )}
+
       </div>
     </div>
   );
