@@ -201,10 +201,21 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
     updateUnitState({ ...localUnit, learningSituations: updatedSAs });
   };
 
-  // Edição de Rubricas
+  // Edição e Gestão de Rubricas
   const updateRubric = (index: number, field: string, value: string) => {
     const updatedRubrics = [...(localUnit.rubrics || [])];
     updatedRubrics[index] = { ...updatedRubrics[index], [field]: value };
+    updateUnitState({ ...localUnit, rubrics: updatedRubrics });
+  };
+
+  const addRubricRow = () => {
+    const updatedRubrics = [...(localUnit.rubrics || []), { capacity: '', nsa: '', apo: '', par: '', aut: '' }];
+    updateUnitState({ ...localUnit, rubrics: updatedRubrics });
+  };
+
+  const removeRubricRow = (index: number) => {
+    const updatedRubrics = [...(localUnit.rubrics || [])];
+    updatedRubrics.splice(index, 1);
     updateUnitState({ ...localUnit, rubrics: updatedRubrics });
   };
 
@@ -483,64 +494,94 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
 
         {/* ABA RUBRICAS */}
         {activeTab === 'rubricas' && (
-          <div className="w-full rounded-2xl border border-slate-200 bg-white p-2 no-print overflow-hidden shadow-sm">
-            <table className="w-full table-fixed text-left border-collapse border-spacing-0">
-              <thead>
-                <tr className="bg-slate-900 text-white">
-                  <th className="p-2 w-1/5 text-[9px] font-black uppercase border border-slate-800">Referência / Capacidade</th>
-                  <th className="p-2 w-1/5 text-[9px] font-black uppercase border border-slate-800 text-red-400">NSA</th>
-                  <th className="p-2 w-1/5 text-[9px] font-black uppercase border border-slate-800 text-orange-400">APO</th>
-                  <th className="p-2 w-1/5 text-[9px] font-black uppercase border border-slate-800 text-blue-400">PAR</th>
-                  <th className="p-2 w-1/5 text-[9px] font-black uppercase border border-slate-800 text-green-400">AUT</th>
-                </tr>
-              </thead>
-              <tbody className="text-[10px] font-bold">
-                {(localUnit.rubrics || []).map((row, i) => (
-                  <tr key={i} className="hover:bg-slate-50/80 transition-colors">
-                    <td className="p-1 border border-slate-200 bg-slate-50/50 align-top h-1">
-                      <EditableArea
-                        value={row.capacity}
-                        onChange={(val) => updateRubric(i, 'capacity', val)}
-                        rows={1}
-                        className="bg-transparent border-none outline-none font-bold text-slate-900 text-[10px] leading-tight p-0"
-                      />
-                    </td>
-                    <td className="p-1 border border-slate-200 align-top h-1">
-                      <EditableArea
-                        value={row.nsa}
-                        onChange={(val) => updateRubric(i, 'nsa', val)}
-                        rows={1}
-                        className="bg-slate-50/60 border border-slate-100 rounded p-1 text-slate-600 italic text-[9.5px] leading-tight focus:outline-none focus:border-red-300 focus:bg-white"
-                      />
-                    </td>
-                    <td className="p-1 border border-slate-200 align-top h-1">
-                      <EditableArea
-                        value={row.apo}
-                        onChange={(val) => updateRubric(i, 'apo', val)}
-                        rows={1}
-                        className="bg-slate-50/60 border border-slate-100 rounded p-1 text-slate-600 italic text-[9.5px] leading-tight focus:outline-none focus:border-orange-300 focus:bg-white"
-                      />
-                    </td>
-                    <td className="p-1 border border-slate-200 align-top h-1">
-                      <EditableArea
-                        value={row.par}
-                        onChange={(val) => updateRubric(i, 'par', val)}
-                        rows={1}
-                        className="bg-slate-50/60 border border-slate-100 rounded p-1 text-slate-600 italic text-[9.5px] leading-tight focus:outline-none focus:border-blue-300 focus:bg-white"
-                      />
-                    </td>
-                    <td className="p-1 border border-slate-200 align-top h-1">
-                      <EditableArea
-                        value={row.aut}
-                        onChange={(val) => updateRubric(i, 'aut', val)}
-                        rows={1}
-                        className="bg-slate-50/60 border border-slate-100 rounded p-1 text-slate-600 italic text-[9.5px] leading-tight focus:outline-none focus:border-green-300 focus:bg-white"
-                      />
-                    </td>
+          <div className="space-y-6 max-w-7xl mx-auto">
+            <div className="flex justify-between items-center border-b border-slate-100 pb-4 no-print">
+              <div>
+                <h3 className="text-2xl font-[1000] text-slate-900 uppercase italic">Matriz de Rubricas</h3>
+                <p className="text-xs text-slate-400 font-bold uppercase tracking-wider mt-1">Critérios de Avaliação e Desempenho</p>
+              </div>
+              <button 
+                onClick={addRubricRow} 
+                className="bg-blue-600 text-white px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider shadow-md hover:bg-slate-900 transition-all flex items-center gap-2"
+              >
+                <span>+ Adicionar Rubrica</span>
+              </button>
+            </div>
+
+            <div className="w-full rounded-2xl border border-slate-200 bg-white p-2 no-print overflow-hidden shadow-sm">
+              <table className="w-full table-fixed text-left border-collapse border-spacing-0">
+                <thead>
+                  <tr className="bg-slate-900 text-white">
+                    <th className="p-2.5 w-[22%] text-[9px] font-black uppercase border border-slate-800">Referência / Capacidade</th>
+                    <th className="p-2.5 w-[18%] text-[9px] font-black uppercase border border-slate-800 text-red-400">NSA</th>
+                    <th className="p-2.5 w-[18%] text-[9px] font-black uppercase border border-slate-800 text-orange-400">APO</th>
+                    <th className="p-2.5 w-[18%] text-[9px] font-black uppercase border border-slate-800 text-blue-400">PAR</th>
+                    <th className="p-2.5 w-[18%] text-[9px] font-black uppercase border border-slate-800 text-green-400">AUT</th>
+                    <th className="p-2.5 w-[6%] text-[9px] font-black uppercase border border-slate-800 text-center">Ações</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="text-[10px] font-bold">
+                  {(localUnit.rubrics || []).map((row, i) => (
+                    <tr key={i} className="hover:bg-slate-50/80 transition-colors group">
+                      <td className="p-1.5 border border-slate-200 bg-slate-50/50 align-top">
+                        <EditableArea
+                          value={row.capacity}
+                          onChange={(val) => updateRubric(i, 'capacity', val)}
+                          rows={1}
+                          placeholder="Capacidade avaliada..."
+                          className="bg-transparent border-none outline-none font-bold text-slate-900 text-[10px] leading-tight p-0"
+                        />
+                      </td>
+                      <td className="p-1.5 border border-slate-200 align-top">
+                        <EditableArea
+                          value={row.nsa}
+                          onChange={(val) => updateRubric(i, 'nsa', val)}
+                          rows={1}
+                          placeholder="Não Satisfatório..."
+                          className="bg-slate-50/60 border border-slate-100 rounded p-1 text-slate-600 italic text-[9.5px] leading-tight focus:outline-none focus:border-red-300 focus:bg-white"
+                        />
+                      </td>
+                      <td className="p-1.5 border border-slate-200 align-top">
+                        <EditableArea
+                          value={row.apo}
+                          onChange={(val) => updateRubric(i, 'apo', val)}
+                          rows={1}
+                          placeholder="Em Apoio..."
+                          className="bg-slate-50/60 border border-slate-100 rounded p-1 text-slate-600 italic text-[9.5px] leading-tight focus:outline-none focus:border-orange-300 focus:bg-white"
+                        />
+                      </td>
+                      <td className="p-1.5 border border-slate-200 align-top">
+                        <EditableArea
+                          value={row.par}
+                          onChange={(val) => updateRubric(i, 'par', val)}
+                          rows={1}
+                          placeholder="Parcial..."
+                          className="bg-slate-50/60 border border-slate-100 rounded p-1 text-slate-600 italic text-[9.5px] leading-tight focus:outline-none focus:border-blue-300 focus:bg-white"
+                        />
+                      </td>
+                      <td className="p-1.5 border border-slate-200 align-top">
+                        <EditableArea
+                          value={row.aut}
+                          onChange={(val) => updateRubric(i, 'aut', val)}
+                          rows={1}
+                          placeholder="Autônomo..."
+                          className="bg-slate-50/60 border border-slate-100 rounded p-1 text-slate-600 italic text-[9.5px] leading-tight focus:outline-none focus:border-green-300 focus:bg-white"
+                        />
+                      </td>
+                      <td className="p-1.5 border border-slate-200 align-middle text-center">
+                        <button
+                          onClick={() => removeRubricRow(i)}
+                          className="text-slate-300 hover:text-red-600 font-bold px-2 py-1 transition-all rounded hover:bg-red-50 text-xs"
+                          title="Excluir Rubrica"
+                        >
+                          ✕
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
 
