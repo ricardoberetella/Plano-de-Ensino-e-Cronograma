@@ -581,175 +581,171 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
             </div>
 
             <div className="w-full rounded-2xl border border-slate-200 bg-white p-2 overflow-x-auto shadow-sm">
-            <table className="w-full min-w-[900px] table-fixed text-left border-collapse border-spacing-0">
-              <thead>
-                <tr className="bg-slate-900 text-white">
-                  <th className="p-2 w-[19%] text-[9px] font-black uppercase border border-slate-800">Referência / Capacidade</th>
-                  <th className="p-2 w-[19%] text-[9px] font-black uppercase border border-slate-800 text-red-400">NSA</th>
-                  <th className="p-2 w-[19%] text-[9px] font-black uppercase border border-slate-800 text-orange-400">APO</th>
-                  <th className="p-2 w-[19%] text-[9px] font-black uppercase border border-slate-800 text-blue-400">PAR</th>
-                  <th className="p-2 w-[19%] text-[9px] font-black uppercase border border-slate-800 text-green-400">AUT</th>
-                  <th className="p-2 w-[5%] text-[9px] font-black uppercase border border-slate-800 text-center">Excluir</th>
-                </tr>
-              </thead>
-              <tbody className="text-[10px] font-bold">
-                {(localUnit?.rubrics || []).map((row, i) => (
-                  <tr key={i} className="hover:bg-slate-50/80 transition-colors">
-                    <td className="p-1 border border-slate-200 bg-slate-50/50 align-top h-1">
-                      <EditableArea
-                        value={row?.capacity || ''}
-                        onChange={(val) => updateRubric(i, 'capacity', val)}
-                        rows={1}
-                        className="bg-transparent border-none outline-none font-bold text-slate-900 text-[10px] leading-tight p-0"
-                      />
-                    </td>
-                    <td className="p-1 border border-slate-200 align-top h-1">
-                      <EditableArea
-                        value={row?.nsa || ''}
-                        onChange={(val) => updateRubric(i, 'nsa', val)}
-                        rows={1}
-                        className="bg-slate-50/60 border border-slate-100 rounded p-1 text-slate-600 italic text-[9.5px] leading-tight focus:outline-none focus:border-red-300 focus:bg-white"
-                      />
-                    </td>
-                    <td className="p-1 border border-slate-200 align-top h-1">
-                      <EditableArea
-                        value={row?.apo || ''}
-                        onChange={(val) => updateRubric(i, 'apo', val)}
-                        rows={1}
-                        className="bg-slate-50/60 border border-slate-100 rounded p-1 text-slate-600 italic text-[9.5px] leading-tight focus:outline-none focus:border-orange-300 focus:bg-white"
-                      />
-                    </td>
-                    <td className="p-1 border border-slate-200 align-top h-1">
-                      <EditableArea
-                        value={row?.par || ''}
-                        onChange={(val) => updateRubric(i, 'par', val)}
-                        rows={1}
-                        className="bg-slate-50/60 border border-slate-100 rounded p-1 text-slate-600 italic text-[9.5px] leading-tight focus:outline-none focus:border-blue-300 focus:bg-white"
-                      />
-                    </td>
-                    <td className="p-1 border border-slate-200 align-top h-1">
-                      <EditableArea
-                        value={row?.aut || ''}
-                        onChange={(val) => updateRubric(i, 'aut', val)}
-                        rows={1}
-                        className="bg-slate-50/60 border border-slate-100 rounded p-1 text-slate-600 italic text-[9.5px] leading-tight focus:outline-none focus:border-green-300 focus:bg-white"
-                      />
-                    </td>
-                    <td className="p-1 border border-slate-200 text-center align-middle">
-                      <button
-                        type="button"
-                        onClick={() => removeRubric(i)}
-                        className="text-slate-300 hover:text-red-600 font-bold p-1 transition-all"
-                        title="Excluir Rubrica"
-                      >
-                        ✕
-                      </button>
-                    </td>
+              <table className="w-full min-w-[900px] table-fixed text-left border-collapse border-spacing-0">
+                <thead>
+                  <tr className="bg-slate-900 text-white">
+                    <th className="p-2 w-[19%] text-[9px] font-black uppercase border border-slate-800">Referência / Capacidade</th>
+                    <th className="p-2 w-[19%] text-[9px] font-black uppercase border border-slate-800 text-red-400">NSA</th>
+                    <th className="p-2 w-[19%] text-[9px] font-black uppercase border border-slate-800 text-orange-400">APO</th>
+                    <th className="p-2 w-[19%] text-[9px] font-black uppercase border border-slate-800 text-blue-400">PAR</th>
+                    <th className="p-2 w-[19%] text-[9px] font-black uppercase border border-slate-800 text-green-400">AUT</th>
+                    <th className="p-2 w-[5%] text-[9px] font-black uppercase border border-slate-800 text-center">Excluir</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="text-[10px] font-bold">
+                  {(localUnit?.rubrics || []).map((row, i) => (
+                    <tr key={i} className="hover:bg-slate-50/80 transition-colors">
+                      <td className="p-1 border border-slate-200 bg-slate-50/50 align-top">
+                        <EditableArea
+                          value={row?.capacity || ''}
+                          onChange={(val) => updateRubric(i, 'capacity', val)}
+                          rows={1}
+                          className="bg-transparent border-none outline-none font-bold text-slate-900 text-[10px] leading-tight p-0"
+                        />
+                      </td>
+                      <td className="p-1 border border-slate-200 align-top">
+                        <EditableArea
+                          value={row?.nsa || ''}
+                          onChange={(val) => updateRubric(i, 'nsa', val)}
+                          rows={1}
+                          className="bg-slate-50/60 border border-slate-100 rounded p-1 text-slate-600 italic text-[9.5px] leading-tight focus:outline-none focus:border-red-300 focus:bg-white"
+                        />
+                      </td>
+                      <td className="p-1 border border-slate-200 align-top">
+                        <EditableArea
+                          value={row?.apo || ''}
+                          onChange={(val) => updateRubric(i, 'apo', val)}
+                          rows={1}
+                          className="bg-slate-50/60 border border-slate-100 rounded p-1 text-slate-600 italic text-[9.5px] leading-tight focus:outline-none focus:border-orange-300 focus:bg-white"
+                        />
+                      </td>
+                      <td className="p-1 border border-slate-200 align-top">
+                        <EditableArea
+                          value={row?.par || ''}
+                          onChange={(val) => updateRubric(i, 'par', val)}
+                          rows={1}
+                          className="bg-slate-50/60 border border-slate-100 rounded p-1 text-slate-600 italic text-[9.5px] leading-tight focus:outline-none focus:border-blue-300 focus:bg-white"
+                        />
+                      </td>
+                      <td className="p-1 border border-slate-200 align-top">
+                        <EditableArea
+                          value={row?.aut || ''}
+                          onChange={(val) => updateRubric(i, 'aut', val)}
+                          rows={1}
+                          className="bg-slate-50/60 border border-slate-100 rounded p-1 text-slate-600 italic text-[9.5px] leading-tight focus:outline-none focus:border-green-300 focus:bg-white"
+                        />
+                      </td>
+                      <td className="p-1 border border-slate-200 text-center align-middle">
+                        <button
+                          type="button"
+                          onClick={() => removeRubric(i)}
+                          className="text-slate-300 hover:text-red-500 p-1 font-bold transition-colors"
+                          title="Excluir Rubrica"
+                        >
+                          ✕
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </div>
         )}
 
-        {/* ABA CRONOGRAMA / PLANO DE AULA */}
+        {/* ABA CRONOGRAMA */}
         {activeTab === 'cronograma' && (
           <div className="space-y-6">
             <div className="flex justify-between items-center no-print">
               <div>
-                <h3 className="text-3xl font-[1000] text-slate-900 uppercase italic">Plano de Ensino & Cronograma</h3>
-                <p className="text-xs text-slate-400 font-bold uppercase tracking-wider mt-1">Planejamento detalhado das aulas e carga horária</p>
+                <h3 className="text-2xl font-black text-slate-900 uppercase italic">Plano de Aula / Cronograma</h3>
+                <p className="text-xs text-slate-400 font-bold uppercase tracking-wider mt-1">Distribuição de horas, capacidades e estratégias</p>
               </div>
               <div className="flex gap-3">
-                <button onClick={() => addScheduleEntry()} className="bg-blue-600 text-white px-5 py-3 rounded-xl text-[10px] font-black uppercase tracking-wider shadow-md hover:bg-slate-900 transition-all">
-                  + Incluir Linha
+                <button onClick={() => addScheduleEntry()} className="bg-blue-600 text-white px-5 py-3 rounded-xl text-[10px] font-black uppercase tracking-wider hover:bg-slate-900 transition-all shadow-md">
+                  + Adicionar Linha
                 </button>
-                <button onClick={handlePrint} className="bg-red-600 text-white px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-wider shadow-md flex items-center gap-2 hover:bg-slate-900 transition-all">
+                <button onClick={handlePrint} className="bg-slate-900 text-white px-5 py-3 rounded-xl text-[10px] font-black uppercase tracking-wider hover:bg-blue-600 transition-all shadow-md flex items-center gap-2">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
                   Imprimir Cronograma
                 </button>
               </div>
             </div>
 
-            {/* TABELA DE CRONOGRAMA INTERATIVA */}
-            <div className="w-full rounded-2xl border border-slate-200 bg-white p-2 overflow-x-auto shadow-sm no-print">
-              <table className="w-full min-w-[1000px] border-collapse">
+            {/* TABELA EDITÁVEL NA TELA */}
+            <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm no-print">
+              <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className="bg-slate-900 text-white text-[9px] font-black uppercase tracking-wider">
-                    <th className="p-3 text-left w-28">Data</th>
-                    <th className="p-3 text-center w-16">Horas</th>
-                    <th className="p-3 text-left">Capacidades</th>
-                    <th className="p-3 text-left">Conhecimentos</th>
-                    <th className="p-3 text-left">Estratégias / Metodologia</th>
-                    <th className="p-3 text-left">Recursos</th>
-                    <th className="p-3 text-center w-20">Ações</th>
+                    <th className="p-3 w-32">Data</th>
+                    <th className="p-3 w-20 text-center">Horas</th>
+                    <th className="p-3">Capacidades / Conhecimentos</th>
+                    <th className="p-3">Estratégias / Recursos</th>
+                    <th className="p-3 w-20 text-center">Ações</th>
                   </tr>
                 </thead>
-                <tbody className="text-xs divide-y divide-slate-100 font-bold">
+                <tbody className="divide-y divide-slate-100 text-xs font-medium">
                   {localSchedule.map((entry, idx) => (
-                    <tr key={entry.id || idx} className="hover:bg-slate-50/50 transition-all">
-                      <td className="p-2 align-top">
+                    <tr key={entry.id || idx} className="hover:bg-slate-50/50 transition-colors">
+                      <td className="p-3 align-top">
                         <div className="space-y-1">
                           <DebouncedInput
-                            value={entry.date}
+                            value={entry.date || ''}
                             onChange={(val) => updateEntry(entry.id, 'date', val)}
                             placeholder="DD/MM/AAAA"
-                            className="w-full bg-slate-50 border border-slate-200 rounded-lg px-2 py-1 text-xs font-bold text-slate-800 focus:outline-none focus:border-blue-500"
+                            className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 text-xs font-bold text-slate-800 focus:outline-none focus:border-blue-500"
                           />
-                          <span className="text-[9px] text-slate-400 block capitalize font-medium px-1">
-                            {getDayOfWeek(entry.date)}
-                          </span>
+                          <span className="text-[9px] text-slate-400 font-bold uppercase block px-1">{getDayOfWeek(entry.date)}</span>
                         </div>
                       </td>
-                      <td className="p-2 align-top">
+                      <td className="p-3 align-top text-center">
                         <input
                           type="number"
-                          value={entry.hours}
+                          value={entry.hours || 0}
                           onChange={(e) => updateEntry(entry.id, 'hours', Number(e.target.value))}
-                          className="w-full bg-slate-50 border border-slate-200 rounded-lg px-2 py-1 text-xs font-bold text-center text-slate-800 focus:outline-none focus:border-blue-500"
+                          className="w-16 bg-slate-50 border border-slate-200 rounded-lg p-2 text-xs font-bold text-slate-800 text-center focus:outline-none focus:border-blue-500"
                         />
                       </td>
-                      <td className="p-2 align-top">
+                      <td className="p-3 align-top space-y-2">
                         <EditableArea
-                          value={entry.capacities}
+                          value={entry.capacities || ''}
                           onChange={(val) => updateEntry(entry.id, 'capacities', val)}
                           placeholder="Capacidades..."
                           rows={2}
-                          className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 text-xs font-medium text-slate-700 focus:outline-none focus:border-blue-500"
+                          className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 text-xs text-slate-700 font-medium focus:outline-none focus:border-blue-500"
                         />
-                      </td>
-                      <td className="p-2 align-top">
                         <EditableArea
-                          value={entry.knowledges}
+                          value={entry.knowledges || ''}
                           onChange={(val) => updateEntry(entry.id, 'knowledges', val)}
                           placeholder="Conhecimentos..."
                           rows={2}
-                          className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 text-xs font-medium text-slate-700 focus:outline-none focus:border-blue-500"
+                          className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 text-xs text-slate-600 font-normal focus:outline-none focus:border-blue-500"
                         />
                       </td>
-                      <td className="p-2 align-top">
+                      <td className="p-3 align-top space-y-2">
                         <EditableArea
-                          value={entry.strategies}
+                          value={entry.strategies || ''}
                           onChange={(val) => updateEntry(entry.id, 'strategies', val)}
-                          placeholder="Estratégias..."
+                          placeholder="Estratégias metodológicas..."
                           rows={2}
-                          className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 text-xs font-medium text-slate-700 focus:outline-none focus:border-blue-500"
+                          className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 text-xs text-slate-700 font-medium focus:outline-none focus:border-blue-500"
                         />
-                      </td>
-                      <td className="p-2 align-top">
                         <EditableArea
-                          value={entry.resources}
+                          value={entry.resources || ''}
                           onChange={(val) => updateEntry(entry.id, 'resources', val)}
-                          placeholder="Recursos..."
+                          placeholder="Recursos didáticos..."
                           rows={2}
-                          className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 text-xs font-medium text-slate-700 focus:outline-none focus:border-blue-500"
+                          className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 text-xs text-slate-600 font-normal focus:outline-none focus:border-blue-500"
                         />
                       </td>
-                      <td className="p-2 align-middle text-center">
-                        <div className="flex items-center justify-center gap-1">
-                          <button onClick={() => addScheduleEntry(idx)} className="w-7 h-7 bg-blue-50 text-blue-600 rounded-lg flex items-center justify-center hover:bg-blue-600 hover:text-white transition-all text-xs font-black" title="Inserir abaixo">+</button>
-                          <button onClick={() => removeScheduleEntry(entry.id)} className="w-7 h-7 bg-red-50 text-red-600 rounded-lg flex items-center justify-center hover:bg-red-600 hover:text-white transition-all text-xs font-black" title="Excluir">✕</button>
+                      <td className="p-3 align-top text-center">
+                        <div className="flex flex-col items-center gap-2">
+                          <button onClick={() => addScheduleEntry(idx)} title="Inserir abaixo" className="p-1.5 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-600 hover:text-white transition-all text-xs font-black">
+                            +
+                          </button>
+                          <button onClick={() => removeScheduleEntry(entry.id)} title="Excluir linha" className="p-1.5 bg-red-50 text-red-500 rounded-lg hover:bg-red-600 hover:text-white transition-all text-xs font-black">
+                            ✕
+                          </button>
                         </div>
                       </td>
                     </tr>
@@ -758,36 +754,38 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
               </table>
             </div>
 
-            {/* DOCUMENTO PARA IMPRESSÃO (CRONOGRAMA) */}
-            <div className="hidden report-document bg-white p-8 text-black">
+            {/* DOCUMENTO DE IMPRESSÃO (CRONOGRAMA) */}
+            <div className="hidden report-document bg-white p-8">
               <div className="report-header">
                 <div className="logo-box">SENAI</div>
                 <div className="info-box">
-                  <h1>PLANO DE ENSINO / CRONOGRAMA</h1>
+                  <h1>Plano de Curso / Cronograma</h1>
                   <p>{localUnit?.name}</p>
                 </div>
               </div>
-              <div className="doc-main-title">CRONOGRAMA DE DESENVOLVIMENTO DA UNIDADE CURRICULAR</div>
+              <h2 className="doc-main-title">Cronograma de Aulas e Atividades</h2>
               <table className="tech-table">
                 <thead>
                   <tr>
-                    <th>Data / Dia</th>
-                    <th>Horas</th>
-                    <th>Capacidades</th>
-                    <th>Conhecimentos</th>
-                    <th>Estratégias / Metodologia</th>
-                    <th>Recursos</th>
+                    <th style={{ width: '15%' }}>Data</th>
+                    <th style={{ width: '8%', textAlign: 'center' }}>Horas</th>
+                    <th style={{ width: '38%' }}>Capacidades / Conhecimentos</th>
+                    <th style={{ width: '39%' }}>Estratégias / Recursos</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {localSchedule.map((entry, i) => (
-                    <tr key={i}>
-                      <td><strong>{entry.date}</strong><br/><span style={{fontSize:'7.5pt', color:'#666'}}>{getDayOfWeek(entry.date)}</span></td>
-                      <td style={{textAlign:'center'}}>{entry.hours}h</td>
-                      <td>{entry.capacities}</td>
-                      <td>{entry.knowledges}</td>
-                      <td>{entry.strategies}</td>
-                      <td>{entry.resources}</td>
+                  {localSchedule.map((e, idx) => (
+                    <tr key={idx}>
+                      <td><strong>{e.date}</strong><br/><span style={{ fontSize: '7pt', color: '#64748b' }}>{getDayOfWeek(e.date)}</span></td>
+                      <td style={{ textAlign: 'center' }}>{e.hours}h</td>
+                      <td>
+                        {e.capacities && <div><strong>Capacidades:</strong> {e.capacities}</div>}
+                        {e.knowledges && <div style={{ marginTop: '4pt' }}><strong>Conhecimentos:</strong> {e.knowledges}</div>}
+                      </td>
+                      <td>
+                        {e.strategies && <div><strong>Estratégias:</strong> {e.strategies}</div>}
+                        {e.resources && <div style={{ marginTop: '4pt' }}><strong>Recursos:</strong> {e.resources}</div>}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -798,64 +796,51 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
 
         {/* ABA CALENDÁRIO */}
         {activeTab === 'calendario' && (
-          <div className="space-y-8 no-print">
-            <div className="flex justify-between items-center border-b border-slate-100 pb-6">
-              <div>
-                <h3 className="text-3xl font-[1000] text-slate-900 uppercase italic">Calendário de Aulas</h3>
-                <p className="text-xs text-slate-400 font-bold uppercase tracking-wider mt-1">Sincronização automática com as datas do cronograma</p>
-              </div>
-              <div className="flex items-center gap-3 bg-slate-50 px-4 py-2 rounded-2xl border border-slate-200">
-                <span className="w-3 h-3 rounded-full inline-block" style={{ backgroundColor: COLOR_MAP[scheduleColor] }}></span>
-                <span className="text-xs font-black uppercase text-slate-700">Aulas Marcadas no Cronograma</span>
-              </div>
+          <div className="space-y-6 no-print">
+            <div>
+              <h3 className="text-2xl font-black text-slate-900 uppercase italic">Calendário da Unidade</h3>
+              <p className="text-xs text-slate-400 font-bold uppercase tracking-wider mt-1">Visão mensal dos dias letivos vinculados ao cronograma</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {monthsInRange.map(monthStr => {
-                const [year, month] = monthStr.split('-').map(Number);
-                const firstDay = new Date(year, month - 1, 1);
-                const lastDay = new Date(year, month, 0);
+                const [y, m] = monthStr.split('-').map(Number);
+                const firstDay = new Date(y, m - 1, 1);
+                const lastDay = new Date(y, m, 0);
                 const daysInMonth = lastDay.getDate();
-                const startingDayOfWeek = firstDay.getDay();
+                const startingDayOfWeek = firstDay.getDay(); // 0 = Domingo
+
                 const monthName = new Intl.DateTimeFormat('pt-BR', { month: 'long', year: 'numeric' }).format(firstDay);
 
-                const days = [];
-                for (let i = 0; i < startingDayOfWeek; i++) {
-                  days.push(null);
-                }
-                for (let d = 1; d <= daysInMonth; d++) {
-                  days.push(new Date(year, month - 1, d));
-                }
-
                 return (
-                  <div key={monthStr} className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm">
-                    <h4 className="text-sm font-black uppercase text-slate-900 mb-4 capitalize text-center">{monthName}</h4>
-                    <div className="grid grid-cols-7 gap-1 text-center mb-2">
+                  <div key={monthStr} className="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm space-y-4">
+                    <h4 className="text-xs font-black text-slate-800 uppercase tracking-widest text-center capitalize border-b border-slate-100 pb-2">
+                      {monthName}
+                    </h4>
+                    <div className="grid grid-cols-7 gap-1 text-center">
                       {['D', 'S', 'T', 'Q', 'Q', 'S', 'S'].map((d, i) => (
                         <span key={i} className="text-[9px] font-black text-slate-400">{d}</span>
                       ))}
-                    </div>
-                    <div className="grid grid-cols-7 gap-1 text-center">
-                      {days.map((dateObj, idx) => {
-                        if (!dateObj) return <div key={idx} />;
-                        const dateString = dateObj.toISOString().substring(0, 10);
-                        const isScheduled = scheduleDates[dateString];
+                      {Array.from({ length: startingDayOfWeek }).map((_, i) => (
+                        <div key={`empty-${i}`} />
+                      ))}
+                      {Array.from({ length: daysInMonth }).map((_, i) => {
+                        const dayNum = i + 1;
+                        const dateFormatted = `${String(dayNum).padStart(2, '0')}/${String(m).padStart(2, '0')}/${y}`;
+                        const isoDate = `${y}-${String(m).padStart(2, '0')}-${String(dayNum).padStart(2, '0')}`;
+                        const isScheduled = scheduleDates[isoDate];
 
                         return (
                           <div
-                            key={idx}
-                            className={`h-9 rounded-xl flex items-center justify-center text-xs font-bold transition-all ${
-                              isScheduled
-                                ? 'shadow-md scale-105'
-                                : 'text-slate-700 hover:bg-slate-100'
+                            key={dayNum}
+                            className={`h-8 rounded-xl flex items-center justify-center text-[10px] font-bold transition-all ${
+                              isScheduled 
+                                ? 'bg-blue-600 text-white shadow-md shadow-blue-200 font-black' 
+                                : 'bg-slate-50 text-slate-600 hover:bg-slate-100'
                             }`}
-                            style={{
-                              backgroundColor: isScheduled ? COLOR_MAP[scheduleColor] : 'transparent',
-                              color: isScheduled ? TEXT_COLOR_MAP[scheduleColor] : undefined
-                            }}
-                            title={dateString}
+                            title={isScheduled ? `Aula agendada: ${dateFormatted}` : dateFormatted}
                           >
-                            {dateObj.getDate()}
+                            {dayNum}
                           </div>
                         );
                       })}
