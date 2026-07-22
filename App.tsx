@@ -194,6 +194,36 @@ const App: React.FC = () => {
     }
   };
 
+  const handleCreateNewPlan = async () => {
+    if (!isAdmin) {
+      alert('Acesso negado: Apenas administradores podem criar novos cursos.');
+      return;
+    }
+
+    const newPlanId = `plan-novo-${activeProfileId}-${Date.now()}`;
+    const newPlan: TeachingPlan = {
+      id: newPlanId,
+      profileId: activeProfileId,
+      courseName: 'NOVO CURSO TÉCNICO',
+      totalHours: 1200,
+      modality: 'Presencial',
+      objective: 'Descrever o perfil de conclusão do novo curso técnico.',
+      version: SCHEDULE_VERSION,
+      updatedAt: new Date().toISOString(),
+      units: []
+    };
+
+    try {
+      await FirebaseService.savePlan(newPlan);
+      const refreshed = await FirebaseService.getPlans(activeProfileId);
+      setPlans(refreshed);
+      setCurrentPlan(newPlan);
+      setView('editor' as ViewType);
+    } catch (error) {
+      console.error('Erro ao criar novo plano:', error);
+    }
+  };
+
   const handleUpdateSchedule = async (
     unitId: string,
     newSchedule: ScheduleEntry[]
@@ -330,6 +360,7 @@ const App: React.FC = () => {
               }}
               onView={openPlan}
               onRefresh={() => loadPlans(activeProfileId)}
+              onCreateNewPlan={handleCreateNewPlan}
             />
           )}
 
