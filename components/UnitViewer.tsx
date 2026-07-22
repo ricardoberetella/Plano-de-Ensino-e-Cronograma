@@ -1,521 +1,750 @@
-import React, { useState } from 'react';
-import { CurricularUnit, ScheduleEntry, UnitCalendar, RubricItem } from '../types';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
+import { CurricularUnit, ScheduleEntry, UnitCalendar, CalendarColor } from '../types';
 
-interface UnitViewerProps {
+interface Props {
   unit: CurricularUnit;
-  isAdmin: boolean;
-  onUpdateSchedule: (newSchedule: ScheduleEntry[]) => void;
-  onUpdateCalendar: (newCalendar: UnitCalendar) => void;
-  onUpdateUnit: (updatedUnit: CurricularUnit) => void;
+  onUpdateSchedule?: (newSchedule: ScheduleEntry[]) => void;
+  onUpdateCalendar?: (newCalendar: UnitCalendar) => void;
+  onUpdateUnit?: (updatedUnit: CurricularUnit) => void;
 }
 
-const UnitViewer: React.FC<UnitViewerProps> = ({
-  unit,
-  isAdmin,
-  onUpdateUnit,
-}) => {
-  const [activeTab, setActiveTab] = useState<'geral' | 'situacao' | 'rubricas' | 'plano' | 'calendario'>('situacao');
-  
-  const [rubrics, setRubrics] = useState<RubricItem[]>(unit.rubrics || []);
-  const [scheduleEntries, setScheduleEntries] = useState<ScheduleEntry[]>(unit.schedule || []);
-  const [description, setDescription] = useState(unit.description || '');
-  const [problemSituation, setProblemSituation] = useState(unit.problemSituation || '');
-  const [capacitiesText, setCapacitiesText] = useState(unit.capacitiesText || '');
-  const [knowledgeText, setKnowledgeText] = useState(unit.knowledgeText || '');
+const COLOR_MAP: Record<CalendarColor, string> = {
+  yellow: '#fbbf24', green: '#22c55e', blue: '#3b82f6', red: '#ef4444', cyan: '#06b6d4', orange: '#f97316', purple: '#a855f7', pink: '#ec4899', white: '#ffffff', none: 'transparent'
+};
 
-  const handleFieldChange = (field: keyof CurricularUnit, value: any) => {
-    const updated = { ...unit, [field]: value };
-    onUpdateUnit(updated);
-  };
+const TEXT_COLOR_MAP: Record<CalendarColor, string> = {
+  yellow: '#0f172a', green: '#ffffff', blue: '#ffffff', red: '#ffffff', cyan: '#ffffff', orange: '#ffffff', purple: '#ffffff', pink: '#ffffff', white: '#1e293b', none: 'inherit'
+};
 
-  const handleAddRubricRow = () => {
-    const newRow: RubricItem = {
-      id: `rubric-${Date.now()}`,
-      capacity: '',
-      nsa: '',
-      apo: '',
-      par: '',
-      aut: ''
-    };
-    const updated = [...rubrics, newRow];
-    setRubrics(updated);
-    onUpdateUnit({ ...unit, rubrics: updated });
-  };
+// Componente para Inputs simples
+const DebouncedInput: React.FC<{
+  value: string;
+  onChange: (val: string) => void;
+  placeholder?: string;
+  className?: string;
+}> = ({ value, onChange, placeholder, className }) => {
+  const [localValue, setLocalValue] = useState(value || '');
 
-  const handleRubricChange = (id: string, field: keyof RubricItem, value: string) => {
-    const updated = rubrics.map(r => r.id === id ? { ...r, [field]: value } : r);
-    setRubrics(updated);
-    onUpdateUnit({ ...unit, rubrics: updated });
-  };
+  useEffect(() => {
+    setLocalValue(value || '');
+  }, [value]);
 
-  const handleDeleteRubricRow = (id: string) => {
-    const updated = rubrics.filter(r => r.id !== id);
-    setRubrics(updated);
-    onUpdateUnit({ ...unit, rubrics: updated });
-  };
-
-  const handleAddScheduleRow = () => {
-    const newEntry: ScheduleEntry = {
-      id: `schedule-${Date.now()}`,
-      dateOrHours: '',
-      capacities: '',
-      knowledge: '',
-      strategies: '',
-      resources: ''
-    };
-    const updated = [...scheduleEntries, newEntry];
-    setScheduleEntries(updated);
-    onUpdateUnit({ ...unit, schedule: updated });
-  };
-
-  const handleScheduleChange = (id: string, field: keyof ScheduleEntry, value: string) => {
-    const updated = scheduleEntries.map(s => s.id === id ? { ...s, [field]: value } : s);
-    setScheduleEntries(updated);
-    onUpdateUnit({ ...unit, schedule: updated });
-  };
-
-  const handleDeleteScheduleRow = (id: string) => {
-    const updated = scheduleEntries.filter(s => s.id !== id);
-    setScheduleEntries(updated);
-    onUpdateUnit({ ...unit, schedule: updated });
+  const handleBlur = () => {
+    if (localValue !== value) {
+      onChange(localValue);
+    }
   };
 
   return (
-    <div className="bg-white rounded-[2.5rem] shadow-xl border border-slate-200 overflow-hidden animate-fadeIn">
+    <input
+      type="text"
+      value={localValue}
+      onChange={(e) => setLocalValue(e.target.value)}
+      onBlur={handleBlur}
+      placeholder={placeholder}
+      className={className}
+    />
+  );
+};
+
+// Componente isolado para Textareas dinâmicas
+const EditableArea: React.FC<{
+  value: string;
+  onChange: (val: string) => void;
+  placeholder?: string;
+  className?: string;
+  rows?: number;
+}> = ({ value, onChange, placeholder, className, rows = 1 }) => {
+  const [val, setVal] = useState(value || '');
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    setVal(value || '');
+  }, [value]);
+
+  const adjustHeight = () => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+    }
+  };
+
+  useEffect(() => {
+    adjustHeight();
+  }, [val]);
+
+  const handleBlur = () => {
+    if (val !== value) {
+      onChange(val);
+    }
+  };
+
+  return (
+    <textarea
+      ref={textareaRef}
+      value={val}
+      onChange={(e) => setVal(e.target.value)}
+      onBlur={handleBlur}
+      placeholder={placeholder}
+      rows={rows}
+      className={`resize-none overflow-hidden block w-full ${className || ''}`}
+    />
+  );
+};
+
+const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar, onUpdateUnit }) => {
+  const [activeTab, setActiveTab] = useState<'geral' | 'sa' | 'rubricas' | 'cronograma' | 'calendario'>('geral');
+  const [localSchedule, setLocalSchedule] = useState<ScheduleEntry[]>(unit.schedule);
+  const [localUnit, setLocalUnit] = useState<CurricularUnit>(unit);
+
+  useEffect(() => {
+    setLocalSchedule(unit.schedule);
+  }, [unit.schedule]);
+
+  useEffect(() => {
+    setLocalUnit(unit);
+  }, [unit]);
+
+  const updateUnitState = (newUnit: CurricularUnit) => {
+    setLocalUnit(newUnit);
+    onUpdateUnit?.(newUnit);
+  };
+
+  const isCRD = localUnit.id.toLowerCase().includes('crd') || localUnit.name.toLowerCase().includes('dimensional');
+  const isFUSI = localUnit.id.toLowerCase().includes('fusi') || localUnit.name.toLowerCase().includes('usinagem');
+  const scheduleColor: CalendarColor = isCRD ? 'pink' : (isFUSI ? 'orange' : 'blue');
+
+  const calendar = useMemo(() => localUnit.calendar || {
+    startDate: '2026-01-26',
+    endDate: '2026-06-24',
+    markings: []
+  }, [localUnit.calendar]);
+
+  const getDayOfWeek = (dateStr: string) => {
+    if (!dateStr || !dateStr.includes('/')) return "";
+    const [d, m, y] = dateStr.split('/').map(Number);
+    const date = new Date(y, m - 1, d);
+    return isNaN(date.getTime()) ? "" : new Intl.DateTimeFormat('pt-BR', { weekday: 'long' }).format(date);
+  };
+
+  const updateEntry = (id: string, field: keyof ScheduleEntry, value: any) => {
+    const updated = localSchedule.map(entry => entry.id === id ? { ...entry, [field]: value } : entry);
+    setLocalSchedule(updated);
+    onUpdateSchedule?.(updated);
+  };
+
+  // Edição dos campos da aba Geral
+  const updateGeneralFieldList = (field: 'technicalCapacities' | 'socialCapacities' | 'knowledges', index: number, value: string) => {
+    const currentList = localUnit[field] ? [...localUnit[field]!] : [];
+    currentList[index] = value;
+    updateUnitState({ ...localUnit, [field]: currentList });
+  };
+
+  const addGeneralFieldItem = (field: 'technicalCapacities' | 'socialCapacities' | 'knowledges') => {
+    const currentList = localUnit[field] ? [...localUnit[field]!] : [];
+    currentList.push('');
+    updateUnitState({ ...localUnit, [field]: currentList });
+  };
+
+  const removeGeneralFieldItem = (field: 'technicalCapacities' | 'socialCapacities' | 'knowledges', index: number) => {
+    const currentList = localUnit[field] ? [...localUnit[field]!] : [];
+    currentList.splice(index, 1);
+    updateUnitState({ ...localUnit, [field]: currentList });
+  };
+
+  // Manipulação das Situações de Aprendizagem / Fases
+  const updateSAField = (saIndex: number, field: string, value: any) => {
+    const updatedSAs = [...(localUnit.learningSituations || [])];
+    updatedSAs[saIndex] = { ...updatedSAs[saIndex], [field]: value };
+    updateUnitState({ ...localUnit, learningSituations: updatedSAs });
+  };
+
+  const addLearningSituation = () => {
+    const newSA = {
+      id: `sa-${Date.now()}`,
+      title: `Situação de Aprendizagem ${(localUnit.learningSituations || []).length + 1}`,
+      context: '',
+      challenge: '',
+      expectedResults: ['']
+    };
+    updateUnitState({ ...localUnit, learningSituations: [...(localUnit.learningSituations || []), newSA] });
+  };
+
+  const removeLearningSituation = (saIndex: number) => {
+    if (confirm("Tem certeza que deseja remover esta Situação de Aprendizagem na íntegra?")) {
+      const updatedSAs = [...(localUnit.learningSituations || [])];
+      updatedSAs.splice(saIndex, 1);
+      updateUnitState({ ...localUnit, learningSituations: updatedSAs });
+    }
+  };
+
+  const updateSAResult = (saIndex: number, resultIndex: number, value: string) => {
+    const updatedSAs = [...(localUnit.learningSituations || [])];
+    const results = [...(updatedSAs[saIndex].expectedResults || [])];
+    results[resultIndex] = value;
+    updatedSAs[saIndex] = { ...updatedSAs[saIndex], expectedResults: results };
+    updateUnitState({ ...localUnit, learningSituations: updatedSAs });
+  };
+
+  const addSAResult = (saIndex: number) => {
+    const updatedSAs = [...(localUnit.learningSituations || [])];
+    const results = [...(updatedSAs[saIndex].expectedResults || []), ''];
+    updatedSAs[saIndex] = { ...updatedSAs[saIndex], expectedResults: results };
+    updateUnitState({ ...localUnit, learningSituations: updatedSAs });
+  };
+
+  const removeSAResult = (saIndex: number, resultIndex: number) => {
+    const updatedSAs = [...(localUnit.learningSituations || [])];
+    const results = [...(updatedSAs[saIndex].expectedResults || [])];
+    results.splice(resultIndex, 1);
+    updatedSAs[saIndex] = { ...updatedSAs[saIndex], expectedResults: results };
+    updateUnitState({ ...localUnit, learningSituations: updatedSAs });
+  };
+
+  // Edição de Rubricas
+  const updateRubric = (index: number, field: string, value: string) => {
+    const updatedRubrics = [...(localUnit.rubrics || [])];
+    updatedRubrics[index] = { ...updatedRubrics[index], [field]: value };
+    updateUnitState({ ...localUnit, rubrics: updatedRubrics });
+  };
+
+  const handlePrint = () => {
+    window.print();
+  };
+
+  const scheduleDates = useMemo(() => {
+    const dates: Record<string, boolean> = {};
+    localSchedule.forEach(s => {
+      const parts = s.date.split('/');
+      if (parts.length === 3) {
+        dates[`${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`] = true;
+      }
+    });
+    return dates;
+  }, [localSchedule]);
+
+  const monthsInRange = useMemo(() => {
+    const start = new Date(calendar.startDate + 'T00:00:00');
+    const end = new Date(calendar.endDate + 'T00:00:00');
+    const months: string[] = [];
+    const current = new Date(start.getFullYear(), start.getMonth(), 1);
+    while (current <= end) {
+      months.push(current.toISOString().substring(0, 7));
+      current.setMonth(current.getMonth() + 1);
+    }
+    return months;
+  }, [calendar.startDate, calendar.endDate]);
+
+  return (
+    <div className="bg-white rounded-[2.5rem] shadow-2xl border border-slate-200 overflow-hidden animate-fadeIn printable-unit-module" data-active-tab={activeTab}>
+      <style>{`
+        @media print {
+          @page { size: A4 portrait; margin: 1.0cm !important; }
+          aside, header, nav, .tabs-header, .no-print, button { display: none !important; }
+          html, body, #root, main, .printable-unit-module, .content-area { display: block !important; height: auto !important; overflow: visible !important; background: white !important; margin: 0 !important; padding: 0 !important; box-shadow: none !important; position: static !important; }
+          .report-document, .report-document-sa { display: none !important; }
+          [data-active-tab="cronograma"] .report-document { display: block !important; }
+          [data-active-tab="sa"] .report-document-sa { display: block !important; }
+          .report-header { display: flex !important; justify-between: space-between !important; align-items: center !important; border-bottom: 2pt solid #E30613 !important; padding-bottom: 10pt !important; margin-bottom: 15pt !important; }
+          .logo-box { background: #E30613 !important; color: white !important; padding: 10pt 20pt !important; font-size: 24pt !important; font-weight: 900 !important; font-style: italic !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+          .info-box { text-align: right !important; color: #000 !important; }
+          .info-box h1 { font-size: 10pt !important; font-weight: 900 !important; margin: 0 !important; text-transform: uppercase !important; }
+          .info-box p { font-size: 8pt !important; margin: 2pt 0 0 0 !important; font-weight: bold !important; }
+          .doc-main-title { text-align: center !important; font-weight: 900 !important; font-size: 14pt !important; text-transform: uppercase !important; margin: 15pt 0 !important; border-bottom: 1pt solid #000 !important; padding-bottom: 5pt !important; color: #000 !important; }
+          .tech-table { width: 100% !important; border-collapse: collapse !important; margin-top: 10pt !important; }
+          .tech-table th { background: #f8fafc !important; color: #64748b !important; font-size: 7pt !important; font-weight: 900 !important; text-transform: uppercase !important; padding: 8pt !important; border: 0.5pt solid #e2e8f0 !important; text-align: left !important; -webkit-print-color-adjust: exact; }
+          .tech-table td { padding: 10pt !important; border: 0.5pt solid #e2e8f0 !important; font-size: 8.5pt !important; vertical-align: top !important; color: #1e293b !important; }
+        }
+      `}</style>
+
       {/* HEADER DA UNIDADE */}
-      <div className="bg-slate-900 p-8 md:p-12 text-white relative">
-        <span className="bg-blue-600 text-white px-3 py-1 rounded text-[9px] font-black uppercase tracking-widest mb-3 inline-block">
-          MSEP - Unidade Curricular
-        </span>
-        <h2 className="text-3xl md:text-4xl font-[1000] uppercase tracking-tight">
-          {unit.name}
-        </h2>
+      <div className="bg-slate-900 p-8 text-white flex justify-between items-center no-print">
+        <div className="w-full">
+          <span className="bg-blue-600 px-3 py-1 rounded text-[9px] font-black uppercase tracking-widest mb-2 inline-block">MSEP - Unidade Curricular</span>
+          <DebouncedInput
+            value={localUnit.name}
+            onChange={(val) => updateUnitState({ ...localUnit, name: val })}
+            className="text-3xl font-black tracking-tighter uppercase leading-none bg-transparent text-white border-b border-transparent hover:border-slate-700 focus:border-blue-500 outline-none w-full transition-all"
+          />
+        </div>
       </div>
 
-      {/* ABAS DE NAVEGAÇÃO DA UNIDADE */}
-      <div className="flex border-b border-slate-100 bg-slate-50/50 overflow-x-auto scrollbar-hide">
-        <button
-          onClick={() => setActiveTab('geral')}
-          className={`px-8 py-4 text-xs font-black uppercase tracking-wider transition-all border-b-2 ${
-            activeTab === 'geral'
-              ? 'border-blue-600 text-blue-600 bg-white'
-              : 'border-transparent text-slate-400 hover:text-slate-600'
-          }`}
-        >
-          Geral
-        </button>
-        <button
-          onClick={() => setActiveTab('situacao')}
-          className={`px-8 py-4 text-xs font-black uppercase tracking-wider transition-all border-b-2 ${
-            activeTab === 'situacao'
-              ? 'border-blue-600 text-blue-600 bg-white'
-              : 'border-transparent text-slate-400 hover:text-slate-600'
-          }`}
-        >
-          Situação-Problema
-        </button>
-        <button
-          onClick={() => setActiveTab('rubricas')}
-          className={`px-8 py-4 text-xs font-black uppercase tracking-wider transition-all border-b-2 ${
-            activeTab === 'rubricas'
-              ? 'border-blue-600 text-blue-600 bg-white'
-              : 'border-transparent text-slate-400 hover:text-slate-600'
-          }`}
-        >
-          Rubricas
-        </button>
-        <button
-          onClick={() => setActiveTab('plano')}
-          className={`px-8 py-4 text-xs font-black uppercase tracking-wider transition-all border-b-2 ${
-            activeTab === 'plano'
-              ? 'border-blue-600 text-blue-600 bg-white'
-              : 'border-transparent text-slate-400 hover:text-slate-600'
-          }`}
-        >
-          Plano de Aula | Cronograma
-        </button>
-        <button
-          onClick={() => setActiveTab('calendario')}
-          className={`px-8 py-4 text-xs font-black uppercase tracking-wider transition-all border-b-2 ${
-            activeTab === 'calendario'
-              ? 'border-blue-600 text-blue-600 bg-white'
-              : 'border-transparent text-slate-400 hover:text-slate-600'
-          }`}
-        >
-          Calendário
-        </button>
+      {/* TABS DE NAVEGAÇÃO */}
+      <div className="flex border-b border-slate-200 bg-slate-50 overflow-x-auto scrollbar-hide no-print tabs-header">
+        {(['geral', 'sa', 'rubricas', 'cronograma', 'calendario'] as const).map(tab => (
+          <button
+            key={tab}
+            onClick={() => setActiveTab(tab)}
+            className={`px-8 py-5 transition-all border-b-4 ${activeTab === tab ? 'border-blue-600 bg-white' : 'border-transparent text-slate-400 hover:bg-slate-100'}`}
+          >
+            <span className="text-[10px] font-black uppercase tracking-widest block">
+              {tab === 'geral' ? 'Geral' : tab === 'sa' ? 'Situação-Problema' : tab === 'rubricas' ? 'Rubricas' : tab === 'cronograma' ? 'Plano de Aula' : 'Calendário'}
+            </span>
+          </button>
+        ))}
       </div>
 
-      {/* CONTEÚDO DAS ABAS */}
-      <div className="p-8 md:p-12">
+      <div className="p-6 md:p-10 max-h-[75vh] overflow-y-auto custom-scrollbar bg-[#FDFDFD] content-area">
+
+        {/* ABA GERAL EM COLUNAS */}
         {activeTab === 'geral' && (
-          <div className="space-y-8">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-100 pb-6">
+          <div className="space-y-10 max-w-7xl mx-auto">
+            <div className="border-b border-slate-100 pb-6">
+              <h3 className="text-3xl font-[1000] text-slate-900 uppercase italic">Geral & Matriz Pedagógica</h3>
+              <p className="text-xs text-slate-400 font-bold uppercase tracking-wider mt-1">Gerais da Unidade Curricular Organizadas em Colunas</p>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+              {/* COLUNA 1: CAPACIDADES TÉCNICAS */}
+              <div className="bg-white p-6 rounded-[2rem] border border-slate-200 shadow-lg space-y-4 flex flex-col h-full">
+                <div className="flex justify-between items-center border-b border-slate-100 pb-4">
+                  <h4 className="text-xs font-black uppercase tracking-wider text-blue-600 flex items-center gap-2">
+                    <span className="w-2.5 h-2.5 bg-blue-600 rounded-full inline-block"></span>
+                    Capacidades Técnicas
+                  </h4>
+                  <button onClick={() => addGeneralFieldItem('technicalCapacities')} className="bg-blue-50 text-blue-600 px-2.5 py-1 rounded-xl text-[9px] font-black uppercase hover:bg-blue-600 hover:text-white transition-all">
+                    + Item
+                  </button>
+                </div>
+                <div className="space-y-3 flex-1">
+                  {(localUnit.technicalCapacities || []).map((cap, idx) => (
+                    <div key={idx} className="flex gap-2 items-start bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                      <span className="text-[10px] font-black text-slate-400 mt-1">{idx + 1}.</span>
+                      <EditableArea
+                        value={cap}
+                        onChange={(val) => updateGeneralFieldList('technicalCapacities', idx, val)}
+                        placeholder="Descreva a capacidade técnica..."
+                        rows={1}
+                        className="flex-1 bg-transparent border-none text-xs font-bold text-slate-800 focus:outline-none"
+                      />
+                      <button onClick={() => removeGeneralFieldItem('technicalCapacities', idx)} className="text-slate-300 hover:text-red-500 text-xs font-bold transition-all p-1">
+                        ✕
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* COLUNA 2: CAPACIDADES SOCIOEMOCIONAIS */}
+              <div className="bg-white p-6 rounded-[2rem] border border-slate-200 shadow-lg space-y-4 flex flex-col h-full">
+                <div className="flex justify-between items-center border-b border-slate-100 pb-4">
+                  <h4 className="text-xs font-black uppercase tracking-wider text-purple-600 flex items-center gap-2">
+                    <span className="w-2.5 h-2.5 bg-purple-600 rounded-full inline-block"></span>
+                    Socioemocionais
+                  </h4>
+                  <button onClick={() => addGeneralFieldItem('socialCapacities')} className="bg-purple-50 text-purple-600 px-2.5 py-1 rounded-xl text-[9px] font-black uppercase hover:bg-purple-600 hover:text-white transition-all">
+                    + Item
+                  </button>
+                </div>
+                <div className="space-y-3 flex-1">
+                  {(localUnit.socialCapacities || []).map((cap, idx) => (
+                    <div key={idx} className="flex gap-2 items-start bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                      <span className="text-[10px] font-black text-slate-400 mt-1">{idx + 1}.</span>
+                      <EditableArea
+                        value={cap}
+                        onChange={(val) => updateGeneralFieldList('socialCapacities', idx, val)}
+                        placeholder="Descreva a capacidade socioemocional..."
+                        rows={1}
+                        className="flex-1 bg-transparent border-none text-xs font-bold text-slate-800 focus:outline-none"
+                      />
+                      <button onClick={() => removeGeneralFieldItem('socialCapacities', idx)} className="text-slate-300 hover:text-red-500 text-xs font-bold transition-all p-1">
+                        ✕
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* COLUNA 3: CONHECIMENTOS */}
+              <div className="bg-white p-6 rounded-[2rem] border border-slate-200 shadow-lg space-y-4 flex flex-col h-full">
+                <div className="flex justify-between items-center border-b border-slate-100 pb-4">
+                  <h4 className="text-xs font-black uppercase tracking-wider text-orange-600 flex items-center gap-2">
+                    <span className="w-2.5 h-2.5 bg-orange-600 rounded-full inline-block"></span>
+                    Conhecimentos
+                  </h4>
+                  <button onClick={() => addGeneralFieldItem('knowledges')} className="bg-orange-50 text-orange-600 px-2.5 py-1 rounded-xl text-[9px] font-black uppercase hover:bg-orange-600 hover:text-white transition-all">
+                    + Item
+                  </button>
+                </div>
+                <div className="space-y-3 flex-1">
+                  {(localUnit.knowledges || []).map((know, idx) => (
+                    <div key={idx} className="flex gap-2 items-start bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                      <span className="text-[10px] font-black text-slate-400 mt-1">{idx + 1}.</span>
+                      <EditableArea
+                        value={know}
+                        onChange={(val) => updateGeneralFieldList('knowledges', idx, val)}
+                        placeholder="Descreva o conhecimento..."
+                        rows={1}
+                        className="flex-1 bg-transparent border-none text-xs font-bold text-slate-800 focus:outline-none"
+                      />
+                      <button onClick={() => removeGeneralFieldItem('knowledges', idx)} className="text-slate-300 hover:text-red-500 text-xs font-bold transition-all p-1">
+                        ✕
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ABA SITUAÇÃO-PROBLEMA */}
+        {activeTab === 'sa' && (
+          <div className="max-w-4xl mx-auto space-y-8">
+            <div className="flex justify-between items-center gap-6 border-b border-slate-100 pb-8 no-print">
               <div>
-                <h3 className="text-lg font-[1000] uppercase text-slate-900">Informações Gerais e Objetivos</h3>
-                <p className="text-xs text-slate-400 font-bold uppercase tracking-wider mt-1">
-                  Estrutura curricular, carga horária e diretrizes da unidade
-                </p>
+                <h3 className="text-3xl font-[1000] text-slate-900 uppercase italic">Situações de Aprendizagem / Fases</h3>
+                <p className="text-xs text-slate-400 font-bold uppercase tracking-wider mt-1">Gestão e detalhamento das Fases e Projetos da Unidade</p>
               </div>
-              <div className="flex items-center gap-3">
-                <div className="px-4 py-2 bg-slate-50 rounded-xl border border-slate-200">
-                  <span className="text-[9px] font-black text-slate-400 uppercase block">Carga Horária</span>
-                  <span className="text-sm font-black text-slate-800">{unit.workload || 40}h</span>
-                </div>
-                <div className="px-4 py-2 bg-slate-50 rounded-xl border border-slate-200">
-                  <span className="text-[9px] font-black text-slate-400 uppercase block">Semestre</span>
-                  <span className="text-sm font-black text-slate-800">{unit.semester || 1}º Semestre</span>
-                </div>
+              <div className="flex items-center gap-4">
+                <button onClick={addLearningSituation} className="bg-blue-600 text-white px-6 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl hover:bg-slate-900 transition-all">
+                  + Nova Fase / SA
+                </button>
+                <button onClick={handlePrint} className="bg-red-600 text-white px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl flex items-center gap-3 hover:bg-slate-900 transition-all">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+                  Imprimir Situações
+                </button>
               </div>
             </div>
 
-            {isAdmin ? (
-              <div className="space-y-6">
-                <div>
-                  <label className="block text-[10px] font-black uppercase text-slate-400 mb-2">Objetivo da Unidade Curricular</label>
-                  <textarea
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    onBlur={(e) => handleFieldChange('description', e.target.value)}
-                    placeholder="Digite o objetivo geral da unidade..."
-                    className="w-full h-28 p-4 text-xs bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:border-blue-600 outline-none resize-none font-medium"
-                  />
-                </div>
+            <div className="space-y-12 pb-10 no-print">
+              {(localUnit.learningSituations || []).map((sa, saIdx) => (
+                <div key={sa.id || saIdx} className="p-10 bg-white border border-slate-200 rounded-[3rem] shadow-xl relative overflow-hidden transition-all hover:border-blue-200">
+                  <div className="absolute top-0 left-0 w-2 h-full bg-blue-600"></div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-4">
-                    <div className="p-4 bg-slate-900 text-white rounded-2xl">
-                      <h4 className="text-xs font-black uppercase tracking-wider">Capacidades Técnicas e Socioemocionais</h4>
+                  <div className="flex justify-between items-start gap-4 mb-6">
+                    <div className="flex-1">
+                      <span className="text-[10px] font-black uppercase text-blue-600 tracking-widest block mb-1">FASE / ETAPA {saIdx + 1}</span>
+                      <DebouncedInput
+                        value={sa.title}
+                        onChange={(val) => updateSAField(saIdx, 'title', val)}
+                        placeholder="Título da Situação de Aprendizagem / Fase..."
+                        className="text-2xl font-black text-slate-900 uppercase tracking-tight leading-none italic w-full bg-transparent border-b border-slate-200 focus:border-blue-500 outline-none pb-2"
+                      />
                     </div>
-                    <textarea
-                      value={capacitiesText}
-                      onChange={(e) => setCapacitiesText(e.target.value)}
-                      onBlur={(e) => handleFieldChange('capacitiesText', e.target.value)}
-                      placeholder="Insira as capacidades básicas e socioemocionais..."
-                      className="w-full h-96 p-4 text-xs bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:border-blue-600 outline-none resize-none font-medium leading-relaxed"
-                    />
+                    <button onClick={() => removeLearningSituation(saIdx)} className="text-slate-300 hover:text-red-600 p-2 text-sm font-black transition-all" title="Excluir Fase">
+                      Excluir Fase ✕
+                    </button>
                   </div>
-
-                  <div className="space-y-4">
-                    <div className="p-4 bg-slate-900 text-white rounded-2xl">
-                      <h4 className="text-xs font-black uppercase tracking-wider">Conhecimentos</h4>
+                  
+                  <div className="space-y-8">
+                    <div className="border-l-2 border-slate-100 pl-6">
+                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">I. Contextualização / Situação-Problema</p>
+                      <EditableArea
+                        value={sa.context}
+                        onChange={(val) => updateSAField(saIdx, 'context', val)}
+                        rows={2}
+                        placeholder="Descreva aqui o contexto ou problema apresentado ao aluno..."
+                        className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 text-slate-600 text-sm leading-relaxed font-medium focus:outline-none focus:border-blue-500"
+                      />
                     </div>
-                    <textarea
-                      value={knowledgeText}
-                      onChange={(e) => setKnowledgeText(e.target.value)}
-                      onBlur={(e) => handleFieldChange('knowledgeText', e.target.value)}
-                      placeholder="Insira os conhecimentos abordados..."
-                      className="w-full h-96 p-4 text-xs bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:border-blue-600 outline-none resize-none font-medium leading-relaxed"
-                    />
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div className="space-y-6">
-                <div className="p-6 bg-slate-50 rounded-2xl border border-slate-200">
-                  <span className="text-[10px] font-black uppercase text-blue-600 tracking-widest block mb-2">Objetivo</span>
-                  <p className="text-sm text-slate-700 font-medium whitespace-pre-wrap">{unit.description || 'Nenhum objetivo informado.'}</p>
-                </div>
+                    
+                    <div className="bg-slate-900 p-8 rounded-[2.5rem] text-white shadow-lg">
+                      <p className="text-[10px] font-black text-red-500 uppercase mb-4 tracking-widest">II. Desafio Proposto</p>
+                      <EditableArea
+                        value={sa.challenge}
+                        onChange={(val) => updateSAField(saIdx, 'challenge', val)}
+                        rows={2}
+                        placeholder="Desafio pedagógico do aluno..."
+                        className="w-full bg-slate-800 border border-slate-700 text-slate-200 text-sm italic font-medium leading-relaxed rounded-xl p-3 focus:outline-none focus:border-red-500"
+                      />
+                    </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="p-6 bg-slate-50 rounded-2xl border border-slate-200 space-y-3">
-                    <h4 className="text-xs font-black uppercase text-slate-900 tracking-wider border-b border-slate-200 pb-2">Capacidades Técnicas e Socioemocionais</h4>
-                    <p className="text-xs text-slate-700 font-medium whitespace-pre-wrap">{unit.capacitiesText || 'Nenhuma capacidade cadastrada.'}</p>
-                  </div>
-                  <div className="p-6 bg-slate-50 rounded-2xl border border-slate-200 space-y-3">
-                    <h4 className="text-xs font-black uppercase text-slate-900 tracking-wider border-b border-slate-200 pb-2">Conhecimentos</h4>
-                    <p className="text-xs text-slate-700 font-medium whitespace-pre-wrap">{unit.knowledgeText || 'Nenhum conhecimento cadastrado.'}</p>
+                    <div className="border-t border-slate-100 pt-8">
+                      <div className="flex justify-between items-center mb-4">
+                        <p className="text-[10px] font-black text-blue-600 uppercase tracking-widest">III. Resultados Esperados / Entregas da Fase</p>
+                        <button onClick={() => addSAResult(saIdx)} className="text-[10px] font-black uppercase text-blue-600 bg-blue-50 px-3 py-1.5 rounded-lg hover:bg-blue-600 hover:text-white transition-all">
+                          + Adicionar Entrega
+                        </button>
+                      </div>
+                      <ul className="space-y-3">
+                        {(sa.expectedResults || []).map((result, rIdx) => (
+                          <li key={rIdx} className="flex gap-3 items-center">
+                            <span className="w-6 h-6 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center shrink-0 text-[10px] font-black">{rIdx + 1}</span>
+                            <DebouncedInput
+                              value={result}
+                              onChange={(val) => updateSAResult(saIdx, rIdx, val)}
+                              placeholder="Descreva o resultado ou produto esperado..."
+                              className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-slate-700 text-sm font-bold focus:outline-none focus:border-blue-500"
+                            />
+                            <button onClick={() => removeSAResult(saIdx, rIdx)} className="text-slate-300 hover:text-red-500 p-2 text-xs font-bold transition-all">
+                              ✕
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
-          </div>
-        )}
-
-        {activeTab === 'situacao' && (
-          <div className="space-y-8">
-            <div className="border-b border-slate-100 pb-4">
-              <h3 className="text-lg font-[1000] uppercase text-slate-900">Situação-Problema / Desafio / Resultados Esperados</h3>
-              <p className="text-xs text-slate-400 font-bold uppercase tracking-wider mt-1">
-                Contextualização do cenário industrial, desafio técnico e entregas exigidas dos aprendizes[cite: 2]
-              </p>
+              ))}
             </div>
-
-            {isAdmin ? (
-              <div className="space-y-6">
-                <div>
-                  <label className="block text-[10px] font-black uppercase text-slate-400 mb-2">Texto Completo da Situação-Problema (Contextualização, Desafio e Resultados)</label>
-                  <textarea
-                    value={problemSituation}
-                    onChange={(e) => setProblemSituation(e.target.value)}
-                    onBlur={(e) => handleFieldChange('problemSituation', e.target.value)}
-                    placeholder="Digite ou cole aqui a situação-problema estruturada..."
-                    className="w-full h-[500px] p-6 text-xs bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:border-blue-600 outline-none resize-none font-medium leading-relaxed"
-                  />
-                </div>
-              </div>
-            ) : (
-              <div className="space-y-6">
-                <div className="p-8 bg-slate-50 rounded-3xl border border-slate-200 space-y-4">
-                  <span className="text-[10px] font-black uppercase text-blue-600 tracking-widest block">Descrição da Atividade Prática</span>
-                  <p className="text-xs text-slate-700 font-medium whitespace-pre-wrap leading-relaxed">
-                    {unit.problemSituation || 'Nenhuma situação-problema cadastrada para esta unidade.'}
-                  </p>
-                </div>
-              </div>
-            )}
           </div>
         )}
 
+        {/* ABA RUBRICAS */}
         {activeTab === 'rubricas' && (
+          <div className="w-full rounded-2xl border border-slate-200 bg-white p-2 no-print overflow-hidden shadow-sm">
+            <table className="w-full table-fixed text-left border-collapse border-spacing-0">
+              <thead>
+                <tr className="bg-slate-900 text-white">
+                  <th className="p-2 w-1/5 text-[9px] font-black uppercase border border-slate-800">Referência / Capacidade</th>
+                  <th className="p-2 w-1/5 text-[9px] font-black uppercase border border-slate-800 text-red-400">NSA</th>
+                  <th className="p-2 w-1/5 text-[9px] font-black uppercase border border-slate-800 text-orange-400">APO</th>
+                  <th className="p-2 w-1/5 text-[9px] font-black uppercase border border-slate-800 text-blue-400">PAR</th>
+                  <th className="p-2 w-1/5 text-[9px] font-black uppercase border border-slate-800 text-green-400">AUT</th>
+                </tr>
+              </thead>
+              <tbody className="text-[10px] font-bold">
+                {(localUnit.rubrics || []).map((row, i) => (
+                  <tr key={i} className="hover:bg-slate-50/80 transition-colors">
+                    <td className="p-1 border border-slate-200 bg-slate-50/50 align-top h-1">
+                      <EditableArea
+                        value={row.capacity}
+                        onChange={(val) => updateRubric(i, 'capacity', val)}
+                        rows={1}
+                        className="bg-transparent border-none outline-none font-bold text-slate-900 text-[10px] leading-tight p-0"
+                      />
+                    </td>
+                    <td className="p-1 border border-slate-200 align-top h-1">
+                      <EditableArea
+                        value={row.nsa}
+                        onChange={(val) => updateRubric(i, 'nsa', val)}
+                        rows={1}
+                        className="bg-slate-50/60 border border-slate-100 rounded p-1 text-slate-600 italic text-[9.5px] leading-tight focus:outline-none focus:border-red-300 focus:bg-white"
+                      />
+                    </td>
+                    <td className="p-1 border border-slate-200 align-top h-1">
+                      <EditableArea
+                        value={row.apo}
+                        onChange={(val) => updateRubric(i, 'apo', val)}
+                        rows={1}
+                        className="bg-slate-50/60 border border-slate-100 rounded p-1 text-slate-600 italic text-[9.5px] leading-tight focus:outline-none focus:border-orange-300 focus:bg-white"
+                      />
+                    </td>
+                    <td className="p-1 border border-slate-200 align-top h-1">
+                      <EditableArea
+                        value={row.par}
+                        onChange={(val) => updateRubric(i, 'par', val)}
+                        rows={1}
+                        className="bg-slate-50/60 border border-slate-100 rounded p-1 text-slate-600 italic text-[9.5px] leading-tight focus:outline-none focus:border-blue-300 focus:bg-white"
+                      />
+                    </td>
+                    <td className="p-1 border border-slate-200 align-top h-1">
+                      <EditableArea
+                        value={row.aut}
+                        onChange={(val) => updateRubric(i, 'aut', val)}
+                        rows={1}
+                        className="bg-slate-50/60 border border-slate-100 rounded p-1 text-slate-600 italic text-[9.5px] leading-tight focus:outline-none focus:border-green-300 focus:bg-white"
+                      />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {/* ABA CRONOGRAMA - TABELA PADRÃO SENAI */}
+        {activeTab === 'cronograma' && (
           <div className="space-y-6">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div className="flex justify-between items-center gap-6 border-b border-slate-200 pb-4 no-print">
               <div>
-                <h3 className="text-lg font-[1000] uppercase text-slate-900">Rubricas (Critérios Graduais)[cite: 2]</h3>
-                <p className="text-xs text-slate-400 font-bold uppercase tracking-wider mt-1">
-                  Defina as capacidades e os níveis de desempenho (NSA, APO, PAR, AUT)[cite: 2]
-                </p>
+                <h3 className="text-2xl font-[1000] text-slate-900 uppercase italic">Plano de aula | Cronograma</h3>
+                <p className="text-xs text-slate-500 font-semibold">Visualização e edição no formato padrão de tabela pedagógica</p>
               </div>
-              {isAdmin && (
-                <button
-                  onClick={handleAddRubricRow}
-                  className="px-6 py-3 rounded-xl text-xs font-black uppercase bg-blue-600 text-white hover:bg-blue-700 transition-all shadow-lg flex items-center gap-2"
+              <div className="flex gap-3">
+                <button 
+                  onClick={handlePrint} 
+                  className="bg-red-600 text-white px-6 py-3 rounded-xl text-xs font-black uppercase tracking-wider shadow-md flex items-center gap-2 hover:bg-slate-900 transition-all"
                 >
-                  <span>+ Adicionar Linha</span>
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
+                  </svg>
+                  Imprimir Cronograma
                 </button>
-              )}
+              </div>
             </div>
 
-            <div className="overflow-x-auto border border-slate-200 rounded-2xl shadow-sm">
-              <table className="w-full text-left border-collapse">
+            {/* TABELA ESTILO PRINT 1 */}
+            <div className="w-full bg-white rounded-lg border-2 border-black overflow-hidden shadow-sm">
+              <table className="w-full table-fixed border-collapse">
                 <thead>
-                  <tr className="bg-slate-900 text-white text-[10px] font-black uppercase tracking-widest">
-                    <th className="py-4 px-4 border-r border-slate-800 w-1/5 text-center">Capacidades[cite: 2]</th>
-                    <th className="py-4 px-4 border-r border-slate-800 w-1/5 text-center text-red-400">NSA[cite: 2]</th>
-                    <th className="py-4 px-4 border-r border-slate-800 w-1/5 text-center text-amber-400">APO[cite: 2]</th>
-                    <th className="py-4 px-4 border-r border-slate-800 w-1/5 text-center text-blue-400">PAR[cite: 2]</th>
-                    <th className="py-4 px-4 w-1/5 text-center text-emerald-400">AUT[cite: 2]</th>
-                    {isAdmin && <th className="py-4 px-2 w-12 text-center">Ações</th>}
+                  <tr className="bg-slate-50 border-b-2 border-black text-slate-900">
+                    <th className="p-3 w-[15%] text-xs font-black uppercase border-r border-black text-center align-middle">
+                      Horas/Aulas/Data
+                    </th>
+                    <th className="p-3 w-[20%] text-xs font-black uppercase border-r border-black text-center align-middle">
+                      Capacidades
+                    </th>
+                    <th className="p-3 w-[20%] text-xs font-black uppercase border-r border-black text-center align-middle">
+                      Conhecimentos
+                    </th>
+                    <th className="p-3 w-[25%] text-xs font-black uppercase border-r border-black text-center align-middle">
+                      Estratégias
+                    </th>
+                    <th className="p-3 w-[20%] text-xs font-black uppercase text-center align-middle">
+                      Recursos/Ambientes
+                    </th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-200">
-                  {rubrics.map((rubric) => (
-                    <tr key={rubric.id} className="hover:bg-slate-50/50 transition-all">
-                      <td className="p-3 border-r border-slate-200 align-top">
-                        {isAdmin ? (
-                          <textarea
-                            value={rubric.capacity}
-                            onChange={(e) => handleRubricChange(rubric.id, 'capacity', e.target.value)}
-                            placeholder="Digite a capacidade..."
-                            className="w-full h-32 p-3 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-blue-600 outline-none resize-none font-medium"
+                <tbody className="text-xs font-medium text-slate-900 divide-y border-black">
+                  {localSchedule.map((entry) => (
+                    <tr key={entry.id} className="border-b border-black hover:bg-slate-50/50 transition-colors">
+                      
+                      {/* COLUNA 1: HORAS / DATA */}
+                      <td className="p-2 border-r border-black align-top bg-slate-50/30">
+                        <div className="flex flex-col gap-1.5">
+                          <div className="flex items-center gap-1 text-[11px] font-bold">
+                            <input
+                              type="number"
+                              value={entry.hours}
+                              onChange={(e) => updateEntry(entry.id, 'hours', Number(e.target.value))}
+                              className="w-8 bg-transparent border-b border-slate-400 font-bold text-center focus:outline-none focus:border-black"
+                            />
+                            <span>horas -</span>
+                          </div>
+                          <DebouncedInput
+                            value={entry.date}
+                            onChange={(val) => updateEntry(entry.id, 'date', val)}
+                            placeholder="DD/MM/AAAA"
+                            className="w-full bg-transparent border-b border-dashed border-slate-300 font-bold text-xs focus:outline-none focus:border-black"
                           />
-                        ) : (
-                          <p className="text-xs text-slate-800 font-medium whitespace-pre-wrap">{rubric.capacity}</p>
-                        )}
+                          <span className="text-[9px] font-black uppercase text-slate-400 italic">
+                            {getDayOfWeek(entry.date)}
+                          </span>
+                        </div>
                       </td>
-                      <td className="p-3 border-r border-slate-200 align-top">
-                        {isAdmin ? (
-                          <textarea
-                            value={rubric.nsa}
-                            onChange={(e) => handleRubricChange(rubric.id, 'nsa', e.target.value)}
-                            placeholder="Não Suficiente..."
-                            className="w-full h-32 p-3 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-blue-600 outline-none resize-none font-medium"
-                          />
-                        ) : (
-                          <p className="text-xs text-slate-800 font-medium whitespace-pre-wrap">{rubric.nsa}</p>
-                        )}
+
+                      {/* COLUNA 2: CAPACIDADES */}
+                      <td className="p-2 border-r border-black align-top">
+                        <EditableArea
+                          value={entry.capacities}
+                          onChange={(val) => updateEntry(entry.id, 'capacities', val)}
+                          rows={2}
+                          placeholder="Capacidades..."
+                          className="w-full bg-transparent border-none text-xs leading-relaxed focus:outline-none focus:bg-slate-50 rounded p-1"
+                        />
                       </td>
-                      <td className="p-3 border-r border-slate-200 align-top">
-                        {isAdmin ? (
-                          <textarea
-                            value={rubric.apo}
-                            onChange={(e) => handleRubricChange(rubric.id, 'apo', e.target.value)}
-                            placeholder="Acompanhamento Parcial..."
-                            className="w-full h-32 p-3 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-blue-600 outline-none resize-none font-medium"
-                          />
-                        ) : (
-                          <p className="text-xs text-slate-800 font-medium whitespace-pre-wrap">{rubric.apo}</p>
-                        )}
+
+                      {/* COLUNA 3: CONHECIMENTOS */}
+                      <td className="p-2 border-r border-black align-top">
+                        <EditableArea
+                          value={entry.knowledge}
+                          onChange={(val) => updateEntry(entry.id, 'knowledge', val)}
+                          rows={2}
+                          placeholder="Conhecimentos..."
+                          className="w-full bg-transparent border-none text-xs leading-relaxed focus:outline-none focus:bg-slate-50 rounded p-1"
+                        />
                       </td>
-                      <td className="p-3 border-r border-slate-200 align-top">
-                        {isAdmin ? (
-                          <textarea
-                            value={rubric.par}
-                            onChange={(e) => handleRubricChange(rubric.id, 'par', e.target.value)}
-                            placeholder="Autonomia Parcial..."
-                            className="w-full h-32 p-3 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-blue-600 outline-none resize-none font-medium"
-                          />
-                        ) : (
-                          <p className="text-xs text-slate-800 font-medium whitespace-pre-wrap">{rubric.par}</p>
-                        )}
+
+                      {/* COLUNA 4: ESTRATÉGIAS */}
+                      <td className="p-2 border-r border-black align-top">
+                        <EditableArea
+                          value={entry.strategy}
+                          onChange={(val) => updateEntry(entry.id, 'strategy', val)}
+                          rows={3}
+                          placeholder="Estratégias pedagógicas..."
+                          className="w-full bg-transparent border-none text-xs leading-relaxed focus:outline-none focus:bg-slate-50 rounded p-1"
+                        />
                       </td>
-                      <td className="p-3 align-top">
-                        {isAdmin ? (
-                          <textarea
-                            value={rubric.aut}
-                            onChange={(e) => handleRubricChange(rubric.id, 'aut', e.target.value)}
-                            placeholder="Autonomia Total..."
-                            className="w-full h-32 p-3 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-blue-600 outline-none resize-none font-medium"
-                          />
-                        ) : (
-                          <p className="text-xs text-slate-800 font-medium whitespace-pre-wrap">{rubric.aut}</p>
-                        )}
+
+                      {/* COLUNA 5: RECURSOS/AMBIENTES */}
+                      <td className="p-2 align-top">
+                        <EditableArea
+                          value={entry.resources}
+                          onChange={(val) => updateEntry(entry.id, 'resources', val)}
+                          rows={2}
+                          placeholder="Recursos e ambientes..."
+                          className="w-full bg-transparent border-none text-xs leading-relaxed focus:outline-none focus:bg-slate-50 rounded p-1"
+                        />
                       </td>
-                      {isAdmin && (
-                        <td className="p-3 text-center align-middle">
-                          <button
-                            onClick={() => handleDeleteRubricRow(rubric.id)}
-                            className="p-2 text-red-500 hover:bg-red-50 rounded-xl transition-all"
-                            title="Excluir linha"
-                          >
-                            ✕
-                          </button>
-                        </td>
-                      )}
+
                     </tr>
                   ))}
-                  {rubrics.length === 0 && (
-                    <tr>
-                      <td colSpan={isAdmin ? 6 : 5} className="py-12 text-center text-slate-400 text-xs font-bold uppercase tracking-wider">
-                        Nenhuma rubrica cadastrada. Clique em "+ Adicionar Linha" para preencher manualmente.
-                      </td>
-                    </tr>
-                  )}
                 </tbody>
               </table>
             </div>
           </div>
         )}
 
-        {activeTab === 'plano' && (
-          <div className="space-y-6">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-              <div>
-                <h3 className="text-lg font-[1000] uppercase text-slate-900">Plano de Aula | Cronograma</h3>
-                <p className="text-xs text-slate-400 font-bold uppercase tracking-wider mt-1">
-                  Distribuição de aulas, capacidades, conhecimentos, estratégias e recursos
-                </p>
-              </div>
-              {isAdmin && (
-                <button
-                  onClick={handleAddScheduleRow}
-                  className="px-6 py-3 rounded-xl text-xs font-black uppercase bg-blue-600 text-white hover:bg-blue-700 transition-all shadow-lg flex items-center gap-2"
-                >
-                  <span>+ Adicionar Linha</span>
-                </button>
-              )}
-            </div>
-
-            <div className="overflow-x-auto border border-slate-200 rounded-2xl shadow-sm">
-              <table className="w-full text-left border-collapse">
-                <thead>
-                  <tr className="bg-slate-900 text-white text-[10px] font-black uppercase tracking-widest">
-                    <th className="py-4 px-4 border-r border-slate-800 w-1/6 text-center">Horas/Aulas/Data</th>
-                    <th className="py-4 px-4 border-r border-slate-800 w-1/4 text-center">Capacidades</th>
-                    <th className="py-4 px-4 border-r border-slate-800 w-1/4 text-center">Conhecimentos</th>
-                    <th className="py-4 px-4 border-r border-slate-800 w-1/4 text-center">Estratégias</th>
-                    <th className="py-4 px-4 w-1/5 text-center">Recursos/Ambientes</th>
-                    {isAdmin && <th className="py-4 px-2 w-12 text-center">Ações</th>}
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-200">
-                  {scheduleEntries.map((entry) => (
-                    <tr key={entry.id} className="hover:bg-slate-50/50 transition-all">
-                      <td className="p-3 border-r border-slate-200 align-top">
-                        {isAdmin ? (
-                          <textarea
-                            value={entry.dateOrHours}
-                            onChange={(e) => handleScheduleChange(entry.id, 'dateOrHours', e.target.value)}
-                            placeholder="Ex: 2 horas - 26/01/2026"
-                            className="w-full h-32 p-3 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-blue-600 outline-none resize-none font-medium"
-                          />
-                        ) : (
-                          <p className="text-xs text-slate-800 font-medium whitespace-pre-wrap">{entry.dateOrHours}</p>
-                        )}
-                      </td>
-                      <td className="p-3 border-r border-slate-200 align-top">
-                        {isAdmin ? (
-                          <textarea
-                            value={entry.capacities}
-                            onChange={(e) => handleScheduleChange(entry.id, 'capacities', e.target.value)}
-                            placeholder="Capacidades abordadas..."
-                            className="w-full h-32 p-3 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-blue-600 outline-none resize-none font-medium"
-                          />
-                        ) : (
-                          <p className="text-xs text-slate-800 font-medium whitespace-pre-wrap">{entry.capacities}</p>
-                        )}
-                      </td>
-                      <td className="p-3 border-r border-slate-200 align-top">
-                        {isAdmin ? (
-                          <textarea
-                            value={entry.knowledge}
-                            onChange={(e) => handleScheduleChange(entry.id, 'knowledge', e.target.value)}
-                            placeholder="Conhecimentos..."
-                            className="w-full h-32 p-3 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-blue-600 outline-none resize-none font-medium"
-                          />
-                        ) : (
-                          <p className="text-xs text-slate-800 font-medium whitespace-pre-wrap">{entry.knowledge}</p>
-                        )}
-                      </td>
-                      <td className="p-3 border-r border-slate-200 align-top">
-                        {isAdmin ? (
-                          <textarea
-                            value={entry.strategies}
-                            onChange={(e) => handleScheduleChange(entry.id, 'strategies', e.target.value)}
-                            placeholder="Estratégias metodológicas..."
-                            className="w-full h-32 p-3 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-blue-600 outline-none resize-none font-medium"
-                          />
-                        ) : (
-                          <p className="text-xs text-slate-800 font-medium whitespace-pre-wrap">{entry.strategies}</p>
-                        )}
-                      </td>
-                      <td className="p-3 align-top">
-                        {isAdmin ? (
-                          <textarea
-                            value={entry.resources}
-                            onChange={(e) => handleScheduleChange(entry.id, 'resources', e.target.value)}
-                            placeholder="Recursos e ambientes..."
-                            className="w-full h-32 p-3 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-blue-600 outline-none resize-none font-medium"
-                          />
-                        ) : (
-                          <p className="text-xs text-slate-800 font-medium whitespace-pre-wrap">{entry.resources}</p>
-                        )}
-                      </td>
-                      {isAdmin && (
-                        <td className="p-3 text-center align-middle">
-                          <button
-                            onClick={() => handleDeleteScheduleRow(entry.id)}
-                            className="p-2 text-red-500 hover:bg-red-50 rounded-xl transition-all"
-                            title="Excluir linha"
-                          >
-                            ✕
-                          </button>
-                        </td>
-                      )}
-                    </tr>
-                  ))}
-                  {scheduleEntries.length === 0 && (
-                    <tr>
-                      <td colSpan={isAdmin ? 6 : 5} className="py-12 text-center text-slate-400 text-xs font-bold uppercase tracking-wider">
-                        Nenhum registro no cronograma. Clique em "+ Adicionar Linha" para preencher.
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        )}
-
+        {/* ABA CALENDÁRIO */}
         {activeTab === 'calendario' && (
-          <div className="space-y-6">
-            <h3 className="text-lg font-[1000] uppercase text-slate-900">Calendário da Unidade</h3>
-            <p className="text-xs text-slate-400 font-bold uppercase tracking-wider">Gerenciamento automático de datas e cronograma da unidade curricular.</p>
-            <div className="p-6 bg-slate-50 rounded-2xl border border-slate-200">
-              <p className="text-xs font-bold text-slate-700">O cronograma está sincronizado com o calendário geral do curso e distribuição de aulas.</p>
+          <div className="space-y-6 no-print">
+            <div className="flex justify-between items-center border-b border-slate-200 pb-4">
+              <div>
+                <h3 className="text-2xl font-[1000] text-slate-900 uppercase italic">Calendário de Aulas</h3>
+                <p className="text-xs text-slate-500 font-semibold">Distribuição temporal das aulas e encontros previstos</p>
+              </div>
+              <div className="flex items-center gap-2 bg-slate-100 px-3 py-1.5 rounded-full border border-slate-200">
+                <span className="w-3 h-3 rounded-full shadow-sm" style={{ backgroundColor: COLOR_MAP[scheduleColor] }}></span>
+                <span className="text-[10px] font-black text-slate-700 uppercase tracking-wider">{localUnit.name}</span>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {monthsInRange.map(monthStr => {
+                const [year, month] = monthStr.split('-').map(Number);
+                const firstDay = new Date(year, month - 1, 1);
+                const lastDay = new Date(year, month, 0);
+                const monthName = firstDay.toLocaleDateString('pt-BR', { month: 'long' });
+                
+                const days: (string | null)[] = [];
+                for (let i = 0; i < firstDay.getDay(); i++) days.push(null);
+                for (let i = 1; i <= lastDay.getDate(); i++) {
+                  const d = i < 10 ? `0${i}` : `${i}`;
+                  days.push(`${monthStr}-${d}`);
+                }
+
+                return (
+                  <div key={monthStr} className="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-lg flex flex-col justify-between">
+                    <div className="bg-slate-900 text-white py-3 px-4 text-center border-b border-slate-800">
+                      <h4 className="text-xs font-black uppercase tracking-widest italic">{monthName} {year}</h4>
+                    </div>
+                    
+                    <div className="p-3">
+                      {/* DIAS DA SEMANA */}
+                      <div className="grid grid-cols-7 gap-1 text-center mb-2">
+                        {['D','S','T','Q','Q','S','S'].map((d, i) => (
+                          <div key={i} className={`text-[10px] font-black ${i === 0 ? 'text-red-500' : 'text-slate-400'}`}>
+                            {d}
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* DIAS DO MÊS ALINHADOS */}
+                      <div className="grid grid-cols-7 gap-1 text-center">
+                        {days.map((day, idx) => {
+                          if (!day) return <div key={`empty-${idx}`} className="aspect-square"></div>;
+                          
+                          const hasClass = scheduleDates[day];
+                          const isSunday = idx % 7 === 0;
+
+                          return (
+                            <div
+                              key={day}
+                              className={`aspect-square flex items-center justify-center rounded-xl text-xs font-black transition-all ${
+                                hasClass 
+                                  ? 'shadow-sm ring-1 ring-black/10 scale-105' 
+                                  : 'hover:bg-slate-100 text-slate-700'
+                              }`}
+                              style={{
+                                backgroundColor: hasClass ? COLOR_MAP[scheduleColor] : 'transparent',
+                                color: hasClass ? TEXT_COLOR_MAP[scheduleColor] : (isSunday ? '#ef4444' : '#1e293b')
+                              }}
+                            >
+                              {day.split('-')[2]}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
         )}
+
       </div>
     </div>
   );
