@@ -7,7 +7,6 @@ interface DashboardProps {
   onEdit: (plan: TeachingPlan) => void;
   onView: (plan: TeachingPlan) => void;
   onRefresh: () => void;
-  onCreateNewPlan?: () => void;
 }
 
 const Dashboard: React.FC<DashboardProps> = ({
@@ -16,7 +15,6 @@ const Dashboard: React.FC<DashboardProps> = ({
   onEdit,
   onView,
   onRefresh,
-  onCreateNewPlan,
 }) => {
   return (
     <div className="max-w-7xl mx-auto space-y-8 animate-fadeIn pb-16">
@@ -35,14 +33,6 @@ const Dashboard: React.FC<DashboardProps> = ({
         </div>
 
         <div className="flex items-center gap-3 w-full md:w-auto">
-          {isAdmin && onCreateNewPlan && (
-            <button
-              onClick={onCreateNewPlan}
-              className="flex-1 md:flex-none px-6 py-3 rounded-xl text-xs font-black uppercase bg-blue-600 text-white shadow-lg hover:bg-slate-900 transition-all flex items-center justify-center gap-2"
-            >
-              <span>+ Novo Curso</span>
-            </button>
-          )}
           <button
             onClick={onRefresh}
             className="flex-1 md:flex-none px-5 py-3 rounded-xl text-xs font-black uppercase bg-slate-100 text-slate-700 hover:bg-slate-200 transition-all flex items-center justify-center gap-2"
