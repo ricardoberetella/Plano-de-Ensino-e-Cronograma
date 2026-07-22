@@ -7,6 +7,7 @@ interface DashboardProps {
   onEdit: (plan: TeachingPlan) => void;
   onView: (plan: TeachingPlan) => void;
   onRefresh: () => void;
+  onDeletePlan?: (planId: string) => void;
 }
 
 const Dashboard: React.FC<DashboardProps> = ({
@@ -15,6 +16,7 @@ const Dashboard: React.FC<DashboardProps> = ({
   onEdit,
   onView,
   onRefresh,
+  onDeletePlan,
 }) => {
   return (
     <div className="max-w-7xl mx-auto space-y-8 animate-fadeIn pb-16">
@@ -129,13 +131,24 @@ const Dashboard: React.FC<DashboardProps> = ({
                       Visualizar
                     </button>
                     {isAdmin && (
-                      <button
-                        onClick={() => onEdit(plan)}
-                        className="px-4 py-2 rounded-xl text-xs font-black uppercase bg-blue-50 text-blue-600 hover:bg-slate-900 hover:text-white transition-all shadow-sm"
-                        title="Editar Plano"
-                      >
-                        Editar
-                      </button>
+                      <>
+                        <button
+                          onClick={() => onEdit(plan)}
+                          className="px-4 py-2 rounded-xl text-xs font-black uppercase bg-blue-50 text-blue-600 hover:bg-slate-900 hover:text-white transition-all shadow-sm"
+                          title="Editar Plano"
+                        >
+                          Editar
+                        </button>
+                        {onDeletePlan && (
+                          <button
+                            onClick={() => onDeletePlan(plan.id)}
+                            className="px-4 py-2 rounded-xl text-xs font-black uppercase bg-red-50 text-red-600 hover:bg-red-600 hover:text-white transition-all shadow-sm"
+                            title="Excluir Plano"
+                          >
+                            Excluir
+                          </button>
+                        )}
+                      </>
                     )}
                   </td>
                 </tr>
