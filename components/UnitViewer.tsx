@@ -205,7 +205,31 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
   // Edição de Rubricas
   const updateRubric = (index: number, field: string, value: string) => {
     const updatedRubrics = [...(localUnit.rubrics || [])];
-    updatedRubrics[index] = { ...updatedRubrics[index], [field]: value };
+    updatedRubrics[index] = { ...updatedRubrics[index], [field]: value } as any;
+    updateUnitState({ ...localUnit, rubrics: updatedRubrics });
+  };
+
+  const addRubric = () => {
+    const newRubric = {
+      id: `rubric-${Date.now()}`,
+      capacity: '',
+      nsa: '',
+      apo: '',
+      par: '',
+      aut: ''
+    } as any;
+
+    updateUnitState({
+      ...localUnit,
+      rubrics: [...(localUnit.rubrics || []), newRubric]
+    });
+  };
+
+  const removeRubric = (index: number) => {
+    if (!window.confirm('Tem certeza que deseja excluir esta rubrica?')) return;
+
+    const updatedRubrics = [...(localUnit.rubrics || [])];
+    updatedRubrics.splice(index, 1);
     updateUnitState({ ...localUnit, rubrics: updatedRubrics });
   };
 
@@ -484,15 +508,27 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
 
         {/* ABA RUBRICAS */}
         {activeTab === 'rubricas' && (
-          <div className="w-full rounded-2xl border border-slate-200 bg-white p-2 no-print overflow-hidden shadow-sm">
-            <table className="w-full table-fixed text-left border-collapse border-spacing-0">
+          <div className="space-y-4 no-print">
+            <div className="flex justify-end">
+              <button
+                type="button"
+                onClick={addRubric}
+                className="bg-blue-600 text-white px-5 py-3 rounded-xl text-[10px] font-black uppercase tracking-wider shadow-md hover:bg-slate-900 transition-all"
+              >
+                + Incluir Rubrica
+              </button>
+            </div>
+
+            <div className="w-full rounded-2xl border border-slate-200 bg-white p-2 overflow-x-auto shadow-sm">
+            <table className="w-full min-w-[900px] table-fixed text-left border-collapse border-spacing-0">
               <thead>
                 <tr className="bg-slate-900 text-white">
-                  <th className="p-2 w-1/5 text-[9px] font-black uppercase border border-slate-800">Referência / Capacidade</th>
-                  <th className="p-2 w-1/5 text-[9px] font-black uppercase border border-slate-800 text-red-400">NSA</th>
-                  <th className="p-2 w-1/5 text-[9px] font-black uppercase border border-slate-800 text-orange-400">APO</th>
-                  <th className="p-2 w-1/5 text-[9px] font-black uppercase border border-slate-800 text-blue-400">PAR</th>
-                  <th className="p-2 w-1/5 text-[9px] font-black uppercase border border-slate-800 text-green-400">AUT</th>
+                  <th className="p-2 w-[19%] text-[9px] font-black uppercase border border-slate-800">Referência / Capacidade</th>
+                  <th className="p-2 w-[19%] text-[9px] font-black uppercase border border-slate-800 text-red-400">NSA</th>
+                  <th className="p-2 w-[19%] text-[9px] font-black uppercase border border-slate-800 text-orange-400">APO</th>
+                  <th className="p-2 w-[19%] text-[9px] font-black uppercase border border-slate-800 text-blue-400">PAR</th>
+                  <th className="p-2 w-[19%] text-[9px] font-black uppercase border border-slate-800 text-green-400">AUT</th>
+                  <th className="p-2 w-[5%] text-[9px] font-black uppercase border border-slate-800 text-center">Excluir</th>
                 </tr>
               </thead>
               <tbody className="text-[10px] font-bold">
@@ -532,16 +568,28 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                     </td>
                     <td className="p-1 border border-slate-200 align-top h-1">
                       <EditableArea
-                        value={row.aut}
+                        value={(row as any).aut || ''}
                         onChange={(val) => updateRubric(i, 'aut', val)}
                         rows={1}
                         className="bg-slate-50/60 border border-slate-100 rounded p-1 text-slate-600 italic text-[9.5px] leading-tight focus:outline-none focus:border-green-300 focus:bg-white"
                       />
                     </td>
+                    <td className="p-1 border border-slate-200 align-middle text-center">
+                      <button
+                        type="button"
+                        onClick={() => removeRubric(i)}
+                        className="w-8 h-8 rounded-lg bg-red-50 text-red-600 hover:bg-red-600 hover:text-white transition-all font-black"
+                        title="Excluir rubrica"
+                        aria-label={`Excluir rubrica ${i + 1}`}
+                      >
+                        ✕
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
             </table>
+            </div>
           </div>
         )}
 
