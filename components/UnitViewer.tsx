@@ -1,17 +1,4 @@
 import React, { useState, useMemo } from 'react';
-import { 
-  Calendar as CalendarIcon, 
-  FileText, 
-  Printer, 
-  Download, 
-  CheckCircle2, 
-  BookOpen, 
-  Clock, 
-  AlertCircle,
-  Layers,
-  ChevronRight,
-  Edit3
-} from 'lucide-react';
 
 // Componente simples para área editável in-line
 const EditableArea = ({ value, onChange, placeholder, className }: { value: string; onChange: (val: string) => void; placeholder?: string; className?: string }) => {
@@ -137,7 +124,7 @@ const UnitViewer: React.FC<UnitViewerProps> = ({ unitData }) => {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center bg-white p-6 rounded-2xl shadow-sm border border-slate-200 gap-4 no-print">
         <div>
           <div className="flex items-center gap-2 text-blue-600 font-bold text-xs uppercase tracking-wider mb-1">
-            <Layers size={14} />
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
             <span>Planejamento Curricular</span>
           </div>
           <h1 className="text-2xl font-[1000] text-slate-900 tracking-tight">
@@ -153,7 +140,7 @@ const UnitViewer: React.FC<UnitViewerProps> = ({ unitData }) => {
             onClick={handlePrint}
             className="flex items-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-xl text-xs font-bold transition-all"
           >
-            <Printer size={15} />
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2m-16 0v5a2 2 0 002 2h12a2 2 0 002-2v-5m-14 4h12"/></svg>
             <span>Imprimir / PDF</span>
           </button>
         </div>
@@ -169,7 +156,7 @@ const UnitViewer: React.FC<UnitViewerProps> = ({ unitData }) => {
               : 'border-transparent text-slate-400 hover:text-slate-600'
           }`}
         >
-          <FileText size={16} />
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
           <span>Plano de Aulas / Cronograma</span>
         </button>
         <button
@@ -180,7 +167,7 @@ const UnitViewer: React.FC<UnitViewerProps> = ({ unitData }) => {
               : 'border-transparent text-slate-400 hover:text-slate-600'
           }`}
         >
-          <CalendarIcon size={16} />
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
           <span>Calendário da Unidade</span>
         </button>
       </div>
@@ -195,7 +182,7 @@ const UnitViewer: React.FC<UnitViewerProps> = ({ unitData }) => {
                 <p className="text-xs text-slate-500 font-medium">Edite os campos diretamente nas células da tabela abaixo se necessário.</p>
               </div>
               <div className="flex items-center gap-2 text-xs font-bold text-emerald-700 bg-emerald-50 px-3 py-1.5 rounded-lg">
-                <CheckCircle2 size={14} />
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"/></svg>
                 <span>Pronto para uso</span>
               </div>
             </div>
@@ -326,7 +313,7 @@ const UnitViewer: React.FC<UnitViewerProps> = ({ unitData }) => {
                             className={`h-8 flex items-center justify-center rounded-lg text-xs font-bold transition-all ${
                               hasSchedule
                                 ? 'bg-blue-600 text-white shadow-sm font-black'
-                                : 'text-slate-700 hover:bg-slate-150'
+                                : 'text-slate-700 hover:bg-slate-100'
                             }`}
                           >
                             {dateObj.getDate()}
