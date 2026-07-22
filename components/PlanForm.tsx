@@ -10,7 +10,7 @@ interface PlanFormProps {
 }
 
 const PlanForm: React.FC<PlanFormProps> = ({
-  units,
+  units = [],
   onAddUnit,
   onUpdateUnit,
   onDeleteUnit,
@@ -120,7 +120,7 @@ const PlanForm: React.FC<PlanFormProps> = ({
 
         {/* LISTAGEM DE UNIDADES CURRICULARES CADASTRADAS */}
         <div className="space-y-4">
-          {units.map((unit, index) => (
+          {Array.isArray(units) && units.map((unit, index) => (
             <div
               key={unit.id || index}
               className="bg-white border border-slate-200 rounded-2xl p-4 flex flex-col md:flex-row items-center justify-between gap-4 shadow-sm hover:border-blue-300 transition-all group"
@@ -197,7 +197,7 @@ const PlanForm: React.FC<PlanFormProps> = ({
             </div>
           ))}
 
-          {units.length === 0 && (
+          {(!Array.isArray(units) || units.length === 0) && (
             <div className="text-center py-12 text-slate-400 text-xs font-bold uppercase tracking-wider">
               Nenhuma Unidade Curricular cadastrada. Utilize o formulário acima para criar a primeira.
             </div>
