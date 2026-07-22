@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { TeachingPlan, CurricularUnit, SemesterNumber } from '../types';
 import { GoogleGenAI } from "@google/genai";
 
@@ -22,6 +22,12 @@ const PlanForm: React.FC<PlanFormProps> = ({ initialPlan, onSave, onCancel }) =>
   const [isGenerating, setIsGenerating] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  // Estados para a customização de estilo do Perfil de Conclusão
+  const [fontSize, setFontSize] = useState<string>('text-base');
+  const [textColor, setTextColor] = useState<string>('text-slate-700');
+  const [showToolbar, setShowToolbar] = useState(false);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const handleConfigKey = async () => {
     if (window.aistudio) {
@@ -170,13 +176,78 @@ const PlanForm: React.FC<PlanFormProps> = ({ initialPlan, onSave, onCancel }) =>
             <option>Semipresencial</option>
           </select>
         </div>
-        <div className="space-y-2 md:col-span-2">
-          <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-2">I. Perfil de Conclusão (Objetivo)</label>
+
+        {/* Perfil de Conclusão Editável com Menu Suspenso de Formatação Condicional */}
+        <div className="space-y-2 md:col-span-2 relative">
+          <div className="flex justify-between items-center ml-2 mr-2">
+            <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest">I. Perfil de Conclusão (Objetivo)</label>
+            
+            {/* Menu Suspenso Dinâmico (Aparece ao focar ou digitar) */}
+            {showToolbar && (
+              <div className="flex items-center gap-3 bg-slate-900 text-white px-4 py-1.5 rounded-xl shadow-lg animate-fadeIn text-[10px] font-black uppercase tracking-wider">
+                <div className="flex items-center gap-1.5 border-r border-slate-700 pr-3">
+                  <span className="text-slate-400 text-[8px]">Fonte:</span>
+                  <button 
+                    type="button" 
+                    onClick={() => setFontSize('text-xs')} 
+                    className={`px-1.5 py-0.5 rounded ${fontSize === 'text-xs' ? 'bg-blue-600 text-white' : 'hover:text-blue-400'}`}
+                  >P</button>
+                  <button 
+                    type="button" 
+                    onClick={() => setFontSize('text-base')} 
+                    className={`px-1.5 py-0.5 rounded ${fontSize === 'text-base' ? 'bg-blue-600 text-white' : 'hover:text-blue-400'}`}
+                  >M</button>
+                  <button 
+                    type="button" 
+                    onClick={() => setFontSize('text-xl')} 
+                    className={`px-1.5 py-0.5 rounded ${fontSize === 'text-xl' ? 'bg-blue-600 text-white' : 'hover:text-blue-400'}`}
+                  >G</button>
+                  <button 
+                    type="button" 
+                    onClick={() => setFontSize('text-2xl')} 
+                    className={`px-1.5 py-0.5 rounded ${fontSize === 'text-2xl' ? 'bg-blue-600 text-white' : 'hover:text-blue-400'}`}
+                  >GG</button>
+                </div>
+
+                <div className="flex items-center gap-1.5">
+                  <span className="text-slate-400 text-[8px]">Cor:</span>
+                  <button 
+                    type="button" 
+                    onClick={() => setTextColor('text-slate-700')} 
+                    className="w-3.5 h-3.5 rounded-full bg-slate-700 border border-white/20 hover:scale-110 transition-transform"
+                    title="Padrão"
+                  ></button>
+                  <button 
+                    type="button" 
+                    onClick={() => setTextColor('text-blue-600')} 
+                    className="w-3.5 h-3.5 rounded-full bg-blue-500 border border-white/20 hover:scale-110 transition-transform"
+                    title="Azul"
+                  ></button>
+                  <button 
+                    type="button" 
+                    onClick={() => setTextColor('text-emerald-600')} 
+                    className="w-3.5 h-3.5 rounded-full bg-emerald-500 border border-white/20 hover:scale-110 transition-transform"
+                    title="Verde"
+                  ></button>
+                  <button 
+                    type="button" 
+                    onClick={() => setTextColor('text-amber-600')} 
+                    className="w-3.5 h-3.5 rounded-full bg-amber-500 border border-white/20 hover:scale-110 transition-transform"
+                    title="Laranja"
+                  ></button>
+                </div>
+              </div>
+            )}
+          </div>
+
           <textarea 
+            ref={textareaRef}
             rows={5}
             value={formData.objective}
+            onFocus={() => setShowToolbar(true)}
+            onBlur={() => setTimeout(() => setShowToolbar(false), 200)} // Mantém visível se clicar nos botões
             onChange={e => setFormData({ ...formData, objective: e.target.value })}
-            className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-6 py-4 focus:ring-2 focus:ring-blue-500 focus:bg-white outline-none transition-all font-medium text-slate-700 leading-relaxed"
+            className={`w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-6 py-4 focus:ring-2 focus:ring-blue-500 focus:bg-white outline-none transition-all font-medium leading-relaxed ${fontSize} ${textColor}`}
             placeholder="O objetivo será preenchido aqui pela IA ou manualmente..."
           />
         </div>
@@ -262,7 +333,7 @@ const PlanForm: React.FC<PlanFormProps> = ({ initialPlan, onSave, onCancel }) =>
                  </select>
                </div>
 
-               {/* Botão de Excluir (Usa o index do array em vez do ID da UC para evitar conflitos se houver itens duplicados) */}
+               {/* Botão de Excluir */}
                <button 
                  type="button"
                  onClick={() => {
