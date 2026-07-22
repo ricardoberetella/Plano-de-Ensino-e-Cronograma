@@ -116,8 +116,8 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
   const scheduleColor: CalendarColor = isCRD ? 'pink' : (isFUSI ? 'orange' : 'blue');
 
   const calendar = useMemo(() => localUnit.calendar || {
-    startDate: '2026-01-26',
-    endDate: '2026-06-24',
+    startDate: '2026-01-01',
+    endDate: '2026-06-30',
     markings: []
   }, [localUnit.calendar]);
 
@@ -283,9 +283,38 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
     return dates;
   }, [localSchedule]);
 
+  // Detecção automática do semestre (Janeiro-Junho vs Julho-Dezembro) com base nas datas do cronograma
   const monthsInRange = useMemo(() => {
-    const start = new Date(calendar.startDate + 'T00:00:00');
-    const end = new Date(calendar.endDate + 'T00:00:00');
+    let minDateStr = calendar.startDate;
+    let maxDateStr = calendar.endDate;
+
+    if (localSchedule && localSchedule.length > 0) {
+      const parsedDates = localSchedule.map(s => {
+        const parts = s.date.split('/');
+        if (parts.length === 3) {
+          return new Date(Number(parts[2]), Number(parts[1]) - 1, Number(parts[0]));
+        }
+        return null;
+      }).filter(d => d !== null && !isNaN(d.getTime())) as Date[];
+
+      if (parsedDates.length > 0) {
+        const minYear = Math.min(...parsedDates.map(d => d.getFullYear()));
+        const maxYear = Math.max(...parsedDates.map(d => d.getFullYear()));
+        const hasSecondSemester = parsedDates.some(d => d.getMonth() >= 6); // Julho a Dezembro
+        const hasFirstSemester = parsedDates.some(d => d.getMonth() < 6);   // Janeiro a Junho
+
+        if (hasSecondSemester && !hasFirstSemester) {
+          minDateStr = `${minYear}-07-01`;
+          maxDateStr = `${maxYear}-12-31`;
+        } else if (hasFirstSemester && !hasSecondSemester) {
+          minDateStr = `${minYear}-01-01`;
+          maxDateStr = `${minYear}-06-30`;
+        }
+      }
+    }
+
+    const start = new Date(minDateStr + 'T00:00:00');
+    const end = new Date(maxDateStr + 'T00:00:00');
     const months: string[] = [];
     const current = new Date(start.getFullYear(), start.getMonth(), 1);
     while (current <= end) {
@@ -293,7 +322,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
       current.setMonth(current.getMonth() + 1);
     }
     return months;
-  }, [calendar.startDate, calendar.endDate]);
+  }, [localSchedule, calendar.startDate, calendar.endDate]);
 
   return (
     <div className="bg-white rounded-[2.5rem] shadow-2xl border border-slate-200 overflow-hidden animate-fadeIn printable-unit-module" data-active-tab={activeTab}>
