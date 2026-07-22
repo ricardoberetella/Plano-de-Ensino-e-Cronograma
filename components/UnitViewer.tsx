@@ -272,10 +272,25 @@ const UnitViewer: React.FC<Props> = ({ unit, allUnits = [], onUpdateSchedule, on
 
         {/* ABA GERAL EM COLUNAS */}
         {activeTab === 'geral' && (
-          <div className="space-y-4 max-w-7xl mx-auto">
+          <div className="space-y-6 max-w-7xl mx-auto">
             <div className="border-b border-slate-100 pb-4">
               <h3 className="text-2xl font-[1000] text-slate-900 uppercase italic">Geral & Matriz Pedagógica</h3>
-              <p className="text-xs text-slate-400 font-bold uppercase tracking-wider mt-0.5">Gerais da Unidade Curricular Organizadas em Colunas</p>
+              <p className="text-xs text-slate-400 font-bold uppercase tracking-wider mt-0.5">Perfil de Conclusão e Capacidades da Unidade Curricular</p>
+            </div>
+
+            {/* SEÇÃO PERFIL DE CONCLUSÃO EDITÁVEL */}
+            <div className="bg-white p-4 rounded-none border border-slate-300 shadow-none space-y-2">
+              <h4 className="text-[11px] font-black uppercase tracking-wider text-slate-900 flex items-center gap-1.5 border-b border-slate-200 pb-2">
+                <span className="w-2 h-2 bg-slate-900 inline-block"></span>
+                I. Perfil de Conclusão
+              </h4>
+              <EditableArea
+                value={localUnit.conclusionProfile || ''}
+                onChange={(val) => updateUnitState({ ...localUnit, conclusionProfile: val })}
+                placeholder="Descreva o perfil de conclusão..."
+                rows={3}
+                className="w-full bg-slate-50 border border-slate-200 p-3 text-slate-800 text-xs font-medium focus:outline-none focus:border-blue-500 rounded"
+              />
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-2 items-start">
