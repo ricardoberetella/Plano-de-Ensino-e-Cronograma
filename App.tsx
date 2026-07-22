@@ -94,7 +94,7 @@ const mergeUnitWithTemplate = (
 });
 
 const App: React.FC = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [userRole, setUserRole] = useState<'admin' | 'viewer' | null>(null);
   const [activeProfileId, setActiveProfileId] = useState('beretella');
   const [view, setView] = useState<ViewType>('dashboard');
   const [plans, setPlans] = useState<TeachingPlan[]>([]);
@@ -332,10 +332,10 @@ const App: React.FC = () => {
   );
 
   useEffect(() => {
-    if (isAuthenticated) {
+    if (userRole) {
       loadPlans(activeProfileId);
     }
-  }, [activeProfileId, isAuthenticated, loadPlans]);
+  }, [activeProfileId, userRole, loadPlans]);
 
   useEffect(() => {
     if (!visibleUnits.length) return;
@@ -350,6 +350,8 @@ const App: React.FC = () => {
   }, [visibleUnits, selectedUnit?.id]);
 
   const persistPlan = async (updatedPlan: TeachingPlan) => {
+    if (userRole !== 'admin') return updatedPlan; // Bloqueia persistência se for viewer
+
     const planToSave: TeachingPlan = {
       ...updatedPlan,
       profileId: activeProfileId,
@@ -368,6 +370,7 @@ const App: React.FC = () => {
   };
 
   const handleSave = async (updatedPlan: TeachingPlan) => {
+    if (userRole !== 'admin') return;
     try {
       await persistPlan(updatedPlan);
       const refreshed = await FirebaseService.getPlans(activeProfileId);
@@ -380,7 +383,7 @@ const App: React.FC = () => {
   };
 
   const handleSaveObjective = async () => {
-    if (!currentPlan) return;
+    if (userRole !== 'admin' || !currentPlan) return;
     try {
       const updatedPlan = {
         ...currentPlan,
@@ -397,7 +400,7 @@ const App: React.FC = () => {
     unitId: string,
     newSchedule: ScheduleEntry[]
   ) => {
-    if (!currentPlan) return;
+    if (userRole !== 'admin' || !currentPlan) return;
 
     const updatedUnits = currentPlan.units.map(unit =>
       unit.id === unitId ? { ...unit, schedule: newSchedule } : unit
@@ -408,15 +411,17 @@ const App: React.FC = () => {
       units: updatedUnits
     });
 
-    const updatedUnit = updatedPlan.units.find(unit => unit.id === unitId);
-    if (updatedUnit) setSelectedUnit(updatedUnit);
+    if (updatedPlan) {
+      const updatedUnit = updatedPlan.units.find(unit => unit.id === unitId);
+      if (updatedUnit) setSelectedUnit(updatedUnit);
+    }
   };
 
   const handleUpdateCalendar = async (
     unitId: string,
     newCalendar: UnitCalendar
   ) => {
-    if (!currentPlan) return;
+    if (userRole !== 'admin' || !currentPlan) return;
 
     const updatedUnits = currentPlan.units.map(unit =>
       unit.id === unitId
@@ -437,12 +442,14 @@ const App: React.FC = () => {
       units: updatedUnits
     });
 
-    const updatedUnit = updatedPlan.units.find(unit => unit.id === unitId);
-    if (updatedUnit) setSelectedUnit(updatedUnit);
+    if (updatedPlan) {
+      const updatedUnit = updatedPlan.units.find(unit => unit.id === unitId);
+      if (updatedUnit) setSelectedUnit(updatedUnit);
+    }
   };
 
   const handleUpdateUnit = async (updatedUnit: CurricularUnit) => {
-    if (!currentPlan) return;
+    if (userRole !== 'admin' || !currentPlan) return;
 
     const normalizedUnit: CurricularUnit = {
       ...updatedUnit,
@@ -467,18 +474,20 @@ const App: React.FC = () => {
       units: updatedUnits
     });
 
-    const savedUnit = updatedPlan.units.find(
-      unit => unit.id === normalizedUnit.id
-    );
+    if (updatedPlan) {
+      const savedUnit = updatedPlan.units.find(
+        unit => unit.id === normalizedUnit.id
+      );
 
-    if (savedUnit) {
-      setSelectedUnit(savedUnit);
-      setSelectedSemester(savedUnit.semester);
+      if (savedUnit) {
+        setSelectedUnit(savedUnit);
+        setSelectedSemester(savedUnit.semester);
+      }
     }
   };
 
   const handleLogout = () => {
-    setIsAuthenticated(false);
+    setUserRole(null);
     setCurrentPlan(null);
     setSelectedUnit(null);
     setSelectedSemester(1);
@@ -507,9 +516,11 @@ const App: React.FC = () => {
     setView('plano-curso' as ViewType);
   };
 
-  if (!isAuthenticated) {
-    return <Login onLogin={() => setIsAuthenticated(true)} />;
+  if (!userRole) {
+    return <Login onLogin={(role) => setUserRole(role)} />;
   }
+
+  const isAdmin = userRole === 'admin';
 
   return (
     <Layout
@@ -518,6 +529,7 @@ const App: React.FC = () => {
       onLogout={handleLogout}
       activeProfileId={activeProfileId}
       onProfileChange={handleProfileChange}
+      userRole={userRole}
     >
       {isLoading ? (
         <div className="flex flex-col items-center justify-center h-full space-y-4">
@@ -532,11 +544,13 @@ const App: React.FC = () => {
             <Dashboard
               plans={plans}
               onEdit={plan => {
+                if (!isAdmin) return;
                 setCurrentPlan(plan);
                 setView('editor' as ViewType);
               }}
               onView={openPlan}
               onRefresh={() => loadPlans(activeProfileId)}
+              userRole={userRole}
             />
           )}
 
@@ -581,35 +595,39 @@ const App: React.FC = () => {
                     <h3 className="text-[10px] font-black uppercase text-blue-600 tracking-[0.3em]">
                       I. Perfil de Conclusão
                     </h3>
-                    {!isEditingObjective ? (
-                      <button
-                        onClick={() => setIsEditingObjective(true)}
-                        className="text-[10px] font-black uppercase bg-slate-100 hover:bg-blue-600 hover:text-white text-slate-600 px-3 py-1.5 rounded-xl transition-all"
-                      >
-                        Editar Perfil
-                      </button>
-                    ) : (
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => {
-                            setObjectiveText(currentPlan.objective || '');
-                            setIsEditingObjective(false);
-                          }}
-                          className="text-[10px] font-black uppercase bg-slate-200 hover:bg-slate-300 text-slate-700 px-3 py-1.5 rounded-xl transition-all"
-                        >
-                          Cancelar
-                        </button>
-                        <button
-                          onClick={handleSaveObjective}
-                          className="text-[10px] font-black uppercase bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-xl transition-all shadow-md"
-                        >
-                          Salvar
-                        </button>
-                      </div>
+                    {isAdmin && (
+                      <>
+                        {!isEditingObjective ? (
+                          <button
+                            onClick={() => setIsEditingObjective(true)}
+                            className="text-[10px] font-black uppercase bg-slate-100 hover:bg-blue-600 hover:text-white text-slate-600 px-3 py-1.5 rounded-xl transition-all"
+                          >
+                            Editar Perfil
+                          </button>
+                        ) : (
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => {
+                                setObjectiveText(currentPlan.objective || '');
+                                setIsEditingObjective(false);
+                              }}
+                              className="text-[10px] font-black uppercase bg-slate-200 hover:bg-slate-300 text-slate-700 px-3 py-1.5 rounded-xl transition-all"
+                            >
+                              Cancelar
+                            </button>
+                            <button
+                              onClick={handleSaveObjective}
+                              className="text-[10px] font-black uppercase bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-xl transition-all shadow-md"
+                            >
+                              Salvar
+                            </button>
+                          </div>
+                        )}
+                      </>
                     )}
                   </div>
 
-                  {isEditingObjective ? (
+                  {isEditingObjective && isAdmin ? (
                     <textarea
                       value={objectiveText}
                       onChange={e => setObjectiveText(e.target.value)}
@@ -718,6 +736,7 @@ const App: React.FC = () => {
                     handleUpdateCalendar(selectedUnit.id, newCalendar)
                   }
                   onUpdateUnit={handleUpdateUnit}
+                  userRole={userRole}
                 />
               </div>
             )}
@@ -726,7 +745,7 @@ const App: React.FC = () => {
             <GeneralCalendar plan={currentPlan} />
           )}
 
-          {view === ('editor' as ViewType) && (
+          {view === ('editor' as ViewType) && isAdmin && (
             <PlanForm
               initialPlan={currentPlan || undefined}
               onSave={handleSave}
