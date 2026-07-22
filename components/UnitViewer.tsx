@@ -111,8 +111,10 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
     onUpdateUnit?.(newUnit);
   };
 
-  const isCRD = localUnit.id.toLowerCase().includes('crd') || localUnit.name.toLowerCase().includes('dimensional');
-  const isFUSI = localUnit.id.toLowerCase().includes('fusi') || localUnit.name.toLowerCase().includes('usinagem');
+  // Correção: Verifica ID e nome considerando também o semestre para evitar conflitos de duplicidade
+  const unitIdOrName = `${localUnit.id || ''}-${localUnit.semester || ''}-${localUnit.name || ''}`.toLowerCase();
+  const isCRD = unitIdOrName.includes('crd') || unitIdOrName.includes('dimensional');
+  const isFUSI = unitIdOrName.includes('fusi') || unitIdOrName.includes('usinagem');
   const scheduleColor: CalendarColor = isCRD ? 'pink' : (isFUSI ? 'orange' : 'blue');
 
   const calendar = useMemo(() => localUnit.calendar || {
@@ -261,7 +263,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
       {/* HEADER DA UNIDADE */}
       <div className="bg-slate-900 p-8 text-white flex justify-between items-center no-print">
         <div className="w-full">
-          <span className="bg-blue-600 px-3 py-1 rounded text-[9px] font-black uppercase tracking-widest mb-2 inline-block">MSEP - Unidade Curricular</span>
+          <span className="bg-blue-600 px-3 py-1 rounded text-[9px] font-black uppercase tracking-widest mb-2 inline-block">MSEP - Unidade Curricular ({localUnit.semester ? `${localUnit.semester}º Sem.` : ''})</span>
           <DebouncedInput
             value={localUnit.name}
             onChange={(val) => updateUnitState({ ...localUnit, name: val })}
