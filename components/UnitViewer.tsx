@@ -53,7 +53,8 @@ const EditableArea: React.FC<{
   placeholder?: string;
   className?: string;
   rows?: number;
-}> = ({ value, onChange, placeholder, className, rows = 1 }) => {
+  style?: React.CSSProperties;
+}> = ({ value, onChange, placeholder, className, rows = 1, style }) => {
   const [val, setVal] = useState(value || '');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -86,6 +87,7 @@ const EditableArea: React.FC<{
       onBlur={handleBlur}
       placeholder={placeholder}
       rows={rows}
+      style={style}
       className={`resize-none overflow-hidden block w-full ${className || ''}`}
     />
   );
@@ -95,6 +97,10 @@ const UnitViewer: React.FC<Props> = ({ unit, allUnits = [], onUpdateSchedule, on
   const [activeTab, setActiveTab] = useState<'geral' | 'sa' | 'rubricas' | 'cronograma' | 'calendario'>('geral');
   const [localSchedule, setLocalSchedule] = useState<ScheduleEntry[]>(unit.schedule);
   const [localUnit, setLocalUnit] = useState<CurricularUnit>(unit);
+
+  // Estados para customização de estilo do Perfil de Conclusão (Tamanho de fonte e Cor)
+  const [profileFontSize, setProfileFontSize] = useState<string>('14px');
+  const [profileFontColor, setProfileFontColor] = useState<string>('#1e293b');
 
   useEffect(() => {
     setLocalSchedule(unit.schedule || []);
@@ -278,18 +284,50 @@ const UnitViewer: React.FC<Props> = ({ unit, allUnits = [], onUpdateSchedule, on
               <p className="text-xs text-slate-400 font-bold uppercase tracking-wider mt-0.5">Perfil de Conclusão e Capacidades da Unidade Curricular</p>
             </div>
 
-            {/* SEÇÃO PERFIL DE CONCLUSÃO EDITÁVEL */}
+            {/* SEÇÃO PERFIL DE CONCLUSÃO EDITÁVEL COM CONTROLE DE FONTE E COR */}
             <div className="bg-white p-4 rounded-none border border-slate-300 shadow-none space-y-2">
-              <h4 className="text-[11px] font-black uppercase tracking-wider text-slate-900 flex items-center gap-1.5 border-b border-slate-200 pb-2">
-                <span className="w-2 h-2 bg-slate-900 inline-block"></span>
-                I. Perfil de Conclusão
-              </h4>
+              <div className="flex flex-wrap justify-between items-center border-b border-slate-200 pb-2 gap-2">
+                <h4 className="text-[11px] font-black uppercase tracking-wider text-slate-900 flex items-center gap-1.5">
+                  <span className="w-2 h-2 bg-slate-900 inline-block"></span>
+                  I. Perfil de Conclusão
+                </h4>
+                
+                {/* BARRA DE FERRAMENTAS DE FORMATAÇÃO (FONTE E COR) */}
+                <div className="flex items-center gap-3 no-print bg-slate-50 px-3 py-1 rounded border border-slate-200">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[10px] font-bold text-slate-500 uppercase">Fonte:</span>
+                    <select 
+                      value={profileFontSize} 
+                      onChange={(e) => setProfileFontSize(e.target.value)}
+                      className="text-xs bg-white border border-slate-300 rounded px-1.5 py-0.5 font-semibold text-slate-700 outline-none"
+                    >
+                      <option value="11px">Pequena (11px)</option>
+                      <option value="13px">Média (13px)</option>
+                      <option value="15px">Grande (15px)</option>
+                      <option value="18px">Muito Grande (18px)</option>
+                    </select>
+                  </div>
+                  
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[10px] font-bold text-slate-500 uppercase">Cor:</span>
+                    <input 
+                      type="color" 
+                      value={profileFontColor} 
+                      onChange={(e) => setProfileFontColor(e.target.value)}
+                      className="w-6 h-6 p-0 border border-slate-300 rounded cursor-pointer bg-white"
+                      title="Escolher cor do texto"
+                    />
+                  </div>
+                </div>
+              </div>
+
               <EditableArea
                 value={localUnit.conclusionProfile || ''}
                 onChange={(val) => updateUnitState({ ...localUnit, conclusionProfile: val })}
                 placeholder="Descreva o perfil de conclusão..."
                 rows={3}
-                className="w-full bg-slate-50 border border-slate-200 p-3 text-slate-800 text-xs font-medium focus:outline-none focus:border-blue-500 rounded"
+                style={{ fontSize: profileFontSize, color: profileFontColor }}
+                className="w-full bg-slate-50 border border-slate-200 p-3 font-medium focus:outline-none focus:border-blue-500 rounded transition-all"
               />
             </div>
 
