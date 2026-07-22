@@ -653,6 +653,198 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
           </div>
         )}
 
+        {/* ABA CRONOGRAMA */}
+        {activeTab === 'cronograma' && (
+          <div className="space-y-6">
+            <div className="flex justify-between items-center no-print">
+              <div>
+                <h3 className="text-3xl font-[1000] text-slate-900 uppercase italic">Cronograma / Plano de Aula</h3>
+                <p className="text-xs text-slate-400 font-bold uppercase tracking-wider mt-1">Planejamento detalhado de aulas, horas e conteúdos</p>
+              </div>
+              <div className="flex items-center gap-4">
+                <button onClick={() => addScheduleEntry()} className="bg-blue-600 text-white px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-lg hover:bg-slate-900 transition-all">
+                  + Nova Linha
+                </button>
+                <button onClick={handlePrint} className="bg-red-600 text-white px-8 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-lg flex items-center gap-2 hover:bg-slate-900 transition-all">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+                  Imprimir Cronograma
+                </button>
+              </div>
+            </div>
+
+            {/* Documento de Impressão Oculto para Cronograma */}
+            <div className="hidden report-document bg-white p-8 text-black">
+              <div className="report-header">
+                <div className="logo-box">SENAI</div>
+                <div className="info-box">
+                  <h1>Plano de Desenvolvimento de Unidade Curricular</h1>
+                  <p>{localUnit?.name}</p>
+                </div>
+              </div>
+              <h2 className="doc-main-title">Cronograma de Aulas</h2>
+              <table className="tech-table">
+                <thead>
+                  <tr>
+                    <th style={{ width: '12%' }}>Data</th>
+                    <th style={{ width: '8%' }}>Horas</th>
+                    <th style={{ width: '25%' }}>Capacidades</th>
+                    <th style={{ width: '25%' }}>Conhecimentos</th>
+                    <th style={{ width: '30%' }}>Estratégias / Recursos</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {(localSchedule || []).map((entry, index) => (
+                    <tr key={entry.id || index}>
+                      <td><b>{entry.date}</b><br/><span style={{ fontSize: '7pt', color: '#64748b' }}>{getDayOfWeek(entry.date)}</span></td>
+                      <td style={{ textAlign: 'center' }}>{entry.hours}h</td>
+                      <td>{entry.capacities}</td>
+                      <td>{entry.knowledges}</td>
+                      <td>{entry.strategies} {entry.resources ? `/ ${entry.resources}` : ''}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Tabela Interativa de Cronograma */}
+            <div className="space-y-4 no-print">
+              {(localSchedule || []).map((entry, idx) => (
+                <div key={entry.id || idx} className="bg-white border border-slate-200 rounded-3xl p-6 shadow-md hover:border-slate-300 transition-all flex flex-col gap-4">
+                  <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-100 pb-4">
+                    <div className="flex items-center gap-4">
+                      <span className="w-8 h-8 rounded-full bg-slate-900 text-white font-black text-xs flex items-center justify-center">{idx + 1}</span>
+                      <div className="flex items-center gap-2">
+                        <label className="text-[10px] font-black uppercase text-slate-400">Data:</label>
+                        <DebouncedInput
+                          value={entry.date || ''}
+                          onChange={(val) => updateEntry(entry.id, 'date', val)}
+                          placeholder="DD/MM/AAAA"
+                          className="w-32 bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 text-xs font-bold text-slate-800 focus:outline-none focus:border-blue-500"
+                        />
+                        <span className="text-[10px] font-bold text-slate-400 capitalize">({getDayOfWeek(entry.date)})</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <label className="text-[10px] font-black uppercase text-slate-400">Horas:</label>
+                        <input
+                          type="number"
+                          value={entry.hours || 0}
+                          onChange={(e) => updateEntry(entry.id, 'hours', Number(e.target.value))}
+                          className="w-20 bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 text-xs font-bold text-slate-800 focus:outline-none focus:border-blue-500 text-center"
+                        />
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <button onClick={() => addScheduleEntry(idx)} className="text-[10px] font-black uppercase text-blue-600 bg-blue-50 hover:bg-blue-600 hover:text-white px-3 py-1.5 rounded-xl transition-all">
+                        + Inserir Abaixo
+                      </button>
+                      <button onClick={() => removeScheduleEntry(entry.id)} className="text-slate-300 hover:text-red-600 text-xs font-bold p-1 transition-all" title="Excluir Linha">
+                        ✕
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div>
+                      <label className="text-[9px] font-black uppercase text-slate-400 block mb-1">Capacidades</label>
+                      <EditableArea
+                        value={entry.capacities || ''}
+                        onChange={(val) => updateEntry(entry.id, 'capacities', val)}
+                        placeholder="Capacidades trabalhadas..."
+                        rows={2}
+                        className="bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs font-medium text-slate-700 focus:outline-none focus:border-blue-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[9px] font-black uppercase text-slate-400 block mb-1">Conhecimentos</label>
+                      <EditableArea
+                        value={entry.knowledges || ''}
+                        onChange={(val) => updateEntry(entry.id, 'knowledges', val)}
+                        placeholder="Conhecimentos abordados..."
+                        rows={2}
+                        className="bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs font-medium text-slate-700 focus:outline-none focus:border-blue-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[9px] font-black uppercase text-slate-400 block mb-1">Estratégias / Metodologia</label>
+                      <EditableArea
+                        value={entry.strategies || ''}
+                        onChange={(val) => updateEntry(entry.id, 'strategies', val)}
+                        placeholder="Estratégias de ensino..."
+                        rows={2}
+                        className="bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs font-medium text-slate-700 focus:outline-none focus:border-blue-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[9px] font-black uppercase text-slate-400 block mb-1">Recursos Didáticos</label>
+                      <EditableArea
+                        value={entry.resources || ''}
+                        onChange={(val) => updateEntry(entry.id, 'resources', val)}
+                        placeholder="Recursos utilizados..."
+                        rows={2}
+                        className="bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs font-medium text-slate-700 focus:outline-none focus:border-blue-500"
+                      />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* ABA CALENDÁRIO */}
+        {activeTab === 'calendario' && (
+          <div className="space-y-8 max-w-5xl mx-auto no-print">
+            <div>
+              <h3 className="text-3xl font-[1000] text-slate-900 uppercase italic">Calendário de Aulas</h3>
+              <p className="text-xs text-slate-400 font-bold uppercase tracking-wider mt-1">Mapeamento visual dos dias letivos e marcações do cronograma</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {monthsInRange.map(monthStr => {
+                const [year, month] = monthStr.split('-').map(Number);
+                const firstDay = new Date(year, month - 1, 1).getDay();
+                const daysInMonth = new Date(year, month, 0).getDate();
+                const monthName = new Intl.DateTimeFormat('pt-BR', { month: 'long', year: 'numeric' }).format(new Date(year, month - 1, 1));
+
+                return (
+                  <div key={monthStr} className="bg-white border border-slate-200 rounded-3xl p-6 shadow-lg space-y-4">
+                    <h4 className="text-xs font-black uppercase text-slate-900 text-center tracking-widest bg-slate-50 py-2 rounded-xl">{monthName}</h4>
+                    <div className="grid grid-cols-7 gap-1 text-center">
+                      {['D', 'S', 'T', 'Q', 'Q', 'S', 'S'].map((d, i) => (
+                        <span key={i} className="text-[9px] font-black text-slate-400">{d}</span>
+                      ))}
+                      {Array.from({ length: firstDay }).map((_, i) => (
+                        <div key={`empty-${i}`} />
+                      ))}
+                      {Array.from({ length: daysInMonth }).map((_, i) => {
+                        const dayNum = i + 1;
+                        const dateKey = `${year}-${String(month).padStart(2, '0')}-${String(dayNum).padStart(2, '0')}`;
+                        const isMarked = scheduleDates[dateKey];
+                        const customMarking = (calendar.markings || []).find(m => m.date === dateKey);
+                        const colorKey = customMarking ? customMarking.color : (isMarked ? scheduleColor : 'none');
+                        const bgCol = COLOR_MAP[colorKey] || 'transparent';
+                        const txtCol = TEXT_COLOR_MAP[colorKey] || 'inherit';
+
+                        return (
+                          <div
+                            key={dateKey}
+                            style={{ backgroundColor: bgCol, color: txtCol }}
+                            className={`h-8 rounded-xl flex items-center justify-center text-xs font-black transition-all ${
+                              bgCol !== 'transparent' ? 'shadow-md scale-105' : 'text-slate-700 hover:bg-slate-100'
+                            }`}
+                          >
+                            {dayNum}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
       </div>
     </div>
   );
