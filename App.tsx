@@ -172,6 +172,32 @@ const App: React.FC = () => {
     return planToSave;
   };
 
+  const handleDeletePlan = async (planId: string) => {
+    if (!isAdmin) {
+      alert('Acesso negado: Apenas administradores podem excluir cursos.');
+      return;
+    }
+
+    if (plans.length <= 1) {
+      alert('Não é possível excluir o único curso restante no perfil.');
+      return;
+    }
+
+    if (window.confirm('Tem certeza que deseja excluir este curso permanentemente?')) {
+      try {
+        await FirebaseService.deletePlan(planId);
+        const refreshed = await FirebaseService.getPlans(activeProfileId);
+        setPlans(refreshed);
+        if (currentPlan?.id === planId) {
+          setCurrentPlan(refreshed[0] || null);
+        }
+      } catch (error) {
+        console.error('Erro ao excluir plano:', error);
+        alert('Erro ao excluir o curso da nuvem.');
+      }
+    }
+  };
+
   const handleSave = async (updatedPlan: TeachingPlan) => {
     if (!isAdmin) {
       alert('Acesso negado: O perfil de visualização não pode salvar alterações.');
@@ -330,6 +356,7 @@ const App: React.FC = () => {
               }}
               onView={openPlan}
               onRefresh={() => loadPlans(activeProfileId)}
+              onDeletePlan={handleDeletePlan}
             />
           )}
 
