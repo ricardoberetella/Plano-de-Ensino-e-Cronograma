@@ -1,262 +1,469 @@
-import React, { useState } from 'react';
-import { TeachingPlan, CurricularUnit } from '../types';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import Layout from './components/Layout';
+import Dashboard from './components/Dashboard';
+import PlanForm from './components/PlanForm';
+import UnitViewer from './components/UnitViewer';
+import Login from './components/Login';
+import GeneralCalendar from './components/GeneralCalendar';
+import {
+  TeachingPlan,
+  ViewType,
+  CurricularUnit,
+  ScheduleEntry,
+  UnitCalendar,
+  SemesterNumber
+} from './types';
+import { SAMPLE_PLANS, SCHEDULE_VERSION } from './constants';
+import { FirebaseService } from './services/firebase';
 
-interface PlanFormProps {
-  initialPlan?: TeachingPlan;
-  isAdmin: boolean;
-  onSave: (plan: TeachingPlan) => void;
-  onCancel: () => void;
-}
+const normalizeText = (value: string) =>
+  value
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toUpperCase()
+    .trim();
 
-const PlanForm: React.FC<PlanFormProps> = ({
-  initialPlan,
-  isAdmin,
-  onSave,
-  onCancel,
-}) => {
-  const [courseName, setCourseName] = useState(initialPlan?.courseName || '');
-  const [totalHours, setTotalHours] = useState(initialPlan?.totalHours || 1400);
-  const [modality, setModality] = useState(initialPlan?.modality || 'Presencial');
-  const [objective, setObjective] = useState(initialPlan?.objective || '');
-  const [units, setUnits] = useState<CurricularUnit[]>(initialPlan?.units || []);
+const getUnitSigla = (unit: CurricularUnit): string => {
+  if (unit.code?.trim()) return unit.code.trim().toUpperCase();
 
-  // Estados locais para formulário de nova unidade
-  const [newCode, setNewCode] = useState('');
-  const [newName, setNewName] = useState('');
-  const [newSemester, setNewSemester] = useState<number>(1);
-  const [newWorkload, setNewWorkload] = useState<number>(40);
+  const name = normalizeText(unit.name || '');
+  return name
+    .split(/\s+/)
+    .filter(Boolean)
+    .map(word => word[0])
+    .join('')
+    .slice(0, 8);
+};
 
-  const handleAddUnit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newName.trim()) return;
+const sortUnits = (units: CurricularUnit[]) => {
+  const safeUnits = Array.isArray(units) ? units : [];
+  return [...safeUnits].sort((a, b) => {
+    const semesterDiff = Number(a.semester || 1) - Number(b.semester || 1);
+    if (semesterDiff !== 0) return semesterDiff;
 
-    const unit: CurricularUnit = {
-      id: `unit-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      code: newCode.trim().toUpperCase() || newName.trim().substring(0, 3).toUpperCase(),
-      name: newName.trim(),
-      semester: Number(newSemester),
-      workload: Number(newWorkload) || 40,
-      order: units.length + 1,
-      active: true,
-      technicalCapacities: [],
-      socialCapacities: [],
-      knowledges: [],
-      learningSituations: [],
-      rubrics: [],
-      schedule: [],
-    };
+    const orderDiff = Number(a.order || 0) - Number(b.order || 0);
+    if (orderDiff !== 0) return orderDiff;
 
-    setUnits([...units, unit]);
-    setNewCode('');
-    setNewName('');
-    setNewWorkload(40);
-  };
+    return (a.name || '').localeCompare(b.name || '', 'pt-BR');
+  });
+};
 
-  const handleUpdateUnitLocal = (id: string, updatedFields: Partial<CurricularUnit>) => {
-    setUnits(prev =>
-      prev.map(u => (u.id === id ? { ...u, ...updatedFields } : u))
+const App: React.FC = () => {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [activeProfileId, setActiveProfileId] = useState('beretella');
+  const [view, setView] = useState<ViewType>('dashboard');
+  const [plans, setPlans] = useState<TeachingPlan[]>([]);
+  const [currentPlan, setCurrentPlan] = useState<TeachingPlan | null>(null);
+  const [selectedUnit, setSelectedUnit] = useState<CurricularUnit | null>(null);
+  const [selectedSemester, setSelectedSemester] = useState<SemesterNumber>(1);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const currentPlanSemesters = useMemo(() => {
+    if (!currentPlan || !Array.isArray(currentPlan.units)) return [];
+
+    return Array.from(
+      new Set(
+        currentPlan.units
+          .filter(unit => unit && unit.active !== false)
+          .map(unit => Number(unit.semester || 1))
+      )
+    ).sort((a, b) => a - b);
+  }, [currentPlan]);
+
+  const visibleUnits = useMemo(() => {
+    if (!currentPlan || !Array.isArray(currentPlan.units)) return [];
+
+    return sortUnits(
+      currentPlan.units.filter(
+        unit =>
+          unit &&
+          unit.active !== false &&
+          Number(unit.semester || 1) === Number(selectedSemester)
+      )
     );
-  };
+  }, [currentPlan, selectedSemester]);
 
-  const handleDeleteUnitLocal = (id: string) => {
-    setUnits(prev => prev.filter(u => u.id !== id));
-  };
+  const loadPlans = useCallback(
+    async (profileId: string) => {
+      setIsLoading(true);
 
-  const handleSubmitAll = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!initialPlan) return;
+      try {
+        const template =
+          SAMPLE_PLANS.find(plan => plan.profileId === profileId) ||
+          SAMPLE_PLANS[0];
 
-    const updatedPlan: TeachingPlan = {
-      ...initialPlan,
-      courseName,
-      totalHours: Number(totalHours),
-      modality,
-      objective,
-      units,
+        let dbPlans = await FirebaseService.getPlans(profileId);
+
+        if (!dbPlans || dbPlans.length === 0) {
+          const freshPlan: TeachingPlan = {
+            ...template,
+            id: `plan-usinagem-${profileId}-${Date.now()}`,
+            profileId,
+            version: SCHEDULE_VERSION,
+            updatedAt: new Date().toISOString(),
+            units: sortUnits(template?.units || [])
+          };
+
+          await FirebaseService.savePlan(freshPlan);
+          dbPlans = [freshPlan];
+        }
+
+        setPlans(dbPlans);
+
+        const nextCurrent = dbPlans[0] || template;
+        setCurrentPlan(nextCurrent);
+
+        const availableSemesters = Array.from(
+          new Set(
+            (nextCurrent?.units || [])
+              .filter(unit => unit && unit.active !== false)
+              .map(unit => Number(unit.semester || 1))
+          )
+        ).sort((a, b) => a - b);
+
+        const nextSemester = availableSemesters[0] || 1;
+        setSelectedSemester(nextSemester);
+
+        const nextSelected =
+          sortUnits(nextCurrent?.units || []).find(
+            unit =>
+              unit &&
+              unit.active !== false &&
+              Number(unit.semester || 1) === nextSemester
+          ) || null;
+
+        setSelectedUnit(nextSelected);
+      } catch (error) {
+        console.error('Erro ao carregar Firebase:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    []
+  );
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      loadPlans(activeProfileId);
+    }
+  }, [activeProfileId, isAuthenticated, loadPlans]);
+
+  const persistPlan = async (updatedPlan: TeachingPlan) => {
+    if (!isAdmin) {
+      alert('Acesso negado: O perfil de visualização não pode alterar dados.');
+      throw new Error('Unauthorized');
+    }
+
+    const planToSave: TeachingPlan = {
+      ...updatedPlan,
+      profileId: activeProfileId,
+      version: SCHEDULE_VERSION,
       updatedAt: new Date().toISOString(),
+      units: sortUnits(updatedPlan.units)
     };
 
-    onSave(updatedPlan);
+    setCurrentPlan(planToSave);
+    setPlans(previous =>
+      previous.map(plan => (plan.id === planToSave.id ? planToSave : plan))
+    );
+
+    await FirebaseService.savePlan(planToSave);
+    return planToSave;
   };
+
+  const handleSave = async (updatedPlan: TeachingPlan) => {
+    if (!isAdmin) {
+      alert('Acesso negado: O perfil de visualização não pode salvar alterações.');
+      return;
+    }
+    try {
+      const saved = await persistPlan(updatedPlan);
+      const refreshed = await FirebaseService.getPlans(activeProfileId);
+      setPlans(refreshed);
+
+      setCurrentPlan(saved);
+      const newSemesters = Array.from(new Set(saved.units.map(u => Number(u.semester || 1)))).sort((a, b) => a - b);
+      if (newSemesters.length > 0) {
+        setSelectedSemester(newSemesters[0]);
+      }
+
+      setView('dashboard');
+    } catch (error) {
+      console.error('Erro ao salvar dados:', error);
+    }
+  };
+
+  const handleUpdateSchedule = async (
+    unitId: string,
+    newSchedule: ScheduleEntry[]
+  ) => {
+    if (!isAdmin || !currentPlan) {
+      alert('Acesso negado: Apenas o administrador pode editar o cronograma.');
+      return;
+    }
+    const updatedUnits = currentPlan.units.map(unit =>
+      unit.id === unitId ? { ...unit, schedule: newSchedule } : unit
+    );
+    const updatedPlan = await persistPlan({ ...currentPlan, units: updatedUnits });
+    const updatedUnit = updatedPlan.units.find(unit => unit.id === unitId);
+    if (updatedUnit) setSelectedUnit(updatedUnit);
+  };
+
+  const handleUpdateCalendar = async (
+    unitId: string,
+    newCalendar: UnitCalendar
+  ) => {
+    if (!isAdmin || !currentPlan) {
+      alert('Acesso negado: Apenas o administrador pode editar o calendário.');
+      return;
+    }
+    const updatedUnits = currentPlan.units.map(unit =>
+      unit.id === unitId
+        ? { ...unit, calendar: { ...newCalendar, semester: newCalendar.semester || unit.semester } }
+        : unit
+    );
+    const updatedPlan = await persistPlan({ ...currentPlan, units: updatedUnits });
+    const updatedUnit = updatedPlan.units.find(unit => unit.id === unitId);
+    if (updatedUnit) setSelectedUnit(updatedUnit);
+  };
+
+  const handleUpdateUnit = async (updatedUnit: CurricularUnit) => {
+    if (!isAdmin || !currentPlan) {
+      alert('Acesso negado: Apenas o administrador pode atualizar unidades.');
+      return;
+    }
+    const normalizedUnit: CurricularUnit = {
+      ...updatedUnit,
+      code: updatedUnit.code || getUnitSigla(updatedUnit),
+      semester: Number(updatedUnit.semester || 1),
+      order: Number(updatedUnit.order || 1),
+      active: updatedUnit.active ?? true,
+      calendar: { ...updatedUnit.calendar, semester: updatedUnit.calendar?.semester || Number(updatedUnit.semester || 1) }
+    };
+    const updatedUnits = currentPlan.units.map(unit =>
+      unit.id === normalizedUnit.id ? normalizedUnit : unit
+    );
+    const updatedPlan = await persistPlan({ ...currentPlan, units: updatedUnits });
+    const savedUnit = updatedPlan.units.find(unit => unit.id === normalizedUnit.id);
+    if (savedUnit) {
+      setSelectedUnit(savedUnit);
+      setSelectedSemester(savedUnit.semester);
+    }
+  };
+
+  const handleLoginSubmit = (passwordEntered: string) => {
+    if (passwordEntered === 'bere662') {
+      setIsAdmin(true);
+      setIsAuthenticated(true);
+    } else if (passwordEntered === 'ianes662') {
+      setIsAdmin(false);
+      setIsAuthenticated(true);
+    } else {
+      alert('Senha incorreta!');
+    }
+  };
+
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    setIsAdmin(false);
+    setCurrentPlan(null);
+    setSelectedUnit(null);
+    setSelectedSemester(1);
+    setView('dashboard');
+  };
+
+  const handleProfileChange = (profileId: string) => {
+    setActiveProfileId(profileId);
+    setCurrentPlan(null);
+    setSelectedUnit(null);
+    setSelectedSemester(1);
+    setView('dashboard');
+  };
+
+  const openPlan = (plan: TeachingPlan) => {
+    const orderedUnits = sortUnits(plan.units || []);
+    const firstUnit = orderedUnits.find(unit => unit.active !== false) || null;
+    const firstSemester = Number(firstUnit?.semester || 1);
+
+    setCurrentPlan({
+      ...plan,
+      units: orderedUnits
+    });
+    setSelectedSemester(firstSemester);
+    setSelectedUnit(firstUnit);
+    setView('plano-curso' as ViewType);
+  };
+
+  if (!isAuthenticated) {
+    return <Login onLogin={handleLoginSubmit} />;
+  }
 
   return (
-    <div className="max-w-7xl mx-auto space-y-8 animate-fadeIn pb-12">
-      <form onSubmit={handleSubmitAll} className="bg-white p-8 rounded-[2.5rem] shadow-xl border border-slate-200">
-        <div className="border-b border-slate-100 pb-6 mb-8 flex justify-between items-center">
-          <div>
-            <span className="bg-blue-600 px-3 py-1 rounded text-[9px] font-black uppercase tracking-widest text-white mb-2 inline-block">
-              MSEP - Editor de Plano de Curso
-            </span>
-            <h2 className="text-3xl font-[1000] text-slate-900 uppercase italic tracking-tight">
-              III. Estrutura de Unidades Curriculares
-            </h2>
-            <p className="text-xs text-slate-400 font-bold uppercase tracking-wider mt-1">
-              Gerencie as unidades, semestres e cargas horárias do curso
-            </p>
-          </div>
-          <div className="flex gap-3">
-            <button
-              type="button"
-              onClick={onCancel}
-              className="px-5 py-3 rounded-xl text-xs font-black uppercase bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all"
-            >
-              Cancelar
-            </button>
-            {isAdmin && (
-              <button
-                type="submit"
-                className="px-6 py-3 rounded-xl text-xs font-black uppercase bg-blue-600 text-white shadow-lg hover:bg-slate-900 transition-all"
-              >
-                Salvar Alterações
-              </button>
-            )}
-          </div>
+    <Layout
+      activeView={view}
+      onViewChange={setView}
+      onLogout={handleLogout}
+      activeProfileId={activeProfileId}
+      onProfileCardChange={handleProfileChange}
+    >
+      {isLoading ? (
+        <div className="flex flex-col items-center justify-center h-full space-y-4">
+          <div className="w-12 h-12 border-4 border-slate-200 border-t-blue-600 rounded-full animate-spin" />
+          <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest">
+            Sincronizando dados...
+          </p>
         </div>
+      ) : (
+        <>
+          {view === 'dashboard' && (
+            <Dashboard
+              plans={plans}
+              isAdmin={isAdmin}
+              onEdit={plan => {
+                if (!isAdmin) {
+                  alert("Acesso restrito: Apenas o administrador pode editar.");
+                  return;
+                }
+                setCurrentPlan(plan);
+                setView('editor' as ViewType);
+              }}
+              onView={openPlan}
+              onRefresh={() => loadPlans(activeProfileId)}
+            />
+          )}
 
-        {/* FORMULÁRIO DE ADIÇÃO DE NOVA UC */}
-        {isAdmin && (
-          <div className="bg-slate-50 p-6 rounded-3xl border border-slate-200 mb-10 grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
-            <div className="md:col-span-2">
-              <label className="block text-[10px] font-black uppercase text-slate-500 mb-2">Sigla</label>
-              <input
-                type="text"
-                value={newCode}
-                onChange={(e) => setNewCode(e.target.value)}
-                placeholder="Ex: CRD"
-                className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-xs font-bold text-slate-800 uppercase focus:outline-none focus:border-blue-600"
-              />
-            </div>
-
-            <div className="md:col-span-4">
-              <label className="block text-[10px] font-black uppercase text-slate-500 mb-2">Nome da Unidade Curricular</label>
-              <input
-                type="text"
-                value={newName}
-                onChange={(e) => setNewName(e.target.value)}
-                placeholder="Ex: Controle Dimensional"
-                className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-xs font-bold text-slate-800 focus:outline-none focus:border-blue-600"
-              />
-            </div>
-
-            <div className="md:col-span-2">
-              <label className="block text-[10px] font-black uppercase text-slate-500 mb-2">Semestre</label>
-              <select
-                value={newSemester}
-                onChange={(e) => setNewSemester(Number(e.target.value))}
-                className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-xs font-bold text-slate-800 focus:outline-none focus:border-blue-600"
-              >
-                <option value={1}>1º Semestre</option>
-                <option value={2}>2º Semestre</option>
-                <option value={3}>3º Semestre</option>
-                <option value={4}>4º Semestre</option>
-              </select>
-            </div>
-
-            <div className="md:col-span-2">
-              <label className="block text-[10px] font-black uppercase text-slate-500 mb-2">Carga Horária (h)</label>
-              <input
-                type="number"
-                value={newWorkload}
-                onChange={(e) => setNewWorkload(Number(e.target.value))}
-                placeholder="40"
-                className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-xs font-bold text-slate-800 focus:outline-none focus:border-blue-600"
-              />
-            </div>
-
-            <div className="md:col-span-2">
-              <button
-                type="button"
-                onClick={handleAddUnit}
-                className="w-full bg-blue-600 text-white rounded-xl px-6 py-3 text-xs font-black uppercase tracking-wider shadow-lg hover:bg-slate-900 transition-all flex items-center justify-center gap-2"
-              >
-                <span>+ Adicionar</span>
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* LISTAGEM DAS UNIDADES */}
-        <div className="space-y-4">
-          {Array.isArray(units) && units.map((unit, index) => (
-            <div
-              key={unit.id || index}
-              className="bg-white border border-slate-200 rounded-2xl p-4 flex flex-col md:flex-row items-center justify-between gap-4 shadow-sm hover:border-blue-300 transition-all group"
-            >
-              <div className="flex items-center gap-4 w-full md:w-auto flex-1">
-                <span className="w-8 h-8 rounded-xl bg-slate-100 text-slate-500 font-black text-xs flex items-center justify-center shrink-0">
-                  {String(index + 1).padStart(2, '0')}
-                </span>
-
-                <div className="w-24 shrink-0">
-                  <input
-                    type="text"
-                    value={unit.code || ''}
-                    disabled={!isAdmin}
-                    onChange={(e) => handleUpdateUnitLocal(unit.id, { code: e.target.value.toUpperCase() })}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-black text-slate-800 uppercase text-center focus:outline-none focus:border-blue-600"
-                  />
+          {view === ('plano-curso' as ViewType) && currentPlan && (
+            <div className="max-w-5xl mx-auto space-y-10 animate-fadeIn pb-20">
+              <div className="bg-white rounded-[2.5rem] p-8 md:p-16 border border-slate-200 shadow-2xl relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-2 h-full bg-[#E30613]" />
+                <div className="mb-12 flex justify-between items-start">
+                  <div>
+                    <span className="bg-slate-900 text-white px-3 py-1 rounded text-[10px] font-black uppercase tracking-[0.2em] mb-4 inline-block">
+                      MSEP - Modelo SENAI
+                    </span>
+                    <h2 className="text-3xl md:text-5xl font-[1000] text-slate-900 tracking-tighter uppercase leading-[0.9]">
+                      {currentPlan.courseName || "Curso de Usinagem"}
+                    </h2>
+                  </div>
                 </div>
 
-                <div className="flex-1">
-                  <input
-                    type="text"
-                    value={unit.name || ''}
-                    disabled={!isAdmin}
-                    onChange={(e) => handleUpdateUnitLocal(unit.id, { name: e.target.value })}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-xs font-bold text-slate-800 focus:outline-none focus:border-blue-600"
-                  />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+                  <div className="p-6 bg-slate-50 rounded-3xl border border-slate-100">
+                    <p className="text-[9px] font-black text-slate-400 uppercase mb-2">Carga Total</p>
+                    <p className="text-2xl font-black text-slate-800 italic">{currentPlan.totalHours || 1400} HORAS</p>
+                  </div>
+                  <div className="p-6 bg-slate-50 rounded-3xl border border-slate-100">
+                    <p className="text-[9px] font-black text-slate-400 uppercase mb-2">Modalidade</p>
+                    <p className="text-2xl font-black text-slate-800 italic uppercase">{currentPlan.modality || "Presencial"}</p>
+                  </div>
                 </div>
+
+                <section>
+                  <h3 className="text-[10px] font-black uppercase text-blue-600 tracking-[0.3em] mb-4">I. Perfil de Conclusão</h3>
+                  <p className="text-slate-600 text-sm leading-relaxed font-medium">{currentPlan.objective || "Perfil padrão do curso."}</p>
+                </section>
               </div>
 
-              <div className="flex items-center gap-4 w-full md:w-auto justify-end">
-                <div className="w-36">
-                  <select
-                    value={unit.semester || 1}
-                    disabled={!isAdmin}
-                    onChange={(e) => handleUpdateUnitLocal(unit.id, { semester: Number(e.target.value) })}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 focus:outline-none focus:border-blue-600"
-                  >
-                    <option value={1}>1º Semestre</option>
-                    <option value={2}>2º Semestre</option>
-                    <option value={3}>3º Semestre</option>
-                    <option value={4}>4º Semestre</option>
-                  </select>
+              <div className="bg-slate-900 rounded-[2.5rem] p-8 md:p-12 text-white shadow-2xl">
+                <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 mb-8">III. Unidades Curriculares</h3>
+                <div className="flex flex-wrap gap-3 mb-8">
+                  {currentPlanSemesters.map(semester => (
+                    <button
+                      key={semester}
+                      onClick={() => setSelectedSemester(semester)}
+                      className={`px-6 py-3 rounded-2xl text-[10px] font-black uppercase transition-all border-2 ${
+                        Number(selectedSemester) === Number(semester)
+                          ? 'bg-blue-600 border-blue-600 text-white shadow-xl'
+                          : 'bg-slate-800 border-slate-700 text-slate-300 hover:border-blue-500'
+                      }`}
+                    >
+                      {semester}º semestre
+                    </button>
+                  ))}
                 </div>
 
-                <div className="w-28 flex items-center gap-1">
-                  <input
-                    type="number"
-                    value={unit.workload ?? 40}
-                    disabled={!isAdmin}
-                    onChange={(e) => handleUpdateUnitLocal(unit.id, { workload: Number(e.target.value) })}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 text-center focus:outline-none focus:border-blue-600"
-                  />
-                  <span className="text-[10px] font-black text-slate-400 uppercase">h</span>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                  {visibleUnits.map((unit, index) => (
+                    <button
+                      key={unit.id}
+                      onClick={() => {
+                        setSelectedUnit(unit);
+                        setSelectedSemester(unit.semester);
+                        setView('plano-ensino' as ViewType);
+                      }}
+                      className="bg-slate-800 p-8 rounded-3xl text-left hover:bg-blue-600 transition-all group relative overflow-hidden"
+                    >
+                      <span className="text-6xl font-black opacity-5 absolute -right-2 -bottom-2">{String(index + 1).padStart(2, '0')}</span>
+                      <p className="text-[9px] font-black text-blue-400 mb-2">{getUnitSigla(unit)}</p>
+                      <h4 className="font-black text-lg leading-tight uppercase line-clamp-2">{unit.name}</h4>
+                    </button>
+                  ))}
                 </div>
-
-                {isAdmin && (
-                  <button
-                    type="button"
-                    onClick={() => handleDeleteUnitLocal(unit.id)}
-                    className="text-slate-300 hover:text-red-500 p-2 font-black transition-all shrink-0"
-                    title="Excluir Unidade"
-                  >
-                    ✕
-                  </button>
-                )}
               </div>
-            </div>
-          ))}
-
-          {(!Array.isArray(units) || units.length === 0) && (
-            <div className="text-center py-12 text-slate-400 text-xs font-bold uppercase tracking-wider">
-              Nenhuma Unidade Curricular cadastrada neste plano.
             </div>
           )}
-        </div>
-      </form>
-    </div>
+
+          {view === ('plano-ensino' as ViewType) && currentPlan && selectedUnit && (
+            <div className="space-y-8 max-w-7xl mx-auto pb-20">
+              <div className="flex flex-wrap gap-3 px-1">
+                {currentPlanSemesters.map(semester => (
+                  <button
+                    key={semester}
+                    onClick={() => setSelectedSemester(semester)}
+                    className={`px-6 py-3 rounded-2xl text-[10px] font-black uppercase transition-all border-2 ${
+                      Number(selectedSemester) === Number(semester)
+                        ? 'bg-slate-900 border-slate-900 text-white shadow-lg'
+                        : 'bg-white border-slate-200 text-slate-400 hover:border-blue-300'
+                    }`}
+                  >
+                    {semester}º semestre
+                  </button>
+                ))}
+              </div>
+
+              <div className="flex gap-2 overflow-x-auto pb-4 scrollbar-hide px-1">
+                {visibleUnits.map(unit => (
+                  <button
+                    key={unit.id}
+                    onClick={() => setSelectedUnit(unit)}
+                    className={`flex-shrink-0 px-8 py-4 rounded-2xl text-[10px] font-black uppercase transition-all border-2 ${
+                      selectedUnit.id === unit.id
+                        ? 'bg-blue-600 border-blue-600 text-white shadow-xl scale-105'
+                        : 'bg-white border-slate-200 text-slate-400 hover:border-blue-100'
+                    }`}
+                  >
+                    {getUnitSigla(unit)}
+                  </button>
+                ))}
+              </div>
+
+              <UnitViewer
+                unit={selectedUnit}
+                isAdmin={isAdmin}
+                onUpdateSchedule={newSchedule => handleUpdateSchedule(selectedUnit.id, newSchedule)}
+                onUpdateCalendar={newCalendar => handleUpdateCalendar(selectedUnit.id, newCalendar)}
+                onUpdateUnit={handleUpdateUnit}
+              />
+            </div>
+          )}
+
+          {view === ('calendario' as ViewType) && currentPlan && (
+            <GeneralCalendar plan={currentPlan} />
+          )}
+
+          {view === ('editor' as ViewType) && (
+            <PlanForm
+              initialPlan={currentPlan || undefined}
+              isAdmin={isAdmin}
+              onSave={handleSave}
+              onCancel={() => setView('dashboard')}
+            />
+          )}
+        </>
+      )}
+    </Layout>
   );
 };
 
-export default PlanForm;
+export default App;
