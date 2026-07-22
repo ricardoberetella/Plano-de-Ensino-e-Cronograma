@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { CurricularUnit, ScheduleEntry, UnitCalendar, CalendarColor } from '../types';
-import { SAMPLE_PLANS } from '../constants';
 
 interface Props {
   unit: CurricularUnit;
+  allUnits?: CurricularUnit[];
   onUpdateSchedule?: (newSchedule: ScheduleEntry[]) => void;
   onUpdateCalendar?: (newCalendar: UnitCalendar) => void;
   onUpdateUnit?: (updatedUnit: CurricularUnit) => void;
@@ -93,7 +93,7 @@ const EditableArea: React.FC<{
   );
 };
 
-const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar, onUpdateUnit }) => {
+const UnitViewer: React.FC<Props> = ({ unit, allUnits = [], onUpdateSchedule, onUpdateCalendar, onUpdateUnit }) => {
   const [activeTab, setActiveTab] = useState<'geral' | 'sa' | 'rubricas' | 'cronograma' | 'calendario'>('geral');
   const [localSchedule, setLocalSchedule] = useState<ScheduleEntry[]>(unit.schedule);
   const [localUnit, setLocalUnit] = useState<CurricularUnit>(unit);
@@ -115,12 +115,6 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
   const isCRD = unitIdOrName.includes('crd') || unitIdOrName.includes('dimensional');
   const isFUSI = unitIdOrName.includes('fusi') || unitIdOrName.includes('usinagem');
   const scheduleColor: CalendarColor = isCRD ? 'pink' : (isFUSI ? 'orange' : 'blue');
-
-  const calendar = useMemo(() => localUnit.calendar || {
-    startDate: '2026-01-26',
-    endDate: '2026-06-24',
-    markings: []
-  }, [localUnit.calendar]);
 
   const getDayOfWeek = (dateStr: string) => {
     if (!dateStr || !dateStr.includes('/')) return "";
@@ -243,28 +237,61 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
     window.print();
   };
 
-  const scheduleDates = useMemo(() => {
-    const dates: Record<string, boolean> = {};
-    localSchedule.forEach(s => {
-      const parts = s.date.split('/');
-      if (parts.length === 3) {
-        dates[`${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`] = true;
-      }
-    });
-    return dates;
-  }, [localSchedule]);
+  // Mapeia datas de todas as unidades para o calendário geral
+  const unitsDateMap = useMemo(() => {
+    const map: Record<string, { color: CalendarColor; unitName: string }> = {};
+    const unitsList = allUnits.length > 0 ? allUnits : [localUnit];
 
-  const monthsInRange = useMemo(() => {
-    const start = new Date(calendar.startDate + 'T00:00:00');
-    const end = new Date(calendar.endDate + 'T00:00:00');
-    const months: string[] = [];
-    const current = new Date(start.getFullYear(), start.getMonth(), 1);
-    while (current <= end) {
-      months.push(current.toISOString().substring(0, 7));
-      current.setMonth(current.getMonth() + 1);
+    unitsList.forEach((u, idx) => {
+      const uIdName = `${u.id || ''}-${u.semester || ''}-${u.name || ''}`.toLowerCase();
+      const isUCRD = uIdName.includes('crd') || uIdName.includes('dimensional');
+      const isUFUSI = uIdName.includes('fusi') || uIdName.includes('usinagem');
+      const colorList: CalendarColor[] = ['blue', 'orange', 'pink', 'purple', 'green', 'cyan', 'red', 'yellow'];
+      const uColor: CalendarColor = isUCRD ? 'pink' : (isUFUSI ? 'orange' : colorList[idx % colorList.length]);
+
+      (u.schedule || []).forEach(s => {
+        const parts = s.date.split('/');
+        if (parts.length === 3) {
+          const dateKey = `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+          map[dateKey] = { color: uColor, unitName: u.name };
+        }
+      });
+    });
+
+    return map;
+  }, [allUnits, localUnit]);
+
+  // Determina se o semestre é o 2º (julho a dezembro) ou 1º (janeiro a junho)
+  const semesterNum = localUnit.semester || 1;
+  const currentYear = new Date().getFullYear();
+  const calendarRange = useMemo(() => {
+    if (semesterNum === 2) {
+      return {
+        startDate: `${currentYear}-07-01`,
+        endDate: `${currentYear}-12-31`,
+        months: [`${currentYear}-07`, `${currentYear}-08`, `${currentYear}-09`, `${currentYear}-10`, `${currentYear}-11`, `${currentYear}-12`]
+      };
+    } else {
+      return {
+        startDate: `${currentYear}-01-01`,
+        endDate: `${currentYear}-06-30`,
+        months: [`${currentYear}-01`, `${currentYear}-02`, `${currentYear}-03`, `${currentYear}-04`, `${currentYear}-05`, `${currentYear}-06`]
+      };
     }
-    return months;
-  }, [calendar.startDate, calendar.endDate]);
+  }, [semesterNum, currentYear]);
+
+  // Lista de unidades para a legenda superior
+  const legendUnits = useMemo(() => {
+    const unitsList = allUnits.length > 0 ? allUnits : [localUnit];
+    return unitsList.map((u, idx) => {
+      const uIdName = `${u.id || ''}-${u.semester || ''}-${u.name || ''}`.toLowerCase();
+      const isUCRD = uIdName.includes('crd') || uIdName.includes('dimensional');
+      const isUFUSI = uIdName.includes('fusi') || uIdName.includes('usinagem');
+      const colorList: CalendarColor[] = ['blue', 'orange', 'pink', 'purple', 'green', 'cyan', 'red', 'yellow'];
+      const color: CalendarColor = isUCRD ? 'pink' : (isUFUSI ? 'orange' : colorList[idx % colorList.length]);
+      return { name: u.name, color, semester: u.semester || 1 };
+    });
+  }, [allUnits, localUnit]);
 
   return (
     <div className="bg-white rounded-[2.5rem] shadow-2xl border border-slate-200 overflow-hidden animate-fadeIn printable-unit-module" data-active-tab={activeTab}>
@@ -684,13 +711,27 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
           <div className="space-y-6 no-print">
             <div className="flex justify-between items-center border-b border-slate-200 pb-4">
               <div>
-                <h3 className="text-2xl font-[1000] text-slate-900 uppercase italic">Calendário de Aulas</h3>
-                <p className="text-xs text-slate-500 font-semibold">Distribuição temporal das aulas e encontros previstos</p>
+                <h3 className="text-2xl font-[1000] text-slate-900 uppercase italic">Calendário de Aulas ({semesterNum}º Semestre)</h3>
+                <p className="text-xs text-slate-500 font-semibold">Distribuição temporal das aulas e marcações por Unidade Curricular</p>
               </div>
             </div>
 
+            {/* LEGENDA SUPERIOR DE CORES E UNIDADES */}
+            <div className="bg-slate-900 p-4 rounded-2xl flex flex-wrap gap-4 items-center justify-between text-white shadow-md">
+              <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Legenda de Unidades:</span>
+              <div className="flex flex-wrap gap-3 items-center">
+                {legendUnits.map((item, idx) => (
+                  <div key={idx} className="flex items-center gap-2 bg-slate-800 px-3 py-1.5 rounded-xl border border-slate-700">
+                    <span className="w-3 h-3 rounded-full shadow-sm" style={{ backgroundColor: COLOR_MAP[item.color] }}></span>
+                    <span className="text-[10px] font-black uppercase tracking-wider text-slate-200">{item.name}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* GRID DE MESES DO SEMESTRE */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {monthsInRange.map(monthStr => {
+              {calendarRange.months.map(monthStr => {
                 const [year, month] = monthStr.split('-').map(Number);
                 const firstDay = new Date(year, month - 1, 1);
                 const lastDay = new Date(year, month, 0);
@@ -721,18 +762,19 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                       <div className="grid grid-cols-7 gap-1 text-center">
                         {days.map((day, idx) => {
                           if (!day) return <div key={`empty-${idx}`} className="aspect-square"></div>;
-                          const hasClass = scheduleDates[day];
+                          const matchInfo = unitsDateMap[day];
                           const isSunday = idx % 7 === 0;
 
                           return (
                             <div
                               key={day}
+                              title={matchInfo ? `${matchInfo.unitName}` : undefined}
                               className={`aspect-square flex items-center justify-center rounded-xl text-xs font-black transition-all ${
-                                hasClass ? 'shadow-sm ring-1 ring-black/10 scale-105' : 'hover:bg-slate-100 text-slate-700'
+                                matchInfo ? 'shadow-sm ring-1 ring-black/10 scale-105' : 'hover:bg-slate-100 text-slate-700'
                               }`}
                               style={{
-                                backgroundColor: hasClass ? COLOR_MAP[scheduleColor] : 'transparent',
-                                color: hasClass ? TEXT_COLOR_MAP[scheduleColor] : (isSunday ? '#ef4444' : '#1e293b')
+                                backgroundColor: matchInfo ? COLOR_MAP[matchInfo.color] : 'transparent',
+                                color: matchInfo ? TEXT_COLOR_MAP[matchInfo.color] : (isSunday ? '#ef4444' : '#1e293b')
                               }}
                             >
                               {day.split('-')[2]}
