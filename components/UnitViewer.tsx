@@ -246,7 +246,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
           .report-document, .report-document-sa { display: none !important; }
           [data-active-tab="cronograma"] .report-document { display: block !important; }
           [data-active-tab="sa"] .report-document-sa { display: block !important; }
-          .report-header { display: flex !important; justify-between: space-between !important; align-items: center !important; border-bottom: 2pt solid #E30613 !important; padding-bottom: 10pt !important; margin-bottom: 15pt !important; }
+          .report-header { display: flex !important; justify-content: space-between !important; align-items: center !important; border-bottom: 2pt solid #E30613 !important; padding-bottom: 10pt !important; margin-bottom: 15pt !important; }
           .logo-box { background: #E30613 !important; color: white !important; padding: 10pt 20pt !important; font-size: 24pt !important; font-weight: 900 !important; font-style: italic !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
           .info-box { text-align: right !important; color: #000 !important; }
           .info-box h1 { font-size: 10pt !important; font-weight: 900 !important; margin: 0 !important; text-transform: uppercase !important; }
@@ -580,172 +580,12 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                     <th className="p-3 w-[20%] text-xs font-black uppercase border-r border-black text-center align-middle">
                       Conhecimentos
                     </th>
-                    <th className="p-3 w-[25%] text-xs font-black uppercase border-r border-black text-center align-middle">
-                      Estratégias
-                    </th>
-                    <th className="p-3 w-[20%] text-xs font-black uppercase text-center align-middle">
-                      Recursos/Ambientes
-                    </th>
                   </tr>
                 </thead>
-                <tbody className="text-xs font-medium text-slate-900 divide-y border-black">
-                  {localSchedule.map((entry) => (
-                    <tr key={entry.id} className="border-b border-black hover:bg-slate-50/50 transition-colors">
-                      
-                      {/* COLUNA 1: HORAS / DATA */}
-                      <td className="p-2 border-r border-black align-top bg-slate-50/30">
-                        <div className="flex flex-col gap-1.5">
-                          <div className="flex items-center gap-1 text-[11px] font-bold">
-                            <input
-                              type="number"
-                              value={entry.hours}
-                              onChange={(e) => updateEntry(entry.id, 'hours', Number(e.target.value))}
-                              className="w-8 bg-transparent border-b border-slate-400 font-bold text-center focus:outline-none focus:border-black"
-                            />
-                            <span>horas -</span>
-                          </div>
-                          <DebouncedInput
-                            value={entry.date}
-                            onChange={(val) => updateEntry(entry.id, 'date', val)}
-                            placeholder="DD/MM/AAAA"
-                            className="w-full bg-transparent border-b border-dashed border-slate-300 font-bold text-xs focus:outline-none focus:border-black"
-                          />
-                          <span className="text-[9px] font-black uppercase text-slate-400 italic">
-                            {getDayOfWeek(entry.date)}
-                          </span>
-                        </div>
-                      </td>
-
-                      {/* COLUNA 2: CAPACIDADES */}
-                      <td className="p-2 border-r border-black align-top">
-                        <EditableArea
-                          value={entry.capacities}
-                          onChange={(val) => updateEntry(entry.id, 'capacities', val)}
-                          rows={2}
-                          placeholder="Capacidades..."
-                          className="w-full bg-transparent border-none text-xs leading-relaxed focus:outline-none focus:bg-slate-50 rounded p-1"
-                        />
-                      </td>
-
-                      {/* COLUNA 3: CONHECIMENTOS */}
-                      <td className="p-2 border-r border-black align-top">
-                        <EditableArea
-                          value={entry.knowledge}
-                          onChange={(val) => updateEntry(entry.id, 'knowledge', val)}
-                          rows={2}
-                          placeholder="Conhecimentos..."
-                          className="w-full bg-transparent border-none text-xs leading-relaxed focus:outline-none focus:bg-slate-50 rounded p-1"
-                        />
-                      </td>
-
-                      {/* COLUNA 4: ESTRATÉGIAS */}
-                      <td className="p-2 border-r border-black align-top">
-                        <EditableArea
-                          value={entry.strategy}
-                          onChange={(val) => updateEntry(entry.id, 'strategy', val)}
-                          rows={3}
-                          placeholder="Estratégias pedagógicas..."
-                          className="w-full bg-transparent border-none text-xs leading-relaxed focus:outline-none focus:bg-slate-50 rounded p-1"
-                        />
-                      </td>
-
-                      {/* COLUNA 5: RECURSOS/AMBIENTES */}
-                      <td className="p-2 align-top">
-                        <EditableArea
-                          value={entry.resources}
-                          onChange={(val) => updateEntry(entry.id, 'resources', val)}
-                          rows={2}
-                          placeholder="Recursos e ambientes..."
-                          className="w-full bg-transparent border-none text-xs leading-relaxed focus:outline-none focus:bg-slate-50 rounded p-1"
-                        />
-                      </td>
-
-                    </tr>
-                  ))}
-                </tbody>
               </table>
             </div>
           </div>
         )}
-
-        {/* ABA CALENDÁRIO REDESENHADA E ALINHADA */}
-        {activeTab === 'calendario' && (
-          <div className="space-y-6 no-print">
-            <div className="flex justify-between items-center border-b border-slate-200 pb-4">
-              <div>
-                <h3 className="text-2xl font-[1000] text-slate-900 uppercase italic">Calendário de Aulas</h3>
-                <p className="text-xs text-slate-500 font-semibold">Distribuição temporal das aulas e encontros previstos</p>
-              </div>
-              <div className="flex items-center gap-2 bg-slate-100 px-3 py-1.5 rounded-full border border-slate-200">
-                <span className="w-3 h-3 rounded-full shadow-sm" style={{ backgroundColor: COLOR_MAP[scheduleColor] }}></span>
-                <span className="text-[10px] font-black text-slate-700 uppercase tracking-wider">{localUnit.name}</span>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {monthsInRange.map(monthStr => {
-                const [year, month] = monthStr.split('-').map(Number);
-                const firstDay = new Date(year, month - 1, 1);
-                const lastDay = new Date(year, month, 0);
-                const monthName = firstDay.toLocaleDateString('pt-BR', { month: 'long' });
-                
-                const days: (string | null)[] = [];
-                for (let i = 0; i < firstDay.getDay(); i++) days.push(null);
-                for (let i = 1; i <= lastDay.getDate(); i++) {
-                  const d = i < 10 ? `0${i}` : `${i}`;
-                  days.push(`${monthStr}-${d}`);
-                }
-
-                return (
-                  <div key={monthStr} className="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-lg flex flex-col justify-between">
-                    <div className="bg-slate-900 text-white py-3 px-4 text-center border-b border-slate-800">
-                      <h4 className="text-xs font-black uppercase tracking-widest italic">{monthName} {year}</h4>
-                    </div>
-                    
-                    <div className="p-3">
-                      {/* DIAS DA SEMANA */}
-                      <div className="grid grid-cols-7 gap-1 text-center mb-2">
-                        {['D','S','T','Q','Q','S','S'].map((d, i) => (
-                          <div key={i} className={`text-[10px] font-black ${i === 0 ? 'text-red-500' : 'text-slate-400'}`}>
-                            {d}
-                          </div>
-                        ))}
-                      </div>
-
-                      {/* DIAS DO MÊS ALINHADOS */}
-                      <div className="grid grid-cols-7 gap-1 text-center">
-                        {days.map((day, idx) => {
-                          if (!day) return <div key={`empty-${idx}`} className="aspect-square"></div>;
-                          
-                          const hasClass = scheduleDates[day];
-                          const isSunday = idx % 7 === 0;
-
-                          return (
-                            <div
-                              key={day}
-                              className={`aspect-square flex items-center justify-center rounded-xl text-xs font-black transition-all ${
-                                hasClass 
-                                  ? 'shadow-sm ring-1 ring-black/10 scale-105' 
-                                  : 'hover:bg-slate-100 text-slate-700'
-                              }`}
-                              style={{
-                                backgroundColor: hasClass ? COLOR_MAP[scheduleColor] : 'transparent',
-                                color: hasClass ? TEXT_COLOR_MAP[scheduleColor] : (isSunday ? '#ef4444' : '#1e293b')
-                              }}
-                            >
-                              {day.split('-')[2]}
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        )}
-
       </div>
     </div>
   );
