@@ -1,322 +1,208 @@
 import React, { useState } from 'react';
-import { TeachingPlan, CurricularUnit, SemesterNumber } from '../types';
-import { GoogleGenAI } from "@google/genai";
+import { CurricularUnit } from '../types';
 
 interface PlanFormProps {
-  initialPlan?: TeachingPlan;
-  isAdmin?: boolean;
-  onSave: (plan: TeachingPlan) => Promise<void> | void;
-  onCancel: () => void;
+  units: CurricularUnit[];
+  onAddUnit: (unit: Partial<CurricularUnit>) => void;
+  onUpdateUnit: (id: string, updated: Partial<CurricularUnit>) => void;
+  onDeleteUnit: (id: string) => void;
+  onSelectUnit: (unit: CurricularUnit) => void;
 }
 
-const PlanForm: React.FC<PlanFormProps> = ({ initialPlan, isAdmin = true, onSave, onCancel }) => {
-  const [formData, setFormData] = useState<Partial<TeachingPlan>>(initialPlan || {
-    courseName: '',
-    modality: 'Presencial',
-    totalHours: 0,
-    objective: '',
-    units: [],
-    methodology: '',
-    evaluation: '',
-    bibliography: ''
-  });
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+const PlanForm: React.FC<PlanFormProps> = ({
+  units,
+  onAddUnit,
+  onUpdateUnit,
+  onDeleteUnit,
+  onSelectUnit,
+}) => {
+  const [newCode, setNewCode] = useState('');
+  const [newName, setNewName] = useState('');
+  const [newSemester, setNewSemester] = useState('1º Semestre');
+  const [newWorkload, setNewWorkload] = useState<number>(40);
 
-  const handleConfigKey = async () => {
-    if (window.aistudio) {
-      await window.aistudio.openSelectKey();
-    } else {
-      alert("Ambiente AI Studio não detectado.");
-    }
-  };
+  const handleCreate = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newName.trim()) return;
 
-  const handleAIHelp = async () => {
-    if (!isAdmin) return;
-    if (isGenerating) return;
-    if (!formData.courseName) {
-       alert("Preencha o nome do curso primeiro.");
-       return;
-    }
-    
-    setIsGenerating(true);
-    setErrorMsg(null);
-
-    try {
-      if (window.aistudio && !(await window.aistudio.hasSelectedApiKey())) {
-        await window.aistudio.openSelectKey();
-      }
-      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-      const response = await ai.models.generateContent({
-        model: 'gemini-3-flash-preview',
-        contents: `Escreva um objetivo geral de plano de ensino SENAI (perfil de conclusão) para o curso de: ${formData.courseName}. Seja técnico e profissional.`
-      });
-      const generatedText = response.text;
-      if (generatedText) {
-        setFormData(prev => ({ ...prev, objective: generatedText.trim() }));
-      }
-    } catch (err: any) {
-      console.error("Erro detalhado da IA:", err);
-      if (err.message?.includes("Requested entity was not found")) {
-        setErrorMsg("Projeto ou chave não encontrada.");
-        if (window.aistudio) await window.aistudio.openSelectKey();
-      } else {
-        setErrorMsg("Erro na conexão com a IA.");
-      }
-    } finally {
-      setIsGenerating(false);
-    }
-  };
-
-  const handleFinalSave = async () => {
-    if (!isAdmin) return;
-    if (!formData.courseName) {
-      alert("Defina o nome do curso.");
-      return;
-    }
-
-    setIsSubmitting(true);
-    setErrorMsg(null);
-
-    try {
-      const planToSave = {
-        ...formData,
-        id: formData.id || `plan-${Date.now()}`,
-        createdAt: formData.createdAt || new Date().toISOString(),
-      } as TeachingPlan;
-
-      await onSave(planToSave);
-    } catch (err: any) {
-      console.error("Erro ao salvar plano:", err);
-      setErrorMsg("Falha ao salvar no banco de dados. Tente novamente.");
-      setIsSubmitting(false);
-    }
-  };
-
-  const addUnit = () => {
-    if (!isAdmin) return;
-    const newUnit: CurricularUnit = {
-      id: `uc-${Math.random().toString(36).substr(2, 5)}`,
-      code: '',
-      name: '',
-      semester: 1 as SemesterNumber,
-      basicCapacities: [],
-      socioemocionalCapacities: [],
-      knowledge: [],
+    onAddUnit({
+      code: newCode.trim().toUpperCase(),
+      name: newName.trim(),
+      semester: newSemester,
+      workload: Number(newWorkload) || 0,
+      technicalCapacities: [],
+      socialCapacities: [],
+      knowledges: [],
       learningSituations: [],
       rubrics: [],
-      schedule: []
-    };
-    setFormData(prev => ({ ...prev, units: [...(prev.units || []), newUnit] }));
+      schedule: [],
+    });
+
+    setNewCode('');
+    setNewName('');
+    setNewWorkload(40);
   };
 
   return (
-    <div className="bg-white rounded-[2rem] shadow-2xl border border-slate-200 p-8 md:p-12 max-w-4xl mx-auto animate-fadeIn pb-20">
-      {!isAdmin && (
-        <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-2xl flex items-center justify-between">
-          <p className="text-xs font-black text-amber-800 uppercase tracking-wider">
-            Modo de Visualização: Apenas o administrador pode fazer alterações neste plano.
+    <div className="max-w-7xl mx-auto space-y-8 animate-fadeIn pb-12">
+      <div className="bg-white p-8 rounded-[2.5rem] shadow-xl border border-slate-200">
+        <div className="border-b border-slate-100 pb-6 mb-8">
+          <span className="bg-blue-600 px-3 py-1 rounded text-[9px] font-black uppercase tracking-widest text-white mb-2 inline-block">
+            MSEP - Gestão de Componentes
+          </span>
+          <h2 className="text-3xl font-[1000] text-slate-900 uppercase italic tracking-tight">
+            III. Estrutura de Unidades Curriculares
+          </h2>
+          <p className="text-xs text-slate-400 font-bold uppercase tracking-wider mt-1">
+            Cadastro de Sigla, Nome, Semestre e Carga Horária (Permite a mesma UC em semestres distintos)
           </p>
         </div>
-      )}
 
-      <div className="flex justify-between items-start mb-10">
-        <div>
-          <h2 className="text-3xl font-black text-slate-900 tracking-tighter uppercase">
-            {initialPlan ? 'Editar Plano' : 'Novo Plano'}
-          </h2>
-          <p className="text-slate-400 text-[10px] font-black uppercase tracking-widest mt-1">MSEP - Modelo SENAI de Educação</p>
-        </div>
-        
-        <div className="flex flex-col items-end gap-2">
-          <div className="flex gap-2">
-            {isAdmin && (
-              <button 
-                type="button"
-                onClick={handleConfigKey}
-                className="px-4 py-2 border-2 border-slate-200 rounded-xl font-black text-[8px] uppercase tracking-widest text-slate-400 hover:border-blue-400 hover:text-blue-600 transition-all"
-              >
-                Configurar Chave
-              </button>
-            )}
-            {isAdmin && (
-              <button 
-                type="button"
-                onClick={handleAIHelp}
-                disabled={isGenerating || isSubmitting}
-                className={`flex items-center gap-3 px-6 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all ${
-                  isGenerating ? 'bg-slate-100 text-slate-400' : 'bg-blue-600 text-white hover:bg-slate-900 shadow-lg shadow-blue-100'
-                }`}
-              >
-                {isGenerating ? (
-                  <div className="w-3 h-3 border-2 border-slate-300 border-t-slate-600 rounded-full animate-spin"></div>
-                ) : (
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                )}
-                {isGenerating ? 'Gerando...' : 'IA Assistente'}
-              </button>
-            )}
+        {/* FORMULÁRIO DE ADIÇÃO DE NOVA UNIDADE */}
+        <form onSubmit={handleCreate} className="bg-slate-50 p-6 rounded-3xl border border-slate-200 mb-10 grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
+          <div className="md:col-span-2">
+            <label className="block text-[10px] font-black uppercase text-slate-500 mb-2">Sigla</label>
+            <input
+              type="text"
+              value={newCode}
+              onChange={(e) => setNewCode(e.target.value)}
+              placeholder="Ex: CRD"
+              className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-xs font-bold text-slate-800 uppercase focus:outline-none focus:border-blue-600"
+            />
           </div>
-          {errorMsg && <p className="text-red-500 text-[8px] font-black uppercase text-right max-w-[250px] leading-tight">{errorMsg}</p>}
-        </div>
-      </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
-        <div className="space-y-2">
-          <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-2">Título do Curso</label>
-          <input 
-            type="text" 
-            value={formData.courseName}
-            disabled={!isAdmin}
-            onChange={e => setFormData({ ...formData, courseName: e.target.value })}
-            className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-6 py-4 focus:ring-2 focus:ring-blue-500 focus:bg-white outline-none transition-all font-bold text-slate-800 disabled:opacity-70 disabled:cursor-not-allowed" 
-            placeholder="Ex: TÉCNICO EM MECATRÔNICA"
-          />
-        </div>
-        <div className="space-y-2">
-          <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-2">Modalidade</label>
-          <select 
-            value={formData.modality}
-            disabled={!isAdmin}
-            onChange={e => setFormData({ ...formData, modality: e.target.value as any })}
-            className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-6 py-4 focus:ring-2 focus:ring-blue-500 focus:bg-white outline-none transition-all font-black text-[10px] uppercase tracking-widest disabled:opacity-70 disabled:cursor-not-allowed"
-          >
-            <option>Presencial</option>
-            <option>EAD</option>
-            <option>Semipresencial</option>
-          </select>
-        </div>
-        <div className="space-y-2 md:col-span-2">
-          <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-2">I. Perfil de Conclusão (Objetivo)</label>
-          <textarea 
-            rows={5}
-            value={formData.objective}
-            disabled={!isAdmin}
-            onChange={e => setFormData({ ...formData, objective: e.target.value })}
-            className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-6 py-4 focus:ring-2 focus:ring-blue-500 focus:bg-white outline-none transition-all font-medium text-slate-700 leading-relaxed disabled:opacity-70 disabled:cursor-not-allowed"
-            placeholder="O objetivo será preenchido aqui pela IA ou manualmente..."
-          />
-        </div>
-      </div>
+          <div className="md:col-span-4">
+            <label className="block text-[10px] font-black uppercase text-slate-500 mb-2">Nome da Unidade Curricular</label>
+            <input
+              type="text"
+              value={newName}
+              onChange={(e) => setNewName(e.target.value)}
+              placeholder="Ex: Controle Dimensional"
+              className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-xs font-bold text-slate-800 focus:outline-none focus:border-blue-600"
+              required
+            />
+          </div>
 
-      <div className="mb-10 bg-slate-50 p-8 rounded-3xl border border-slate-100">
-        <div className="flex justify-between items-center mb-6">
-          <h3 className="text-xs font-black uppercase tracking-widest text-slate-400">III. Estrutura de Unidades Curriculares</h3>
-          {isAdmin && (
-            <button 
-              type="button"
-              onClick={addUnit}
-              className="bg-white border border-slate-200 px-4 py-2 rounded-xl text-[9px] font-black uppercase text-blue-600 hover:bg-blue-600 hover:text-white transition-all shadow-sm flex items-center gap-2"
+          <div className="md:col-span-2">
+            <label className="block text-[10px] font-black uppercase text-slate-500 mb-2">Semestre</label>
+            <select
+              value={newSemester}
+              onChange={(e) => setNewSemester(e.target.value)}
+              className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-xs font-bold text-slate-800 focus:outline-none focus:border-blue-600"
             >
-              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4"/></svg>
-              Nova UC
+              <option value="1º Semestre">1º Semestre</option>
+              <option value="2º Semestre">2º Semestre</option>
+              <option value="3º Semestre">3º Semestre</option>
+              <option value="4º Semestre">4º Semestre</option>
+            </select>
+          </div>
+
+          <div className="md:col-span-2">
+            <label className="block text-[10px] font-black uppercase text-slate-500 mb-2">Carga Horária (h)</label>
+            <input
+              type="number"
+              value={newWorkload}
+              onChange={(e) => setNewWorkload(Number(e.target.value))}
+              placeholder="40"
+              className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-xs font-bold text-slate-800 focus:outline-none focus:border-blue-600"
+            />
+          </div>
+
+          <div className="md:col-span-2">
+            <button
+              type="submit"
+              className="w-full bg-blue-600 text-white rounded-xl px-6 py-3 text-xs font-black uppercase tracking-wider shadow-lg hover:bg-slate-900 transition-all flex items-center justify-center gap-2"
+            >
+              <span>+ Nova UC</span>
             </button>
-          )}
-        </div>
-        
+          </div>
+        </form>
+
+        {/* LISTAGEM DE UNIDADES CURRICULARES CADASTRADAS */}
         <div className="space-y-4">
-          {formData.units?.map((unit, index) => (
-            <div key={unit.id} className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row gap-4 items-center group">
-               <span className="text-[10px] font-black text-slate-300">0{index + 1}</span>
-               
-               {/* Campo de Sigla / Código */}
-               <div className="w-full md:w-32">
-                 <input 
-                   type="text" 
-                   placeholder="Sigla (Ex: USI)" 
-                   disabled={!isAdmin}
-                   className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold uppercase text-slate-800 outline-none focus:border-blue-500 disabled:opacity-70 disabled:cursor-not-allowed"
-                   value={unit.code || ''}
-                   onChange={e => {
-                     if (!isAdmin) return;
-                     const newUnits = [...formData.units!];
-                     newUnits[index].code = e.target.value.toUpperCase();
-                     setFormData({ ...formData, units: newUnits });
-                   }}
-                 />
-               </div>
+          {units.map((unit, index) => (
+            <div
+              key={unit.id || index}
+              className="bg-white border border-slate-200 rounded-2xl p-4 flex flex-col md:flex-row items-center justify-between gap-4 shadow-sm hover:border-blue-300 transition-all group"
+            >
+              <div className="flex items-center gap-4 w-full md:w-auto flex-1">
+                <span className="w-8 h-8 rounded-xl bg-slate-100 text-slate-500 font-black text-xs flex items-center justify-center shrink-0">
+                  {String(index + 1).padStart(2, '0')}
+                </span>
 
-               {/* Nome da Unidade Curricular */}
-               <div className="flex-1 w-full">
-                 <input 
-                   type="text" 
-                   placeholder="Nome da Unidade Curricular" 
-                   disabled={!isAdmin}
-                   className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold uppercase text-slate-800 outline-none focus:border-blue-500 disabled:opacity-70 disabled:cursor-not-allowed"
-                   value={unit.name}
-                   onChange={e => {
-                     if (!isAdmin) return;
-                     const newUnits = [...formData.units!];
-                     newUnits[index].name = e.target.value;
-                     setFormData({ ...formData, units: newUnits });
-                   }}
-                 />
-               </div>
+                <div className="w-24 shrink-0">
+                  <input
+                    type="text"
+                    value={unit.code || ''}
+                    onChange={(e) => onUpdateUnit(unit.id, { code: e.target.value.toUpperCase() })}
+                    placeholder="SIGLA"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-black text-slate-800 uppercase text-center focus:outline-none focus:border-blue-600"
+                  />
+                </div>
 
-               {/* Seletor de Semestre (Numérico 1 ou 2) */}
-               <div className="w-full md:w-44">
-                 <select
-                   className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-[10px] font-black uppercase tracking-wider text-slate-700 outline-none focus:border-blue-500 disabled:opacity-70 disabled:cursor-not-allowed"
-                   value={Number(unit.semester || 1)}
-                   disabled={!isAdmin}
-                   onChange={e => {
-                     if (!isAdmin) return;
-                     const newUnits = [...formData.units!];
-                     newUnits[index].semester = Number(e.target.value) as SemesterNumber;
-                     setFormData({ ...formData, units: newUnits });
-                   }}
-                 >
-                   <option value={1}>1º Semestre</option>
-                   <option value={2}>2º Semestre</option>
-                 </select>
-               </div>
+                <div className="flex-1">
+                  <input
+                    type="text"
+                    value={unit.name || ''}
+                    onChange={(e) => onUpdateUnit(unit.id, { name: e.target.value })}
+                    placeholder="Nome da Unidade Curricular"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-xs font-bold text-slate-800 focus:outline-none focus:border-blue-600"
+                  />
+                </div>
+              </div>
 
-               {/* Botão de Excluir */}
-               {isAdmin && (
-                 <button 
-                   type="button"
-                   onClick={() => {
-                     const newUnits = formData.units?.filter((_, i) => i !== index);
-                     setFormData({ ...formData, units: newUnits });
-                   }}
-                   className="p-3 text-slate-300 hover:text-red-500 transition-colors self-center"
-                 >
-                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                 </button>
-               )}
+              <div className="flex items-center gap-4 w-full md:w-auto justify-end">
+                <div className="w-36">
+                  <select
+                    value={unit.semester || '1º Semestre'}
+                    onChange={(e) => onUpdateUnit(unit.id, { semester: e.target.value })}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 focus:outline-none focus:border-blue-600"
+                  >
+                    <option value="1º Semestre">1º Semestre</option>
+                    <option value="2º Semestre">2º Semestre</option>
+                    <option value="3º Semestre">3º Semestre</option>
+                    <option value="4º Semestre">4º Semestre</option>
+                  </select>
+                </div>
+
+                <div className="w-28 flex items-center gap-1">
+                  <input
+                    type="number"
+                    value={unit.workload ?? 40}
+                    onChange={(e) => onUpdateUnit(unit.id, { workload: Number(e.target.value) })}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 text-center focus:outline-none focus:border-blue-600"
+                  />
+                  <span className="text-[10px] font-black text-slate-400 uppercase">h</span>
+                </div>
+
+                <button
+                  onClick={() => onSelectUnit(unit)}
+                  className="bg-blue-50 text-blue-600 px-4 py-2 rounded-xl text-xs font-black uppercase hover:bg-blue-600 hover:text-white transition-all shadow-sm shrink-0"
+                >
+                  Abrir Unidade
+                </button>
+
+                <button
+                  onClick={() => {
+                    if (confirm("Tem certeza que deseja excluir esta Unidade Curricular?")) {
+                      onDeleteUnit(unit.id);
+                    }
+                  }}
+                  className="text-slate-300 hover:text-red-500 p-2 font-black transition-all shrink-0"
+                  title="Excluir Unidade"
+                >
+                  ✕
+                </button>
+              </div>
             </div>
           ))}
-          {(!formData.units || formData.units.length === 0) && (
-            <p className="text-center text-slate-400 text-xs py-4 uppercase font-bold tracking-widest">Nenhuma Unidade Curricular cadastrada neste plano.</p>
+
+          {units.length === 0 && (
+            <div className="text-center py-12 text-slate-400 text-xs font-bold uppercase tracking-wider">
+              Nenhuma Unidade Curricular cadastrada. Utilize o formulário acima para criar a primeira.
+            </div>
           )}
         </div>
-      </div>
-
-      <div className="flex justify-end gap-4">
-        <button 
-          type="button"
-          onClick={onCancel}
-          disabled={isSubmitting}
-          className="px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest text-slate-400 hover:text-slate-800 transition-colors disabled:opacity-50"
-        >
-          {isAdmin ? 'Descartar' : 'Voltar'}
-        </button>
-        {isAdmin && (
-          <button 
-            type="button"
-            onClick={handleFinalSave}
-            disabled={isSubmitting}
-            className={`px-10 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl transition-all flex items-center gap-3 ${
-              isSubmitting ? 'bg-slate-700 text-white cursor-not-allowed' : 'bg-slate-900 text-white hover:bg-blue-600'
-            }`}
-          >
-            {isSubmitting && (
-              <div className="w-3 h-3 border-2 border-slate-400 border-t-white rounded-full animate-spin"></div>
-            )}
-            {isSubmitting ? 'Sincronizando...' : 'Confirmar e Salvar'}
-          </button>
-        )}
       </div>
     </div>
   );
