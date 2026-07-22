@@ -17,7 +17,6 @@ const TEXT_COLOR_MAP: Record<CalendarColor, string> = {
   yellow: '#0f172a', green: '#ffffff', blue: '#ffffff', red: '#ffffff', cyan: '#ffffff', orange: '#ffffff', purple: '#ffffff', pink: '#ffffff', white: '#1e293b', none: 'inherit'
 };
 
-// Componente para Inputs simples
 const DebouncedInput: React.FC<{
   value: string;
   onChange: (val: string) => void;
@@ -48,7 +47,6 @@ const DebouncedInput: React.FC<{
   );
 };
 
-// Componente isolado para Textareas dinâmicas
 const EditableArea: React.FC<{
   value: string;
   onChange: (val: string) => void;
@@ -114,7 +112,6 @@ const UnitViewer: React.FC<Props> = ({ unit, allUnits = [], onUpdateSchedule, on
   const unitIdOrName = `${localUnit.id || ''}-${localUnit.semester || ''}-${localUnit.name || ''}`.toLowerCase();
   const isCRD = unitIdOrName.includes('crd') || unitIdOrName.includes('dimensional');
   const isFUSI = unitIdOrName.includes('fusi') || unitIdOrName.includes('usinagem');
-  const scheduleColor: CalendarColor = isCRD ? 'pink' : (isFUSI ? 'orange' : 'blue');
 
   const getDayOfWeek = (dateStr: string) => {
     if (!dateStr || !dateStr.includes('/')) return "";
@@ -237,7 +234,6 @@ const UnitViewer: React.FC<Props> = ({ unit, allUnits = [], onUpdateSchedule, on
     window.print();
   };
 
-  // Mapeia datas de todas as unidades para o calendário geral
   const unitsDateMap = useMemo(() => {
     const map: Record<string, { color: CalendarColor; unitName: string }> = {};
     const unitsList = allUnits.length > 0 ? allUnits : [localUnit];
@@ -261,7 +257,6 @@ const UnitViewer: React.FC<Props> = ({ unit, allUnits = [], onUpdateSchedule, on
     return map;
   }, [allUnits, localUnit]);
 
-  // Determina se o semestre é o 2º (julho a dezembro) ou 1º (janeiro a junho)
   const semesterNum = localUnit.semester || 1;
   const currentYear = new Date().getFullYear();
   const calendarRange = useMemo(() => {
@@ -280,7 +275,6 @@ const UnitViewer: React.FC<Props> = ({ unit, allUnits = [], onUpdateSchedule, on
     }
   }, [semesterNum, currentYear]);
 
-  // Lista de unidades para a legenda superior
   const legendUnits = useMemo(() => {
     const unitsList = allUnits.length > 0 ? allUnits : [localUnit];
     return unitsList.map((u, idx) => {
@@ -335,37 +329,39 @@ const UnitViewer: React.FC<Props> = ({ unit, allUnits = [], onUpdateSchedule, on
 
       <div className="p-6 md:p-10 max-h-[75vh] overflow-y-auto custom-scrollbar bg-[#FDFDFD] content-area">
 
-        {/* ABA GERAL EM COLUNAS */}
+        {/* ABA GERAL EM COLUNAS - RETO / SEM ARREDONDAMENTO E MAIS PRÓXIMO (~1mm) */}
         {activeTab === 'geral' && (
-          <div className="space-y-10 max-w-7xl mx-auto">
-            <div className="border-b border-slate-100 pb-6">
-              <h3 className="text-3xl font-[1000] text-slate-900 uppercase italic">Geral & Matriz Pedagógica</h3>
-              <p className="text-xs text-slate-400 font-bold uppercase tracking-wider mt-1">Gerais da Unidade Curricular Organizadas em Colunas</p>
+          <div className="space-y-4 max-w-7xl mx-auto">
+            <div className="border-b border-slate-100 pb-4">
+              <h3 className="text-2xl font-[1000] text-slate-900 uppercase italic">Geral & Matriz Pedagógica</h3>
+              <p className="text-xs text-slate-400 font-bold uppercase tracking-wider mt-0.5">Gerais da Unidade Curricular Organizadas em Colunas</p>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-              <div className="bg-white p-6 rounded-[2rem] border border-slate-200 shadow-lg space-y-4 flex flex-col h-full">
-                <div className="flex justify-between items-center border-b border-slate-100 pb-4">
-                  <h4 className="text-xs font-black uppercase tracking-wider text-blue-600 flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 bg-blue-600 rounded-full inline-block"></span>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-2 items-start">
+              
+              {/* COLUNA 1: CAPACIDADES TÉCNICAS */}
+              <div className="bg-white p-3 rounded-none border border-slate-300 shadow-none space-y-2 flex flex-col h-full">
+                <div className="flex justify-between items-center border-b border-slate-200 pb-2">
+                  <h4 className="text-[11px] font-black uppercase tracking-wider text-blue-600 flex items-center gap-1.5">
+                    <span className="w-2 h-2 bg-blue-600 inline-block"></span>
                     Capacidades Técnicas
                   </h4>
-                  <button onClick={() => addGeneralFieldItem('technicalCapacities')} className="bg-blue-50 text-blue-600 px-2.5 py-1 rounded-xl text-[9px] font-black uppercase hover:bg-blue-600 hover:text-white transition-all">
+                  <button onClick={() => addGeneralFieldItem('technicalCapacities')} className="bg-blue-50 text-blue-600 px-2 py-0.5 rounded-none text-[8.5px] font-black uppercase hover:bg-blue-600 hover:text-white transition-all">
                     + Item
                   </button>
                 </div>
-                <div className="space-y-3 flex-1">
+                <div className="space-y-1.5 flex-1">
                   {(localUnit.technicalCapacities || []).map((cap, idx) => (
-                    <div key={idx} className="flex gap-2 items-start bg-slate-50 p-2.5 rounded-xl border border-slate-100">
-                      <span className="text-[10px] font-black text-slate-400 mt-1">{idx + 1}.</span>
+                    <div key={idx} className="flex gap-1.5 items-start bg-slate-50 p-1.5 rounded-none border border-slate-200">
+                      <span className="text-[9.5px] font-black text-slate-400 mt-0.5">{idx + 1}.</span>
                       <EditableArea
                         value={cap}
                         onChange={(val) => updateGeneralFieldList('technicalCapacities', idx, val)}
                         placeholder="Descreva a capacidade técnica..."
                         rows={1}
-                        className="flex-1 bg-transparent border-none text-xs font-bold text-slate-800 focus:outline-none"
+                        className="flex-1 bg-transparent border-none text-[11px] font-bold text-slate-800 focus:outline-none p-0"
                       />
-                      <button onClick={() => removeGeneralFieldItem('technicalCapacities', idx)} className="text-slate-300 hover:text-red-500 text-xs font-bold transition-all p-1">
+                      <button onClick={() => removeGeneralFieldItem('technicalCapacities', idx)} className="text-slate-300 hover:text-red-500 text-[10px] font-bold transition-all px-1">
                         ✕
                       </button>
                     </div>
@@ -373,28 +369,29 @@ const UnitViewer: React.FC<Props> = ({ unit, allUnits = [], onUpdateSchedule, on
                 </div>
               </div>
 
-              <div className="bg-white p-6 rounded-[2rem] border border-slate-200 shadow-lg space-y-4 flex flex-col h-full">
-                <div className="flex justify-between items-center border-b border-slate-100 pb-4">
-                  <h4 className="text-xs font-black uppercase tracking-wider text-purple-600 flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 bg-purple-600 rounded-full inline-block"></span>
+              {/* COLUNA 2: SOCIOEMOCIONAIS */}
+              <div className="bg-white p-3 rounded-none border border-slate-300 shadow-none space-y-2 flex flex-col h-full">
+                <div className="flex justify-between items-center border-b border-slate-200 pb-2">
+                  <h4 className="text-[11px] font-black uppercase tracking-wider text-purple-600 flex items-center gap-1.5">
+                    <span className="w-2 h-2 bg-purple-600 inline-block"></span>
                     Socioemocionais
                   </h4>
-                  <button onClick={() => addGeneralFieldItem('socialCapacities')} className="bg-purple-50 text-purple-600 px-2.5 py-1 rounded-xl text-[9px] font-black uppercase hover:bg-purple-600 hover:text-white transition-all">
+                  <button onClick={() => addGeneralFieldItem('socialCapacities')} className="bg-purple-50 text-purple-600 px-2 py-0.5 rounded-none text-[8.5px] font-black uppercase hover:bg-purple-600 hover:text-white transition-all">
                     + Item
                   </button>
                 </div>
-                <div className="space-y-3 flex-1">
+                <div className="space-y-1.5 flex-1">
                   {(localUnit.socialCapacities || []).map((cap, idx) => (
-                    <div key={idx} className="flex gap-2 items-start bg-slate-50 p-2.5 rounded-xl border border-slate-100">
-                      <span className="text-[10px] font-black text-slate-400 mt-1">{idx + 1}.</span>
+                    <div key={idx} className="flex gap-1.5 items-start bg-slate-50 p-1.5 rounded-none border border-slate-200">
+                      <span className="text-[9.5px] font-black text-slate-400 mt-0.5">{idx + 1}.</span>
                       <EditableArea
                         value={cap}
                         onChange={(val) => updateGeneralFieldList('socialCapacities', idx, val)}
                         placeholder="Descreva a capacidade socioemocional..."
                         rows={1}
-                        className="flex-1 bg-transparent border-none text-xs font-bold text-slate-800 focus:outline-none"
+                        className="flex-1 bg-transparent border-none text-[11px] font-bold text-slate-800 focus:outline-none p-0"
                       />
-                      <button onClick={() => removeGeneralFieldItem('socialCapacities', idx)} className="text-slate-300 hover:text-red-500 text-xs font-bold transition-all p-1">
+                      <button onClick={() => removeGeneralFieldItem('socialCapacities', idx)} className="text-slate-300 hover:text-red-500 text-[10px] font-bold transition-all px-1">
                         ✕
                       </button>
                     </div>
@@ -402,34 +399,36 @@ const UnitViewer: React.FC<Props> = ({ unit, allUnits = [], onUpdateSchedule, on
                 </div>
               </div>
 
-              <div className="bg-white p-6 rounded-[2rem] border border-slate-200 shadow-lg space-y-4 flex flex-col h-full">
-                <div className="flex justify-between items-center border-b border-slate-100 pb-4">
-                  <h4 className="text-xs font-black uppercase tracking-wider text-orange-600 flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 bg-orange-600 rounded-full inline-block"></span>
+              {/* COLUNA 3: CONHECIMENTOS */}
+              <div className="bg-white p-3 rounded-none border border-slate-300 shadow-none space-y-2 flex flex-col h-full">
+                <div className="flex justify-between items-center border-b border-slate-200 pb-2">
+                  <h4 className="text-[11px] font-black uppercase tracking-wider text-orange-600 flex items-center gap-1.5">
+                    <span className="w-2 h-2 bg-orange-600 inline-block"></span>
                     Conhecimentos
                   </h4>
-                  <button onClick={() => addGeneralFieldItem('knowledges')} className="bg-orange-50 text-orange-600 px-2.5 py-1 rounded-xl text-[9px] font-black uppercase hover:bg-orange-600 hover:text-white transition-all">
+                  <button onClick={() => addGeneralFieldItem('knowledges')} className="bg-orange-50 text-orange-600 px-2 py-0.5 rounded-none text-[8.5px] font-black uppercase hover:bg-orange-600 hover:text-white transition-all">
                     + Item
                   </button>
                 </div>
-                <div className="space-y-3 flex-1">
+                <div className="space-y-1.5 flex-1">
                   {(localUnit.knowledges || []).map((know, idx) => (
-                    <div key={idx} className="flex gap-2 items-start bg-slate-50 p-2.5 rounded-xl border border-slate-100">
-                      <span className="text-[10px] font-black text-slate-400 mt-1">{idx + 1}.</span>
+                    <div key={idx} className="flex gap-1.5 items-start bg-slate-50 p-1.5 rounded-none border border-slate-200">
+                      <span className="text-[9.5px] font-black text-slate-400 mt-0.5">{idx + 1}.</span>
                       <EditableArea
                         value={know}
                         onChange={(val) => updateGeneralFieldList('knowledges', idx, val)}
                         placeholder="Descreva o conhecimento..."
                         rows={1}
-                        className="flex-1 bg-transparent border-none text-xs font-bold text-slate-800 focus:outline-none"
+                        className="flex-1 bg-transparent border-none text-[11px] font-bold text-slate-800 focus:outline-none p-0"
                       />
-                      <button onClick={() => removeGeneralFieldItem('knowledges', idx)} className="text-slate-300 hover:text-red-500 text-xs font-bold transition-all p-1">
+                      <button onClick={() => removeGeneralFieldItem('knowledges', idx)} className="text-slate-300 hover:text-red-500 text-[10px] font-bold transition-all px-1">
                         ✕
                       </button>
                     </div>
                   ))}
                 </div>
               </div>
+
             </div>
           </div>
         )}
