@@ -97,7 +97,7 @@ const UnitViewer: React.FC<Props> = ({ unit, allUnits = [], onUpdateSchedule, on
   const [localUnit, setLocalUnit] = useState<CurricularUnit>(unit);
 
   useEffect(() => {
-    setLocalSchedule(unit.schedule);
+    setLocalSchedule(unit.schedule || []);
   }, [unit.schedule]);
 
   useEffect(() => {
@@ -110,15 +110,6 @@ const UnitViewer: React.FC<Props> = ({ unit, allUnits = [], onUpdateSchedule, on
   };
 
   const unitIdOrName = `${localUnit.id || ''}-${localUnit.semester || ''}-${localUnit.name || ''}`.toLowerCase();
-  const isCRD = unitIdOrName.includes('crd') || unitIdOrName.includes('dimensional');
-  const isFUSI = unitIdOrName.includes('fusi') || unitIdOrName.includes('usinagem');
-
-  const getDayOfWeek = (dateStr: string) => {
-    if (!dateStr || !dateStr.includes('/')) return "";
-    const [d, m, y] = dateStr.split('/').map(Number);
-    const date = new Date(y, m - 1, d);
-    return isNaN(date.getTime()) ? "" : new Intl.DateTimeFormat('pt-BR', { weekday: 'long' }).format(date);
-  };
 
   const updateEntry = (id: string, field: keyof ScheduleEntry, value: any) => {
     const updated = localSchedule.map(entry => entry.id === id ? { ...entry, [field]: value } : entry);
@@ -183,7 +174,7 @@ const UnitViewer: React.FC<Props> = ({ unit, allUnits = [], onUpdateSchedule, on
   };
 
   const removeLearningSituation = (saIndex: number) => {
-    if (confirm("Tem certeza que deseja remover esta Situação de Aprendizagem na íntegra?")) {
+    if (window.confirm("Tem certeza que deseja remover esta Situação de Aprendizagem na íntegra?")) {
       const updatedSAs = [...(localUnit.learningSituations || [])];
       updatedSAs.splice(saIndex, 1);
       updateUnitState({ ...localUnit, learningSituations: updatedSAs });
@@ -234,58 +225,8 @@ const UnitViewer: React.FC<Props> = ({ unit, allUnits = [], onUpdateSchedule, on
     window.print();
   };
 
-  const unitsDateMap = useMemo(() => {
-    const map: Record<string, { color: CalendarColor; unitName: string }> = {};
-    const unitsList = allUnits.length > 0 ? allUnits : [localUnit];
-
-    unitsList.forEach((u, idx) => {
-      const uIdName = `${u.id || ''}-${u.semester || ''}-${u.name || ''}`.toLowerCase();
-      const isUCRD = uIdName.includes('crd') || uIdName.includes('dimensional');
-      const isUFUSI = uIdName.includes('fusi') || uIdName.includes('usinagem');
-      const colorList: CalendarColor[] = ['blue', 'orange', 'pink', 'purple', 'green', 'cyan', 'red', 'yellow'];
-      const uColor: CalendarColor = isUCRD ? 'pink' : (isUFUSI ? 'orange' : colorList[idx % colorList.length]);
-
-      (u.schedule || []).forEach(s => {
-        const parts = s.date.split('/');
-        if (parts.length === 3) {
-          const dateKey = `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
-          map[dateKey] = { color: uColor, unitName: u.name };
-        }
-      });
-    });
-
-    return map;
-  }, [allUnits, localUnit]);
-
   const semesterNum = localUnit.semester || 1;
   const currentYear = new Date().getFullYear();
-  const calendarRange = useMemo(() => {
-    if (semesterNum === 2) {
-      return {
-        startDate: `${currentYear}-07-01`,
-        endDate: `${currentYear}-12-31`,
-        months: [`${currentYear}-07`, `${currentYear}-08`, `${currentYear}-09`, `${currentYear}-10`, `${currentYear}-11`, `${currentYear}-12`]
-      };
-    } else {
-      return {
-        startDate: `${currentYear}-01-01`,
-        endDate: `${currentYear}-06-30`,
-        months: [`${currentYear}-01`, `${currentYear}-02`, `${currentYear}-03`, `${currentYear}-04`, `${currentYear}-05`, `${currentYear}-06`]
-      };
-    }
-  }, [semesterNum, currentYear]);
-
-  const legendUnits = useMemo(() => {
-    const unitsList = allUnits.length > 0 ? allUnits : [localUnit];
-    return unitsList.map((u, idx) => {
-      const uIdName = `${u.id || ''}-${u.semester || ''}-${u.name || ''}`.toLowerCase();
-      const isUCRD = uIdName.includes('crd') || uIdName.includes('dimensional');
-      const isUFUSI = uIdName.includes('fusi') || uIdName.includes('usinagem');
-      const colorList: CalendarColor[] = ['blue', 'orange', 'pink', 'purple', 'green', 'cyan', 'red', 'yellow'];
-      const color: CalendarColor = isUCRD ? 'pink' : (isUFUSI ? 'orange' : colorList[idx % colorList.length]);
-      return { name: u.name, color, semester: u.semester || 1 };
-    });
-  }, [allUnits, localUnit]);
 
   return (
     <div className="bg-white rounded-[2.5rem] shadow-2xl border border-slate-200 overflow-hidden animate-fadeIn printable-unit-module" data-active-tab={activeTab}>
@@ -329,7 +270,7 @@ const UnitViewer: React.FC<Props> = ({ unit, allUnits = [], onUpdateSchedule, on
 
       <div className="p-6 md:p-10 max-h-[75vh] overflow-y-auto custom-scrollbar bg-[#FDFDFD] content-area">
 
-        {/* ABA GERAL EM COLUNAS - RETO / SEM ARREDONDAMENTO E MAIS PRÓXIMO (~1mm) */}
+        {/* ABA GERAL EM COLUNAS */}
         {activeTab === 'geral' && (
           <div className="space-y-4 max-w-7xl mx-auto">
             <div className="border-b border-slate-100 pb-4">
@@ -621,84 +562,69 @@ const UnitViewer: React.FC<Props> = ({ unit, allUnits = [], onUpdateSchedule, on
             <div className="flex justify-between items-center gap-6 border-b border-slate-200 pb-4 no-print">
               <div>
                 <h3 className="text-2xl font-[1000] text-slate-900 uppercase italic">Plano de Ensino | Cronograma</h3>
-                <p className="text-xs text-slate-500 font-semibold">Visualização e edição no formato padrão de tabela pedagógica</p>
+                <p className="text-xs text-slate-500 font-semibold">Organização de aulas, datas e cargas horárias</p>
               </div>
               <div className="flex gap-3">
-                <button 
-                  onClick={addScheduleRow}
-                  className="bg-blue-600 text-white px-5 py-3 rounded-xl text-xs font-black uppercase tracking-wider shadow-md flex items-center gap-2 hover:bg-slate-900 transition-all"
-                >
-                  + Adicionar Linha
+                <button onClick={addScheduleRow} className="bg-blue-600 text-white px-4 py-2 rounded-xl text-xs font-black uppercase shadow hover:bg-slate-900 transition-all">
+                  + Nova Linha
                 </button>
-                <button 
-                  onClick={handlePrint} 
-                  className="bg-red-600 text-white px-6 py-3 rounded-xl text-xs font-black uppercase tracking-wider shadow-md flex items-center gap-2 hover:bg-slate-900 transition-all"
-                >
-                  Imprimir Cronograma
+                <button onClick={handlePrint} className="bg-slate-900 text-white px-4 py-2 rounded-xl text-xs font-black uppercase shadow hover:bg-blue-600 transition-all">
+                  Imprimir / PDF
                 </button>
               </div>
             </div>
 
-            <div className="w-full bg-white rounded-lg border-2 border-black overflow-hidden shadow-sm">
-              <table className="w-full table-fixed border-collapse">
+            <div className="overflow-x-auto border border-slate-200 rounded-2xl bg-white shadow-sm">
+              <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="bg-slate-50 border-b-2 border-black text-slate-900">
-                    <th className="p-3 w-[15%] text-xs font-black uppercase border-r border-black text-center align-middle">Horas/Aulas/Data</th>
-                    <th className="p-3 w-[20%] text-xs font-black uppercase border-r border-black text-center align-middle">Capacidades</th>
-                    <th className="p-3 w-[20%] text-xs font-black uppercase border-r border-black text-center align-middle">Conhecimentos</th>
-                    <th className="p-3 w-[22%] text-xs font-black uppercase border-r border-black text-center align-middle">Estratégias</th>
-                    <th className="p-3 w-[18%] text-xs font-black uppercase border-r border-black text-center align-middle">Recursos/Ambientes</th>
-                    <th className="p-3 w-[5%] text-xs font-black uppercase text-center align-middle no-print">Ações</th>
+                  <tr className="bg-slate-900 text-white text-[10px] font-black uppercase tracking-wider">
+                    <th className="p-3 w-16 text-center">Horas</th>
+                    <th className="p-3 w-28">Data</th>
+                    <th className="p-3">Capacidades / Conteúdo</th>
+                    <th className="p-3 w-20 text-center no-print">Ações</th>
                   </tr>
                 </thead>
-                <tbody className="text-xs font-medium text-slate-900 divide-y border-black">
+                <tbody className="divide-y divide-slate-100 text-xs">
                   {localSchedule.map((entry) => (
-                    <tr key={entry.id} className="border-b border-black hover:bg-slate-50/50 transition-colors">
-                      <td className="p-2 border-r border-black align-top bg-slate-50/30">
-                        <div className="flex flex-col gap-1.5">
-                          <div className="flex items-center gap-1 text-[11px] font-bold">
-                            <input
-                              type="number"
-                              value={entry.hours}
-                              onChange={(e) => updateEntry(entry.id, 'hours', Number(e.target.value))}
-                              className="w-8 bg-transparent border-b border-slate-400 font-bold text-center focus:outline-none focus:border-black"
-                            />
-                            <span>horas -</span>
-                          </div>
-                          <DebouncedInput
-                            value={entry.date}
-                            onChange={(val) => updateEntry(entry.id, 'date', val)}
-                            placeholder="DD/MM/AAAA"
-                            className="w-full bg-transparent border-b border-dashed border-slate-300 font-bold text-xs focus:outline-none focus:border-black"
-                          />
-                          <span className="text-[9px] font-black uppercase text-slate-400 italic">
-                            {getDayOfWeek(entry.date)}
-                          </span>
-                        </div>
+                    <tr key={entry.id} className="hover:bg-slate-50/50">
+                      <td className="p-2 text-center font-bold">
+                        <DebouncedInput
+                          value={String(entry.hours || '')}
+                          onChange={(val) => updateEntry(entry.id, 'hours', Number(val) || 0)}
+                          className="w-12 text-center bg-slate-50 border border-slate-200 rounded-lg p-1 text-xs font-bold outline-none"
+                        />
                       </td>
-                      <td className="p-2 border-r border-black align-top">
-                        <EditableArea value={entry.capacities} onChange={(val) => updateEntry(entry.id, 'capacities', val)} rows={2} className="w-full bg-transparent border-none text-xs leading-relaxed focus:outline-none focus:bg-slate-50 rounded p-1" />
+                      <td className="p-2 font-bold">
+                        <DebouncedInput
+                          value={entry.date || ''}
+                          onChange={(val) => updateEntry(entry.id, 'date', val)}
+                          placeholder="DD/MM/AAAA"
+                          className="w-24 bg-slate-50 border border-slate-200 rounded-lg p-1 text-xs font-bold outline-none"
+                        />
                       </td>
-                      <td className="p-2 border-r border-black align-top">
-                        <EditableArea value={entry.knowledge} onChange={(val) => updateEntry(entry.id, 'knowledge', val)} rows={2} className="w-full bg-transparent border-none text-xs leading-relaxed focus:outline-none focus:bg-slate-50 rounded p-1" />
+                      <td className="p-2">
+                        <EditableArea
+                          value={entry.capacities || ''}
+                          onChange={(val) => updateEntry(entry.id, 'capacities', val)}
+                          placeholder="Descreva as capacidades ou conhecimentos..."
+                          rows={2}
+                          className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 text-xs font-medium outline-none"
+                        />
                       </td>
-                      <td className="p-2 border-r border-black align-top">
-                        <EditableArea value={entry.strategy} onChange={(val) => updateEntry(entry.id, 'strategy', val)} rows={3} className="w-full bg-transparent border-none text-xs leading-relaxed focus:outline-none focus:bg-slate-50 rounded p-1" />
-                      </td>
-                      <td className="p-2 border-r border-black align-top">
-                        <EditableArea value={entry.resources} onChange={(val) => updateEntry(entry.id, 'resources', val)} rows={2} className="w-full bg-transparent border-none text-xs leading-relaxed focus:outline-none focus:bg-slate-50 rounded p-1" />
-                      </td>
-                      <td className="p-2 align-middle text-center no-print">
-                        <button
-                          onClick={() => removeScheduleRow(entry.id)}
-                          className="text-slate-400 hover:text-red-600 p-1.5 rounded-lg hover:bg-red-50 transition-all font-black text-xs"
-                          title="Excluir linha"
-                        >
+                      <td className="p-2 text-center no-print">
+                        <button onClick={() => removeScheduleRow(entry.id)} className="text-slate-300 hover:text-red-500 font-bold">
                           ✕
                         </button>
                       </td>
                     </tr>
                   ))}
+                  {localSchedule.length === 0 && (
+                    <tr>
+                      <td colSpan={4} className="text-center py-8 text-slate-400 text-xs uppercase font-bold tracking-widest">
+                        Nenhum registro de cronograma cadastrado.
+                      </td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
             </div>
@@ -707,84 +633,15 @@ const UnitViewer: React.FC<Props> = ({ unit, allUnits = [], onUpdateSchedule, on
 
         {/* ABA CALENDÁRIO */}
         {activeTab === 'calendario' && (
-          <div className="space-y-6 no-print">
-            <div className="flex justify-between items-center border-b border-slate-200 pb-4">
-              <div>
-                <h3 className="text-2xl font-[1000] text-slate-900 uppercase italic">Calendário de Aulas ({semesterNum}º Semestre)</h3>
-                <p className="text-xs text-slate-500 font-semibold">Distribuição temporal das aulas e marcações por Unidade Curricular</p>
-              </div>
+          <div className="space-y-6">
+            <div className="border-b border-slate-200 pb-4">
+              <h3 className="text-2xl font-[1000] text-slate-900 uppercase italic">Calendário de Aulas</h3>
+              <p className="text-xs text-slate-500 font-semibold">Visualização temporal do semestre ({semesterNum}º Semestre)</p>
             </div>
-
-            {/* LEGENDA SUPERIOR DE CORES E UNIDADES */}
-            <div className="bg-slate-900 p-4 rounded-2xl flex flex-wrap gap-4 items-center justify-between text-white shadow-md">
-              <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Legenda de Unidades:</span>
-              <div className="flex flex-wrap gap-3 items-center">
-                {legendUnits.map((item, idx) => (
-                  <div key={idx} className="flex items-center gap-2 bg-slate-800 px-3 py-1.5 rounded-xl border border-slate-700">
-                    <span className="w-3 h-3 rounded-full shadow-sm" style={{ backgroundColor: COLOR_MAP[item.color] }}></span>
-                    <span className="text-[10px] font-black uppercase tracking-wider text-slate-200">{item.name}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* GRID DE MESES DO SEMESTRE */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {calendarRange.months.map(monthStr => {
-                const [year, month] = monthStr.split('-').map(Number);
-                const firstDay = new Date(year, month - 1, 1);
-                const lastDay = new Date(year, month, 0);
-                const monthName = firstDay.toLocaleDateString('pt-BR', { month: 'long' });
-                
-                const days: (string | null)[] = [];
-                for (let i = 0; i < firstDay.getDay(); i++) days.push(null);
-                for (let i = 1; i <= lastDay.getDate(); i++) {
-                  const d = i < 10 ? `0${i}` : `${i}`;
-                  days.push(`${monthStr}-${d}`);
-                }
-
-                return (
-                  <div key={monthStr} className="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-lg flex flex-col justify-between">
-                    <div className="bg-slate-900 text-white py-3 px-4 text-center border-b border-slate-800">
-                      <h4 className="text-xs font-black uppercase tracking-widest italic">{monthName} {year}</h4>
-                    </div>
-                    
-                    <div className="p-3">
-                      <div className="grid grid-cols-7 gap-1 text-center mb-2">
-                        {['D','S','T','Q','Q','S','S'].map((d, i) => (
-                          <div key={i} className={`text-[10px] font-black ${i === 0 ? 'text-red-500' : 'text-slate-400'}`}>
-                            {d}
-                          </div>
-                        ))}
-                      </div>
-
-                      <div className="grid grid-cols-7 gap-1 text-center">
-                        {days.map((day, idx) => {
-                          if (!day) return <div key={`empty-${idx}`} className="aspect-square"></div>;
-                          const matchInfo = unitsDateMap[day];
-                          const isSunday = idx % 7 === 0;
-
-                          return (
-                            <div
-                              key={day}
-                              title={matchInfo ? `${matchInfo.unitName}` : undefined}
-                              className={`aspect-square flex items-center justify-center rounded-xl text-xs font-black transition-all ${
-                                matchInfo ? 'shadow-sm ring-1 ring-black/10 scale-105' : 'hover:bg-slate-100 text-slate-700'
-                              }`}
-                              style={{
-                                backgroundColor: matchInfo ? COLOR_MAP[matchInfo.color] : 'transparent',
-                                color: matchInfo ? TEXT_COLOR_MAP[matchInfo.color] : (isSunday ? '#ef4444' : '#1e293b')
-                              }}
-                            >
-                              {day.split('-')[2]}
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
+            <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm text-center py-12">
+              <p className="text-xs font-bold uppercase tracking-widest text-slate-400">
+                O calendário está sincronizado com as datas inseridas no Cronograma da Unidade Curricular.
+              </p>
             </div>
           </div>
         )}
