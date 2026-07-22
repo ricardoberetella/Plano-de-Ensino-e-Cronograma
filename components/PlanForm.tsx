@@ -230,16 +230,17 @@ const PlanForm: React.FC<PlanFormProps> = ({ initialPlan, onSave, onCancel }) =>
                  />
                </div>
 
-               {/* Carga Horária */}
+               {/* Carga Horária (Modificado para type="text" para remover as setas nativas do input number) */}
                <div className="w-full md:w-28">
                  <input 
-                   type="number" 
+                   type="text" 
                    placeholder="C.H. (Horas)" 
                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold uppercase text-slate-800 outline-none focus:border-blue-500"
                    value={unit.hours || ''}
                    onChange={e => {
+                     const val = e.target.value.replace(/\D/g, '');
                      const newUnits = [...formData.units!];
-                     newUnits[index].hours = Number(e.target.value);
+                     newUnits[index].hours = val ? Number(val) : 0;
                      setFormData({ ...formData, units: newUnits });
                    }}
                  />
