@@ -10,7 +10,7 @@ interface CronogramaRow {
   concluido: boolean;
 }
 
-export const PlanForm: React.FC = () => {
+export default function PlanForm() {
   const [linhas, setLinhas] = useState<CronogramaRow[]>([
     {
       horas: 4,
@@ -157,7 +157,7 @@ export const PlanForm: React.FC = () => {
                       placeholder="Recursos / Ambientes..."
                     />
                   </td>
-                  {/* COLUNA DE AÇÕES: Apenas o botão de excluir e o botão OK de conteúdo dado */}
+                  {/* COLUNA DE AÇÕES: Apenas exclusão e botão de OK (sem o ícone de mais) */}
                   <td className="py-4 px-4 align-middle text-center">
                     <div className="flex items-center justify-center gap-2">
                       <button
@@ -198,4 +198,4 @@ export const PlanForm: React.FC = () => {
       </div>
     </div>
   );
-};
+}
