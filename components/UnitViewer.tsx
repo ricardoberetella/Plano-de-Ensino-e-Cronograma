@@ -134,6 +134,41 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
     onUpdateSchedule?.(updated);
   };
 
+  // Funções de Inclusão e Exclusão de Linhas no Cronograma
+  const addScheduleEntry = (index?: number) => {
+    const newEntry: ScheduleEntry = {
+      id: `sched-${Date.now()}-${Math.random().toString(36).substring(2, 5)}`,
+      date: new Date().toLocaleDateString('pt-BR'),
+      hours: 4,
+      capacities: '',
+      knowledges: '',
+      strategies: '',
+      resources: ''
+    };
+
+    const updated = [...localSchedule];
+    if (index !== undefined && index >= 0) {
+      updated.splice(index + 1, 0, newEntry);
+    } else {
+      updated.push(newEntry);
+    }
+
+    setLocalSchedule(updated);
+    onUpdateSchedule?.(updated);
+  };
+
+  const removeScheduleEntry = (id: string) => {
+    if (localSchedule.length <= 1) {
+      alert("O cronograma precisa ter ao menos uma linha.");
+      return;
+    }
+    if (window.confirm("Tem certeza que deseja excluir esta linha do cronograma?")) {
+      const updated = localSchedule.filter(entry => entry.id !== id);
+      setLocalSchedule(updated);
+      onUpdateSchedule?.(updated);
+    }
+  };
+
   // Edição dos campos da aba Geral
   const updateGeneralFieldList = (field: 'technicalCapacities' | 'socialCapacities' | 'knowledges', index: number, value: string) => {
     const currentList = localUnit[field] ? [...localUnit[field]!] : [];
@@ -601,132 +636,171 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                 <h3 className="text-2xl font-[1000] text-slate-900 uppercase italic">Plano de aula | Cronograma</h3>
                 <p className="text-xs text-slate-500 font-semibold">Visualização e edição no formato padrão de tabela pedagógica</p>
               </div>
-              <div className="flex gap-3">
-                <button 
-                  onClick={handlePrint} 
-                  className="bg-red-600 text-white px-6 py-3 rounded-xl text-xs font-black uppercase tracking-wider shadow-md flex items-center gap-2 hover:bg-slate-900 transition-all"
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => addScheduleEntry()}
+                  className="bg-blue-600 text-white px-5 py-3 rounded-xl text-[10px] font-black uppercase tracking-wider shadow-lg hover:bg-slate-900 transition-all flex items-center gap-2"
                 >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
-                  </svg>
+                  <span>+ Incluir Linha</span>
+                </button>
+                <button
+                  onClick={handlePrint}
+                  className="bg-red-600 text-white px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-wider shadow-lg flex items-center gap-2 hover:bg-slate-900 transition-all"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
                   Imprimir Cronograma
                 </button>
               </div>
             </div>
 
-            {/* TABELA ESTILO PRINT 1 */}
-            <div className="w-full bg-white rounded-lg border-2 border-black overflow-hidden shadow-sm">
-              <table className="w-full table-fixed border-collapse">
+            {/* RELATÓRIO IMPRESSO / VISUALIZAÇÃO PADRÃO SENAI */}
+            <div className="report-document bg-white border border-slate-200 rounded-3xl p-6 shadow-sm overflow-x-auto">
+              <div className="report-header hidden">
+                <div className="logo-box">SENAI</div>
+                <div className="info-box">
+                  <h1>Plano de Aula | Cronograma</h1>
+                  <p>{localUnit.name}</p>
+                </div>
+              </div>
+
+              <h2 className="doc-main-title hidden">Cronograma da Unidade Curricular</h2>
+
+              <table className="tech-table w-full border-collapse">
                 <thead>
-                  <tr className="bg-slate-50 border-b-2 border-black text-slate-900">
-                    <th className="p-3 w-[15%] text-xs font-black uppercase border-r border-black text-center align-middle">
-                      Horas/Aulas/Data
-                    </th>
-                    <th className="p-3 w-[20%] text-xs font-black uppercase border-r border-black text-center align-middle">
-                      Capacidades
-                    </th>
-                    <th className="p-3 w-[20%] text-xs font-black uppercase border-r border-black text-center align-middle">
-                      Conhecimentos
-                    </th>
-                    <th className="p-3 w-[25%] text-xs font-black uppercase border-r border-black text-center align-middle">
-                      Estratégias
-                    </th>
-                    <th className="p-3 w-[20%] text-xs font-black uppercase text-center align-middle">
-                      Recursos/Ambientes
-                    </th>
+                  <tr className="bg-slate-100 text-slate-700 text-[10px] font-black uppercase tracking-wider">
+                    <th className="p-3 border border-slate-300 w-[16%] text-center">Horas / Aulas / Data</th>
+                    <th className="p-3 border border-slate-300 w-[21%]">Capacidades</th>
+                    <th className="p-3 border border-slate-300 w-[21%]">Conhecimentos</th>
+                    <th className="p-3 border border-slate-300 w-[21%]">Estratégias</th>
+                    <th className="p-3 border border-slate-300 w-[15%]">Recursos / Ambientes</th>
+                    <th className="p-3 border border-slate-300 w-[6%] text-center no-print">Ações</th>
                   </tr>
                 </thead>
-                <tbody className="text-xs font-medium text-slate-900 divide-y border-black">
-                  {localSchedule.map((entry) => (
-                    <tr key={entry.id} className="border-b border-black hover:bg-slate-50/50 transition-colors">
-                      
-                      {/* COLUNA 1: HORAS / DATA */}
-                      <td className="p-2 border-r border-black align-top bg-slate-50/30">
-                        <div className="flex flex-col gap-1.5">
-                          <div className="flex items-center gap-1 text-[11px] font-bold">
-                            <input
-                              type="number"
-                              value={entry.hours}
-                              onChange={(e) => updateEntry(entry.id, 'hours', Number(e.target.value))}
-                              className="w-8 bg-transparent border-b border-slate-400 font-bold text-center focus:outline-none focus:border-black"
-                            />
-                            <span>horas -</span>
+                <tbody className="text-xs font-medium text-slate-800">
+                  {localSchedule.map((entry, index) => {
+                    const dayOfWeek = getDayOfWeek(entry.date);
+                    return (
+                      <tr key={entry.id || index} className="hover:bg-slate-50/50 transition-colors">
+                        {/* COLUNA 1: HORAS, AULAS E DATA */}
+                        <td className="p-3 border border-slate-200 align-top bg-slate-50/40">
+                          <div className="space-y-2">
+                            <div className="flex items-center gap-1.5">
+                              <DebouncedInput
+                                value={String(entry.hours || '')}
+                                onChange={(val) => updateEntry(entry.id, 'hours', Number(val) || 0)}
+                                className="w-12 text-center bg-white border border-slate-200 rounded p-1 font-bold text-xs"
+                              />
+                              <span className="text-[10px] font-bold text-slate-500 uppercase">horas</span>
+                            </div>
+                            <div className="border-t border-dashed border-slate-200 pt-2">
+                              <DebouncedInput
+                                value={entry.date}
+                                onChange={(val) => updateEntry(entry.id, 'date', val)}
+                                placeholder="DD/MM/AAAA"
+                                className="w-full text-center bg-white border border-slate-200 rounded p-1 font-bold text-xs"
+                              />
+                            </div>
+                            {dayOfWeek && (
+                              <div className="text-[9px] font-black uppercase text-blue-600 text-center tracking-wider">
+                                {dayOfWeek}
+                              </div>
+                            )}
                           </div>
-                          <DebouncedInput
-                            value={entry.date}
-                            onChange={(val) => updateEntry(entry.id, 'date', val)}
-                            placeholder="DD/MM/AAAA"
-                            className="w-full bg-transparent border-b border-dashed border-slate-300 font-bold text-xs focus:outline-none focus:border-black"
+                        </td>
+
+                        {/* COLUNA 2: CAPACIDADES */}
+                        <td className="p-3 border border-slate-200 align-top">
+                          <EditableArea
+                            value={entry.capacities}
+                            onChange={(val) => updateEntry(entry.id, 'capacities', val)}
+                            placeholder="Capacidades..."
+                            rows={3}
+                            className="bg-transparent border-none text-xs text-slate-800 focus:outline-none"
                           />
-                          <span className="text-[9px] font-black uppercase text-slate-400 italic">
-                            {getDayOfWeek(entry.date)}
-                          </span>
-                        </div>
-                      </td>
+                        </td>
 
-                      {/* COLUNA 2: CAPACIDADES */}
-                      <td className="p-2 border-r border-black align-top">
-                        <EditableArea
-                          value={entry.capacities}
-                          onChange={(val) => updateEntry(entry.id, 'capacities', val)}
-                          rows={2}
-                          placeholder="Capacidades..."
-                          className="w-full bg-transparent border-none text-xs leading-relaxed focus:outline-none focus:bg-slate-50 rounded p-1"
-                        />
-                      </td>
+                        {/* COLUNA 3: CONHECIMENTOS */}
+                        <td className="p-3 border border-slate-200 align-top">
+                          <EditableArea
+                            value={entry.knowledges}
+                            onChange={(val) => updateEntry(entry.id, 'knowledges', val)}
+                            placeholder="Conhecimentos..."
+                            rows={3}
+                            className="bg-transparent border-none text-xs text-slate-800 focus:outline-none"
+                          />
+                        </td>
 
-                      {/* COLUNA 3: CONHECIMENTOS */}
-                      <td className="p-2 border-r border-black align-top">
-                        <EditableArea
-                          value={entry.knowledge}
-                          onChange={(val) => updateEntry(entry.id, 'knowledge', val)}
-                          rows={2}
-                          placeholder="Conhecimentos..."
-                          className="w-full bg-transparent border-none text-xs leading-relaxed focus:outline-none focus:bg-slate-50 rounded p-1"
-                        />
-                      </td>
+                        {/* COLUNA 4: ESTRATÉGIAS */}
+                        <td className="p-3 border border-slate-200 align-top">
+                          <EditableArea
+                            value={entry.strategies}
+                            onChange={(val) => updateEntry(entry.id, 'strategies', val)}
+                            placeholder="Estratégias pedagógicas..."
+                            rows={3}
+                            className="bg-transparent border-none text-xs text-slate-800 focus:outline-none"
+                          />
+                        </td>
 
-                      {/* COLUNA 4: ESTRATÉGIAS */}
-                      <td className="p-2 border-r border-black align-top">
-                        <EditableArea
-                          value={entry.strategy}
-                          onChange={(val) => updateEntry(entry.id, 'strategy', val)}
-                          rows={3}
-                          placeholder="Estratégias pedagógicas..."
-                          className="w-full bg-transparent border-none text-xs leading-relaxed focus:outline-none focus:bg-slate-50 rounded p-1"
-                        />
-                      </td>
+                        {/* COLUNA 5: RECURSOS / AMBIENTES */}
+                        <td className="p-3 border border-slate-200 align-top">
+                          <EditableArea
+                            value={entry.resources}
+                            onChange={(val) => updateEntry(entry.id, 'resources', val)}
+                            placeholder="Recursos e ambientes..."
+                            rows={3}
+                            className="bg-transparent border-none text-xs text-slate-800 focus:outline-none"
+                          />
+                        </td>
 
-                      {/* COLUNA 5: RECURSOS/AMBIENTES */}
-                      <td className="p-2 align-top">
-                        <EditableArea
-                          value={entry.resources}
-                          onChange={(val) => updateEntry(entry.id, 'resources', val)}
-                          rows={2}
-                          placeholder="Recursos e ambientes..."
-                          className="w-full bg-transparent border-none text-xs leading-relaxed focus:outline-none focus:bg-slate-50 rounded p-1"
-                        />
-                      </td>
-
-                    </tr>
-                  ))}
+                        {/* COLUNA 6: BOTÕES DE AÇÃO (INCLUIR ABAIXO E EXCLUIR) */}
+                        <td className="p-3 border border-slate-200 align-middle text-center no-print">
+                          <div className="flex flex-col items-center gap-1.5">
+                            <button
+                              type="button"
+                              onClick={() => addScheduleEntry(index)}
+                              className="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white transition-all font-black text-xs flex items-center justify-center shadow-sm"
+                              title="Inserir nova linha abaixo"
+                            >
+                              +
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => removeScheduleEntry(entry.id)}
+                              className="w-7 h-7 rounded-lg bg-red-50 text-red-600 hover:bg-red-600 hover:text-white transition-all font-black text-xs flex items-center justify-center shadow-sm"
+                              title="Excluir linha"
+                            >
+                              ✕
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
+
+              {/* Botão inferior para adicionar nova linha ao final */}
+              <div className="mt-4 flex justify-start no-print">
+                <button
+                  type="button"
+                  onClick={() => addScheduleEntry()}
+                  className="bg-slate-900 text-white px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-wider hover:bg-blue-600 transition-all shadow-md"
+                >
+                  + Adicionar Linha ao Final
+                </button>
+              </div>
             </div>
           </div>
         )}
 
-        {/* ABA CALENDÁRIO REDESENHADA E ALINHADA */}
+        {/* ABA CALENDÁRIO */}
         {activeTab === 'calendario' && (
-          <div className="space-y-6 no-print">
-            <div className="flex justify-between items-center border-b border-slate-200 pb-4">
+          <div className="space-y-6">
+            <div className="flex justify-between items-center border-b border-slate-200 pb-4 no-print">
               <div>
-                <h3 className="text-2xl font-[1000] text-slate-900 uppercase italic">Calendário de Aulas</h3>
-                <p className="text-xs text-slate-500 font-semibold">Distribuição temporal das aulas e encontros previstos</p>
-              </div>
-              <div className="flex items-center gap-2 bg-slate-100 px-3 py-1.5 rounded-full border border-slate-200">
-                <span className="w-3 h-3 rounded-full shadow-sm" style={{ backgroundColor: COLOR_MAP[scheduleColor] }}></span>
-                <span className="text-[10px] font-black text-slate-700 uppercase tracking-wider">{localUnit.name}</span>
+                <h3 className="text-2xl font-[1000] text-slate-900 uppercase italic">Calendário Letivo | Mapeamento</h3>
+                <p className="text-xs text-slate-500 font-semibold">Visualização dos dias letivos e marcações da unidade curricular</p>
               </div>
             </div>
 
@@ -735,57 +809,63 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                 const [year, month] = monthStr.split('-').map(Number);
                 const firstDay = new Date(year, month - 1, 1);
                 const lastDay = new Date(year, month, 0);
-                const monthName = firstDay.toLocaleDateString('pt-BR', { month: 'long' });
-                
-                const days: (string | null)[] = [];
-                for (let i = 0; i < firstDay.getDay(); i++) days.push(null);
-                for (let i = 1; i <= lastDay.getDate(); i++) {
-                  const d = i < 10 ? `0${i}` : `${i}`;
-                  days.push(`${monthStr}-${d}`);
+                const daysInMonth = lastDay.getDate();
+                const startingDayOfWeek = firstDay.getDay(); // 0 = Domingo
+
+                const monthName = new Intl.DateTimeFormat('pt-BR', { month: 'long', year: 'numeric' }).format(firstDay);
+
+                const daysArray = [];
+                for (let i = 0; i < startingDayOfWeek; i++) {
+                  daysArray.push(null);
+                }
+                for (let d = 1; d <= daysInMonth; d++) {
+                  daysArray.push(new Date(year, month - 1, d));
                 }
 
                 return (
-                  <div key={monthStr} className="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-lg flex flex-col justify-between">
-                    <div className="bg-slate-900 text-white py-3 px-4 text-center border-b border-slate-800">
-                      <h4 className="text-xs font-black uppercase tracking-widest italic">{monthName} {year}</h4>
-                    </div>
-                    
-                    <div className="p-3">
-                      {/* DIAS DA SEMANA */}
-                      <div className="grid grid-cols-7 gap-1 text-center mb-2">
-                        {['D','S','T','Q','Q','S','S'].map((d, i) => (
-                          <div key={i} className={`text-[10px] font-black ${i === 0 ? 'text-red-500' : 'text-slate-400'}`}>
-                            {d}
+                  <div key={monthStr} className="bg-white border border-slate-200 rounded-3xl p-5 shadow-sm space-y-4">
+                    <h4 className="text-xs font-black uppercase tracking-wider text-slate-900 text-center capitalize">{monthName}</h4>
+                    <div className="grid grid-cols-7 gap-1 text-center">
+                      {['D', 'S', 'T', 'Q', 'Q', 'S', 'S'].map((d, idx) => (
+                        <span key={idx} className="text-[9px] font-black text-slate-400">{d}</span>
+                      ))}
+                      {daysArray.map((dateObj, idx) => {
+                        if (!dateObj) return <div key={idx} />;
+                        const dStr = String(dateObj.getDate()).padStart(2, '0');
+                        const mStr = String(dateObj.getMonth() + 1).padStart(2, '0');
+                        const yStr = dateObj.getFullYear();
+                        const fullDateKey = `${dStr}/${mStr}/${yStr}`;
+                        const isoDateKey = `${yStr}-${mStr}-${dStr}`;
+
+                        const hasSchedule = scheduleDates[isoDateKey];
+                        const marking = calendar.markings.find(m => m.date === isoDateKey);
+
+                        let bgColor = 'bg-slate-50 hover:bg-slate-100 text-slate-700';
+                        let customStyle = {};
+
+                        if (marking) {
+                          const hex = COLOR_MAP[marking.color] || '#3b82f6';
+                          const textHex = TEXT_COLOR_MAP[marking.color] || '#ffffff';
+                          customStyle = { backgroundColor: hex, color: textHex };
+                          bgColor = '';
+                        } else if (hasSchedule) {
+                          const hex = COLOR_MAP[scheduleColor] || '#3b82f6';
+                          const textHex = TEXT_COLOR_MAP[scheduleColor] || '#ffffff';
+                          customStyle = { backgroundColor: hex, color: textHex };
+                          bgColor = '';
+                        }
+
+                        return (
+                          <div
+                            key={idx}
+                            style={customStyle}
+                            className={`h-8 rounded-xl flex items-center justify-center text-xs font-bold transition-all ${bgColor}`}
+                            title={marking?.description || (hasSchedule ? 'Aula agendada' : fullDateKey)}
+                          >
+                            {dateObj.getDate()}
                           </div>
-                        ))}
-                      </div>
-
-                      {/* DIAS DO MÊS ALINHADOS */}
-                      <div className="grid grid-cols-7 gap-1 text-center">
-                        {days.map((day, idx) => {
-                          if (!day) return <div key={`empty-${idx}`} className="aspect-square"></div>;
-                          
-                          const hasClass = scheduleDates[day];
-                          const isSunday = idx % 7 === 0;
-
-                          return (
-                            <div
-                              key={day}
-                              className={`aspect-square flex items-center justify-center rounded-xl text-xs font-black transition-all ${
-                                hasClass 
-                                  ? 'shadow-sm ring-1 ring-black/10 scale-105' 
-                                  : 'hover:bg-slate-100 text-slate-700'
-                              }`}
-                              style={{
-                                backgroundColor: hasClass ? COLOR_MAP[scheduleColor] : 'transparent',
-                                color: hasClass ? TEXT_COLOR_MAP[scheduleColor] : (isSunday ? '#ef4444' : '#1e293b')
-                              }}
-                            >
-                              {day.split('-')[2]}
-                            </div>
-                          );
-                        })}
-                      </div>
+                        );
+                      })}
                     </div>
                   </div>
                 );
