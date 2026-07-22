@@ -109,7 +109,6 @@ const App: React.FC = () => {
           await FirebaseService.savePlan(freshPlan);
           dbPlans = [freshPlan];
         } else {
-          // Garante 800h caso venha desatualizado do banco
           dbPlans = dbPlans.map(p => ({ ...p, totalHours: 800 }));
         }
 
@@ -196,6 +195,15 @@ const App: React.FC = () => {
       setView('dashboard');
     } catch (error) {
       console.error('Erro ao salvar dados:', error);
+    }
+  };
+
+  const handleUpdateObjective = async (newObjective: string) => {
+    if (!isAdmin || !currentPlan) return;
+    try {
+      await persistPlan({ ...currentPlan, objective: newObjective });
+    } catch (error) {
+      console.error('Erro ao atualizar perfil de conclusão:', error);
     }
   };
 
@@ -367,7 +375,20 @@ const App: React.FC = () => {
 
                 <section>
                   <h3 className="text-[10px] font-black uppercase text-blue-600 tracking-[0.3em] mb-4">I. Perfil de Conclusão</h3>
-                  <p className="text-slate-600 text-sm leading-relaxed font-medium">{currentPlan.objective || "Perfil padrão do curso."}</p>
+                  {isAdmin ? (
+                    <textarea
+                      value={currentPlan.objective || ''}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setCurrentPlan(prev => prev ? { ...prev, objective: val } : null);
+                      }}
+                      onBlur={(e) => handleUpdateObjective(e.target.value)}
+                      placeholder="Digite o perfil de conclusão do curso..."
+                      className="w-full h-32 p-4 text-sm font-medium text-slate-700 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:border-blue-600 outline-none resize-none transition-all shadow-sm"
+                    />
+                  ) : (
+                    <p className="text-slate-600 text-sm leading-relaxed font-medium whitespace-pre-wrap">{currentPlan.objective || "Perfil padrão do curso."}</p>
+                  )}
                 </section>
               </div>
 
