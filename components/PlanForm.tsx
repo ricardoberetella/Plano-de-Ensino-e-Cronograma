@@ -97,6 +97,7 @@ const PlanForm: React.FC<PlanFormProps> = ({ initialPlan, onSave, onCancel }) =>
       code: '',
       name: '',
       semester: 1 as SemesterNumber,
+      hours: 0,
       basicCapacities: [],
       socioemocionalCapacities: [],
       knowledge: [],
@@ -229,8 +230,23 @@ const PlanForm: React.FC<PlanFormProps> = ({ initialPlan, onSave, onCancel }) =>
                  />
                </div>
 
+               {/* Carga Horária */}
+               <div className="w-full md:w-28">
+                 <input 
+                   type="number" 
+                   placeholder="C.H. (Horas)" 
+                   className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold uppercase text-slate-800 outline-none focus:border-blue-500"
+                   value={unit.hours || ''}
+                   onChange={e => {
+                     const newUnits = [...formData.units!];
+                     newUnits[index].hours = Number(e.target.value);
+                     setFormData({ ...formData, units: newUnits });
+                   }}
+                 />
+               </div>
+
                {/* Seletor de Semestre (Numérico 1 ou 2) */}
-               <div className="w-full md:w-44">
+               <div className="w-full md:w-40">
                  <select
                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-[10px] font-black uppercase tracking-wider text-slate-700 outline-none focus:border-blue-500"
                    value={Number(unit.semester || 1)}
