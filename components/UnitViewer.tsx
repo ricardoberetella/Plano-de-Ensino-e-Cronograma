@@ -47,7 +47,7 @@ const DebouncedInput: React.FC<{
   );
 };
 
-// Componente isolado para Textareas dinâmicas
+// Componente isolado para Textareas dinâmicas com contenção rigorosa
 const EditableArea: React.FC<{
   value: string;
   onChange: (val: string) => void;
@@ -87,7 +87,7 @@ const EditableArea: React.FC<{
       onBlur={handleBlur}
       placeholder={placeholder}
       rows={rows}
-      className={`resize-none overflow-hidden block w-full ${className || ''}`}
+      className={`resize-none overflow-hidden block w-full box-border break-words whitespace-pre-wrap ${className || ''}`}
     />
   );
 };
@@ -129,6 +129,27 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
 
   const updateEntry = (id: string, field: keyof ScheduleEntry, value: any) => {
     const updated = localSchedule.map(entry => entry.id === id ? { ...entry, [field]: value } : entry);
+    setLocalSchedule(updated);
+    onUpdateSchedule?.(updated);
+  };
+
+  const addScheduleRow = () => {
+    const newEntry: ScheduleEntry = {
+      id: `sch-${Date.now()}`,
+      hours: 4,
+      date: '',
+      capacities: '',
+      knowledge: '',
+      strategy: '',
+      resources: ''
+    };
+    const updated = [...localSchedule, newEntry];
+    setLocalSchedule(updated);
+    onUpdateSchedule?.(updated);
+  };
+
+  const removeScheduleRow = (id: string) => {
+    const updated = localSchedule.filter(entry => entry.id !== id);
     setLocalSchedule(updated);
     onUpdateSchedule?.(updated);
   };
@@ -264,7 +285,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
           .doc-main-title { text-align: center !important; font-weight: 900 !important; font-size: 14pt !important; text-transform: uppercase !important; margin: 15pt 0 !important; border-bottom: 1pt solid #000 !important; padding-bottom: 5pt !important; color: #000 !important; }
           .tech-table { width: 100% !important; border-collapse: collapse !important; margin-top: 10pt !important; }
           .tech-table th { background: #f8fafc !important; color: #64748b !important; font-size: 7pt !important; font-weight: 900 !important; text-transform: uppercase !important; padding: 8pt !important; border: 0.5pt solid #e2e8f0 !important; text-align: left !important; -webkit-print-color-adjust: exact; }
-          .tech-table td { padding: 10pt !important; border: 0.5pt solid #e2e8f0 !important; font-size: 8.5pt !important; vertical-align: top !important; color: #1e293b !important; }
+          .tech-table td { padding: 10pt !important; border: 0.5pt solid #e2e8f0 !important; font-size: 8.5pt !important; vertical-align: top !important; color: #1e293b !important; word-break: break-word !important; }
         }
       `}</style>
 
@@ -595,6 +616,12 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
               </div>
               <div className="flex gap-3">
                 <button 
+                  onClick={addScheduleRow} 
+                  className="bg-blue-600 text-white px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider shadow-md hover:bg-slate-900 transition-all flex items-center gap-2"
+                >
+                  <span>+ Adicionar Aula</span>
+                </button>
+                <button 
                   onClick={handlePrint} 
                   className="bg-red-600 text-white px-6 py-3 rounded-xl text-xs font-black uppercase tracking-wider shadow-md flex items-center gap-2 hover:bg-slate-900 transition-all"
                 >
@@ -606,25 +633,28 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
               </div>
             </div>
 
-            {/* TABELA ESTILO PRINT 1 */}
+            {/* TABELA ESTILO PRINT 1 COM CONTEÚDO RIGOROSAMENTE CONTIDO */}
             <div className="w-full bg-white rounded-lg border-2 border-black overflow-hidden shadow-sm">
               <table className="w-full table-fixed border-collapse">
                 <thead>
                   <tr className="bg-slate-50 border-b-2 border-black text-slate-900">
-                    <th className="p-3 w-[15%] text-xs font-black uppercase border-r border-black text-center align-middle">
+                    <th className="p-2.5 w-[15%] text-[10px] font-black uppercase border-r border-black text-center align-middle">
                       Horas/Aulas/Data
                     </th>
-                    <th className="p-3 w-[20%] text-xs font-black uppercase border-r border-black text-center align-middle">
+                    <th className="p-2.5 w-[20%] text-[10px] font-black uppercase border-r border-black text-center align-middle">
                       Capacidades
                     </th>
-                    <th className="p-3 w-[20%] text-xs font-black uppercase border-r border-black text-center align-middle">
+                    <th className="p-2.5 w-[20%] text-[10px] font-black uppercase border-r border-black text-center align-middle">
                       Conhecimentos
                     </th>
-                    <th className="p-3 w-[25%] text-xs font-black uppercase border-r border-black text-center align-middle">
+                    <th className="p-2.5 w-[22%] text-[10px] font-black uppercase border-r border-black text-center align-middle">
                       Estratégias
                     </th>
-                    <th className="p-3 w-[20%] text-xs font-black uppercase text-center align-middle">
+                    <th className="p-2.5 w-[18%] text-[10px] font-black uppercase border-r border-black text-center align-middle">
                       Recursos/Ambientes
+                    </th>
+                    <th className="p-2.5 w-[5%] text-[10px] font-black uppercase text-center align-middle">
+                      Ações
                     </th>
                   </tr>
                 </thead>
@@ -633,7 +663,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                     <tr key={entry.id} className="border-b border-black hover:bg-slate-50/50 transition-colors">
                       
                       {/* COLUNA 1: HORAS / DATA */}
-                      <td className="p-2 border-r border-black align-top bg-slate-50/30">
+                      <td className="p-2 border-r border-black align-top bg-slate-50/30 overflow-hidden box-border">
                         <div className="flex flex-col gap-1.5">
                           <div className="flex items-center gap-1 text-[11px] font-bold">
                             <input
@@ -642,7 +672,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                               onChange={(e) => updateEntry(entry.id, 'hours', Number(e.target.value))}
                               className="w-8 bg-transparent border-b border-slate-400 font-bold text-center focus:outline-none focus:border-black"
                             />
-                            <span>horas -</span>
+                            <span>h -</span>
                           </div>
                           <DebouncedInput
                             value={entry.date}
@@ -657,47 +687,58 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                       </td>
 
                       {/* COLUNA 2: CAPACIDADES */}
-                      <td className="p-2 border-r border-black align-top">
+                      <td className="p-2 border-r border-black align-top overflow-hidden box-border">
                         <EditableArea
                           value={entry.capacities}
                           onChange={(val) => updateEntry(entry.id, 'capacities', val)}
                           rows={2}
                           placeholder="Capacidades..."
-                          className="w-full bg-transparent border-none text-xs leading-relaxed focus:outline-none focus:bg-slate-50 rounded p-1"
+                          className="w-full bg-transparent border-none text-[11px] leading-snug focus:outline-none focus:bg-slate-50 rounded p-1 box-border break-words whitespace-pre-wrap"
                         />
                       </td>
 
                       {/* COLUNA 3: CONHECIMENTOS */}
-                      <td className="p-2 border-r border-black align-top">
+                      <td className="p-2 border-r border-black align-top overflow-hidden box-border">
                         <EditableArea
                           value={entry.knowledge}
                           onChange={(val) => updateEntry(entry.id, 'knowledge', val)}
                           rows={2}
                           placeholder="Conhecimentos..."
-                          className="w-full bg-transparent border-none text-xs leading-relaxed focus:outline-none focus:bg-slate-50 rounded p-1"
+                          className="w-full bg-transparent border-none text-[11px] leading-snug focus:outline-none focus:bg-slate-50 rounded p-1 box-border break-words whitespace-pre-wrap"
                         />
                       </td>
 
                       {/* COLUNA 4: ESTRATÉGIAS */}
-                      <td className="p-2 border-r border-black align-top">
+                      <td className="p-2 border-r border-black align-top overflow-hidden box-border">
                         <EditableArea
                           value={entry.strategy}
                           onChange={(val) => updateEntry(entry.id, 'strategy', val)}
                           rows={3}
                           placeholder="Estratégias pedagógicas..."
-                          className="w-full bg-transparent border-none text-xs leading-relaxed focus:outline-none focus:bg-slate-50 rounded p-1"
+                          className="w-full bg-transparent border-none text-[11px] leading-snug focus:outline-none focus:bg-slate-50 rounded p-1 box-border break-words whitespace-pre-wrap"
                         />
                       </td>
 
                       {/* COLUNA 5: RECURSOS/AMBIENTES */}
-                      <td className="p-2 align-top">
+                      <td className="p-2 border-r border-black align-top overflow-hidden box-border">
                         <EditableArea
                           value={entry.resources}
                           onChange={(val) => updateEntry(entry.id, 'resources', val)}
                           rows={2}
                           placeholder="Recursos e ambientes..."
-                          className="w-full bg-transparent border-none text-xs leading-relaxed focus:outline-none focus:bg-slate-50 rounded p-1"
+                          className="w-full bg-transparent border-none text-[11px] leading-snug focus:outline-none focus:bg-slate-50 rounded p-1 box-border break-words whitespace-pre-wrap"
                         />
+                      </td>
+
+                      {/* COLUNA 6: AÇÕES (EXCLUIR) */}
+                      <td className="p-2 align-middle text-center overflow-hidden box-border">
+                        <button
+                          onClick={() => removeScheduleRow(entry.id)}
+                          className="text-slate-300 hover:text-red-600 font-bold px-2 py-1 transition-all rounded hover:bg-red-50 text-xs"
+                          title="Excluir Aula"
+                        >
+                          ✕
+                        </button>
                       </td>
 
                     </tr>
