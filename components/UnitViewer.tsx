@@ -331,7 +331,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
           .report-document, .report-document-sa { display: none !important; }
           [data-active-tab="cronograma"] .report-document { display: block !important; }
           [data-active-tab="sa"] .report-document-sa { display: block !important; }
-          .report-header { display: flex !important; justify-between: space-between !important; align-items: center !important; border-bottom: 2pt solid #E30613 !important; padding-bottom: 10pt !important; margin-bottom: 15pt !important; }
+          .report-header { display: flex !important; justify-content: space-between !important; align-items: center !important; border-bottom: 2pt solid #E30613 !important; padding-bottom: 10pt !important; margin-bottom: 15pt !important; }
           .logo-box { background: #E30613 !important; color: white !important; padding: 10pt 20pt !important; font-size: 24pt !important; font-weight: 900 !important; font-style: italic !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
           .info-box { text-align: right !important; color: #000 !important; }
           .info-box h1 { font-size: 10pt !important; font-weight: 900 !important; margin: 0 !important; text-transform: uppercase !important; }
@@ -629,19 +629,18 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                     </td>
                     <td className="p-1 border border-slate-200 align-top h-1">
                       <EditableArea
-                        value={(row as any)?.aut || ''}
+                        value={row?.aut || ''}
                         onChange={(val) => updateRubric(i, 'aut', val)}
                         rows={1}
                         className="bg-slate-50/60 border border-slate-100 rounded p-1 text-slate-600 italic text-[9.5px] leading-tight focus:outline-none focus:border-green-300 focus:bg-white"
                       />
                     </td>
-                    <td className="p-1 border border-slate-200 align-middle text-center">
+                    <td className="p-1 border border-slate-200 text-center align-middle">
                       <button
                         type="button"
                         onClick={() => removeRubric(i)}
-                        className="w-8 h-8 rounded-lg bg-red-50 text-red-600 hover:bg-red-600 hover:text-white transition-all font-black"
-                        title="Excluir rubrica"
-                        aria-label={`Excluir rubrica ${i + 1}`}
+                        className="text-slate-300 hover:text-red-600 font-bold p-1 transition-all"
+                        title="Excluir Rubrica"
                       >
                         ✕
                       </button>
@@ -654,171 +653,160 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
           </div>
         )}
 
-        {/* ABA CRONOGRAMA */}
+        {/* ABA CRONOGRAMA / PLANO DE AULA */}
         {activeTab === 'cronograma' && (
           <div className="space-y-6">
-            <div className="flex justify-between items-center gap-6 border-b border-slate-200 pb-4 no-print">
+            <div className="flex justify-between items-center no-print">
               <div>
-                <h3 className="text-2xl font-[1000] text-slate-900 uppercase italic">Plano de aula | Cronograma</h3>
-                <p className="text-xs text-slate-500 font-semibold">Visualização e edição no formato padrão de tabela pedagógica</p>
+                <h3 className="text-3xl font-[1000] text-slate-900 uppercase italic">Plano de Ensino & Cronograma</h3>
+                <p className="text-xs text-slate-400 font-bold uppercase tracking-wider mt-1">Planejamento detalhado das aulas e carga horária</p>
               </div>
-              <div className="flex items-center gap-3">
-                <button
-                  type="button"
-                  onClick={() => addScheduleEntry()}
-                  className="bg-blue-600 text-white px-5 py-3 rounded-xl text-[10px] font-black uppercase tracking-wider shadow-lg hover:bg-slate-900 transition-all flex items-center gap-2"
-                >
-                  <span>+ Incluir Linha</span>
+              <div className="flex gap-3">
+                <button onClick={() => addScheduleEntry()} className="bg-blue-600 text-white px-5 py-3 rounded-xl text-[10px] font-black uppercase tracking-wider shadow-md hover:bg-slate-900 transition-all">
+                  + Nova Linha
                 </button>
-                <button
-                  onClick={handlePrint}
-                  className="bg-red-600 text-white px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-wider shadow-lg flex items-center gap-2 hover:bg-slate-900 transition-all"
-                >
+                <button onClick={handlePrint} className="bg-red-600 text-white px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-wider shadow-md flex items-center gap-2 hover:bg-slate-900 transition-all">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
                   Imprimir Cronograma
                 </button>
               </div>
             </div>
 
-            <div className="report-document bg-white border border-slate-200 rounded-3xl p-6 shadow-sm overflow-x-auto">
-              <div className="report-header hidden">
-                <div className="logo-box">SENAI</div>
-                <div className="info-box">
-                  <h1>Plano de Aula | Cronograma</h1>
-                  <p>{localUnit?.name || ''}</p>
-                </div>
-              </div>
-
-              <h2 className="doc-main-title hidden">Cronograma da Unidade Curricular</h2>
-
-              <table className="tech-table w-full border-collapse">
+            {/* TABELA DE CRONOGRAMA INTERATIVA */}
+            <div className="w-full rounded-2xl border border-slate-200 bg-white p-2 overflow-x-auto shadow-sm no-print">
+              <table className="w-full min-w-[1000px] border-collapse">
                 <thead>
-                  <tr className="bg-slate-100 text-slate-700 text-[10px] font-black uppercase tracking-wider">
-                    <th className="p-3 border border-slate-300 w-[16%] text-center">Horas / Aulas / Data</th>
-                    <th className="p-3 border border-slate-300 w-[21%]">Capacidades</th>
-                    <th className="p-3 border border-slate-300 w-[21%]">Conhecimentos</th>
-                    <th className="p-3 border border-slate-300 w-[21%]">Estratégias</th>
-                    <th className="p-3 border border-slate-300 w-[15%]">Recursos / Ambientes</th>
-                    <th className="p-3 border border-slate-300 w-[6%] text-center no-print">Ações</th>
+                  <tr className="bg-slate-900 text-white text-[9px] font-black uppercase tracking-wider">
+                    <th className="p-3 text-left w-28">Data</th>
+                    <th className="p-3 text-center w-16">Horas</th>
+                    <th className="p-3 text-left">Capacidades</th>
+                    <th className="p-3 text-left">Conhecimentos</th>
+                    <th className="p-3 text-left">Estratégias / Metodologia</th>
+                    <th className="p-3 text-left">Recursos</th>
+                    <th className="p-3 text-center w-20">Ações</th>
                   </tr>
                 </thead>
-                <tbody className="text-xs font-medium text-slate-800">
-                  {(localSchedule || []).map((entry, index) => {
-                    const dayOfWeek = getDayOfWeek(entry?.date || '');
-                    return (
-                      <tr key={entry?.id || index} className="hover:bg-slate-50/50 transition-colors">
-                        <td className="p-3 border border-slate-200 align-top bg-slate-50/40">
-                          <div className="space-y-2">
-                            <div className="flex items-center gap-1.5">
-                              <DebouncedInput
-                                value={String(entry?.hours || '')}
-                                onChange={(val) => updateEntry(entry.id, 'hours', Number(val) || 0)}
-                                className="w-12 text-center bg-white border border-slate-200 rounded p-1 font-bold text-xs"
-                              />
-                              <span className="text-[10px] font-bold text-slate-500 uppercase">horas</span>
-                            </div>
-                            <div className="border-t border-dashed border-slate-200 pt-2">
-                              <DebouncedInput
-                                value={entry?.date || ''}
-                                onChange={(val) => updateEntry(entry.id, 'date', val)}
-                                placeholder="DD/MM/AAAA"
-                                className="w-full text-center bg-white border border-slate-200 rounded p-1 font-bold text-xs"
-                              />
-                            </div>
-                            {dayOfWeek && (
-                              <div className="text-[9px] font-black uppercase text-blue-600 text-center tracking-wider">
-                                {dayOfWeek}
-                              </div>
-                            )}
-                          </div>
-                        </td>
-
-                        <td className="p-3 border border-slate-200 align-top">
-                          <EditableArea
-                            value={entry?.capacities || ''}
-                            onChange={(val) => updateEntry(entry.id, 'capacities', val)}
-                            placeholder="Capacidades..."
-                            rows={3}
-                            className="bg-transparent border-none text-xs text-slate-800 focus:outline-none"
+                <tbody className="text-xs divide-y divide-slate-100 font-bold">
+                  {localSchedule.map((entry, idx) => (
+                    <tr key={entry.id || idx} className="hover:bg-slate-50/50 transition-all">
+                      <td className="p-2 align-top">
+                        <div className="space-y-1">
+                          <DebouncedInput
+                            value={entry.date}
+                            onChange={(val) => updateEntry(entry.id, 'date', val)}
+                            placeholder="DD/MM/AAAA"
+                            className="w-full bg-slate-50 border border-slate-200 rounded-lg px-2 py-1 text-xs font-bold text-slate-800 focus:outline-none focus:border-blue-500"
                           />
-                        </td>
-
-                        <td className="p-3 border border-slate-200 align-top">
-                          <EditableArea
-                            value={entry?.knowledges || ''}
-                            onChange={(val) => updateEntry(entry.id, 'knowledges', val)}
-                            placeholder="Conhecimentos..."
-                            rows={3}
-                            className="bg-transparent border-none text-xs text-slate-800 focus:outline-none"
-                          />
-                        </td>
-
-                        <td className="p-3 border border-slate-200 align-top">
-                          <EditableArea
-                            value={entry?.strategies || ''}
-                            onChange={(val) => updateEntry(entry.id, 'strategies', val)}
-                            placeholder="Estratégias pedagógicas..."
-                            rows={3}
-                            className="bg-transparent border-none text-xs text-slate-800 focus:outline-none"
-                          />
-                        </td>
-
-                        <td className="p-3 border border-slate-200 align-top">
-                          <EditableArea
-                            value={entry?.resources || ''}
-                            onChange={(val) => updateEntry(entry.id, 'resources', val)}
-                            placeholder="Recursos e ambientes..."
-                            rows={3}
-                            className="bg-transparent border-none text-xs text-slate-800 focus:outline-none"
-                          />
-                        </td>
-
-                        <td className="p-3 border border-slate-200 align-middle text-center no-print">
-                          <div className="flex flex-col items-center gap-1.5">
-                            <button
-                              type="button"
-                              onClick={() => addScheduleEntry(index)}
-                              className="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white transition-all font-black text-xs flex items-center justify-center shadow-sm"
-                              title="Inserir nova linha abaixo"
-                            >
-                              +
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => removeScheduleEntry(entry.id)}
-                              className="w-7 h-7 rounded-lg bg-red-50 text-red-600 hover:bg-red-600 hover:text-white transition-all font-black text-xs flex items-center justify-center shadow-sm"
-                              title="Excluir linha"
-                            >
-                              ✕
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })}
+                          <span className="text-[9px] text-slate-400 block capitalize font-medium px-1">
+                            {getDayOfWeek(entry.date)}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="p-2 align-top">
+                        <input
+                          type="number"
+                          value={entry.hours}
+                          onChange={(e) => updateEntry(entry.id, 'hours', Number(e.target.value))}
+                          className="w-full bg-slate-50 border border-slate-200 rounded-lg px-2 py-1 text-xs font-bold text-center text-slate-800 focus:outline-none focus:border-blue-500"
+                        />
+                      </td>
+                      <td className="p-2 align-top">
+                        <EditableArea
+                          value={entry.capacities}
+                          onChange={(val) => updateEntry(entry.id, 'capacities', val)}
+                          placeholder="Capacidades..."
+                          rows={2}
+                          className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 text-xs font-medium text-slate-700 focus:outline-none focus:border-blue-500"
+                        />
+                      </td>
+                      <td className="p-2 align-top">
+                        <EditableArea
+                          value={entry.knowledges}
+                          onChange={(val) => updateEntry(entry.id, 'knowledges', val)}
+                          placeholder="Conhecimentos..."
+                          rows={2}
+                          className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 text-xs font-medium text-slate-700 focus:outline-none focus:border-blue-500"
+                        />
+                      </td>
+                      <td className="p-2 align-top">
+                        <EditableArea
+                          value={entry.strategies}
+                          onChange={(val) => updateEntry(entry.id, 'strategies', val)}
+                          placeholder="Estratégias..."
+                          rows={2}
+                          className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 text-xs font-medium text-slate-700 focus:outline-none focus:border-blue-500"
+                        />
+                      </td>
+                      <td className="p-2 align-top">
+                        <EditableArea
+                          value={entry.resources}
+                          onChange={(val) => updateEntry(entry.id, 'resources', val)}
+                          placeholder="Recursos..."
+                          rows={2}
+                          className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 text-xs font-medium text-slate-700 focus:outline-none focus:border-blue-500"
+                        />
+                      </td>
+                      <td className="p-2 align-middle text-center">
+                        <div className="flex items-center justify-center gap-1">
+                          <button onClick={() => addScheduleEntry(idx)} className="w-7 h-7 bg-blue-50 text-blue-600 rounded-lg flex items-center justify-center hover:bg-blue-600 hover:text-white transition-all text-xs font-black" title="Inserir abaixo">+</button>
+                          <button onClick={() => removeScheduleEntry(entry.id)} className="w-7 h-7 bg-red-50 text-red-600 rounded-lg flex items-center justify-center hover:bg-red-600 hover:text-white transition-all text-xs font-black" title="Excluir">✕</button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
+            </div>
 
-              <div className="mt-4 flex justify-start no-print">
-                <button
-                  type="button"
-                  onClick={() => addScheduleEntry()}
-                  className="bg-slate-900 text-white px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-wider hover:bg-blue-600 transition-all shadow-md"
-                >
-                  + Adicionar Linha ao Final
-                </button>
+            {/* DOCUMENTO PARA IMPRESSÃO (CRONOGRAMA) */}
+            <div className="hidden report-document bg-white p-8 text-black">
+              <div className="report-header">
+                <div className="logo-box">SENAI</div>
+                <div className="info-box">
+                  <h1>PLANO DE ENSINO / CRONOGRAMA</h1>
+                  <p>{localUnit?.name}</p>
+                </div>
               </div>
+              <div className="doc-main-title">CRONOGRAMA DE DESENVOLVIMENTO DA UNIDADE CURRICULAR</div>
+              <table className="tech-table">
+                <thead>
+                  <tr>
+                    <th>Data / Dia</th>
+                    <th>Horas</th>
+                    <th>Capacidades</th>
+                    <th>Conhecimentos</th>
+                    <th>Estratégias / Metodologia</th>
+                    <th>Recursos</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {localSchedule.map((entry, i) => (
+                    <tr key={i}>
+                      <td><strong>{entry.date}</strong><br/><span style={{fontSize:'7.5pt', color:'#666'}}>{getDayOfWeek(entry.date)}</span></td>
+                      <td style={{textAlign:'center'}}>{entry.hours}h</td>
+                      <td>{entry.capacities}</td>
+                      <td>{entry.knowledges}</td>
+                      <td>{entry.strategies}</td>
+                      <td>{entry.resources}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </div>
         )}
 
         {/* ABA CALENDÁRIO */}
         {activeTab === 'calendario' && (
-          <div className="space-y-6">
-            <div className="flex justify-between items-center border-b border-slate-200 pb-4 no-print">
+          <div className="space-y-8 no-print">
+            <div className="flex justify-between items-center border-b border-slate-100 pb-6">
               <div>
-                <h3 className="text-2xl font-[1000] text-slate-900 uppercase italic">Calendário Letivo | Mapeamento</h3>
-                <p className="text-xs text-slate-500 font-semibold">Visualização dos dias letivos e marcações da unidade curricular</p>
+                <h3 className="text-3xl font-[1000] text-slate-900 uppercase italic">Calendário de Aulas</h3>
+                <p className="text-xs text-slate-400 font-bold uppercase tracking-wider mt-1">Sincronização automática com as datas do cronograma</p>
+              </div>
+              <div className="flex items-center gap-3 bg-slate-50 px-4 py-2 rounded-2xl border border-slate-200">
+                <span className="w-3 h-3 rounded-full inline-block" style={{ backgroundColor: COLOR_MAP[scheduleColor] }}></span>
+                <span className="text-xs font-black uppercase text-slate-700">Aulas Marcadas no Cronograma</span>
               </div>
             </div>
 
@@ -829,56 +817,43 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                 const lastDay = new Date(year, month, 0);
                 const daysInMonth = lastDay.getDate();
                 const startingDayOfWeek = firstDay.getDay();
-
                 const monthName = new Intl.DateTimeFormat('pt-BR', { month: 'long', year: 'numeric' }).format(firstDay);
 
-                const daysArray = [];
+                const days = [];
                 for (let i = 0; i < startingDayOfWeek; i++) {
-                  daysArray.push(null);
+                  days.push(null);
                 }
                 for (let d = 1; d <= daysInMonth; d++) {
-                  daysArray.push(new Date(year, month - 1, d));
+                  days.push(new Date(year, month - 1, d));
                 }
 
                 return (
-                  <div key={monthStr} className="bg-white border border-slate-200 rounded-3xl p-5 shadow-sm space-y-4">
-                    <h4 className="text-xs font-black uppercase tracking-wider text-slate-900 text-center capitalize">{monthName}</h4>
-                    <div className="grid grid-cols-7 gap-1 text-center">
-                      {['D', 'S', 'T', 'Q', 'Q', 'S', 'S'].map((d, idx) => (
-                        <span key={idx} className="text-[9px] font-black text-slate-400">{d}</span>
+                  <div key={monthStr} className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm">
+                    <h4 className="text-sm font-black uppercase text-slate-900 mb-4 capitalize text-center">{monthName}</h4>
+                    <div className="grid grid-cols-7 gap-1 text-center mb-2">
+                      {['D', 'S', 'T', 'Q', 'Q', 'S', 'S'].map((d, i) => (
+                        <span key={i} className="text-[9px] font-black text-slate-400">{d}</span>
                       ))}
-                      {daysArray.map((dateObj, idx) => {
+                    </div>
+                    <div className="grid grid-cols-7 gap-1 text-center">
+                      {days.map((dateObj, idx) => {
                         if (!dateObj) return <div key={idx} />;
-                        const dStr = String(dateObj.getDate()).padStart(2, '0');
-                        const mStr = String(dateObj.getMonth() + 1).padStart(2, '0');
-                        const yStr = dateObj.getFullYear();
-                        const fullDateKey = `${dStr}/${mStr}/${yStr}`;
-                        const isoDateKey = `${yStr}-${mStr}-${dStr}`;
-
-                        const hasSchedule = scheduleDates[isoDateKey];
-                        const marking = calendar?.markings?.find(m => m.date === isoDateKey);
-
-                        let bgColor = 'bg-slate-50 hover:bg-slate-100 text-slate-700';
-                        let customStyle = {};
-
-                        if (marking) {
-                          const hex = COLOR_MAP[marking.color] || '#3b82f6';
-                          const textHex = TEXT_COLOR_MAP[marking.color] || '#ffffff';
-                          customStyle = { backgroundColor: hex, color: textHex };
-                          bgColor = '';
-                        } else if (hasSchedule) {
-                          const hex = COLOR_MAP[scheduleColor] || '#3b82f6';
-                          const textHex = TEXT_COLOR_MAP[scheduleColor] || '#ffffff';
-                          customStyle = { backgroundColor: hex, color: textHex };
-                          bgColor = '';
-                        }
+                        const dateString = dateObj.toISOString().substring(0, 10);
+                        const isScheduled = scheduleDates[dateString];
 
                         return (
                           <div
                             key={idx}
-                            style={customStyle}
-                            className={`h-8 rounded-xl flex items-center justify-center text-xs font-bold transition-all ${bgColor}`}
-                            title={marking?.description || (hasSchedule ? 'Aula agendada' : fullDateKey)}
+                            className={`h-9 rounded-xl flex items-center justify-center text-xs font-bold transition-all ${
+                              isScheduled
+                                ? 'shadow-md scale-105'
+                                : 'text-slate-700 hover:bg-slate-100'
+                            }`}
+                            style={{
+                              backgroundColor: isScheduled ? COLOR_MAP[scheduleColor] : 'transparent',
+                              color: isScheduled ? TEXT_COLOR_MAP[scheduleColor] : undefined
+                            }}
+                            title={dateString}
                           >
                             {dateObj.getDate()}
                           </div>
