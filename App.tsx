@@ -287,7 +287,8 @@ const App: React.FC = () => {
   };
 
   const handleProfileChange = (profileId: string) => {
-    setActiveProfileId(profileId);
+    const targetProfile = profileId === 'Ricardo Gea' || profileId === 'gea' ? 'gea' : 'beretella';
+    setActiveProfileId(targetProfile);
     setCurrentPlan(null);
     setSelectedUnit(null);
     setSelectedSemester(1);
@@ -354,7 +355,7 @@ const App: React.FC = () => {
                 <div className="mb-12 flex justify-between items-start">
                   <div>
                     <span className="bg-slate-900 text-white px-3 py-1 rounded text-[10px] font-black uppercase tracking-[0.2em] mb-4 inline-block">
-                      MSEP - Modelo SENAI
+                      MSEP - Modelo SENAI ({activeProfileId === 'gea' ? 'Ricardo Gea' : 'Ricardo Beretella'})
                     </span>
                     <h2 className="text-3xl md:text-5xl font-[1000] text-slate-900 tracking-tighter uppercase leading-[0.9]">
                       {currentPlan.courseName || "Curso de Usinagem"}
