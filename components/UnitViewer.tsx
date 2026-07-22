@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { CurricularUnit, ScheduleEntry, UnitCalendar, CalendarColor } from '../types';
-import { SAMPLE_PLANS } from '../constants';
 
 interface Props {
   unit: CurricularUnit;
@@ -95,12 +94,12 @@ const EditableArea: React.FC<{
 
 const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar, onUpdateUnit }) => {
   const [activeTab, setActiveTab] = useState<'geral' | 'sa' | 'rubricas' | 'cronograma' | 'calendario'>('geral');
-  const [localSchedule, setLocalSchedule] = useState<ScheduleEntry[]>(unit.schedule);
+  const [localSchedule, setLocalSchedule] = useState<ScheduleEntry[]>(unit?.schedule || []);
   const [localUnit, setLocalUnit] = useState<CurricularUnit>(unit);
 
   useEffect(() => {
-    setLocalSchedule(unit.schedule);
-  }, [unit.schedule]);
+    setLocalSchedule(unit?.schedule || []);
+  }, [unit?.schedule]);
 
   useEffect(() => {
     setLocalUnit(unit);
@@ -111,15 +110,15 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
     onUpdateUnit?.(newUnit);
   };
 
-  const isCRD = localUnit.id.toLowerCase().includes('crd') || localUnit.name.toLowerCase().includes('dimensional');
-  const isFUSI = localUnit.id.toLowerCase().includes('fusi') || localUnit.name.toLowerCase().includes('usinagem');
+  const isCRD = localUnit?.id?.toLowerCase().includes('crd') || localUnit?.name?.toLowerCase().includes('dimensional');
+  const isFUSI = localUnit?.id?.toLowerCase().includes('fusi') || localUnit?.name?.toLowerCase().includes('usinagem');
   const scheduleColor: CalendarColor = isCRD ? 'pink' : (isFUSI ? 'orange' : 'blue');
 
-  const calendar = useMemo(() => localUnit.calendar || {
+  const calendar = useMemo(() => localUnit?.calendar || {
     startDate: '2026-01-01',
     endDate: '2026-06-30',
     markings: []
-  }, [localUnit.calendar]);
+  }, [localUnit?.calendar]);
 
   const getDayOfWeek = (dateStr: string) => {
     if (!dateStr || !dateStr.includes('/')) return "";
@@ -134,7 +133,6 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
     onUpdateSchedule?.(updated);
   };
 
-  // Funções de Inclusão e Exclusão de Linhas no Cronograma
   const addScheduleEntry = (index?: number) => {
     const newEntry: ScheduleEntry = {
       id: `sched-${Date.now()}-${Math.random().toString(36).substring(2, 5)}`,
@@ -169,7 +167,6 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
     }
   };
 
-  // Edição dos campos da aba Geral
   const updateGeneralFieldList = (field: 'technicalCapacities' | 'socialCapacities' | 'knowledges', index: number, value: string) => {
     const currentList = localUnit[field] ? [...localUnit[field]!] : [];
     currentList[index] = value;
@@ -188,7 +185,6 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
     updateUnitState({ ...localUnit, [field]: currentList });
   };
 
-  // Manipulação das Situações de Aprendizagem / Fases
   const updateSAField = (saIndex: number, field: string, value: any) => {
     const updatedSAs = [...(localUnit.learningSituations || [])];
     updatedSAs[saIndex] = { ...updatedSAs[saIndex], [field]: value };
@@ -237,7 +233,6 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
     updateUnitState({ ...localUnit, learningSituations: updatedSAs });
   };
 
-  // Edição de Rubricas
   const updateRubric = (index: number, field: string, value: string) => {
     const updatedRubrics = [...(localUnit.rubrics || [])];
     updatedRubrics[index] = { ...updatedRubrics[index], [field]: value } as any;
@@ -274,22 +269,24 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
 
   const scheduleDates = useMemo(() => {
     const dates: Record<string, boolean> = {};
-    localSchedule.forEach(s => {
-      const parts = s.date.split('/');
-      if (parts.length === 3) {
-        dates[`${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`] = true;
+    (localSchedule || []).forEach(s => {
+      if (s && s.date) {
+        const parts = s.date.split('/');
+        if (parts.length === 3) {
+          dates[`${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`] = true;
+        }
       }
     });
     return dates;
   }, [localSchedule]);
 
-  // Detecção automática do semestre (Janeiro-Junho vs Julho-Dezembro) com base nas datas do cronograma
   const monthsInRange = useMemo(() => {
-    let minDateStr = calendar.startDate;
-    let maxDateStr = calendar.endDate;
+    let minDateStr = calendar?.startDate || '2026-01-01';
+    let maxDateStr = calendar?.endDate || '2026-06-30';
 
     if (localSchedule && localSchedule.length > 0) {
       const parsedDates = localSchedule.map(s => {
+        if (!s || !s.date) return null;
         const parts = s.date.split('/');
         if (parts.length === 3) {
           return new Date(Number(parts[2]), Number(parts[1]) - 1, Number(parts[0]));
@@ -300,8 +297,8 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
       if (parsedDates.length > 0) {
         const minYear = Math.min(...parsedDates.map(d => d.getFullYear()));
         const maxYear = Math.max(...parsedDates.map(d => d.getFullYear()));
-        const hasSecondSemester = parsedDates.some(d => d.getMonth() >= 6); // Julho a Dezembro
-        const hasFirstSemester = parsedDates.some(d => d.getMonth() < 6);   // Janeiro a Junho
+        const hasSecondSemester = parsedDates.some(d => d.getMonth() >= 6);
+        const hasFirstSemester = parsedDates.some(d => d.getMonth() < 6);
 
         if (hasSecondSemester && !hasFirstSemester) {
           minDateStr = `${minYear}-07-01`;
@@ -322,7 +319,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
       current.setMonth(current.getMonth() + 1);
     }
     return months;
-  }, [localSchedule, calendar.startDate, calendar.endDate]);
+  }, [localSchedule, calendar?.startDate, calendar?.endDate]);
 
   return (
     <div className="bg-white rounded-[2.5rem] shadow-2xl border border-slate-200 overflow-hidden animate-fadeIn printable-unit-module" data-active-tab={activeTab}>
@@ -351,7 +348,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
         <div className="w-full">
           <span className="bg-blue-600 px-3 py-1 rounded text-[9px] font-black uppercase tracking-widest mb-2 inline-block">MSEP - Unidade Curricular</span>
           <DebouncedInput
-            value={localUnit.name}
+            value={localUnit?.name || ''}
             onChange={(val) => updateUnitState({ ...localUnit, name: val })}
             className="text-3xl font-black tracking-tighter uppercase leading-none bg-transparent text-white border-b border-transparent hover:border-slate-700 focus:border-blue-500 outline-none w-full transition-all"
           />
@@ -396,7 +393,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                   </button>
                 </div>
                 <div className="space-y-3 flex-1">
-                  {(localUnit.technicalCapacities || []).map((cap, idx) => (
+                  {(localUnit?.technicalCapacities || []).map((cap, idx) => (
                     <div key={idx} className="flex gap-2 items-start bg-slate-50 p-2.5 rounded-xl border border-slate-100">
                       <span className="text-[10px] font-black text-slate-400 mt-1">{idx + 1}.</span>
                       <EditableArea
@@ -426,7 +423,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                   </button>
                 </div>
                 <div className="space-y-3 flex-1">
-                  {(localUnit.socialCapacities || []).map((cap, idx) => (
+                  {(localUnit?.socialCapacities || []).map((cap, idx) => (
                     <div key={idx} className="flex gap-2 items-start bg-slate-50 p-2.5 rounded-xl border border-slate-100">
                       <span className="text-[10px] font-black text-slate-400 mt-1">{idx + 1}.</span>
                       <EditableArea
@@ -456,7 +453,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                   </button>
                 </div>
                 <div className="space-y-3 flex-1">
-                  {(localUnit.knowledges || []).map((know, idx) => (
+                  {(localUnit?.knowledges || []).map((know, idx) => (
                     <div key={idx} className="flex gap-2 items-start bg-slate-50 p-2.5 rounded-xl border border-slate-100">
                       <span className="text-[10px] font-black text-slate-400 mt-1">{idx + 1}.</span>
                       <EditableArea
@@ -497,15 +494,15 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
             </div>
 
             <div className="space-y-12 pb-10 no-print">
-              {(localUnit.learningSituations || []).map((sa, saIdx) => (
-                <div key={sa.id || saIdx} className="p-10 bg-white border border-slate-200 rounded-[3rem] shadow-xl relative overflow-hidden transition-all hover:border-blue-200">
+              {(localUnit?.learningSituations || []).map((sa, saIdx) => (
+                <div key={sa?.id || saIdx} className="p-10 bg-white border border-slate-200 rounded-[3rem] shadow-xl relative overflow-hidden transition-all hover:border-blue-200">
                   <div className="absolute top-0 left-0 w-2 h-full bg-blue-600"></div>
 
                   <div className="flex justify-between items-start gap-4 mb-6">
                     <div className="flex-1">
                       <span className="text-[10px] font-black uppercase text-blue-600 tracking-widest block mb-1">FASE / ETAPA {saIdx + 1}</span>
                       <DebouncedInput
-                        value={sa.title}
+                        value={sa?.title || ''}
                         onChange={(val) => updateSAField(saIdx, 'title', val)}
                         placeholder="Título da Situação de Aprendizagem / Fase..."
                         className="text-2xl font-black text-slate-900 uppercase tracking-tight leading-none italic w-full bg-transparent border-b border-slate-200 focus:border-blue-500 outline-none pb-2"
@@ -520,7 +517,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                     <div className="border-l-2 border-slate-100 pl-6">
                       <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">I. Contextualização / Situação-Problema</p>
                       <EditableArea
-                        value={sa.context}
+                        value={sa?.context || ''}
                         onChange={(val) => updateSAField(saIdx, 'context', val)}
                         rows={2}
                         placeholder="Descreva aqui o contexto ou problema apresentado ao aluno..."
@@ -531,7 +528,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                     <div className="bg-slate-900 p-8 rounded-[2.5rem] text-white shadow-lg">
                       <p className="text-[10px] font-black text-red-500 uppercase mb-4 tracking-widest">II. Desafio Proposto</p>
                       <EditableArea
-                        value={sa.challenge}
+                        value={sa?.challenge || ''}
                         onChange={(val) => updateSAField(saIdx, 'challenge', val)}
                         rows={2}
                         placeholder="Desafio pedagógico do aluno..."
@@ -547,11 +544,11 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                         </button>
                       </div>
                       <ul className="space-y-3">
-                        {(sa.expectedResults || []).map((result, rIdx) => (
+                        {(sa?.expectedResults || []).map((result, rIdx) => (
                           <li key={rIdx} className="flex gap-3 items-center">
                             <span className="w-6 h-6 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center shrink-0 text-[10px] font-black">{rIdx + 1}</span>
                             <DebouncedInput
-                              value={result}
+                              value={result || ''}
                               onChange={(val) => updateSAResult(saIdx, rIdx, val)}
                               placeholder="Descreva o resultado ou produto esperado..."
                               className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-slate-700 text-sm font-bold focus:outline-none focus:border-blue-500"
@@ -596,11 +593,11 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                 </tr>
               </thead>
               <tbody className="text-[10px] font-bold">
-                {(localUnit.rubrics || []).map((row, i) => (
+                {(localUnit?.rubrics || []).map((row, i) => (
                   <tr key={i} className="hover:bg-slate-50/80 transition-colors">
                     <td className="p-1 border border-slate-200 bg-slate-50/50 align-top h-1">
                       <EditableArea
-                        value={row.capacity}
+                        value={row?.capacity || ''}
                         onChange={(val) => updateRubric(i, 'capacity', val)}
                         rows={1}
                         className="bg-transparent border-none outline-none font-bold text-slate-900 text-[10px] leading-tight p-0"
@@ -608,7 +605,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                     </td>
                     <td className="p-1 border border-slate-200 align-top h-1">
                       <EditableArea
-                        value={row.nsa}
+                        value={row?.nsa || ''}
                         onChange={(val) => updateRubric(i, 'nsa', val)}
                         rows={1}
                         className="bg-slate-50/60 border border-slate-100 rounded p-1 text-slate-600 italic text-[9.5px] leading-tight focus:outline-none focus:border-red-300 focus:bg-white"
@@ -616,7 +613,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                     </td>
                     <td className="p-1 border border-slate-200 align-top h-1">
                       <EditableArea
-                        value={row.apo}
+                        value={row?.apo || ''}
                         onChange={(val) => updateRubric(i, 'apo', val)}
                         rows={1}
                         className="bg-slate-50/60 border border-slate-100 rounded p-1 text-slate-600 italic text-[9.5px] leading-tight focus:outline-none focus:border-orange-300 focus:bg-white"
@@ -624,7 +621,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                     </td>
                     <td className="p-1 border border-slate-200 align-top h-1">
                       <EditableArea
-                        value={row.par}
+                        value={row?.par || ''}
                         onChange={(val) => updateRubric(i, 'par', val)}
                         rows={1}
                         className="bg-slate-50/60 border border-slate-100 rounded p-1 text-slate-600 italic text-[9.5px] leading-tight focus:outline-none focus:border-blue-300 focus:bg-white"
@@ -632,7 +629,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                     </td>
                     <td className="p-1 border border-slate-200 align-top h-1">
                       <EditableArea
-                        value={(row as any).aut || ''}
+                        value={(row as any)?.aut || ''}
                         onChange={(val) => updateRubric(i, 'aut', val)}
                         rows={1}
                         className="bg-slate-50/60 border border-slate-100 rounded p-1 text-slate-600 italic text-[9.5px] leading-tight focus:outline-none focus:border-green-300 focus:bg-white"
@@ -657,7 +654,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
           </div>
         )}
 
-        {/* ABA CRONOGRAMA - TABELA PADRÃO SENAI */}
+        {/* ABA CRONOGRAMA */}
         {activeTab === 'cronograma' && (
           <div className="space-y-6">
             <div className="flex justify-between items-center gap-6 border-b border-slate-200 pb-4 no-print">
@@ -683,13 +680,12 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
               </div>
             </div>
 
-            {/* RELATÓRIO IMPRESSO / VISUALIZAÇÃO PADRÃO SENAI */}
             <div className="report-document bg-white border border-slate-200 rounded-3xl p-6 shadow-sm overflow-x-auto">
               <div className="report-header hidden">
                 <div className="logo-box">SENAI</div>
                 <div className="info-box">
                   <h1>Plano de Aula | Cronograma</h1>
-                  <p>{localUnit.name}</p>
+                  <p>{localUnit?.name || ''}</p>
                 </div>
               </div>
 
@@ -707,16 +703,15 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                   </tr>
                 </thead>
                 <tbody className="text-xs font-medium text-slate-800">
-                  {localSchedule.map((entry, index) => {
-                    const dayOfWeek = getDayOfWeek(entry.date);
+                  {(localSchedule || []).map((entry, index) => {
+                    const dayOfWeek = getDayOfWeek(entry?.date || '');
                     return (
-                      <tr key={entry.id || index} className="hover:bg-slate-50/50 transition-colors">
-                        {/* COLUNA 1: HORAS, AULAS E DATA */}
+                      <tr key={entry?.id || index} className="hover:bg-slate-50/50 transition-colors">
                         <td className="p-3 border border-slate-200 align-top bg-slate-50/40">
                           <div className="space-y-2">
                             <div className="flex items-center gap-1.5">
                               <DebouncedInput
-                                value={String(entry.hours || '')}
+                                value={String(entry?.hours || '')}
                                 onChange={(val) => updateEntry(entry.id, 'hours', Number(val) || 0)}
                                 className="w-12 text-center bg-white border border-slate-200 rounded p-1 font-bold text-xs"
                               />
@@ -724,7 +719,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                             </div>
                             <div className="border-t border-dashed border-slate-200 pt-2">
                               <DebouncedInput
-                                value={entry.date}
+                                value={entry?.date || ''}
                                 onChange={(val) => updateEntry(entry.id, 'date', val)}
                                 placeholder="DD/MM/AAAA"
                                 className="w-full text-center bg-white border border-slate-200 rounded p-1 font-bold text-xs"
@@ -738,10 +733,9 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                           </div>
                         </td>
 
-                        {/* COLUNA 2: CAPACIDADES */}
                         <td className="p-3 border border-slate-200 align-top">
                           <EditableArea
-                            value={entry.capacities}
+                            value={entry?.capacities || ''}
                             onChange={(val) => updateEntry(entry.id, 'capacities', val)}
                             placeholder="Capacidades..."
                             rows={3}
@@ -749,10 +743,9 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                           />
                         </td>
 
-                        {/* COLUNA 3: CONHECIMENTOS */}
                         <td className="p-3 border border-slate-200 align-top">
                           <EditableArea
-                            value={entry.knowledges}
+                            value={entry?.knowledges || ''}
                             onChange={(val) => updateEntry(entry.id, 'knowledges', val)}
                             placeholder="Conhecimentos..."
                             rows={3}
@@ -760,10 +753,9 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                           />
                         </td>
 
-                        {/* COLUNA 4: ESTRATÉGIAS */}
                         <td className="p-3 border border-slate-200 align-top">
                           <EditableArea
-                            value={entry.strategies}
+                            value={entry?.strategies || ''}
                             onChange={(val) => updateEntry(entry.id, 'strategies', val)}
                             placeholder="Estratégias pedagógicas..."
                             rows={3}
@@ -771,10 +763,9 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                           />
                         </td>
 
-                        {/* COLUNA 5: RECURSOS / AMBIENTES */}
                         <td className="p-3 border border-slate-200 align-top">
                           <EditableArea
-                            value={entry.resources}
+                            value={entry?.resources || ''}
                             onChange={(val) => updateEntry(entry.id, 'resources', val)}
                             placeholder="Recursos e ambientes..."
                             rows={3}
@@ -782,7 +773,6 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                           />
                         </td>
 
-                        {/* COLUNA 6: BOTÕES DE AÇÃO (INCLUIR ABAIXO E EXCLUIR) */}
                         <td className="p-3 border border-slate-200 align-middle text-center no-print">
                           <div className="flex flex-col items-center gap-1.5">
                             <button
@@ -809,7 +799,6 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                 </tbody>
               </table>
 
-              {/* Botão inferior para adicionar nova linha ao final */}
               <div className="mt-4 flex justify-start no-print">
                 <button
                   type="button"
@@ -839,7 +828,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                 const firstDay = new Date(year, month - 1, 1);
                 const lastDay = new Date(year, month, 0);
                 const daysInMonth = lastDay.getDate();
-                const startingDayOfWeek = firstDay.getDay(); // 0 = Domingo
+                const startingDayOfWeek = firstDay.getDay();
 
                 const monthName = new Intl.DateTimeFormat('pt-BR', { month: 'long', year: 'numeric' }).format(firstDay);
 
@@ -867,7 +856,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                         const isoDateKey = `${yStr}-${mStr}-${dStr}`;
 
                         const hasSchedule = scheduleDates[isoDateKey];
-                        const marking = calendar.markings.find(m => m.date === isoDateKey);
+                        const marking = calendar?.markings?.find(m => m.date === isoDateKey);
 
                         let bgColor = 'bg-slate-50 hover:bg-slate-100 text-slate-700';
                         let customStyle = {};
