@@ -200,12 +200,12 @@ const PlanForm: React.FC<PlanFormProps> = ({ initialPlan, onSave, onCancel }) =>
             <div key={unit.id} className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row gap-4 items-center group">
                <span className="text-[10px] font-black text-slate-300">0{index + 1}</span>
                
-               {/* Campo de Sigla / Código */}
-               <div className="w-full md:w-32">
+               {/* Campo de Sigla / Código (Ajustado para w-24) */}
+               <div className="w-full md:w-24">
                  <input 
                    type="text" 
-                   placeholder="Sigla (Ex: USI)" 
-                   className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold uppercase text-slate-800 outline-none focus:border-blue-500"
+                   placeholder="Sigla" 
+                   className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold uppercase text-slate-800 outline-none focus:border-blue-500 text-center"
                    value={unit.code || ''}
                    onChange={e => {
                      const newUnits = [...formData.units!];
@@ -215,7 +215,7 @@ const PlanForm: React.FC<PlanFormProps> = ({ initialPlan, onSave, onCancel }) =>
                  />
                </div>
 
-               {/* Nome da Unidade Curricular */}
+               {/* Nome da Unidade Curricular (Expandido com flex-1) */}
                <div className="flex-1 w-full">
                  <input 
                    type="text" 
@@ -230,12 +230,12 @@ const PlanForm: React.FC<PlanFormProps> = ({ initialPlan, onSave, onCancel }) =>
                  />
                </div>
 
-               {/* Carga Horária (Modificado para type="text" para remover as setas nativas do input number) */}
-               <div className="w-full md:w-28">
+               {/* Carga Horária (Ajustado para w-20 para ficar compacto e proporcional) */}
+               <div className="w-full md:w-20">
                  <input 
                    type="text" 
-                   placeholder="C.H. (Horas)" 
-                   className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold uppercase text-slate-800 outline-none focus:border-blue-500"
+                   placeholder="C.H." 
+                   className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold uppercase text-slate-800 outline-none focus:border-blue-500 text-center"
                    value={unit.hours || ''}
                    onChange={e => {
                      const val = e.target.value.replace(/\D/g, '');
@@ -246,8 +246,8 @@ const PlanForm: React.FC<PlanFormProps> = ({ initialPlan, onSave, onCancel }) =>
                  />
                </div>
 
-               {/* Seletor de Semestre (Numérico 1 ou 2) */}
-               <div className="w-full md:w-40">
+               {/* Seletor de Semestre (Ajustado para w-36) */}
+               <div className="w-full md:w-36">
                  <select
                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-[10px] font-black uppercase tracking-wider text-slate-700 outline-none focus:border-blue-500"
                    value={Number(unit.semester || 1)}
