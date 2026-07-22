@@ -157,7 +157,6 @@ export default function PlanForm() {
                       placeholder="Recursos / Ambientes..."
                     />
                   </td>
-                  {/* COLUNA DE AÇÕES: Apenas exclusão (×) e botão de OK (sem o botão azul de mais da linha) */}
                   <td className="py-4 px-4 align-middle text-center">
                     <div className="flex items-center justify-center gap-2">
                       <button
