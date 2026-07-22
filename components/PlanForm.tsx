@@ -14,7 +14,7 @@ export default function PlanForm() {
   const [linhas, setLinhas] = useState<CronogramaRow[]>([
     {
       horas: 4,
-      data: '2026-01-12',
+      data: '2026-02-10',
       capacidades: '',
       conhecimentos: '',
       estrategias: '',
@@ -75,7 +75,7 @@ export default function PlanForm() {
             onClick={adicionarLinha}
             className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2.5 rounded-xl text-sm transition-all shadow-sm hover:shadow"
           >
-            + INCLUIR LINHA NO TOPO
+            + INCLUIR LINHA
           </button>
           <button
             onClick={() => window.print()}
@@ -157,21 +157,21 @@ export default function PlanForm() {
                       placeholder="Recursos / Ambientes..."
                     />
                   </td>
-                  {/* COLUNA DE AÇÕES: Apenas exclusão e botão de OK (sem o ícone de mais) */}
+                  {/* COLUNA DE AÇÕES: Apenas exclusão (×) e botão de OK (sem o botão azul de mais da linha) */}
                   <td className="py-4 px-4 align-middle text-center">
                     <div className="flex items-center justify-center gap-2">
                       <button
                         onClick={() => removerLinha(index)}
-                        className="w-8 h-8 flex items-center justify-center rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition-colors"
+                        className="w-8 h-8 flex items-center justify-center rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition-colors font-bold text-lg"
                         title="Excluir linha"
                       >
                         ×
                       </button>
                       <button
                         onClick={() => alternarOk(index)}
-                        className={`px-2.5 py-1.5 text-xs font-semibold rounded-lg transition-all border ${
+                        className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all border ${
                           linha.concluido
-                            ? 'bg-green-600 text-white border-green-600'
+                            ? 'bg-green-600 text-white border-green-600 shadow-sm'
                             : 'bg-slate-50 text-slate-700 border-slate-300 hover:bg-green-50 hover:text-green-700 hover:border-green-300'
                         }`}
                         title="Marcar conteúdo como dado (OK)"
@@ -184,16 +184,6 @@ export default function PlanForm() {
               ))}
             </tbody>
           </table>
-        </div>
-
-        {/* Botão Adicionar Linha ao Final */}
-        <div className="mt-6">
-          <button
-            onClick={adicionarLinha}
-            className="inline-flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white font-semibold px-5 py-3 rounded-xl text-sm transition-all shadow-sm"
-          >
-            + ADICIONAR LINHA AO FINAL
-          </button>
         </div>
       </div>
     </div>
