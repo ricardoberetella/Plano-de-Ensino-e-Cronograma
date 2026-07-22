@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TeachingPlan, CurricularUnit, SemesterNumber } from './types';
+import { TeachingPlan, CurricularUnit, SemesterNumber } from '../types';
 
 interface UnitViewerProps {
   plan: TeachingPlan;
@@ -37,7 +37,7 @@ const UnitViewer: React.FC<UnitViewerProps> = ({ plan, onUpdatePlan, onBack }) =
           <h2 className="text-2xl font-black text-slate-900 tracking-tight uppercase">{plan.courseName}</h2>
         </div>
 
-        {/* Seletor de Unidades Curriculares (Usa o ID único para permitir duplicadas em semestres diferentes) */}
+        {/* Seletor de Unidades Curriculares usando ID único */}
         <div className="w-full md:w-auto">
           <label className="block text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">Selecionar Unidade Curricular</label>
           <select 
