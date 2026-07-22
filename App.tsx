@@ -103,6 +103,17 @@ const App: React.FC = () => {
   const [selectedSemester, setSelectedSemester] = useState<SemesterNumber>(1);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Estados para edição inline do Perfil de Conclusão
+  const [isEditingObjective, setIsEditingObjective] = useState(false);
+  const [objectiveText, setObjectiveText] = useState('');
+
+  // Atualiza o texto local quando o plano corrente mudar
+  useEffect(() => {
+    if (currentPlan) {
+      setObjectiveText(currentPlan.objective || '');
+    }
+  }, [currentPlan]);
+
   const currentPlanSemesters = useMemo(() => {
     if (!currentPlan || !Array.isArray(currentPlan.units)) return [];
 
@@ -368,6 +379,20 @@ const App: React.FC = () => {
     }
   };
 
+  const handleSaveObjective = async () => {
+    if (!currentPlan) return;
+    try {
+      const updatedPlan = {
+        ...currentPlan,
+        objective: objectiveText
+      };
+      await persistPlan(updatedPlan);
+      setIsEditingObjective(false);
+    } catch (error) {
+      console.error('Erro ao salvar perfil de conclusão:', error);
+    }
+  };
+
   const handleUpdateSchedule = async (
     unitId: string,
     newSchedule: ScheduleEntry[]
@@ -552,12 +577,51 @@ const App: React.FC = () => {
                 </div>
 
                 <section>
-                  <h3 className="text-[10px] font-black uppercase text-blue-600 tracking-[0.3em] mb-4">
-                    I. Perfil de Conclusão
-                  </h3>
-                  <p className="text-slate-600 text-sm leading-relaxed font-medium">
-                    {currentPlan.objective}
-                  </p>
+                  <div className="flex justify-between items-center mb-4">
+                    <h3 className="text-[10px] font-black uppercase text-blue-600 tracking-[0.3em]">
+                      I. Perfil de Conclusão
+                    </h3>
+                    {!isEditingObjective ? (
+                      <button
+                        onClick={() => setIsEditingObjective(true)}
+                        className="text-[10px] font-black uppercase bg-slate-100 hover:bg-blue-600 hover:text-white text-slate-600 px-3 py-1.5 rounded-xl transition-all"
+                      >
+                        Editar Perfil
+                      </button>
+                    ) : (
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => {
+                            setObjectiveText(currentPlan.objective || '');
+                            setIsEditingObjective(false);
+                          }}
+                          className="text-[10px] font-black uppercase bg-slate-200 hover:bg-slate-300 text-slate-700 px-3 py-1.5 rounded-xl transition-all"
+                        >
+                          Cancelar
+                        </button>
+                        <button
+                          onClick={handleSaveObjective}
+                          className="text-[10px] font-black uppercase bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-xl transition-all shadow-md"
+                        >
+                          Salvar
+                        </button>
+                      </div>
+                    )}
+                  </div>
+
+                  {isEditingObjective ? (
+                    <textarea
+                      value={objectiveText}
+                      onChange={e => setObjectiveText(e.target.value)}
+                      rows={5}
+                      className="w-full p-4 border-2 border-blue-500 rounded-2xl text-slate-700 text-sm font-medium focus:outline-none bg-slate-50"
+                      placeholder="Digite o perfil de conclusão..."
+                    />
+                  ) : (
+                    <p className="text-slate-600 text-sm leading-relaxed font-medium">
+                      {currentPlan.objective}
+                    </p>
+                  )}
                 </section>
               </div>
 
