@@ -12,11 +12,22 @@ interface UnitViewerProps {
 const UnitViewer: React.FC<UnitViewerProps> = ({
   unit,
   isAdmin,
+  onUpdateSchedule,
+  onUpdateCalendar,
   onUpdateUnit,
 }) => {
-  const [activeTab, setActiveTab] = useState<'geral' | 'situacao' | 'rubricas' | 'plano' | 'calendario'>('rubricas');
+  const [activeTab, setActiveTab] = useState<'geral' | 'situacao' | 'rubricas' | 'plano' | 'calendario'>('geral');
   
   const [rubrics, setRubrics] = useState<RubricItem[]>(unit.rubrics || []);
+  const [description, setDescription] = useState(unit.description || '');
+  const [problemSituation, setProblemSituation] = useState(unit.problemSituation || '');
+  const [lessonPlan, setLessonPlan] = useState(unit.lessonPlan || '');
+  const [workload, setWorkload] = useState(unit.workload || 0);
+
+  const handleFieldChange = (field: keyof CurricularUnit, value: any) => {
+    const updated = { ...unit, [field]: value };
+    onUpdateUnit(updated);
+  };
 
   const handleAddRubricRow = () => {
     const newRow: RubricItem = {
@@ -112,6 +123,78 @@ const UnitViewer: React.FC<UnitViewerProps> = ({
 
       {/* CONTEÚDO DAS ABAS */}
       <div className="p-8 md:p-12">
+        {activeTab === 'geral' && (
+          <div className="space-y-6">
+            <h3 className="text-lg font-[1000] uppercase text-slate-900">Informações Gerais</h3>
+            {isAdmin ? (
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-[10px] font-black uppercase text-slate-400 mb-2">Descrição / Objetivo da Unidade</label>
+                  <textarea
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    onBlur={(e) => handleFieldChange('description', e.target.value)}
+                    placeholder="Digite a descrição geral..."
+                    className="w-full h-32 p-4 text-xs bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:border-blue-600 outline-none resize-none font-medium"
+                  />
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-[10px] font-black uppercase text-slate-400 mb-2">Carga Horária (Horas)</label>
+                    <input
+                      type="number"
+                      value={workload}
+                      onChange={(e) => setWorkload(Number(e.target.value))}
+                      onBlur={(e) => handleFieldChange('workload', Number(e.target.value))}
+                      className="w-full p-4 text-xs bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:border-blue-600 outline-none font-medium"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-black uppercase text-slate-400 mb-2">Semestre</label>
+                    <input
+                      type="number"
+                      value={unit.semester || 1}
+                      onChange={(e) => handleFieldChange('semester', Number(e.target.value))}
+                      className="w-full p-4 text-xs bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:border-blue-600 outline-none font-medium"
+                    />
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <p className="text-sm text-slate-600 font-medium whitespace-pre-wrap">{unit.description || 'Nenhuma descrição informada.'}</p>
+                <div className="grid grid-cols-2 gap-4 pt-4">
+                  <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                    <span className="text-[10px] font-black text-slate-400 uppercase">Carga Horária</span>
+                    <p className="text-xl font-black text-slate-800">{unit.workload || 0}h</p>
+                  </div>
+                  <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                    <span className="text-[10px] font-black text-slate-400 uppercase">Semestre</span>
+                    <p className="text-xl font-black text-slate-800">{unit.semester || 1}º Semestre</p>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {activeTab === 'situacao' && (
+          <div className="space-y-6">
+            <h3 className="text-lg font-[1000] uppercase text-slate-900">Situação-Problema</h3>
+            {isAdmin ? (
+              <textarea
+                value={problemSituation}
+                onChange={(e) => setProblemSituation(e.target.value)}
+                onBlur={(e) => handleFieldChange('problemSituation', e.target.value)}
+                placeholder="Digite a situação-problema..."
+                className="w-full h-64 p-4 text-xs bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:border-blue-600 outline-none resize-none font-medium"
+              />
+            ) : (
+              <p className="text-sm text-slate-600 whitespace-pre-wrap font-medium">{unit.problemSituation || 'Nenhuma situação-problema cadastrada.'}</p>
+            )}
+          </div>
+        )}
+
         {activeTab === 'rubricas' && (
           <div className="space-y-6">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -152,7 +235,7 @@ const UnitViewer: React.FC<UnitViewerProps> = ({
                             value={rubric.capacity}
                             onChange={(e) => handleRubricChange(rubric.id, 'capacity', e.target.value)}
                             placeholder="Digite a capacidade..."
-                            className="w-full h-32 p-3 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-blue-600 outline-none resize-none overflow-hidden font-medium"
+                            className="w-full h-32 p-3 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-blue-600 outline-none resize-none font-medium"
                           />
                         ) : (
                           <p className="text-xs text-slate-800 font-medium whitespace-pre-wrap">{rubric.capacity}</p>
@@ -163,8 +246,8 @@ const UnitViewer: React.FC<UnitViewerProps> = ({
                           <textarea
                             value={rubric.nsa}
                             onChange={(e) => handleRubricChange(rubric.id, 'nsa', e.target.value)}
-                            placeholder="Não Suficiente com Acompanhamento..."
-                            className="w-full h-32 p-3 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-blue-600 outline-none resize-none overflow-hidden font-medium"
+                            placeholder="Não Suficiente..."
+                            className="w-full h-32 p-3 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-blue-600 outline-none resize-none font-medium"
                           />
                         ) : (
                           <p className="text-xs text-slate-800 font-medium whitespace-pre-wrap">{rubric.nsa}</p>
@@ -175,8 +258,8 @@ const UnitViewer: React.FC<UnitViewerProps> = ({
                           <textarea
                             value={rubric.apo}
                             onChange={(e) => handleRubricChange(rubric.id, 'apo', e.target.value)}
-                            placeholder="Suficiente com Acompanhamento Parcial..."
-                            className="w-full h-32 p-3 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-blue-600 outline-none resize-none overflow-hidden font-medium"
+                            placeholder="Acompanhamento Parcial..."
+                            className="w-full h-32 p-3 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-blue-600 outline-none resize-none font-medium"
                           />
                         ) : (
                           <p className="text-xs text-slate-800 font-medium whitespace-pre-wrap">{rubric.apo}</p>
@@ -187,8 +270,8 @@ const UnitViewer: React.FC<UnitViewerProps> = ({
                           <textarea
                             value={rubric.par}
                             onChange={(e) => handleRubricChange(rubric.id, 'par', e.target.value)}
-                            placeholder="Suficiente com Autonomia Parcial..."
-                            className="w-full h-32 p-3 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-blue-600 outline-none resize-none overflow-hidden font-medium"
+                            placeholder="Autonomia Parcial..."
+                            className="w-full h-32 p-3 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-blue-600 outline-none resize-none font-medium"
                           />
                         ) : (
                           <p className="text-xs text-slate-800 font-medium whitespace-pre-wrap">{rubric.par}</p>
@@ -199,8 +282,8 @@ const UnitViewer: React.FC<UnitViewerProps> = ({
                           <textarea
                             value={rubric.aut}
                             onChange={(e) => handleRubricChange(rubric.id, 'aut', e.target.value)}
-                            placeholder="Suficiente com Autonomia Total..."
-                            className="w-full h-32 p-3 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-blue-600 outline-none resize-none overflow-hidden font-medium"
+                            placeholder="Autonomia Total..."
+                            className="w-full h-32 p-3 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-blue-600 outline-none resize-none font-medium"
                           />
                         ) : (
                           <p className="text-xs text-slate-800 font-medium whitespace-pre-wrap">{rubric.aut}</p>
@@ -219,7 +302,6 @@ const UnitViewer: React.FC<UnitViewerProps> = ({
                       )}
                     </tr>
                   ))}
-
                   {rubrics.length === 0 && (
                     <tr>
                       <td colSpan={isAdmin ? 6 : 5} className="py-12 text-center text-slate-400 text-xs font-bold uppercase tracking-wider">
@@ -233,41 +315,30 @@ const UnitViewer: React.FC<UnitViewerProps> = ({
           </div>
         )}
 
-        {activeTab === 'geral' && (
-          <div className="space-y-6">
-            <h3 className="text-lg font-[1000] uppercase text-slate-900">Informações Gerais</h3>
-            <p className="text-sm text-slate-600">{unit.description || 'Nenhuma descrição informada.'}</p>
-            <div className="grid grid-cols-2 gap-4 pt-4">
-              <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                <span className="text-[10px] font-black text-slate-400 uppercase">Carga Horária</span>
-                <p className="text-xl font-black text-slate-800">{unit.workload || 0}h</p>
-              </div>
-              <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                <span className="text-[10px] font-black text-slate-400 uppercase">Semestre</span>
-                <p className="text-xl font-black text-slate-800">{unit.semester || 1}º Semestre</p>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {activeTab === 'situacao' && (
-          <div className="space-y-6">
-            <h3 className="text-lg font-[1000] uppercase text-slate-900">Situação-Problema</h3>
-            <p className="text-sm text-slate-600 whitespace-pre-wrap">{unit.problemSituation || 'Nenhuma situação-problema cadastrada.'}</p>
-          </div>
-        )}
-
         {activeTab === 'plano' && (
           <div className="space-y-6">
             <h3 className="text-lg font-[1000] uppercase text-slate-900">Plano de Aula</h3>
-            <p className="text-sm text-slate-600 whitespace-pre-wrap">{unit.lessonPlan || 'Nenhum plano de aula cadastrado.'}</p>
+            {isAdmin ? (
+              <textarea
+                value={lessonPlan}
+                onChange={(e) => setLessonPlan(e.target.value)}
+                onBlur={(e) => handleFieldChange('lessonPlan', e.target.value)}
+                placeholder="Digite o plano de aula..."
+                className="w-full h-64 p-4 text-xs bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:border-blue-600 outline-none resize-none font-medium"
+              />
+            ) : (
+              <p className="text-sm text-slate-600 whitespace-pre-wrap font-medium">{unit.lessonPlan || 'Nenhum plano de aula cadastrado.'}</p>
+            )}
           </div>
         )}
 
         {activeTab === 'calendario' && (
           <div className="space-y-6">
             <h3 className="text-lg font-[1000] uppercase text-slate-900">Calendário da Unidade</h3>
-            <p className="text-sm text-slate-600">Configurações de datas e cronograma da unidade curricular.</p>
+            <p className="text-xs text-slate-400 font-bold uppercase tracking-wider">Gerenciamento automático de datas e cronograma da unidade curricular.</p>
+            <div className="p-6 bg-slate-50 rounded-2xl border border-slate-200">
+              <p className="text-xs font-bold text-slate-700">O cronograma está sincronizado com o calendário geral do curso e distribuição de aulas.</p>
+            </div>
           </div>
         )}
       </div>
