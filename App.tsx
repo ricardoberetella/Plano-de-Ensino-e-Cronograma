@@ -100,6 +100,7 @@ const App: React.FC = () => {
             ...template,
             id: `plan-usinagem-${profileId}-${Date.now()}`,
             profileId,
+            totalHours: 800,
             version: SCHEDULE_VERSION,
             updatedAt: new Date().toISOString(),
             units: sortUnits(template?.units || [])
@@ -107,12 +108,15 @@ const App: React.FC = () => {
 
           await FirebaseService.savePlan(freshPlan);
           dbPlans = [freshPlan];
+        } else {
+          // Garante 800h caso venha desatualizado do banco
+          dbPlans = dbPlans.map(p => ({ ...p, totalHours: 800 }));
         }
 
         setPlans(dbPlans);
 
         const nextCurrent = dbPlans[0] || template;
-        setCurrentPlan(nextCurrent);
+        setCurrentPlan({ ...nextCurrent, totalHours: 800 });
 
         const availableSemesters = Array.from(
           new Set(
@@ -158,6 +162,7 @@ const App: React.FC = () => {
     const planToSave: TeachingPlan = {
       ...updatedPlan,
       profileId: activeProfileId,
+      totalHours: 800,
       version: SCHEDULE_VERSION,
       updatedAt: new Date().toISOString(),
       units: sortUnits(updatedPlan.units)
@@ -172,41 +177,15 @@ const App: React.FC = () => {
     return planToSave;
   };
 
-  const handleDeletePlan = async (planId: string) => {
-    if (!isAdmin) {
-      alert('Acesso negado: Apenas administradores podem excluir cursos.');
-      return;
-    }
-
-    if (plans.length <= 1) {
-      alert('Não é possível excluir o único curso restante no perfil.');
-      return;
-    }
-
-    if (window.confirm('Tem certeza que deseja excluir este curso permanentemente?')) {
-      try {
-        await FirebaseService.deletePlan(planId);
-        const refreshed = await FirebaseService.getPlans(activeProfileId);
-        setPlans(refreshed);
-        if (currentPlan?.id === planId) {
-          setCurrentPlan(refreshed[0] || null);
-        }
-      } catch (error) {
-        console.error('Erro ao excluir plano:', error);
-        alert('Erro ao excluir o curso da nuvem.');
-      }
-    }
-  };
-
   const handleSave = async (updatedPlan: TeachingPlan) => {
     if (!isAdmin) {
       alert('Acesso negado: O perfil de visualização não pode salvar alterações.');
       return;
     }
     try {
-      const saved = await persistPlan(updatedPlan);
+      const saved = await persistPlan({ ...updatedPlan, totalHours: 800 });
       const refreshed = await FirebaseService.getPlans(activeProfileId);
-      setPlans(refreshed);
+      setPlans(refreshed.map(p => ({ ...p, totalHours: 800 })));
 
       setCurrentPlan(saved);
       const newSemesters = Array.from(new Set(saved.units.map(u => Number(u.semester || 1)))).sort((a, b) => a - b);
@@ -314,6 +293,7 @@ const App: React.FC = () => {
 
     setCurrentPlan({
       ...plan,
+      totalHours: 800,
       units: orderedUnits
     });
     setSelectedSemester(firstSemester);
@@ -344,19 +324,18 @@ const App: React.FC = () => {
         <>
           {view === 'dashboard' && (
             <Dashboard
-              plans={plans}
+              plans={plans.map(p => ({ ...p, totalHours: 800 }))}
               isAdmin={isAdmin}
               onEdit={plan => {
                 if (!isAdmin) {
                   alert("Acesso restrito: Apenas o administrador pode editar.");
                   return;
                 }
-                setCurrentPlan(plan);
+                setCurrentPlan({ ...plan, totalHours: 800 });
                 setView('editor' as ViewType);
               }}
               onView={openPlan}
               onRefresh={() => loadPlans(activeProfileId)}
-              onDeletePlan={handleDeletePlan}
             />
           )}
 
@@ -378,7 +357,7 @@ const App: React.FC = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
                   <div className="p-6 bg-slate-50 rounded-3xl border border-slate-100">
                     <p className="text-[9px] font-black text-slate-400 uppercase mb-2">Carga Total</p>
-                    <p className="text-2xl font-black text-slate-800 italic">{currentPlan.totalHours || 1400} HORAS</p>
+                    <p className="text-2xl font-black text-slate-800 italic">800 HORAS</p>
                   </div>
                   <div className="p-6 bg-slate-50 rounded-3xl border border-slate-100">
                     <p className="text-[9px] font-black text-slate-400 uppercase mb-2">Modalidade</p>
@@ -476,12 +455,12 @@ const App: React.FC = () => {
           )}
 
           {view === ('calendario' as ViewType) && currentPlan && (
-            <GeneralCalendar plan={currentPlan} />
+            <GeneralCalendar plan={{ ...currentPlan, totalHours: 800 }} />
           )}
 
           {view === ('editor' as ViewType) && (
             <PlanForm
-              initialPlan={currentPlan || undefined}
+              initialPlan={currentPlan ? { ...currentPlan, totalHours: 800 } : undefined}
               isAdmin={isAdmin}
               onSave={handleSave}
               onCancel={() => setView('dashboard')}
