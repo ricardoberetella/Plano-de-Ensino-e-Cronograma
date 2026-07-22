@@ -16,7 +16,6 @@ const UnitViewer: React.FC<UnitViewerProps> = ({
 }) => {
   const [activeTab, setActiveTab] = useState<'geral' | 'situacao' | 'rubricas' | 'plano' | 'calendario'>('rubricas');
   
-  // Estado local para edição das rubricas
   const [rubrics, setRubrics] = useState<RubricItem[]>(unit.rubrics || []);
 
   const handleAddRubricRow = () => {
@@ -153,7 +152,7 @@ const UnitViewer: React.FC<UnitViewerProps> = ({
                             value={rubric.capacity}
                             onChange={(e) => handleRubricChange(rubric.id, 'capacity', e.target.value)}
                             placeholder="Digite a capacidade..."
-                            className="w-full h-32 p-3 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-blue-600 outline-none resize-none font-medium"
+                            className="w-full h-32 p-3 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-blue-600 outline-none resize-none overflow-hidden font-medium"
                           />
                         ) : (
                           <p className="text-xs text-slate-800 font-medium whitespace-pre-wrap">{rubric.capacity}</p>
@@ -165,7 +164,7 @@ const UnitViewer: React.FC<UnitViewerProps> = ({
                             value={rubric.nsa}
                             onChange={(e) => handleRubricChange(rubric.id, 'nsa', e.target.value)}
                             placeholder="Não Suficiente com Acompanhamento..."
-                            className="w-full h-32 p-3 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-blue-600 outline-none resize-none font-medium"
+                            className="w-full h-32 p-3 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-blue-600 outline-none resize-none overflow-hidden font-medium"
                           />
                         ) : (
                           <p className="text-xs text-slate-800 font-medium whitespace-pre-wrap">{rubric.nsa}</p>
@@ -177,7 +176,7 @@ const UnitViewer: React.FC<UnitViewerProps> = ({
                             value={rubric.apo}
                             onChange={(e) => handleRubricChange(rubric.id, 'apo', e.target.value)}
                             placeholder="Suficiente com Acompanhamento Parcial..."
-                            className="w-full h-32 p-3 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-blue-600 outline-none resize-none font-medium"
+                            className="w-full h-32 p-3 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-blue-600 outline-none resize-none overflow-hidden font-medium"
                           />
                         ) : (
                           <p className="text-xs text-slate-800 font-medium whitespace-pre-wrap">{rubric.apo}</p>
@@ -189,7 +188,7 @@ const UnitViewer: React.FC<UnitViewerProps> = ({
                             value={rubric.par}
                             onChange={(e) => handleRubricChange(rubric.id, 'par', e.target.value)}
                             placeholder="Suficiente com Autonomia Parcial..."
-                            className="w-full h-32 p-3 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-blue-600 outline-none resize-none font-medium"
+                            className="w-full h-32 p-3 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-blue-600 outline-none resize-none overflow-hidden font-medium"
                           />
                         ) : (
                           <p className="text-xs text-slate-800 font-medium whitespace-pre-wrap">{rubric.par}</p>
@@ -201,7 +200,7 @@ const UnitViewer: React.FC<UnitViewerProps> = ({
                             value={rubric.aut}
                             onChange={(e) => handleRubricChange(rubric.id, 'aut', e.target.value)}
                             placeholder="Suficiente com Autonomia Total..."
-                            className="w-full h-32 p-3 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-blue-600 outline-none resize-none font-medium"
+                            className="w-full h-32 p-3 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-blue-600 outline-none resize-none overflow-hidden font-medium"
                           />
                         ) : (
                           <p className="text-xs text-slate-800 font-medium whitespace-pre-wrap">{rubric.aut}</p>
