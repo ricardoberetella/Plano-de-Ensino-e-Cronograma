@@ -1,8 +1,7 @@
-
 import React, { useState } from 'react';
 
 interface LoginProps {
-  onLogin: (password: string) => void;
+  onLogin: (role: 'admin' | 'viewer') => void;
 }
 
 const Login: React.FC<LoginProps> = ({ onLogin }) => {
@@ -11,8 +10,10 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (password === 'ianes662') {
-      onLogin(password);
+    if (password === 'bere662') {
+      onLogin('admin');
+    } else if (password === 'ianes662') {
+      onLogin('viewer');
     } else {
       setError(true);
       setTimeout(() => setError(false), 2000);
