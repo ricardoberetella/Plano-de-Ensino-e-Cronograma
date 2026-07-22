@@ -135,6 +135,27 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
     onUpdateSchedule?.(updated);
   };
 
+  const addScheduleRow = () => {
+    const newEntry: ScheduleEntry = {
+      id: `sched-${Date.now()}`,
+      hours: 4,
+      date: '',
+      capacities: '',
+      knowledge: '',
+      strategy: '',
+      resources: ''
+    };
+    const updated = [...localSchedule, newEntry];
+    setLocalSchedule(updated);
+    onUpdateSchedule?.(updated);
+  };
+
+  const removeScheduleRow = (id: string) => {
+    const updated = localSchedule.filter(entry => entry.id !== id);
+    setLocalSchedule(updated);
+    onUpdateSchedule?.(updated);
+  };
+
   const updateGeneralFieldList = (field: 'technicalCapacities' | 'socialCapacities' | 'knowledges', index: number, value: string) => {
     const currentList = localUnit[field] ? [...localUnit[field]!] : [];
     currentList[index] = value;
@@ -201,7 +222,6 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
     updateUnitState({ ...localUnit, learningSituations: updatedSAs });
   };
 
-  // Funções de Rubricas (Adicionar e Excluir linha)
   const updateRubric = (index: number, field: string, value: string) => {
     const updatedRubrics = [...(localUnit.rubrics || [])];
     updatedRubrics[index] = { ...updatedRubrics[index], [field]: value };
@@ -280,7 +300,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
             className={`px-8 py-5 transition-all border-b-4 ${activeTab === tab ? 'border-blue-600 bg-white' : 'border-transparent text-slate-400 hover:bg-slate-100'}`}
           >
             <span className="text-[10px] font-black uppercase tracking-widest block">
-              {tab === 'geral' ? 'Geral' : tab === 'sa' ? 'Situação-Problema' : tab === 'rubricas' ? 'Rubricas' : tab === 'cronograma' ? 'Plano de Aula' : 'Calendário'}
+              {tab === 'geral' ? 'Geral' : tab === 'sa' ? 'Situação-Problema' : tab === 'rubricas' ? 'Rubricas' : tab === 'cronograma' ? 'Plano de Ensino / Cronograma' : 'Calendário'}
             </span>
           </button>
         ))}
@@ -476,7 +496,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
           </div>
         )}
 
-        {/* ABA RUBRICAS COM BOTÕES DE ADICIONAR E EXCLUIR */}
+        {/* ABA RUBRICAS */}
         {activeTab === 'rubricas' && (
           <div className="space-y-4">
             <div className="flex justify-between items-center no-print px-2">
@@ -569,15 +589,21 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
           </div>
         )}
 
-        {/* ABA CRONOGRAMA */}
+        {/* ABA PLANO DE ENSINO / CRONOGRAMA */}
         {activeTab === 'cronograma' && (
           <div className="space-y-6">
             <div className="flex justify-between items-center gap-6 border-b border-slate-200 pb-4 no-print">
               <div>
-                <h3 className="text-2xl font-[1000] text-slate-900 uppercase italic">Plano de aula | Cronograma</h3>
+                <h3 className="text-2xl font-[1000] text-slate-900 uppercase italic">Plano de Ensino | Cronograma</h3>
                 <p className="text-xs text-slate-500 font-semibold">Visualização e edição no formato padrão de tabela pedagógica</p>
               </div>
               <div className="flex gap-3">
+                <button 
+                  onClick={addScheduleRow}
+                  className="bg-blue-600 text-white px-5 py-3 rounded-xl text-xs font-black uppercase tracking-wider shadow-md flex items-center gap-2 hover:bg-slate-900 transition-all"
+                >
+                  + Adicionar Linha
+                </button>
                 <button 
                   onClick={handlePrint} 
                   className="bg-red-600 text-white px-6 py-3 rounded-xl text-xs font-black uppercase tracking-wider shadow-md flex items-center gap-2 hover:bg-slate-900 transition-all"
@@ -594,8 +620,9 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                     <th className="p-3 w-[15%] text-xs font-black uppercase border-r border-black text-center align-middle">Horas/Aulas/Data</th>
                     <th className="p-3 w-[20%] text-xs font-black uppercase border-r border-black text-center align-middle">Capacidades</th>
                     <th className="p-3 w-[20%] text-xs font-black uppercase border-r border-black text-center align-middle">Conhecimentos</th>
-                    <th className="p-3 w-[25%] text-xs font-black uppercase border-r border-black text-center align-middle">Estratégias</th>
-                    <th className="p-3 w-[20%] text-xs font-black uppercase text-center align-middle">Recursos/Ambientes</th>
+                    <th className="p-3 w-[22%] text-xs font-black uppercase border-r border-black text-center align-middle">Estratégias</th>
+                    <th className="p-3 w-[18%] text-xs font-black uppercase border-r border-black text-center align-middle">Recursos/Ambientes</th>
+                    <th className="p-3 w-[5%] text-xs font-black uppercase text-center align-middle no-print">Ações</th>
                   </tr>
                 </thead>
                 <tbody className="text-xs font-medium text-slate-900 divide-y border-black">
@@ -632,8 +659,17 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                       <td className="p-2 border-r border-black align-top">
                         <EditableArea value={entry.strategy} onChange={(val) => updateEntry(entry.id, 'strategy', val)} rows={3} className="w-full bg-transparent border-none text-xs leading-relaxed focus:outline-none focus:bg-slate-50 rounded p-1" />
                       </td>
-                      <td className="p-2 align-top">
+                      <td className="p-2 border-r border-black align-top">
                         <EditableArea value={entry.resources} onChange={(val) => updateEntry(entry.id, 'resources', val)} rows={2} className="w-full bg-transparent border-none text-xs leading-relaxed focus:outline-none focus:bg-slate-50 rounded p-1" />
+                      </td>
+                      <td className="p-2 align-middle text-center no-print">
+                        <button
+                          onClick={() => removeScheduleRow(entry.id)}
+                          className="text-slate-400 hover:text-red-600 p-1.5 rounded-lg hover:bg-red-50 transition-all font-black text-xs"
+                          title="Excluir linha"
+                        >
+                          ✕
+                        </button>
                       </td>
                     </tr>
                   ))}
