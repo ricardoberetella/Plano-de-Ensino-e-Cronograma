@@ -8,15 +8,7 @@ interface Props {
   onUpdateUnit?: (updatedUnit: CurricularUnit) => void;
 }
 
-const COLOR_MAP: Record<CalendarColor, string> = {
-  yellow: '#fbbf24', green: '#22c55e', blue: '#3b82f6', red: '#ef4444', cyan: '#06b6d4', orange: '#f97316', purple: '#a855f7', pink: '#ec4899', white: '#ffffff', none: 'transparent'
-};
-
-const TEXT_COLOR_MAP: Record<CalendarColor, string> = {
-  yellow: '#0f172a', green: '#ffffff', blue: '#ffffff', red: '#ffffff', cyan: '#ffffff', orange: '#ffffff', purple: '#ffffff', pink: '#ffffff', white: '#1e293b', none: 'inherit'
-};
-
-// Componente para Inputs simples
+// Componente para Inputs simples com debounce
 const DebouncedInput: React.FC<{
   value: string;
   onChange: (val: string) => void;
@@ -62,15 +54,11 @@ const EditableArea: React.FC<{
     setVal(value || '');
   }, [value]);
 
-  const adjustHeight = () => {
+  useEffect(() => {
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
       textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
     }
-  };
-
-  useEffect(() => {
-    adjustHeight();
   }, [val]);
 
   const handleBlur = () => {
@@ -93,7 +81,7 @@ const EditableArea: React.FC<{
 };
 
 const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar, onUpdateUnit }) => {
-  const [activeTab, setActiveTab] = useState<'geral' | 'sa' | 'rubricas' | 'cronograma' | 'calendario'>('geral');
+  const [activeTab, setActiveTab] = useState<'geral' | 'sa' | 'rubricas' | 'cronograma' | 'calendario' | 'editar_unidade'>('geral');
   const [localSchedule, setLocalSchedule] = useState<ScheduleEntry[]>(unit?.schedule || []);
   const [localUnit, setLocalUnit] = useState<CurricularUnit>(unit);
 
@@ -110,13 +98,9 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
     onUpdateUnit?.(newUnit);
   };
 
-  const isCRD = localUnit?.id?.toLowerCase().includes('crd') || localUnit?.name?.toLowerCase().includes('dimensional');
-  const isFUSI = localUnit?.id?.toLowerCase().includes('fusi') || localUnit?.name?.toLowerCase().includes('usinagem');
-  const scheduleColor: CalendarColor = isCRD ? 'pink' : (isFUSI ? 'orange' : 'blue');
-
   const calendar = useMemo(() => localUnit?.calendar || {
     startDate: '2026-01-01',
-    endDate: '2026-06-30',
+    endDate: '2026-12-31',
     markings: []
   }, [localUnit?.calendar]);
 
@@ -257,7 +241,6 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
 
   const removeRubric = (index: number) => {
     if (!window.confirm('Tem certeza que deseja excluir esta rubrica?')) return;
-
     const updatedRubrics = [...(localUnit.rubrics || [])];
     updatedRubrics.splice(index, 1);
     updateUnitState({ ...localUnit, rubrics: updatedRubrics });
@@ -281,35 +264,8 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
   }, [localSchedule]);
 
   const monthsInRange = useMemo(() => {
-    let minDateStr = calendar?.startDate || '2026-01-01';
-    let maxDateStr = calendar?.endDate || '2026-06-30';
-
-    if (localSchedule && localSchedule.length > 0) {
-      const parsedDates = localSchedule.map(s => {
-        if (!s || !s.date) return null;
-        const parts = s.date.split('/');
-        if (parts.length === 3) {
-          return new Date(Number(parts[2]), Number(parts[1]) - 1, Number(parts[0]));
-        }
-        return null;
-      }).filter(d => d !== null && !isNaN(d.getTime())) as Date[];
-
-      if (parsedDates.length > 0) {
-        const minYear = Math.min(...parsedDates.map(d => d.getFullYear()));
-        const maxYear = Math.max(...parsedDates.map(d => d.getFullYear()));
-        const hasSecondSemester = parsedDates.some(d => d.getMonth() >= 6);
-        const hasFirstSemester = parsedDates.some(d => d.getMonth() < 6);
-
-        if (hasSecondSemester && !hasFirstSemester) {
-          minDateStr = `${minYear}-07-01`;
-          maxDateStr = `${maxYear}-12-31`;
-        } else if (hasFirstSemester && !hasSecondSemester) {
-          minDateStr = `${minYear}-01-01`;
-          maxDateStr = `${minYear}-06-30`;
-        }
-      }
-    }
-
+    const minDateStr = calendar?.startDate || '2026-01-01';
+    const maxDateStr = calendar?.endDate || '2026-12-31';
     const start = new Date(minDateStr + 'T00:00:00');
     const end = new Date(maxDateStr + 'T00:00:00');
     const months: string[] = [];
@@ -319,7 +275,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
       current.setMonth(current.getMonth() + 1);
     }
     return months;
-  }, [localSchedule, calendar?.startDate, calendar?.endDate]);
+  }, [calendar?.startDate, calendar?.endDate]);
 
   return (
     <div className="bg-white rounded-[2.5rem] shadow-2xl border border-slate-200 overflow-hidden animate-fadeIn printable-unit-module" data-active-tab={activeTab}>
@@ -346,31 +302,87 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
       {/* HEADER DA UNIDADE */}
       <div className="bg-slate-900 p-8 text-white flex justify-between items-center no-print">
         <div className="w-full">
-          <span className="bg-blue-600 px-3 py-1 rounded text-[9px] font-black uppercase tracking-widest mb-2 inline-block">MSEP - Unidade Curricular</span>
-          <DebouncedInput
-            value={localUnit?.name || ''}
-            onChange={(val) => updateUnitState({ ...localUnit, name: val })}
-            className="text-3xl font-black tracking-tighter uppercase leading-none bg-transparent text-white border-b border-transparent hover:border-slate-700 focus:border-blue-500 outline-none w-full transition-all"
-          />
+          <span className="bg-blue-600 px-3 py-1 rounded text-[9px] font-black uppercase tracking-widest mb-2 inline-block">
+            {localUnit?.semester ? `${localUnit.semester} Semestre` : 'MSEP - Unidade Curricular'}
+          </span>
+          <div className="text-3xl font-black tracking-tighter uppercase leading-none text-white">
+            {localUnit?.name || ''} <span className="text-blue-400 font-mono text-xl">({localUnit?.id})</span>
+          </div>
         </div>
       </div>
 
       {/* TABS DE NAVEGAÇÃO */}
       <div className="flex border-b border-slate-200 bg-slate-50 overflow-x-auto scrollbar-hide no-print tabs-header">
-        {(['geral', 'sa', 'rubricas', 'cronograma', 'calendario'] as const).map(tab => (
+        {(['geral', 'sa', 'rubricas', 'cronograma', 'calendario', 'editar_unidade'] as const).map(tab => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`px-8 py-5 transition-all border-b-4 ${activeTab === tab ? 'border-blue-600 bg-white' : 'border-transparent text-slate-400 hover:bg-slate-100'}`}
+            className={`px-6 py-5 transition-all border-b-4 ${activeTab === tab ? 'border-blue-600 bg-white' : 'border-transparent text-slate-400 hover:bg-slate-100'}`}
           >
             <span className="text-[10px] font-black uppercase tracking-widest block">
-              {tab === 'geral' ? 'Geral' : tab === 'sa' ? 'Situação-Problema' : tab === 'rubricas' ? 'Rubricas' : tab === 'cronograma' ? 'Plano de Aula' : 'Calendário'}
+              {tab === 'geral' ? 'Geral' : tab === 'sa' ? 'Situação-Problema' : tab === 'rubricas' ? 'Rubricas' : tab === 'cronograma' ? 'Plano de Aula' : tab === 'calendario' ? 'Calendário' : 'Editar Unidade'}
             </span>
           </button>
         ))}
       </div>
 
       <div className="p-6 md:p-10 max-h-[75vh] overflow-y-auto custom-scrollbar bg-[#FDFDFD] content-area">
+
+        {/* ABA EDITAR UNIDADE (SIGLA, NOME E SEMESTRE) */}
+        {activeTab === 'editar_unidade' && (
+          <div className="max-w-2xl mx-auto space-y-8">
+            <div className="border-b border-slate-100 pb-6">
+              <h3 className="text-3xl font-[1000] text-slate-900 uppercase italic">Configurações da Unidade</h3>
+              <p className="text-xs text-slate-400 font-bold uppercase tracking-wider mt-1">Altere a sigla, o nome e o semestre de alocação automática</p>
+            </div>
+
+            <div className="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-xl space-y-6">
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block">Sigla da Unidade (ID)</label>
+                <input
+                  type="text"
+                  value={localUnit?.id || ''}
+                  onChange={(e) => updateUnitState({ ...localUnit, id: e.target.value })}
+                  placeholder="Ex: MDU, FUSI, CRD..."
+                  className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-xs font-bold text-slate-800 focus:outline-none focus:border-blue-500 uppercase"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block">Nome da Unidade Curricular</label>
+                <input
+                  type="text"
+                  value={localUnit?.name || ''}
+                  onChange={(e) => updateUnitState({ ...localUnit, name: e.target.value })}
+                  placeholder="Ex: Mecânica de Usinagem..."
+                  className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-xs font-bold text-slate-800 focus:outline-none focus:border-blue-500"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block">Semestre</label>
+                <select
+                  value={localUnit?.semester || '1º'}
+                  onChange={(e) => updateUnitState({ ...localUnit, semester: e.target.value as '1º' | '2º' })}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-xs font-bold text-slate-800 focus:outline-none focus:border-blue-500"
+                >
+                  <option value="1º">1º Semestre</option>
+                  <option value="2º">2º Semestre</option>
+                </select>
+              </div>
+
+              <div className="pt-4 flex justify-end">
+                <button
+                  type="button"
+                  onClick={() => alert("Unidade atualizada e sincronizada com sucesso!")}
+                  className="bg-blue-600 text-white px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-lg hover:bg-slate-900 transition-all"
+                >
+                  Salvar Alterações
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* ABA GERAL EM COLUNAS */}
         {activeTab === 'geral' && (
@@ -394,16 +406,15 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                 </div>
                 <div className="space-y-3 flex-1">
                   {(localUnit?.technicalCapacities || []).map((cap, idx) => (
-                    <div key={idx} className="flex gap-2 items-start bg-slate-50 p-2.5 rounded-xl border border-slate-100">
-                      <span className="text-[10px] font-black text-slate-400 mt-1">{idx + 1}.</span>
-                      <EditableArea
+                    <div key={idx} className="flex gap-2 items-center bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                      <span className="text-[10px] font-black text-slate-400 shrink-0">{idx + 1}.</span>
+                      <DebouncedInput
                         value={cap}
                         onChange={(val) => updateGeneralFieldList('technicalCapacities', idx, val)}
                         placeholder="Descreva a capacidade técnica..."
-                        rows={1}
-                        className="flex-1 bg-transparent border-none text-xs font-bold text-slate-800 focus:outline-none"
+                        className="flex-1 bg-transparent border-none text-xs font-bold text-slate-800 focus:outline-none truncate"
                       />
-                      <button onClick={() => removeGeneralFieldItem('technicalCapacities', idx)} className="text-slate-300 hover:text-red-500 text-xs font-bold transition-all p-1">
+                      <button onClick={() => removeGeneralFieldItem('technicalCapacities', idx)} className="text-slate-300 hover:text-red-500 text-xs font-bold transition-all p-1 shrink-0">
                         ✕
                       </button>
                     </div>
@@ -424,16 +435,15 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                 </div>
                 <div className="space-y-3 flex-1">
                   {(localUnit?.socialCapacities || []).map((cap, idx) => (
-                    <div key={idx} className="flex gap-2 items-start bg-slate-50 p-2.5 rounded-xl border border-slate-100">
-                      <span className="text-[10px] font-black text-slate-400 mt-1">{idx + 1}.</span>
-                      <EditableArea
+                    <div key={idx} className="flex gap-2 items-center bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                      <span className="text-[10px] font-black text-slate-400 shrink-0">{idx + 1}.</span>
+                      <DebouncedInput
                         value={cap}
                         onChange={(val) => updateGeneralFieldList('socialCapacities', idx, val)}
                         placeholder="Descreva a capacidade socioemocional..."
-                        rows={1}
-                        className="flex-1 bg-transparent border-none text-xs font-bold text-slate-800 focus:outline-none"
+                        className="flex-1 bg-transparent border-none text-xs font-bold text-slate-800 focus:outline-none truncate"
                       />
-                      <button onClick={() => removeGeneralFieldItem('socialCapacities', idx)} className="text-slate-300 hover:text-red-500 text-xs font-bold transition-all p-1">
+                      <button onClick={() => removeGeneralFieldItem('socialCapacities', idx)} className="text-slate-300 hover:text-red-500 text-xs font-bold transition-all p-1 shrink-0">
                         ✕
                       </button>
                     </div>
@@ -454,16 +464,15 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                 </div>
                 <div className="space-y-3 flex-1">
                   {(localUnit?.knowledges || []).map((know, idx) => (
-                    <div key={idx} className="flex gap-2 items-start bg-slate-50 p-2.5 rounded-xl border border-slate-100">
-                      <span className="text-[10px] font-black text-slate-400 mt-1">{idx + 1}.</span>
-                      <EditableArea
+                    <div key={idx} className="flex gap-2 items-center bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                      <span className="text-[10px] font-black text-slate-400 shrink-0">{idx + 1}.</span>
+                      <DebouncedInput
                         value={know}
                         onChange={(val) => updateGeneralFieldList('knowledges', idx, val)}
                         placeholder="Descreva o conhecimento..."
-                        rows={1}
-                        className="flex-1 bg-transparent border-none text-xs font-bold text-slate-800 focus:outline-none"
+                        className="flex-1 bg-transparent border-none text-xs font-bold text-slate-800 focus:outline-none truncate"
                       />
-                      <button onClick={() => removeGeneralFieldItem('knowledges', idx)} className="text-slate-300 hover:text-red-500 text-xs font-bold transition-all p-1">
+                      <button onClick={() => removeGeneralFieldItem('knowledges', idx)} className="text-slate-300 hover:text-red-500 text-xs font-bold transition-all p-1 shrink-0">
                         ✕
                       </button>
                     </div>
@@ -487,7 +496,6 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                   + Nova Fase / SA
                 </button>
                 <button onClick={handlePrint} className="bg-red-600 text-white px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl flex items-center gap-3 hover:bg-slate-900 transition-all">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
                   Imprimir Situações
                 </button>
               </div>
@@ -495,20 +503,19 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
 
             <div className="space-y-12 pb-10 no-print">
               {(localUnit?.learningSituations || []).map((sa, saIdx) => (
-                <div key={sa?.id || saIdx} className="p-10 bg-white border border-slate-200 rounded-[3rem] shadow-xl relative overflow-hidden transition-all hover:border-blue-200">
+                <div key={sa?.id || saIdx} className="p-10 bg-white border border-slate-200 rounded-[3rem] shadow-xl relative overflow-hidden">
                   <div className="absolute top-0 left-0 w-2 h-full bg-blue-600"></div>
-
                   <div className="flex justify-between items-start gap-4 mb-6">
                     <div className="flex-1">
                       <span className="text-[10px] font-black uppercase text-blue-600 tracking-widest block mb-1">FASE / ETAPA {saIdx + 1}</span>
                       <DebouncedInput
                         value={sa?.title || ''}
                         onChange={(val) => updateSAField(saIdx, 'title', val)}
-                        placeholder="Título da Situação de Aprendizagem / Fase..."
+                        placeholder="Título..."
                         className="text-2xl font-black text-slate-900 uppercase tracking-tight leading-none italic w-full bg-transparent border-b border-slate-200 focus:border-blue-500 outline-none pb-2"
                       />
                     </div>
-                    <button onClick={() => removeLearningSituation(saIdx)} className="text-slate-300 hover:text-red-600 p-2 text-sm font-black transition-all" title="Excluir Fase">
+                    <button onClick={() => removeLearningSituation(saIdx)} className="text-slate-300 hover:text-red-600 p-2 text-sm font-black transition-all">
                       Excluir Fase ✕
                     </button>
                   </div>
@@ -520,8 +527,8 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                         value={sa?.context || ''}
                         onChange={(val) => updateSAField(saIdx, 'context', val)}
                         rows={2}
-                        placeholder="Descreva aqui o contexto ou problema apresentado ao aluno..."
-                        className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 text-slate-600 text-sm leading-relaxed font-medium focus:outline-none focus:border-blue-500"
+                        placeholder="Contexto..."
+                        className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 text-slate-600 text-sm leading-relaxed font-medium"
                       />
                     </div>
                     
@@ -531,34 +538,9 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                         value={sa?.challenge || ''}
                         onChange={(val) => updateSAField(saIdx, 'challenge', val)}
                         rows={2}
-                        placeholder="Desafio pedagógico do aluno..."
-                        className="w-full bg-slate-800 border border-slate-700 text-slate-200 text-sm italic font-medium leading-relaxed rounded-xl p-3 focus:outline-none focus:border-red-500"
+                        placeholder="Desafio..."
+                        className="w-full bg-slate-800 border border-slate-700 text-slate-200 text-sm italic font-medium leading-relaxed rounded-xl p-3"
                       />
-                    </div>
-
-                    <div className="border-t border-slate-100 pt-8">
-                      <div className="flex justify-between items-center mb-4">
-                        <p className="text-[10px] font-black text-blue-600 uppercase tracking-widest">III. Resultados Esperados / Entregas da Fase</p>
-                        <button onClick={() => addSAResult(saIdx)} className="text-[10px] font-black uppercase text-blue-600 bg-blue-50 px-3 py-1.5 rounded-lg hover:bg-blue-600 hover:text-white transition-all">
-                          + Adicionar Entrega
-                        </button>
-                      </div>
-                      <ul className="space-y-3">
-                        {(sa?.expectedResults || []).map((result, rIdx) => (
-                          <li key={rIdx} className="flex gap-3 items-center">
-                            <span className="w-6 h-6 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center shrink-0 text-[10px] font-black">{rIdx + 1}</span>
-                            <DebouncedInput
-                              value={result || ''}
-                              onChange={(val) => updateSAResult(saIdx, rIdx, val)}
-                              placeholder="Descreva o resultado ou produto esperado..."
-                              className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-slate-700 text-sm font-bold focus:outline-none focus:border-blue-500"
-                            />
-                            <button onClick={() => removeSAResult(saIdx, rIdx)} className="text-slate-300 hover:text-red-500 p-2 text-xs font-bold transition-all">
-                              ✕
-                            </button>
-                          </li>
-                        ))}
-                      </ul>
                     </div>
                   </div>
                 </div>
@@ -571,227 +553,112 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
         {activeTab === 'rubricas' && (
           <div className="space-y-4 no-print">
             <div className="flex justify-end">
-              <button
-                type="button"
-                onClick={addRubric}
-                className="bg-blue-600 text-white px-5 py-3 rounded-xl text-[10px] font-black uppercase tracking-wider shadow-md hover:bg-slate-900 transition-all"
-              >
+              <button type="button" onClick={addRubric} className="bg-blue-600 text-white px-5 py-3 rounded-xl text-[10px] font-black uppercase tracking-wider shadow-md hover:bg-slate-900 transition-all">
                 + Incluir Rubrica
               </button>
             </div>
 
             <div className="w-full rounded-2xl border border-slate-200 bg-white p-2 overflow-x-auto shadow-sm">
-            <table className="w-full min-w-[900px] table-fixed text-left border-collapse border-spacing-0">
-              <thead>
-                <tr className="bg-slate-900 text-white">
-                  <th className="p-2 w-[19%] text-[9px] font-black uppercase border border-slate-800">Referência / Capacidade</th>
-                  <th className="p-2 w-[19%] text-[9px] font-black uppercase border border-slate-800 text-red-400">NSA</th>
-                  <th className="p-2 w-[19%] text-[9px] font-black uppercase border border-slate-800 text-orange-400">APO</th>
-                  <th className="p-2 w-[19%] text-[9px] font-black uppercase border border-slate-800 text-blue-400">PAR</th>
-                  <th className="p-2 w-[19%] text-[9px] font-black uppercase border border-slate-800 text-green-400">AUT</th>
-                  <th className="p-2 w-[5%] text-[9px] font-black uppercase border border-slate-800 text-center">Excluir</th>
-                </tr>
-              </thead>
-              <tbody className="text-[10px] font-bold">
-                {(localUnit?.rubrics || []).map((row, i) => (
-                  <tr key={i} className="hover:bg-slate-50/80 transition-colors">
-                    <td className="p-1 border border-slate-200 bg-slate-50/50 align-top h-1">
-                      <EditableArea
-                        value={row?.capacity || ''}
-                        onChange={(val) => updateRubric(i, 'capacity', val)}
-                        rows={1}
-                        className="bg-transparent border-none outline-none font-bold text-slate-900 text-[10px] leading-tight p-0"
-                      />
-                    </td>
-                    <td className="p-1 border border-slate-200 align-top h-1">
-                      <EditableArea
-                        value={row?.nsa || ''}
-                        onChange={(val) => updateRubric(i, 'nsa', val)}
-                        rows={1}
-                        className="bg-slate-50/60 border border-slate-100 rounded p-1 text-slate-600 italic text-[9.5px] leading-tight focus:outline-none focus:border-red-300 focus:bg-white"
-                      />
-                    </td>
-                    <td className="p-1 border border-slate-200 align-top h-1">
-                      <EditableArea
-                        value={row?.apo || ''}
-                        onChange={(val) => updateRubric(i, 'apo', val)}
-                        rows={1}
-                        className="bg-slate-50/60 border border-slate-100 rounded p-1 text-slate-600 italic text-[9.5px] leading-tight focus:outline-none focus:border-orange-300 focus:bg-white"
-                      />
-                    </td>
-                    <td className="p-1 border border-slate-200 align-top h-1">
-                      <EditableArea
-                        value={row?.par || ''}
-                        onChange={(val) => updateRubric(i, 'par', val)}
-                        rows={1}
-                        className="bg-slate-50/60 border border-slate-100 rounded p-1 text-slate-600 italic text-[9.5px] leading-tight focus:outline-none focus:border-blue-300 focus:bg-white"
-                      />
-                    </td>
-                    <td className="p-1 border border-slate-200 align-top h-1">
-                      <EditableArea
-                        value={row?.aut || ''}
-                        onChange={(val) => updateRubric(i, 'aut', val)}
-                        rows={1}
-                        className="bg-slate-50/60 border border-slate-100 rounded p-1 text-slate-600 italic text-[9.5px] leading-tight focus:outline-none focus:border-green-300 focus:bg-white"
-                      />
-                    </td>
-                    <td className="p-1 border border-slate-200 text-center align-middle">
-                      <button
-                        type="button"
-                        onClick={() => removeRubric(i)}
-                        className="text-slate-300 hover:text-red-600 font-bold p-1 transition-all"
-                        title="Excluir Rubrica"
-                      >
-                        ✕
-                      </button>
-                    </td>
+              <table className="w-full min-w-[900px] table-fixed text-left border-collapse border-spacing-0">
+                <thead>
+                  <tr className="bg-slate-900 text-white">
+                    <th className="p-2 w-[19%] text-[9px] font-black uppercase border border-slate-800">Referência / Capacidade</th>
+                    <th className="p-2 w-[19%] text-[9px] font-black uppercase border border-slate-800 text-red-400">NSA</th>
+                    <th className="p-2 w-[19%] text-[9px] font-black uppercase border border-slate-800 text-orange-400">APO</th>
+                    <th className="p-2 w-[19%] text-[9px] font-black uppercase border border-slate-800 text-blue-400">PAR</th>
+                    <th className="p-2 w-[19%] text-[9px] font-black uppercase border border-slate-800 text-green-400">AUT</th>
+                    <th className="p-2 w-[5%] text-[9px] font-black uppercase border border-slate-800 text-center">Excluir</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="text-[10px] font-bold">
+                  {(localUnit?.rubrics || []).map((row, i) => (
+                    <tr key={i} className="hover:bg-slate-50/80 transition-colors">
+                      <td className="p-1 border border-slate-200 bg-slate-50/50 align-top">
+                        <EditableArea value={row?.capacity || ''} onChange={(val) => updateRubric(i, 'capacity', val)} rows={1} className="bg-transparent border-none outline-none font-bold text-slate-900 text-[10px]" />
+                      </td>
+                      <td className="p-1 border border-slate-200 align-top">
+                        <EditableArea value={row?.nsa || ''} onChange={(val) => updateRubric(i, 'nsa', val)} rows={1} className="bg-slate-50/60 border border-slate-100 rounded p-1 text-slate-600 italic text-[9.5px]" />
+                      </td>
+                      <td className="p-1 border border-slate-200 align-top">
+                        <EditableArea value={row?.apo || ''} onChange={(val) => updateRubric(i, 'apo', val)} rows={1} className="bg-slate-50/60 border border-slate-100 rounded p-1 text-slate-600 italic text-[9.5px]" />
+                      </td>
+                      <td className="p-1 border border-slate-200 align-top">
+                        <EditableArea value={row?.par || ''} onChange={(val) => updateRubric(i, 'par', val)} rows={1} className="bg-slate-50/60 border border-slate-100 rounded p-1 text-slate-600 italic text-[9.5px]" />
+                      </td>
+                      <td className="p-1 border border-slate-200 align-top">
+                        <EditableArea value={row?.aut || ''} onChange={(val) => updateRubric(i, 'aut', val)} rows={1} className="bg-slate-50/60 border border-slate-100 rounded p-1 text-slate-600 italic text-[9.5px]" />
+                      </td>
+                      <td className="p-1 border border-slate-200 text-center align-middle">
+                        <button type="button" onClick={() => removeRubric(i)} className="text-slate-400 hover:text-red-600 p-1 font-bold">✕</button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </div>
         )}
 
-        {/* ABA CRONOGRAMA / PLANO DE AULA */}
+        {/* ABA CRONOGRAMA */}
         {activeTab === 'cronograma' && (
           <div className="space-y-6">
             <div className="flex justify-between items-center no-print">
               <div>
-                <h3 className="text-3xl font-[1000] text-slate-900 uppercase italic">Plano de Ensino & Cronograma</h3>
+                <h3 className="text-3xl font-[1000] text-slate-900 uppercase italic">Plano de Aula & Cronograma</h3>
                 <p className="text-xs text-slate-400 font-bold uppercase tracking-wider mt-1">Planejamento detalhado das aulas e carga horária</p>
               </div>
-              <div className="flex gap-3">
-                <button onClick={() => addScheduleEntry()} className="bg-blue-600 text-white px-5 py-3 rounded-xl text-[10px] font-black uppercase tracking-wider shadow-md hover:bg-slate-900 transition-all">
+              <div className="flex gap-4">
+                <button onClick={() => addScheduleEntry()} className="bg-blue-600 text-white px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-wider shadow-lg hover:bg-slate-900 transition-all">
                   + Incluir Linha
                 </button>
-                <button onClick={handlePrint} className="bg-red-600 text-white px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-wider shadow-md flex items-center gap-2 hover:bg-slate-900 transition-all">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+                <button onClick={handlePrint} className="bg-red-600 text-white px-8 py-3 rounded-2xl text-[10px] font-black uppercase tracking-wider shadow-lg hover:bg-slate-900 transition-all">
                   Imprimir Cronograma
                 </button>
               </div>
             </div>
 
-            {/* TABELA DE CRONOGRAMA INTERATIVA */}
-            <div className="w-full rounded-2xl border border-slate-200 bg-white p-2 overflow-x-auto shadow-sm no-print">
-              <table className="w-full min-w-[1000px] border-collapse">
-                <thead>
-                  <tr className="bg-slate-900 text-white text-[9px] font-black uppercase tracking-wider">
-                    <th className="p-3 text-left w-28">Data</th>
-                    <th className="p-3 text-center w-16">Horas</th>
-                    <th className="p-3 text-left">Capacidades</th>
-                    <th className="p-3 text-left">Conhecimentos</th>
-                    <th className="p-3 text-left">Estratégias / Metodologia</th>
-                    <th className="p-3 text-left">Recursos</th>
-                    <th className="p-3 text-center w-20">Ações</th>
-                  </tr>
-                </thead>
-                <tbody className="text-xs divide-y divide-slate-100 font-bold">
-                  {localSchedule.map((entry, idx) => (
-                    <tr key={entry.id || idx} className="hover:bg-slate-50/50 transition-all">
-                      <td className="p-2 align-top">
-                        <div className="space-y-1">
-                          <DebouncedInput
-                            value={entry.date}
-                            onChange={(val) => updateEntry(entry.id, 'date', val)}
-                            placeholder="DD/MM/AAAA"
-                            className="w-full bg-slate-50 border border-slate-200 rounded-lg px-2 py-1 text-xs font-bold text-slate-800 focus:outline-none focus:border-blue-500"
-                          />
-                          <span className="text-[9px] text-slate-400 block capitalize font-medium px-1">
-                            {getDayOfWeek(entry.date)}
-                          </span>
-                        </div>
-                      </td>
-                      <td className="p-2 align-top">
-                        <input
-                          type="number"
-                          value={entry.hours}
-                          onChange={(e) => updateEntry(entry.id, 'hours', Number(e.target.value))}
-                          className="w-full bg-slate-50 border border-slate-200 rounded-lg px-2 py-1 text-xs font-bold text-center text-slate-800 focus:outline-none focus:border-blue-500"
-                        />
-                      </td>
-                      <td className="p-2 align-top">
-                        <EditableArea
-                          value={entry.capacities}
-                          onChange={(val) => updateEntry(entry.id, 'capacities', val)}
-                          placeholder="Capacidades..."
-                          rows={2}
-                          className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 text-xs font-medium text-slate-700 focus:outline-none focus:border-blue-500"
-                        />
-                      </td>
-                      <td className="p-2 align-top">
-                        <EditableArea
-                          value={entry.knowledges}
-                          onChange={(val) => updateEntry(entry.id, 'knowledges', val)}
-                          placeholder="Conhecimentos..."
-                          rows={2}
-                          className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 text-xs font-medium text-slate-700 focus:outline-none focus:border-blue-500"
-                        />
-                      </td>
-                      <td className="p-2 align-top">
-                        <EditableArea
-                          value={entry.strategies}
-                          onChange={(val) => updateEntry(entry.id, 'strategies', val)}
-                          placeholder="Estratégias..."
-                          rows={2}
-                          className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 text-xs font-medium text-slate-700 focus:outline-none focus:border-blue-500"
-                        />
-                      </td>
-                      <td className="p-2 align-top">
-                        <EditableArea
-                          value={entry.resources}
-                          onChange={(val) => updateEntry(entry.id, 'resources', val)}
-                          placeholder="Recursos..."
-                          rows={2}
-                          className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 text-xs font-medium text-slate-700 focus:outline-none focus:border-blue-500"
-                        />
-                      </td>
-                      <td className="p-2 align-middle text-center">
-                        <div className="flex items-center justify-center gap-1">
-                          <button onClick={() => addScheduleEntry(idx)} className="w-7 h-7 bg-blue-50 text-blue-600 rounded-lg flex items-center justify-center hover:bg-blue-600 hover:text-white transition-all text-xs font-black" title="Inserir abaixo">+</button>
-                          <button onClick={() => removeScheduleEntry(entry.id)} className="w-7 h-7 bg-red-50 text-red-600 rounded-lg flex items-center justify-center hover:bg-red-600 hover:text-white transition-all text-xs font-black" title="Excluir">✕</button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            {/* DOCUMENTO PARA IMPRESSÃO (CRONOGRAMA) */}
-            <div className="hidden report-document bg-white p-8 text-black">
-              <div className="report-header">
-                <div className="logo-box">SENAI</div>
-                <div className="info-box">
-                  <h1>PLANO DE ENSINO / CRONOGRAMA</h1>
-                  <p>{localUnit?.name}</p>
+            <div className="space-y-3 no-print">
+              {localSchedule.map((entry, index) => (
+                <div key={entry?.id || index} className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-wrap items-center gap-3 relative">
+                  <div className="flex flex-col">
+                    <DebouncedInput
+                      value={entry?.date || ''}
+                      onChange={(val) => updateEntry(entry.id, 'date', val)}
+                      placeholder="DD/MM/AAAA"
+                      className="bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-bold text-slate-800 w-28"
+                    />
+                    <span className="text-[8px] font-extrabold text-blue-600 mt-0.5 uppercase">{getDayOfWeek(entry?.date)}</span>
+                  </div>
+                  <div className="flex flex-col">
+                    <input
+                      type="number"
+                      value={entry?.hours ?? 4}
+                      onChange={(e) => updateEntry(entry.id, 'hours', Number(e.target.value))}
+                      className="bg-slate-50 border border-slate-200 rounded-lg px-2 py-1.5 text-xs font-bold text-slate-800 w-16 text-center"
+                    />
+                  </div>
+                  <div className="flex-1 min-w-[140px]">
+                    <DebouncedInput
+                      value={entry?.capacities || ''}
+                      onChange={(val) => updateEntry(entry.id, 'capacities', val)}
+                      placeholder="Capacidades..."
+                      className="bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 text-xs font-medium text-slate-700 w-full"
+                    />
+                  </div>
+                  <div className="flex-1 min-w-[140px]">
+                    <DebouncedInput
+                      value={entry?.knowledges || ''}
+                      onChange={(val) => updateEntry(entry.id, 'knowledges', val)}
+                      placeholder="Conhecimentos..."
+                      className="bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 text-xs font-medium text-slate-700 w-full"
+                    />
+                  </div>
+                  <div className="flex items-center gap-1.5 shrink-0 ml-auto">
+                    <button onClick={() => addScheduleEntry(index)} className="bg-blue-50 text-blue-600 w-7 h-7 rounded-lg flex items-center justify-center font-black">+</button>
+                    <button onClick={() => removeScheduleEntry(entry.id)} className="bg-red-50 text-red-600 w-7 h-7 rounded-lg flex items-center justify-center font-black">✕</button>
+                  </div>
                 </div>
-              </div>
-              <div className="doc-main-title">CRONOGRAMA DE DESENVOLVIMENTO DA UNIDADE CURRICULAR</div>
-              <table className="tech-table">
-                <thead>
-                  <tr>
-                    <th>Data / Dia</th>
-                    <th>Horas</th>
-                    <th>Capacidades</th>
-                    <th>Conhecimentos</th>
-                    <th>Estratégias / Metodologia</th>
-                    <th>Recursos</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {localSchedule.map((entry, i) => (
-                    <tr key={i}>
-                      <td><strong>{entry.date}</strong><br/><span style={{fontSize:'7.5pt', color:'#666'}}>{getDayOfWeek(entry.date)}</span></td>
-                      <td style={{textAlign:'center'}}>{entry.hours}h</td>
-                      <td>{entry.capacities}</td>
-                      <td>{entry.knowledges}</td>
-                      <td>{entry.strategies}</td>
-                      <td>{entry.resources}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+              ))}
             </div>
           </div>
         )}
@@ -799,15 +666,9 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
         {/* ABA CALENDÁRIO */}
         {activeTab === 'calendario' && (
           <div className="space-y-8 no-print">
-            <div className="flex justify-between items-center border-b border-slate-100 pb-6">
-              <div>
-                <h3 className="text-3xl font-[1000] text-slate-900 uppercase italic">Calendário de Aulas</h3>
-                <p className="text-xs text-slate-400 font-bold uppercase tracking-wider mt-1">Sincronização automática com as datas do cronograma</p>
-              </div>
-              <div className="flex items-center gap-3 bg-slate-50 px-4 py-2 rounded-2xl border border-slate-200">
-                <span className="w-3 h-3 rounded-full inline-block" style={{ backgroundColor: COLOR_MAP[scheduleColor] }}></span>
-                <span className="text-xs font-black uppercase text-slate-700">Aulas Marcadas no Cronograma</span>
-              </div>
+            <div className="border-b border-slate-100 pb-6">
+              <h3 className="text-3xl font-[1000] text-slate-900 uppercase italic">Calendário de Aulas</h3>
+              <p className="text-xs text-slate-400 font-bold uppercase tracking-wider mt-1">Dias letivos sincronizados</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -819,43 +680,29 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                 const startingDayOfWeek = firstDay.getDay();
                 const monthName = new Intl.DateTimeFormat('pt-BR', { month: 'long', year: 'numeric' }).format(firstDay);
 
-                const days = [];
-                for (let i = 0; i < startingDayOfWeek; i++) {
-                  days.push(null);
-                }
-                for (let d = 1; d <= daysInMonth; d++) {
-                  days.push(new Date(year, month - 1, d));
-                }
-
                 return (
-                  <div key={monthStr} className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm">
-                    <h4 className="text-sm font-black uppercase text-slate-900 mb-4 capitalize text-center">{monthName}</h4>
-                    <div className="grid grid-cols-7 gap-1 text-center mb-2">
-                      {['D', 'S', 'T', 'Q', 'Q', 'S', 'S'].map((d, i) => (
-                        <span key={i} className="text-[9px] font-black text-slate-400">{d}</span>
-                      ))}
-                    </div>
+                  <div key={monthStr} className="bg-white p-6 rounded-[2rem] border border-slate-200 shadow-sm space-y-4">
+                    <h4 className="text-sm font-black uppercase text-slate-800 tracking-wider text-center capitalize border-b border-slate-100 pb-3">{monthName}</h4>
                     <div className="grid grid-cols-7 gap-1 text-center">
-                      {days.map((dateObj, idx) => {
-                        if (!dateObj) return <div key={idx} />;
-                        const dateString = dateObj.toISOString().substring(0, 10);
+                      {['D', 'S', 'T', 'Q', 'Q', 'S', 'S'].map((d, i) => (
+                        <span key={i} className="text-[9px] font-black text-slate-400 py-1">{d}</span>
+                      ))}
+                      {Array.from({ length: startingDayOfWeek }).map((_, i) => (
+                        <div key={`empty-${i}`} />
+                      ))}
+                      {Array.from({ length: daysInMonth }).map((_, i) => {
+                        const dayNum = i + 1;
+                        const dateString = `${year}-${String(month).padStart(2, '0')}-${String(dayNum).padStart(2, '0')}`;
                         const isScheduled = scheduleDates[dateString];
 
                         return (
                           <div
-                            key={idx}
-                            className={`h-9 rounded-xl flex items-center justify-center text-xs font-bold transition-all ${
-                              isScheduled
-                                ? 'shadow-md scale-105'
-                                : 'text-slate-700 hover:bg-slate-100'
+                            key={dayNum}
+                            className={`h-8 rounded-xl flex items-center justify-center text-xs font-bold transition-all ${
+                              isScheduled ? 'bg-blue-600 text-white shadow-md font-black scale-105' : 'bg-slate-50 text-slate-600'
                             }`}
-                            style={{
-                              backgroundColor: isScheduled ? COLOR_MAP[scheduleColor] : 'transparent',
-                              color: isScheduled ? TEXT_COLOR_MAP[scheduleColor] : undefined
-                            }}
-                            title={dateString}
                           >
-                            {dateObj.getDate()}
+                            {dayNum}
                           </div>
                         );
                       })}
