@@ -721,7 +721,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                         value={entry?.capacities || ''}
                         onChange={(val) => updateEntry(entry.id, 'capacities', val)}
                         placeholder="Capacidades..."
-                        className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium text-slate-700 focus:outline-none focus:border-blue-500 truncate"
+                        className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium text-slate-700 focus:outline-none focus:border-blue-500"
                       />
                     </div>
                     <div className="flex flex-col">
@@ -730,7 +730,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                         value={entry?.knowledges || ''}
                         onChange={(val) => updateEntry(entry.id, 'knowledges', val)}
                         placeholder="Conhecimentos..."
-                        className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium text-slate-700 focus:outline-none focus:border-blue-500 truncate"
+                        className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium text-slate-700 focus:outline-none focus:border-blue-500"
                       />
                     </div>
                     <div className="flex flex-col">
@@ -739,7 +739,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                         value={entry?.strategies || ''}
                         onChange={(val) => updateEntry(entry.id, 'strategies', val)}
                         placeholder="Estratégias..."
-                        className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium text-slate-700 focus:outline-none focus:border-blue-500 truncate"
+                        className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium text-slate-700 focus:outline-none focus:border-blue-500"
                       />
                     </div>
                     <div className="flex flex-col">
@@ -748,7 +748,7 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                         value={entry?.resources || ''}
                         onChange={(val) => updateEntry(entry.id, 'resources', val)}
                         placeholder="Recursos..."
-                        className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium text-slate-700 focus:outline-none focus:border-blue-500 truncate"
+                        className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium text-slate-700 focus:outline-none focus:border-blue-500"
                       />
                     </div>
                   </div>
