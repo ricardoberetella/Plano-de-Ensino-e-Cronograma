@@ -93,7 +93,7 @@ const EditableArea: React.FC<{
 };
 
 const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar, onUpdateUnit }) => {
-  const [activeTab, setActiveTab] = useState<'geral' | 'sa' | 'rubricas' | 'cronograma' | 'calendario'>('geral');
+  const [activeTab, setActiveTab] = useState<'geral' | 'sa' | 'rubricas' | 'cronograma' | 'calendario' | 'editar_unidade'>('geral');
   const [localSchedule, setLocalSchedule] = useState<ScheduleEntry[]>(unit?.schedule || []);
   const [localUnit, setLocalUnit] = useState<CurricularUnit>(unit);
 
@@ -347,30 +347,83 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
       <div className="bg-slate-900 p-8 text-white flex justify-between items-center no-print">
         <div className="w-full">
           <span className="bg-blue-600 px-3 py-1 rounded text-[9px] font-black uppercase tracking-widest mb-2 inline-block">MSEP - Unidade Curricular</span>
-          <DebouncedInput
-            value={localUnit?.name || ''}
-            onChange={(val) => updateUnitState({ ...localUnit, name: val })}
-            className="text-3xl font-black tracking-tighter uppercase leading-none bg-transparent text-white border-b border-transparent hover:border-slate-700 focus:border-blue-500 outline-none w-full transition-all"
-          />
+          <div className="text-3xl font-black tracking-tighter uppercase leading-none text-white">
+            {localUnit?.name || ''}
+          </div>
         </div>
       </div>
 
       {/* TABS DE NAVEGAÇÃO */}
       <div className="flex border-b border-slate-200 bg-slate-50 overflow-x-auto scrollbar-hide no-print tabs-header">
-        {(['geral', 'sa', 'rubricas', 'cronograma', 'calendario'] as const).map(tab => (
+        {(['geral', 'sa', 'rubricas', 'cronograma', 'calendario', 'editar_unidade'] as const).map(tab => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`px-8 py-5 transition-all border-b-4 ${activeTab === tab ? 'border-blue-600 bg-white' : 'border-transparent text-slate-400 hover:bg-slate-100'}`}
+            className={`px-6 py-5 transition-all border-b-4 ${activeTab === tab ? 'border-blue-600 bg-white' : 'border-transparent text-slate-400 hover:bg-slate-100'}`}
           >
             <span className="text-[10px] font-black uppercase tracking-widest block">
-              {tab === 'geral' ? 'Geral' : tab === 'sa' ? 'Situação-Problema' : tab === 'rubricas' ? 'Rubricas' : tab === 'cronograma' ? 'Plano de Aula' : 'Calendário'}
+              {tab === 'geral' ? 'Geral' : tab === 'sa' ? 'Situação-Problema' : tab === 'rubricas' ? 'Rubricas' : tab === 'cronograma' ? 'Plano de Aula' : tab === 'calendario' ? 'Calendário' : 'Menu / Editar'}
             </span>
           </button>
         ))}
       </div>
 
       <div className="p-6 md:p-10 max-h-[75vh] overflow-y-auto custom-scrollbar bg-[#FDFDFD] content-area">
+
+        {/* ABA MENU / EDITAR UNIDADE (SIGLA, NOME E SEMESTRE) */}
+        {activeTab === 'editar_unidade' && (
+          <div className="max-w-2xl mx-auto space-y-8">
+            <div className="border-b border-slate-100 pb-6">
+              <h3 className="text-3xl font-[1000] text-slate-900 uppercase italic">Editar Unidade Curricular</h3>
+              <p className="text-xs text-slate-400 font-bold uppercase tracking-wider mt-1">Configure a sigla, o nome completo e o semestre correspondente</p>
+            </div>
+
+            <div className="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-xl space-y-6">
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block">Sigla da Unidade (ID)</label>
+                <input
+                  type="text"
+                  value={localUnit?.id || ''}
+                  onChange={(e) => updateUnitState({ ...localUnit, id: e.target.value })}
+                  placeholder="Ex: MDU, FUSI, CRD..."
+                  className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-xs font-bold text-slate-800 focus:outline-none focus:border-blue-500 uppercase"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block">Nome da Unidade Curricular</label>
+                <input
+                  type="text"
+                  value={localUnit?.name || ''}
+                  onChange={(e) => updateUnitState({ ...localUnit, name: e.target.value })}
+                  placeholder="Ex: Mecânica de Usinagem..."
+                  className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-xs font-bold text-slate-800 focus:outline-none focus:border-blue-500"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block">Semestre</label>
+                <input
+                  type="text"
+                  value={localUnit?.semester || ''}
+                  onChange={(e) => updateUnitState({ ...localUnit, semester: e.target.value })}
+                  placeholder="Ex: 1º Semestre / 2026..."
+                  className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-xs font-bold text-slate-800 focus:outline-none focus:border-blue-500"
+                />
+              </div>
+
+              <div className="pt-4 flex justify-end">
+                <button
+                  type="button"
+                  onClick={() => alert("Alterações salvas com sucesso!")}
+                  className="bg-blue-600 text-white px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-lg hover:bg-slate-900 transition-all"
+                >
+                  Salvar Alterações
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* ABA GERAL EM COLUNAS */}
         {activeTab === 'geral' && (
