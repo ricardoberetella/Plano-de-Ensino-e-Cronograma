@@ -394,16 +394,15 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                 </div>
                 <div className="space-y-3 flex-1">
                   {(localUnit?.technicalCapacities || []).map((cap, idx) => (
-                    <div key={idx} className="flex gap-2 items-start bg-slate-50 p-2.5 rounded-xl border border-slate-100">
-                      <span className="text-[10px] font-black text-slate-400 mt-1">{idx + 1}.</span>
-                      <EditableArea
+                    <div key={idx} className="flex gap-2 items-center bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                      <span className="text-[10px] font-black text-slate-400 shrink-0">{idx + 1}.</span>
+                      <DebouncedInput
                         value={cap}
                         onChange={(val) => updateGeneralFieldList('technicalCapacities', idx, val)}
                         placeholder="Descreva a capacidade técnica..."
-                        rows={1}
-                        className="flex-1 bg-transparent border-none text-xs font-bold text-slate-800 focus:outline-none"
+                        className="flex-1 bg-transparent border-none text-xs font-bold text-slate-800 focus:outline-none truncate"
                       />
-                      <button onClick={() => removeGeneralFieldItem('technicalCapacities', idx)} className="text-slate-300 hover:text-red-500 text-xs font-bold transition-all p-1">
+                      <button onClick={() => removeGeneralFieldItem('technicalCapacities', idx)} className="text-slate-300 hover:text-red-500 text-xs font-bold transition-all p-1 shrink-0">
                         ✕
                       </button>
                     </div>
@@ -424,16 +423,15 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                 </div>
                 <div className="space-y-3 flex-1">
                   {(localUnit?.socialCapacities || []).map((cap, idx) => (
-                    <div key={idx} className="flex gap-2 items-start bg-slate-50 p-2.5 rounded-xl border border-slate-100">
-                      <span className="text-[10px] font-black text-slate-400 mt-1">{idx + 1}.</span>
-                      <EditableArea
+                    <div key={idx} className="flex gap-2 items-center bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                      <span className="text-[10px] font-black text-slate-400 shrink-0">{idx + 1}.</span>
+                      <DebouncedInput
                         value={cap}
                         onChange={(val) => updateGeneralFieldList('socialCapacities', idx, val)}
                         placeholder="Descreva a capacidade socioemocional..."
-                        rows={1}
-                        className="flex-1 bg-transparent border-none text-xs font-bold text-slate-800 focus:outline-none"
+                        className="flex-1 bg-transparent border-none text-xs font-bold text-slate-800 focus:outline-none truncate"
                       />
-                      <button onClick={() => removeGeneralFieldItem('socialCapacities', idx)} className="text-slate-300 hover:text-red-500 text-xs font-bold transition-all p-1">
+                      <button onClick={() => removeGeneralFieldItem('socialCapacities', idx)} className="text-slate-300 hover:text-red-500 text-xs font-bold transition-all p-1 shrink-0">
                         ✕
                       </button>
                     </div>
@@ -454,16 +452,15 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                 </div>
                 <div className="space-y-3 flex-1">
                   {(localUnit?.knowledges || []).map((know, idx) => (
-                    <div key={idx} className="flex gap-2 items-start bg-slate-50 p-2.5 rounded-xl border border-slate-100">
-                      <span className="text-[10px] font-black text-slate-400 mt-1">{idx + 1}.</span>
-                      <EditableArea
+                    <div key={idx} className="flex gap-2 items-center bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                      <span className="text-[10px] font-black text-slate-400 shrink-0">{idx + 1}.</span>
+                      <DebouncedInput
                         value={know}
                         onChange={(val) => updateGeneralFieldList('knowledges', idx, val)}
                         placeholder="Descreva o conhecimento..."
-                        rows={1}
-                        className="flex-1 bg-transparent border-none text-xs font-bold text-slate-800 focus:outline-none"
+                        className="flex-1 bg-transparent border-none text-xs font-bold text-slate-800 focus:outline-none truncate"
                       />
-                      <button onClick={() => removeGeneralFieldItem('knowledges', idx)} className="text-slate-300 hover:text-red-500 text-xs font-bold transition-all p-1">
+                      <button onClick={() => removeGeneralFieldItem('knowledges', idx)} className="text-slate-300 hover:text-red-500 text-xs font-bold transition-all p-1 shrink-0">
                         ✕
                       </button>
                     </div>
@@ -720,42 +717,38 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                     <div className="flex flex-col">
                       <label className="text-[9px] font-black text-slate-400 uppercase mb-1">Capacidades</label>
-                      <EditableArea
+                      <DebouncedInput
                         value={entry?.capacities || ''}
                         onChange={(val) => updateEntry(entry.id, 'capacities', val)}
                         placeholder="Capacidades..."
-                        rows={2}
-                        className="bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs font-medium text-slate-700 focus:outline-none focus:border-blue-500"
+                        className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium text-slate-700 focus:outline-none focus:border-blue-500 truncate"
                       />
                     </div>
                     <div className="flex flex-col">
                       <label className="text-[9px] font-black text-slate-400 uppercase mb-1">Conhecimentos</label>
-                      <EditableArea
+                      <DebouncedInput
                         value={entry?.knowledges || ''}
                         onChange={(val) => updateEntry(entry.id, 'knowledges', val)}
                         placeholder="Conhecimentos..."
-                        rows={2}
-                        className="bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs font-medium text-slate-700 focus:outline-none focus:border-blue-500"
+                        className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium text-slate-700 focus:outline-none focus:border-blue-500 truncate"
                       />
                     </div>
                     <div className="flex flex-col">
                       <label className="text-[9px] font-black text-slate-400 uppercase mb-1">Estratégias / Metodologia</label>
-                      <EditableArea
+                      <DebouncedInput
                         value={entry?.strategies || ''}
                         onChange={(val) => updateEntry(entry.id, 'strategies', val)}
                         placeholder="Estratégias..."
-                        rows={2}
-                        className="bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs font-medium text-slate-700 focus:outline-none focus:border-blue-500"
+                        className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium text-slate-700 focus:outline-none focus:border-blue-500 truncate"
                       />
                     </div>
                     <div className="flex flex-col">
                       <label className="text-[9px] font-black text-slate-400 uppercase mb-1">Recursos</label>
-                      <EditableArea
+                      <DebouncedInput
                         value={entry?.resources || ''}
                         onChange={(val) => updateEntry(entry.id, 'resources', val)}
                         placeholder="Recursos..."
-                        rows={2}
-                        className="bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs font-medium text-slate-700 focus:outline-none focus:border-blue-500"
+                        className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium text-slate-700 focus:outline-none focus:border-blue-500 truncate"
                       />
                     </div>
                   </div>
