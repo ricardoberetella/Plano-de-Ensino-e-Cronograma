@@ -669,88 +669,95 @@ const UnitViewer: React.FC<Props> = ({ unit, onUpdateSchedule, onUpdateCalendar,
               </div>
             </div>
 
-            {/* TABELA DE CRONOGRAMA INTERATIVA (TELA) */}
-            <div className="space-y-4 no-print">
+            {/* TABELA DE CRONOGRAMA REDUZIDA EM LINHA ÚNICA (TELA) */}
+            <div className="space-y-3 no-print">
               {localSchedule.map((entry, index) => (
-                <div key={entry?.id || index} className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-4 relative group">
-                  <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-100 pb-4">
-                    <div className="flex items-center gap-4">
-                      <div className="flex flex-col">
-                        <label className="text-[9px] font-black text-slate-400 uppercase">Data</label>
-                        <DebouncedInput
-                          value={entry?.date || ''}
-                          onChange={(val) => updateEntry(entry.id, 'date', val)}
-                          placeholder="DD/MM/AAAA"
-                          className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 text-xs font-bold text-slate-800 w-32 focus:outline-none focus:border-blue-500"
-                        />
-                        <span className="text-[9px] font-extrabold text-blue-600 mt-1 uppercase">{getDayOfWeek(entry?.date)}</span>
-                      </div>
-                      <div className="flex flex-col">
-                        <label className="text-[9px] font-black text-slate-400 uppercase">Horas</label>
-                        <input
-                          type="number"
-                          value={entry?.hours ?? 4}
-                          onChange={(e) => updateEntry(entry.id, 'hours', Number(e.target.value))}
-                          className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 text-xs font-bold text-slate-800 w-20 focus:outline-none focus:border-blue-500"
-                        />
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      {/* BOTÃO OK SOLICITADO */}
-                      <button
-                        type="button"
-                        onClick={() => updateEntry(entry.id, 'strategies', (entry.strategies ? entry.strategies + ' [OK]' : '[OK]'))}
-                        className="bg-emerald-50 text-emerald-600 border border-emerald-200 px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider hover:bg-emerald-600 hover:text-white transition-all shadow-sm flex items-center gap-1.5"
-                        title="Marcar OK nesta linha"
-                      >
-                        <span>✓ OK</span>
-                      </button>
-                      <button onClick={() => addScheduleEntry(index)} className="bg-blue-50 text-blue-600 w-8 h-8 rounded-xl flex items-center justify-center font-black hover:bg-blue-600 hover:text-white transition-all" title="Inserir linha abaixo">
-                        +
-                      </button>
-                      <button onClick={() => removeScheduleEntry(entry.id)} className="bg-red-50 text-red-600 w-8 h-8 rounded-xl flex items-center justify-center font-black hover:bg-red-600 hover:text-white transition-all" title="Excluir linha">
-                        ✕
-                      </button>
-                    </div>
+                <div key={entry?.id || index} className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-wrap items-center gap-3 relative group">
+                  {/* Data */}
+                  <div className="flex flex-col">
+                    <DebouncedInput
+                      value={entry?.date || ''}
+                      onChange={(val) => updateEntry(entry.id, 'date', val)}
+                      placeholder="DD/MM/AAAA"
+                      className="bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-bold text-slate-800 w-28 focus:outline-none focus:border-blue-500"
+                    />
+                    <span className="text-[8px] font-extrabold text-blue-600 mt-0.5 uppercase">{getDayOfWeek(entry?.date)}</span>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div className="flex flex-col">
-                      <label className="text-[9px] font-black text-slate-400 uppercase mb-1">Capacidades</label>
-                      <DebouncedInput
-                        value={entry?.capacities || ''}
-                        onChange={(val) => updateEntry(entry.id, 'capacities', val)}
-                        placeholder="Capacidades..."
-                        className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium text-slate-700 focus:outline-none focus:border-blue-500"
-                      />
-                    </div>
-                    <div className="flex flex-col">
-                      <label className="text-[9px] font-black text-slate-400 uppercase mb-1">Conhecimentos</label>
-                      <DebouncedInput
-                        value={entry?.knowledges || ''}
-                        onChange={(val) => updateEntry(entry.id, 'knowledges', val)}
-                        placeholder="Conhecimentos..."
-                        className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium text-slate-700 focus:outline-none focus:border-blue-500"
-                      />
-                    </div>
-                    <div className="flex flex-col">
-                      <label className="text-[9px] font-black text-slate-400 uppercase mb-1">Estratégias / Metodologia</label>
-                      <DebouncedInput
-                        value={entry?.strategies || ''}
-                        onChange={(val) => updateEntry(entry.id, 'strategies', val)}
-                        placeholder="Estratégias..."
-                        className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium text-slate-700 focus:outline-none focus:border-blue-500"
-                      />
-                    </div>
-                    <div className="flex flex-col">
-                      <label className="text-[9px] font-black text-slate-400 uppercase mb-1">Recursos</label>
-                      <DebouncedInput
-                        value={entry?.resources || ''}
-                        onChange={(val) => updateEntry(entry.id, 'resources', val)}
-                        placeholder="Recursos..."
-                        className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium text-slate-700 focus:outline-none focus:border-blue-500"
-                      />
-                    </div>
+                  {/* Horas */}
+                  <div className="flex flex-col">
+                    <input
+                      type="number"
+                      value={entry?.hours ?? 4}
+                      onChange={(e) => updateEntry(entry.id, 'hours', Number(e.target.value))}
+                      className="bg-slate-50 border border-slate-200 rounded-lg px-2 py-1.5 text-xs font-bold text-slate-800 w-16 text-center focus:outline-none focus:border-blue-500"
+                    />
+                  </div>
+
+                  {/* Capacidades */}
+                  <div className="flex-1 min-w-[140px]">
+                    <DebouncedInput
+                      value={entry?.capacities || ''}
+                      onChange={(val) => updateEntry(entry.id, 'capacities', val)}
+                      placeholder="Capacidades..."
+                      className="bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 text-xs font-medium text-slate-700 w-full focus:outline-none focus:border-blue-500"
+                    />
+                  </div>
+
+                  {/* Conhecimentos */}
+                  <div className="flex-1 min-w-[140px]">
+                    <DebouncedInput
+                      value={entry?.knowledges || ''}
+                      onChange={(val) => updateEntry(entry.id, 'knowledges', val)}
+                      placeholder="Conhecimentos..."
+                      className="bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 text-xs font-medium text-slate-700 w-full focus:outline-none focus:border-blue-500"
+                    />
+                  </div>
+
+                  {/* Estratégias / Metodologia */}
+                  <div className="flex-1 min-w-[140px]">
+                    <DebouncedInput
+                      value={entry?.strategies || ''}
+                      onChange={(val) => updateEntry(entry.id, 'strategies', val)}
+                      placeholder="Estratégias..."
+                      className="bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 text-xs font-medium text-slate-700 w-full focus:outline-none focus:border-blue-500"
+                    />
+                  </div>
+
+                  {/* Recursos */}
+                  <div className="w-32">
+                    <DebouncedInput
+                      value={entry?.resources || ''}
+                      onChange={(val) => updateEntry(entry.id, 'resources', val)}
+                      placeholder="Recursos..."
+                      className="bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 text-xs font-medium text-slate-700 w-full focus:outline-none focus:border-blue-500"
+                    />
+                  </div>
+
+                  {/* Botões de Ação na Mesma Linha */}
+                  <div className="flex items-center gap-1.5 shrink-0 ml-auto">
+                    <button
+                      type="button"
+                      onClick={() => updateEntry(entry.id, 'strategies', (entry.strategies ? entry.strategies + ' [OK]' : '[OK]'))}
+                      className="bg-emerald-50 text-emerald-600 border border-emerald-200 px-2.5 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider hover:bg-emerald-600 hover:text-white transition-all shadow-sm"
+                      title="Marcar OK"
+                    >
+                      ✓ OK
+                    </button>
+                    <button 
+                      onClick={() => addScheduleEntry(index)} 
+                      className="bg-blue-50 text-blue-600 w-7 h-7 rounded-lg flex items-center justify-center font-black hover:bg-blue-600 hover:text-white transition-all" 
+                      title="Inserir linha abaixo"
+                    >
+                      +
+                    </button>
+                    <button 
+                      onClick={() => removeScheduleEntry(entry.id)} 
+                      className="bg-red-50 text-red-600 w-7 h-7 rounded-lg flex items-center justify-center font-black hover:bg-red-600 hover:text-white transition-all" 
+                      title="Excluir linha"
+                    >
+                      ✕
+                    </button>
                   </div>
                 </div>
               ))}
