@@ -37,7 +37,6 @@ export const Dashboard: React.FC<DashboardProps> = ({
     let updatedUnits = [...(editingPlan.units || [])];
 
     if (selectedUnitForEdit) {
-      // Atualizar unidade existente
       updatedUnits = updatedUnits.map(u =>
         u.id === selectedUnitForEdit.id
           ? {
@@ -51,7 +50,6 @@ export const Dashboard: React.FC<DashboardProps> = ({
           : u
       );
     } else {
-      // Criar nova unidade
       const newUnit: CurricularUnit = {
         id: `uc-${Date.now()}`,
         code: unitData.code || `UC-${Date.now().toString().slice(-4)}`,
@@ -343,3 +341,5 @@ export const Dashboard: React.FC<DashboardProps> = ({
     </div>
   );
 };
+
+export default Dashboard;
