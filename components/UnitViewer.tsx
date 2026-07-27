@@ -726,102 +726,99 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                   Nenhum registro de aula cadastrado. Clique em "+ Adicionar Aula / Data" para iniciar.
                 </div>
               ) : (
-                <div className="overflow-x-auto rounded-[2rem] border border-slate-200 shadow-xl bg-white">
-                  <table className="w-full text-left border-collapse">
+                <div className="overflow-x-auto rounded-xl border border-slate-300 shadow-md bg-white">
+                  <table className="w-full text-left border-collapse border border-slate-300">
                     <thead>
                       <tr className="bg-slate-900 text-[10px] font-black uppercase tracking-wider text-white">
-                        <th className="p-4 w-1/6 border-r border-slate-800">Horas/Aulas/Data</th>
-                        <th className="p-4 w-1/4 border-r border-slate-800">Capacidades</th>
-                        <th className="p-4 w-1/4 border-r border-slate-800">Conhecimentos</th>
-                        <th className="p-4 w-1/5 border-r border-slate-800">Estratégias</th>
-                        <th className="p-4 border-r border-slate-800">Recursos/Ambientes</th>
-                        <th className="p-4 text-center">Status / OK</th>
+                        <th className="p-3 w-1/6 border border-slate-700">Horas/Aulas/Data</th>
+                        <th className="p-3 w-1/4 border border-slate-700">Capacidades</th>
+                        <th className="p-3 w-1/4 border border-slate-700">Conhecimentos</th>
+                        <th className="p-3 w-1/5 border border-slate-700">Estratégias</th>
+                        <th className="p-3 border border-slate-700">Recursos/Ambientes</th>
+                        <th className="p-3 text-center border border-slate-700 w-20">Status</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-100 text-xs">
+                    <tbody className="text-xs">
                       {unit.lessonPlan.map((row) => {
                         const isCompleted = row.completed;
                         return (
                           <tr 
                             key={row.id} 
-                            className={`transition-colors ${isCompleted ? 'bg-emerald-50/70 hover:bg-emerald-50' : 'hover:bg-slate-50/50'}`}
+                            className={`transition-colors ${isCompleted ? 'bg-emerald-50/80 hover:bg-emerald-50' : 'bg-white hover:bg-slate-50'}`}
                           >
                             {/* Horas/Aulas/Data */}
-                            <td className="p-4 border-r border-slate-100 align-top space-y-2">
+                            <td className="p-0 border border-slate-300 align-top">
                               <textarea
-                                rows={2}
+                                rows={3}
                                 value={row.hoursDate}
                                 onChange={(e) => handleUpdateLessonPlanCell(row.id, 'hoursDate', e.target.value)}
-                                className={`w-full border rounded-xl p-2.5 text-xs font-bold focus:outline-none focus:border-blue-500 ${isCompleted ? 'bg-emerald-100/60 border-emerald-300 text-emerald-900' : 'bg-slate-50 border-slate-200 text-slate-800'}`}
+                                className={`w-full h-full p-2.5 text-xs font-bold focus:outline-none resize-none border-0 rounded-none ${isCompleted ? 'bg-emerald-100/60 text-emerald-900' : 'bg-transparent text-slate-800'}`}
                                 placeholder="Ex: 4 horas - 13/03/2026"
                               />
-                              <button
-                                onClick={() => handleDeleteLessonPlanRow(row.id)}
-                                className="w-full bg-red-50 hover:bg-red-600 text-red-600 hover:text-white py-1 rounded-lg text-[9px] font-black uppercase transition-all"
-                              >
-                                Excluir Linha
-                              </button>
+                              <div className="p-1 bg-slate-50 border-t border-slate-200">
+                                <button
+                                  onClick={() => handleDeleteLessonPlanRow(row.id)}
+                                  className="w-full bg-red-50 hover:bg-red-600 text-red-600 hover:text-white py-0.5 rounded text-[8px] font-black uppercase transition-all"
+                                >
+                                  Excluir
+                                </button>
+                              </div>
                             </td>
 
                             {/* Capacidades */}
-                            <td className="p-4 border-r border-slate-100 align-top">
+                            <td className="p-0 border border-slate-300 align-top">
                               <textarea
                                 rows={4}
                                 value={row.capacities}
                                 onChange={(e) => handleUpdateLessonPlanCell(row.id, 'capacities', e.target.value)}
-                                className={`w-full border rounded-xl p-2.5 text-xs font-bold focus:outline-none focus:border-blue-500 ${isCompleted ? 'bg-emerald-100/40 border-emerald-300 text-emerald-950' : 'bg-slate-50 border-slate-200 text-slate-800'}`}
+                                className={`w-full h-full p-2.5 text-xs font-bold focus:outline-none resize-none border-0 rounded-none ${isCompleted ? 'bg-emerald-100/40 text-emerald-950' : 'bg-transparent text-slate-800'}`}
                               />
                             </td>
 
                             {/* Conhecimentos */}
-                            <td className="p-4 border-r border-slate-100 align-top">
+                            <td className="p-0 border border-slate-300 align-top">
                               <textarea
                                 rows={4}
                                 value={row.knowledges}
                                 onChange={(e) => handleUpdateLessonPlanCell(row.id, 'knowledges', e.target.value)}
-                                className={`w-full border rounded-xl p-2.5 text-xs font-bold focus:outline-none focus:border-blue-500 ${isCompleted ? 'bg-emerald-100/40 border-emerald-300 text-emerald-950' : 'bg-slate-50 border-slate-200 text-slate-800'}`}
+                                className={`w-full h-full p-2.5 text-xs font-bold focus:outline-none resize-none border-0 rounded-none ${isCompleted ? 'bg-emerald-100/40 text-emerald-950' : 'bg-transparent text-slate-800'}`}
                               />
                             </td>
 
                             {/* Estratégias */}
-                            <td className="p-4 border-r border-slate-100 align-top">
+                            <td className="p-0 border border-slate-300 align-top">
                               <textarea
                                 rows={4}
                                 value={row.strategies}
                                 onChange={(e) => handleUpdateLessonPlanCell(row.id, 'strategies', e.target.value)}
-                                className={`w-full border rounded-xl p-2.5 text-xs font-bold focus:outline-none focus:border-blue-500 ${isCompleted ? 'bg-emerald-100/40 border-emerald-300 text-emerald-950' : 'bg-slate-50 border-slate-200 text-slate-800'}`}
+                                className={`w-full h-full p-2.5 text-xs font-bold focus:outline-none resize-none border-0 rounded-none ${isCompleted ? 'bg-emerald-100/40 text-emerald-950' : 'bg-transparent text-slate-800'}`}
                               />
                             </td>
 
                             {/* Recursos/Ambientes */}
-                            <td className="p-4 border-r border-slate-100 align-top">
+                            <td className="p-0 border border-slate-300 align-top">
                               <textarea
                                 rows={4}
                                 value={row.resources}
                                 onChange={(e) => handleUpdateLessonPlanCell(row.id, 'resources', e.target.value)}
-                                className={`w-full border rounded-xl p-2.5 text-xs font-bold focus:outline-none focus:border-blue-500 ${isCompleted ? 'bg-emerald-100/40 border-emerald-300 text-emerald-950' : 'bg-slate-50 border-slate-200 text-slate-800'}`}
+                                className={`w-full h-full p-2.5 text-xs font-bold focus:outline-none resize-none border-0 rounded-none ${isCompleted ? 'bg-emerald-100/40 text-emerald-950' : 'bg-transparent text-slate-800'}`}
                               />
                             </td>
 
-                            {/* Status / OK (Aula Dada) */}
-                            <td className="p-4 align-middle text-center">
-                              <div className="flex flex-col items-center justify-center gap-2">
-                                <button
-                                  type="button"
-                                  onClick={() => handleUpdateLessonPlanCell(row.id, 'completed', !isCompleted)}
-                                  className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all shadow-md font-black text-xs uppercase ${
-                                    isCompleted 
-                                      ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-200 ring-4 ring-emerald-100' 
-                                      : 'bg-slate-100 hover:bg-slate-200 text-slate-400 hover:text-slate-600'
-                                  }`}
-                                  title={isCompleted ? 'Aula marcada como dada (Concluída)' : 'Marcar como aula dada'}
-                                >
-                                  {isCompleted ? '✓' : 'OK'}
-                                </button>
-                                <span className={`text-[9px] font-black uppercase tracking-wider ${isCompleted ? 'text-emerald-700' : 'text-slate-400'}`}>
-                                  {isCompleted ? 'Aula Dada' : 'Pendente'}
-                                </span>
-                              </div>
+                            {/* Status / OK (Aula Dada) - Compacto */}
+                            <td className="p-2 border border-slate-300 align-middle text-center">
+                              <button
+                                type="button"
+                                onClick={() => handleUpdateLessonPlanCell(row.id, 'completed', !isCompleted)}
+                                className={`w-8 h-8 mx-auto rounded-lg flex items-center justify-center transition-all shadow-sm font-black text-[10px] uppercase ${
+                                  isCompleted 
+                                    ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-200' 
+                                    : 'bg-slate-200 hover:bg-slate-300 text-slate-600'
+                                }`}
+                                title={isCompleted ? 'Aula marcada como dada (Concluída)' : 'Marcar como aula dada'}
+                              >
+                                {isCompleted ? '✓' : 'OK'}
+                              </button>
                             </td>
                           </tr>
                         );
