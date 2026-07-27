@@ -489,7 +489,7 @@ const App: React.FC = () => {
     });
     setSelectedSemester(firstSemester);
     setSelectedUnit(firstUnit);
-    setView('plano-curso' as ViewType);
+    setView('plano-curso');
   };
 
   if (!isAuthenticated) {
@@ -518,14 +518,14 @@ const App: React.FC = () => {
               plans={plans}
               onEdit={plan => {
                 setCurrentPlan(plan);
-                setView('unidades-curriculares' as ViewType);
+                setView('unidades-curriculares');
               }}
               onView={openPlan}
               onRefresh={() => loadPlans(activeProfileId)}
             />
           )}
 
-          {view === ('plano-curso' as ViewType) && currentPlan && (
+          {view === 'plano-curso' && currentPlan && (
             <div className="max-w-5xl mx-auto space-y-10 animate-fadeIn pb-20">
               <div className="bg-white rounded-[2.5rem] p-8 md:p-16 border border-slate-200 shadow-2xl relative overflow-hidden">
                 <div className="absolute top-0 left-0 w-2 h-full bg-[#E30613]" />
@@ -599,7 +599,7 @@ const App: React.FC = () => {
                       onClick={() => {
                         setSelectedUnit(unit);
                         setSelectedSemester(unit.semester);
-                        setView('plano-ensino' as ViewType);
+                        setView('plano-ensino');
                       }}
                       className="bg-slate-800 p-8 rounded-3xl text-left hover:bg-blue-600 transition-all group relative overflow-hidden"
                     >
@@ -619,65 +619,66 @@ const App: React.FC = () => {
             </div>
           )}
 
-          {view === ('plano-ensino' as ViewType) &&
-            currentPlan &&
-            selectedUnit && (
-              <div className="space-y-8 max-w-7xl mx-auto pb-20">
-                <div className="flex flex-wrap gap-3 px-1">
-                  {currentPlanSemesters.map(semester => (
-                    <button
-                      key={semester}
-                      onClick={() => setSelectedSemester(semester)}
-                      className={`px-6 py-3 rounded-2xl text-[10px] font-black uppercase transition-all border-2 ${
-                        Number(selectedSemester) === Number(semester)
-                          ? 'bg-slate-900 border-slate-900 text-white shadow-lg'
-                          : 'bg-white border-slate-200 text-slate-400 hover:border-blue-300'
-                      }`}
-                    >
-                      {semester}º semestre
-                    </button>
-                  ))}
-                </div>
-
-                <div className="flex gap-2 overflow-x-auto pb-4 scrollbar-hide px-1">
-                  {visibleUnits.map(unit => (
-                    <button
-                      key={unit.id}
-                      onClick={() => setSelectedUnit(unit)}
-                      className={`flex-shrink-0 px-8 py-4 rounded-2xl text-[10px] font-black uppercase transition-all border-2 ${
-                        selectedUnit.id === unit.id
-                          ? 'bg-blue-600 border-blue-600 text-white shadow-xl scale-105'
-                          : 'bg-white border-slate-200 text-slate-400 hover:border-blue-100'
-                      }`}
-                    >
-                      {getUnitSigla(unit)}
-                    </button>
-                  ))}
-                </div>
-
-                <UnitViewer
-                  unit={selectedUnit}
-                  onUpdateSchedule={newSchedule =>
-                    handleUpdateSchedule(selectedUnit.id, newSchedule)
-                  }
-                  onUpdateCalendar={newCalendar =>
-                    handleUpdateCalendar(selectedUnit.id, newCalendar)
-                  }
-                  onUpdateUnit={async updatedUnit => {
-                    if (!currentPlan) return;
-                    const updatedUnits = currentPlan.units.map(u => u.id === updatedUnit.id ? updatedUnit : u);
-                    await persistPlan({ ...currentPlan, units: updatedUnits });
-                    setSelectedUnit(updatedUnit);
-                  }}
-                />
+          {view === 'plano-ensino' && currentPlan && selectedUnit && (
+            <div className="space-y-8 max-w-7xl mx-auto pb-20">
+              <div className="flex flex-wrap gap-3 px-1">
+                {currentPlanSemesters.map(semester => (
+                  <button
+                    key={semester}
+                    onClick={() => setSelectedSemester(semester)}
+                    className={`px-6 py-3 rounded-2xl text-[10px] font-black uppercase transition-all border-2 ${
+                      Number(selectedSemester) === Number(semester)
+                        ? 'bg-slate-900 border-slate-900 text-white shadow-lg'
+                        : 'bg-white border-slate-200 text-slate-400 hover:border-blue-300'
+                    }`}
+                  >
+                    {semester}º semestre
+                  </button>
+                ))}
               </div>
-            )}
 
-          {view === ('calendario' as ViewType) && currentPlan && (
+              <div className="flex gap-2 overflow-x-auto pb-4 scrollbar-hide px-1">
+                {visibleUnits.map(unit => (
+                  <button
+                    key={unit.id}
+                    onClick={() => setSelectedUnit(unit)}
+                    className={`flex-shrink-0 px-8 py-4 rounded-2xl text-[10px] font-black uppercase transition-all border-2 ${
+                      selectedUnit.id === unit.id
+                        ? 'bg-blue-600 border-blue-600 text-white shadow-xl scale-105'
+                        : 'bg-white border-slate-200 text-slate-400 hover:border-blue-100'
+                    }`}
+                  >
+                    {getUnitSigla(unit)}
+                  </button>
+                ))}
+              </div>
+
+              {/* Aqui chamamos novamente o UnitViewer original com todo o layout e detalhes completos de capacidades, conhecimentos e situações de aprendizagem */}
+              <UnitViewer
+                unit={selectedUnit}
+                onUpdateSchedule={newSchedule =>
+                  handleUpdateSchedule(selectedUnit.id, newSchedule)
+                }
+                onUpdateCalendar={newCalendar =>
+                  handleUpdateCalendar(selectedUnit.id, newCalendar)
+                }
+                onUpdateUnit={async updatedUnit => {
+                  if (!currentPlan) return;
+                  const updatedUnits = currentPlan.units.map(u =>
+                    u.id === updatedUnit.id ? updatedUnit : u
+                  );
+                  await persistPlan({ ...currentPlan, units: updatedUnits });
+                  setSelectedUnit(updatedUnit);
+                }}
+              />
+            </div>
+          )}
+
+          {view === 'calendario' && currentPlan && (
             <GeneralCalendar plan={currentPlan} />
           )}
 
-          {view === ('unidades-curriculares' as ViewType) && currentPlan && (
+          {view === 'unidades-curriculares' && currentPlan && (
             <div className="max-w-5xl mx-auto space-y-8 animate-fadeIn pb-20">
               <div className="bg-white rounded-[2.5rem] p-8 border border-slate-200 shadow-xl">
                 <span className="text-[10px] font-black text-blue-600 uppercase tracking-widest block mb-1">
