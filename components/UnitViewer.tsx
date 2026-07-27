@@ -210,7 +210,7 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
   };
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto pb-20 animate-fadeIn">
+    <div className="space-y-6 w-full max-w-[98%] mx-auto pb-20 animate-fadeIn">
       {/* Barra de Navegação Superior */}
       <div className="flex justify-between items-center">
         <button
@@ -355,7 +355,7 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
           </button>
         </div>
 
-        <div className="p-6 md:p-8 space-y-6">
+        <div className="p-4 md:p-6 space-y-6">
           {activeTab === 'geral' && (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               
@@ -726,16 +726,16 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                   Nenhum registro de aula cadastrado. Clique em "+ Adicionar Aula / Data" para iniciar.
                 </div>
               ) : (
-                <div className="overflow-x-auto rounded-xl border border-slate-300 shadow-md bg-white">
+                <div className="overflow-x-auto shadow-md bg-white">
                   <table className="w-full text-left border-collapse border border-slate-300">
                     <thead>
                       <tr className="bg-slate-900 text-[10px] font-black uppercase tracking-wider text-white">
-                        <th className="p-3 w-1/6 border border-slate-700">Horas/Aulas/Data</th>
-                        <th className="p-3 w-1/4 border border-slate-700">Capacidades</th>
-                        <th className="p-3 w-1/4 border border-slate-700">Conhecimentos</th>
-                        <th className="p-3 w-1/5 border border-slate-700">Estratégias</th>
-                        <th className="p-3 border border-slate-700">Recursos/Ambientes</th>
-                        <th className="p-3 text-center border border-slate-700 w-20">Status</th>
+                        <th className="p-3 w-1/6 border border-slate-700 text-center">HORAS/AULAS/DATA</th>
+                        <th className="p-3 w-1/4 border border-slate-700 text-center">CAPACIDADES</th>
+                        <th className="p-3 w-1/4 border border-slate-700 text-center">CONHECIMENTOS</th>
+                        <th className="p-3 w-1/5 border border-slate-700 text-center">ESTRATÉGIAS</th>
+                        <th className="p-3 border border-slate-700 text-center">RECURSOS/AMBIENTES</th>
+                        <th className="p-3 text-center border border-slate-700 w-16">STATUS</th>
                       </tr>
                     </thead>
                     <tbody className="text-xs">
@@ -757,8 +757,12 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                               />
                               <div className="p-1 bg-slate-50 border-t border-slate-200">
                                 <button
-                                  onClick={() => handleDeleteLessonPlanRow(row.id)}
-                                  className="w-full bg-red-50 hover:bg-red-600 text-red-600 hover:text-white py-0.5 rounded text-[8px] font-black uppercase transition-all"
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleDeleteLessonPlanRow(row.id);
+                                  }}
+                                  className="w-full bg-red-50 hover:bg-red-600 text-red-600 hover:text-white py-0.5 rounded text-[8px] font-black uppercase transition-all cursor-pointer"
                                 >
                                   Excluir
                                 </button>
@@ -805,14 +809,14 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                               />
                             </td>
 
-                            {/* Status / OK (Aula Dada) - Compacto */}
-                            <td className="p-2 border border-slate-300 align-middle text-center">
+                            {/* Status / OK (Compacto e Centralizado) */}
+                            <td className="p-1 border border-slate-300 align-middle text-center">
                               <button
                                 type="button"
                                 onClick={() => handleUpdateLessonPlanCell(row.id, 'completed', !isCompleted)}
-                                className={`w-8 h-8 mx-auto rounded-lg flex items-center justify-center transition-all shadow-sm font-black text-[10px] uppercase ${
+                                className={`w-6 h-6 mx-auto rounded flex items-center justify-center transition-all shadow-sm font-black text-[9px] uppercase cursor-pointer ${
                                   isCompleted 
-                                    ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-200' 
+                                    ? 'bg-emerald-600 hover:bg-emerald-700 text-white' 
                                     : 'bg-slate-200 hover:bg-slate-300 text-slate-600'
                                 }`}
                                 title={isCompleted ? 'Aula marcada como dada (Concluída)' : 'Marcar como aula dada'}
