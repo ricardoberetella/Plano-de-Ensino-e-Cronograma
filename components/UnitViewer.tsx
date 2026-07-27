@@ -1000,7 +1000,7 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                               return <div key={cIdx} className="h-12 md:h-14"></div>;
                             }
 
-                            const event = parsedEvents.path(
+                            const event = parsedEvents.find(
                               ev => ev.day === dayNum && ev.month === mObj.monthNum && ev.year === mObj.year
                             );
 
