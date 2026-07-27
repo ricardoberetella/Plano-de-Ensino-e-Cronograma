@@ -1,80 +1,161 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { CurricularUnit } from '../types';
 
-interface LayoutProps {
-  children: React.ReactNode;
-  activeTab: string;
-  setActiveTab: (tab: string) => void;
+interface UnitViewerProps {
+  unit: CurricularUnit;
+  onBack: () => void;
 }
 
-export default function Layout({ children, activeTab, setActiveTab }: LayoutProps) {
+export default function UnitViewer({ unit, onBack }: UnitViewerProps) {
+  const [modalAberto, setModalAberto] = useState(false);
+  
+  const [capacidadesTecnicas, setCapacidadesTecnicas] = useState<string[]>([
+    'fdfdfdfdfdf',
+    'wdqwdqwdaqwddwqddww'
+  ]);
+  const [capacidadesSocioemocionais, setCapacidadesSocioemocionais] = useState<string[]>([]);
+  const [conhecimentos, setConhecimentos] = useState<string[]>([
+    'wefwefewfefewfefewfefwefe',
+    'wefwefwefweffeff'
+  ]);
+
+  const adicionarItem = (tipo: 'tecnica' | 'socioemocional' | 'conhecimento') => {
+    if (tipo === 'tecnica') {
+      const valor = prompt('Digite a Capacidade Técnica:');
+      if (valor) setCapacidadesTecnicas([...capacidadesTecnicas, valor]);
+    } else if (tipo === 'socioemocional') {
+      const valor = prompt('Digite a Capacidade Socioemocional:');
+      if (valor) setCapacidadesSocioemocionais([...capacidadesSocioemocionais, valor]);
+    } else if (tipo === 'conhecimento') {
+      const valor = prompt('Digite o Conhecimento:');
+      if (valor) setConhecimentos([...conhecimentos, valor]);
+    }
+    setModalAberto(false);
+  };
+
   return (
-    <div className="flex min-h-screen bg-slate-100">
-      {/* Menu lateral mais estreito (w-56) para ganhar espaço à direita */}
-      <aside className="w-56 bg-[#0B1120] text-white flex flex-col justify-between p-4 shrink-0 shadow-xl">
-        <div className="space-y-8">
-          {/* Logo SENAI */}
-          <div className="bg-red-600 text-white font-black text-center py-2.5 rounded-xl text-lg tracking-wider shadow-md">
-            SENAI
-          </div>
-
-          {/* Links de Navegação */}
-          <nav className="space-y-1">
-            <button
-              onClick={() => setActiveTab('painel')}
-              className={`w-full text-left px-3 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-3 ${
-                activeTab === 'painel' ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-800'
-              }`}
-            >
-              📊 Painel / Cursos
-            </button>
-            <button
-              onClick={() => setActiveTab('plano')}
-              className={`w-full text-left px-3 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-3 ${
-                activeTab === 'plano' ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-800'
-              }`}
-            >
-              📄 Plano de Curso
-            </button>
-            <button
-              onClick={() => setActiveTab('unidades')}
-              className={`w-full text-left px-3 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-3 ${
-                activeTab === 'unidades' ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-800'
-              }`}
-            >
-              📚 Unidades Curriculares
-            </button>
-            <button
-              onClick={() => setActiveTab('calendario')}
-              className={`w-full text-left px-3 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-3 ${
-                activeTab === 'calendario' ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-800'
-              }`}
-            >
-              📅 Calendário Escolar
-            </button>
-          </nav>
-        </div>
-
-        {/* Rodapé do Menu Lateral */}
-        <div className="space-y-4 pt-4 border-t border-slate-800">
-          <div className="bg-slate-900/80 p-3 rounded-2xl border border-slate-800 space-y-1">
-            <span className="text-[10px] font-black uppercase text-slate-500 tracking-wider block">
-              Professor Ativo
-            </span>
-            <span className="text-xs font-bold text-blue-400 block truncate">
-              Ricardo Beretella
-            </span>
-          </div>
-
-          <button className="w-full text-center text-red-400 hover:text-red-300 text-xs font-black uppercase tracking-wider py-2 transition">
-            Sair do Sistema
+    <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 lg:p-8 space-y-6 w-full">
+      {/* Cabeçalho da Unidade e Botão Voltar */}
+      <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+        <div>
+          <button 
+            onClick={onBack}
+            className="text-xs font-bold text-slate-400 hover:text-blue-600 mb-2 uppercase tracking-wider block transition"
+          >
+            ← Voltar para a Lista
           </button>
+          <h1 className="text-2xl font-black text-slate-900 uppercase tracking-tight">
+            {unit.code} - {unit.name}
+          </h1>
         </div>
-      </aside>
+      </div>
 
-      {/* Conteúdo Principal com espaço maximizado */}
-      <main className="flex-1 overflow-y-auto p-6 lg:p-8">
-        {children}
-      </main>
+      {/* Seção da Matriz Curricular e Menu de Adição */}
+      <div className="flex items-center justify-between pt-2">
+        <h2 className="text-blue-700 font-extrabold text-xs lg:text-sm tracking-wide uppercase">
+          Matriz Curricular (Capacidades e Conhecimentos)
+        </h2>
+        <div className="relative">
+          <button 
+            onClick={() => setModalAberto(!modalAberto)}
+            className="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-2 px-4 rounded-xl shadow-md transition flex items-center gap-2"
+          >
+            + Adicionar Item ▼
+          </button>
+
+          {/* Menu Dropdown */}
+          {modalAberto && (
+            <div className="absolute right-0 mt-2 w-56 bg-white border border-slate-200 rounded-xl shadow-2xl z-50 py-2">
+              <button 
+                onClick={() => adicionarItem('tecnica')}
+                className="w-full text-left px-4 py-2.5 text-xs font-bold text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition"
+              >
+                Capacidade Técnica
+              </button>
+              <button 
+                onClick={() => adicionarItem('socioemocional')}
+                className="w-full text-left px-4 py-2.5 text-xs font-bold text-slate-700 hover:bg-emerald-50 hover:text-emerald-600 transition"
+              >
+                Capacidade Socioemocional
+              </button>
+              <button 
+                onClick={() => adicionarItem('conhecimento')}
+                className="w-full text-left px-4 py-2.5 text-xs font-bold text-slate-700 hover:bg-purple-50 hover:text-purple-600 transition"
+              >
+                Conhecimento
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Tabela Principal da Matriz */}
+      <div className="border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+        {/* Cabeçalho da Tabela */}
+        <div className="grid grid-cols-1 md:grid-cols-2 bg-[#0B1120] text-white font-black text-xs py-3.5 px-4 tracking-wider text-center">
+          <div>Capacidades (Técnicas e Socioemocionais)</div>
+          <div>Conhecimentos</div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-slate-200 bg-slate-50/50">
+          {/* Coluna Esquerda: Capacidades */}
+          <div className="p-5 space-y-6">
+            <div>
+              <span className="text-[11px] font-black uppercase text-slate-500 tracking-wider block mb-2">
+                Capacidades Técnicas
+              </span>
+              {capacidadesTecnicas.length === 0 ? (
+                <p className="text-xs text-slate-400 italic">Nenhuma capacidade técnica cadastrada.</p>
+              ) : (
+                <div className="space-y-2">
+                  {capacidadesTecnicas.map((item, index) => (
+                    <div key={index} className="p-3.5 bg-white border border-slate-200/80 rounded-xl text-base font-medium text-slate-800 shadow-sm">
+                      {item}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div>
+              <span className="text-[11px] font-black uppercase text-slate-500 tracking-wider block mb-2">
+                Capacidades Socioemocionais
+              </span>
+              {capacidadesSocioemocionais.length === 0 ? (
+                <p className="text-xs text-slate-400 italic">Nenhuma capacidade socioemocional cadastrada.</p>
+              ) : (
+                <div className="space-y-2">
+                  {capacidadesSocioemocionais.map((item, index) => (
+                    <div key={index} className="p-3.5 bg-white border border-slate-200/80 rounded-xl text-base font-medium text-slate-800 shadow-sm">
+                      {item}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Coluna Direita: Conhecimentos */}
+          <div className="p-5 space-y-6">
+            <div>
+              <span className="text-[11px] font-black uppercase text-slate-500 tracking-wider block mb-2">
+                Conhecimentos
+              </span>
+              {conhecimentos.length === 0 ? (
+                <p className="text-xs text-slate-400 italic">Nenhum conhecimento cadastrado.</p>
+              ) : (
+                <div className="space-y-2">
+                  {conhecimentos.map((item, index) => (
+                    <div key={index} className="p-3.5 bg-white border border-slate-200/80 rounded-xl text-base font-medium text-slate-800 shadow-sm">
+                      {item}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
