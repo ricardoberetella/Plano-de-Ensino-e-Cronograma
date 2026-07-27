@@ -10,7 +10,7 @@ interface DashboardProps {
   onUpdatePlan?: (updatedPlan: TeachingPlan) => void;
 }
 
-export const Dashboard: React.FC<DashboardProps> = ({
+const Dashboard: React.FC<DashboardProps> = ({
   plans,
   onEdit,
   onView,
@@ -44,8 +44,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
               code: unitData.code,
               name: unitData.name,
               totalHours: unitData.totalHours,
-              semester: unitData.semester,
-              calendar: { ...u.calendar, semester: unitData.semester }
+              semester: unitData.semester
             }
           : u
       );
@@ -98,7 +97,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
   };
 
   return (
-    <div className="space-y-8 max-w-7xl mx-auto pb-20 animate-fadeIn">
+    <div className="space-y-8 max-w-7xl mx-auto pb-20">
       {/* Cards Superiores */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-xl">
@@ -195,7 +194,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
       {/* MODAL DE EDIÇÃO DO PLANO */}
       {editingPlan && (
         <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white rounded-[2.5rem] p-8 md:p-12 max-w-4xl w-full shadow-2xl border border-slate-200 my-8 space-y-8 animate-fadeIn">
+          <div className="bg-white rounded-[2.5rem] p-8 md:p-12 max-w-4xl w-full shadow-2xl border border-slate-200 my-8 space-y-8">
             <div className="flex justify-between items-start border-b border-slate-100 pb-6">
               <div>
                 <span className="bg-slate-900 text-white px-3 py-1 rounded text-[9px] font-black uppercase tracking-widest mb-2 inline-block">
