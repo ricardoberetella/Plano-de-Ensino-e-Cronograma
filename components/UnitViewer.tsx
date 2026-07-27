@@ -257,8 +257,8 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
 
   return (
     <div className="space-y-6 w-full max-w-[99%] mx-auto pb-20 animate-fadeIn">
-      {/* Barra de Navegação Superior */}
-      <div className="flex justify-between items-center px-2">
+      {/* Barra de Navegação Superior (Oculta na Impressão) */}
+      <div className="flex justify-between items-center px-2 print:hidden">
         <button
           onClick={onBack}
           className="text-xs font-black uppercase text-slate-500 hover:text-slate-900 transition-all flex items-center gap-1 bg-white px-4 py-2 rounded-xl border border-slate-200 shadow-sm"
@@ -273,27 +273,27 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
         </button>
       </div>
 
-      {/* CABEÇALHO ESCURO */}
-      <div className="bg-slate-900 rounded-[2.5rem] p-8 md:p-12 text-white shadow-2xl relative overflow-hidden border border-slate-800">
-        <div className="absolute -right-10 -bottom-10 opacity-10 text-9xl font-[1000] select-none pointer-events-none">
+      {/* CABEÇALHO ESCURO (Na impressão exibe apenas o nome da unidade curricular conforme solicitado) */}
+      <div className="bg-slate-900 rounded-[2.5rem] p-8 md:p-12 text-white shadow-2xl relative overflow-hidden border border-slate-800 print:bg-white print:text-slate-900 print:border-none print:shadow-none print:p-0 print:mb-6">
+        <div className="absolute -right-10 -bottom-10 opacity-10 text-9xl font-[1000] select-none pointer-events-none print:hidden">
           SENAI
         </div>
 
         {!isEditingHeader ? (
-          <div className="space-y-4 relative z-10">
-            <div className="inline-flex items-center gap-2 bg-red-600 text-white px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-md">
+          <div className="space-y-4 relative z-10 print:space-y-2">
+            <div className="inline-flex items-center gap-2 bg-red-600 text-white px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-md print:hidden">
               <span>{unit.code || unit.id || 'UC'}</span>
               <span>—</span>
               <span>{unit.semester || 1}º Semestre</span>
               <span className="opacity-75">({unit.totalHours || unit.workload || 0}h)</span>
             </div>
 
-            <h1 className="text-3xl md:text-5xl font-[1000] uppercase tracking-tight text-white">
+            <h1 className="text-3xl md:text-5xl font-[1000] uppercase tracking-tight text-white print:text-slate-900 print:text-2xl">
               {unit.name}
             </h1>
           </div>
         ) : (
-          <div className="space-y-4 relative z-10 bg-slate-800 p-6 rounded-2xl border border-slate-700">
+          <div className="space-y-4 relative z-10 bg-slate-800 p-6 rounded-2xl border border-slate-700 print:hidden">
             <h3 className="text-xs font-black uppercase text-blue-400 tracking-widest">
               Editando Dados da Unidade Curricular
             </h3>
@@ -356,9 +356,9 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
         )}
       </div>
 
-      {/* ABAS DE NAVEGAÇÃO INTERNA */}
-      <div className="bg-white rounded-[2rem] border border-slate-200 shadow-xl overflow-hidden p-2">
-        <div className="flex flex-wrap gap-2 border-b border-slate-100 p-4">
+      {/* ABAS DE NAVEGAÇÃO INTERNA (Ocultas na Impressão) */}
+      <div className="bg-white rounded-[2rem] border border-slate-200 shadow-xl overflow-hidden p-2 print:border-none print:shadow-none print:p-0">
+        <div className="flex flex-wrap gap-2 border-b border-slate-100 p-4 print:hidden">
           <button
             onClick={() => setActiveTab('geral')}
             className={`px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all ${
@@ -401,7 +401,7 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
           </button>
         </div>
 
-        <div className="p-4 md:p-6 space-y-6">
+        <div className="p-4 md:p-6 space-y-6 print:p-0">
           {activeTab === 'geral' && (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               
@@ -746,7 +746,7 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
 
           {activeTab === 'plano-aula' && (
             <div className="space-y-6 animate-fadeIn">
-              <div className="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-slate-100 pb-4 gap-4">
+              <div className="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-slate-100 pb-4 gap-4 print:hidden">
                 <div>
                   <h3 className="text-lg font-[1000] uppercase italic text-slate-900 tracking-wider">Plano de Aula | Cronograma</h3>
                   <p className="text-[10px] font-bold uppercase text-slate-400 mt-1">Organização diária das aulas e distribuição de carga horária</p>
@@ -764,7 +764,7 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                     onClick={() => window.print()}
                     className="bg-red-600 hover:bg-red-700 text-white px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-md transition-all cursor-pointer"
                   >
-                    Imprimir
+                    Imprimir PDF
                   </button>
                 </div>
               </div>
@@ -774,16 +774,16 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                   Nenhum registro de aula cadastrado. Clique em "+ Adicionar Aula / Data" para iniciar.
                 </div>
               ) : (
-                <div className="overflow-x-auto shadow-md bg-white rounded-2xl border border-slate-200">
+                <div className="overflow-x-auto shadow-md bg-white rounded-2xl border border-slate-200 print:shadow-none print:border-slate-300">
                   <table className="w-full text-left border-collapse">
                     <thead>
-                      <tr className="bg-slate-900 text-[10px] font-black uppercase tracking-wider text-white">
-                        <th className="p-3 w-[22%] border-r border-slate-800 text-center">HORAS/AULAS/DATA</th>
-                        <th className="p-3 w-[24%] border-r border-slate-800 text-center">CAPACIDADES</th>
-                        <th className="p-3 w-[24%] border-r border-slate-800 text-center">CONHECIMENTOS</th>
-                        <th className="p-3 w-[16%] border-r border-slate-800 text-center">ESTRATÉGIAS</th>
-                        <th className="p-3 border-r border-slate-800 text-center">RECURSOS/AMBIENTES</th>
-                        <th className="p-3 text-center w-24">STATUS</th>
+                      <tr className="bg-slate-900 text-[10px] font-black uppercase tracking-wider text-white print:bg-slate-200 print:text-slate-900">
+                        <th className="p-3 w-[24%] border-r border-slate-800 print:border-slate-300 text-center">HORAS/AULAS/DATA</th>
+                        <th className="p-3 w-[22%] border-r border-slate-800 print:border-slate-300 text-center">CAPACIDADES</th>
+                        <th className="p-3 w-[22%] border-r border-slate-800 print:border-slate-300 text-center">CONHECIMENTOS</th>
+                        <th className="p-3 w-[16%] border-r border-slate-800 print:border-slate-300 text-center">ESTRATÉGIAS</th>
+                        <th className="p-3 border-r border-slate-800 print:border-slate-300 text-center">RECURSOS/AMBIENTES</th>
+                        <th className="p-3 text-center w-20 print:hidden">STATUS</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-200 text-xs">
@@ -794,30 +794,30 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                         return (
                           <tr 
                             key={row.id} 
-                            className={`transition-colors ${isCompleted ? 'bg-emerald-50/80 hover:bg-emerald-50' : 'bg-white hover:bg-slate-50'}`}
+                            className={`transition-colors ${isCompleted ? 'bg-emerald-50/80 hover:bg-emerald-50 print:bg-white' : 'bg-white hover:bg-slate-50'}`}
                           >
-                            {/* Horas e Data lado a lado com bordas perfeitamente alinhadas aos outros quadros */}
-                            <td className="p-2 border-r border-slate-200 align-top">
-                              <div className={`p-2 rounded-xl border space-y-2 ${isCompleted ? 'bg-emerald-100/60 border-emerald-300' : 'bg-slate-50 border-slate-200'}`}>
-                                <div className="grid grid-cols-2 gap-2">
-                                  <div>
-                                    <label className="block text-[8px] font-black uppercase text-slate-500 mb-0.5">QTD. HORAS</label>
+                            {/* Horas (1 dígito - menor largura) e Data (maior largura) lado a lado */}
+                            <td className="p-2 border-r border-slate-200 print:border-slate-300 align-top">
+                              <div className={`p-2 rounded-xl border space-y-2 ${isCompleted ? 'bg-emerald-100/60 border-emerald-300 print:bg-white print:border-slate-300' : 'bg-slate-50 border-slate-200 print:bg-white print:border-slate-300'}`}>
+                                <div className="grid grid-cols-12 gap-1.5">
+                                  <div className="col-span-4">
+                                    <label className="block text-[8px] font-black uppercase text-slate-500 mb-0.5">QTD. H</label>
                                     <input
                                       type="number"
                                       min="1"
-                                      max="20"
+                                      max="9"
                                       value={parsed.hours}
                                       onChange={(e) => handleUpdateHoursOrDate(row.id, row.hoursDate, e.target.value, parsed.date)}
-                                      className={`w-full p-2 text-xs font-bold focus:outline-none rounded-xl border text-center ${isCompleted ? 'bg-emerald-50 text-emerald-950 border-emerald-300' : 'bg-white text-slate-800 border-slate-200'}`}
+                                      className={`w-full p-2 text-xs font-bold focus:outline-none rounded-xl border text-center ${isCompleted ? 'bg-emerald-50 text-emerald-950 border-emerald-300 print:bg-transparent print:border-none' : 'bg-white text-slate-800 border-slate-200 print:bg-transparent print:border-none'}`}
                                     />
                                   </div>
-                                  <div>
+                                  <div className="col-span-8">
                                     <label className="block text-[8px] font-black uppercase text-slate-500 mb-0.5">DATA DA AULA</label>
                                     <input
                                       type="date"
                                       value={parsed.date}
                                       onChange={(e) => handleUpdateHoursOrDate(row.id, row.hoursDate, parsed.hours, e.target.value)}
-                                      className={`w-full p-2 text-xs font-bold focus:outline-none rounded-xl border text-center ${isCompleted ? 'bg-emerald-50 text-emerald-950 border-emerald-300' : 'bg-white text-slate-800 border-slate-200'}`}
+                                      className={`w-full p-2 text-xs font-bold focus:outline-none rounded-xl border text-center ${isCompleted ? 'bg-emerald-50 text-emerald-950 border-emerald-300 print:bg-transparent print:border-none' : 'bg-white text-slate-800 border-slate-200 print:bg-transparent print:border-none'}`}
                                     />
                                   </div>
                                 </div>
@@ -825,51 +825,51 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                             </td>
 
                             {/* Capacidades com auto-crescimento (sem scrollbar) */}
-                            <td className="p-2 border-r border-slate-200 align-top">
+                            <td className="p-2 border-r border-slate-200 print:border-slate-300 align-top">
                               <textarea
                                 rows={3}
                                 value={row.capacities}
                                 onChange={(e) => handleUpdateLessonPlanCell(row.id, 'capacities', e.target.value)}
                                 onInput={handleTextareaInput}
-                                className={`w-full p-2.5 text-xs font-bold focus:outline-none resize-none overflow-hidden rounded-xl border ${isCompleted ? 'bg-emerald-100/40 text-emerald-950 border-emerald-300' : 'bg-slate-50 text-slate-800 border-slate-200'}`}
+                                className={`w-full p-2.5 text-xs font-bold focus:outline-none resize-none overflow-hidden rounded-xl border ${isCompleted ? 'bg-emerald-100/40 text-emerald-950 border-emerald-300 print:bg-transparent print:border-none' : 'bg-slate-50 text-slate-800 border-slate-200 print:bg-transparent print:border-none'}`}
                               />
                             </td>
 
                             {/* Conhecimentos com auto-crescimento (sem scrollbar) */}
-                            <td className="p-2 border-r border-slate-200 align-top">
+                            <td className="p-2 border-r border-slate-200 print:border-slate-300 align-top">
                               <textarea
                                 rows={3}
                                 value={row.knowledges}
                                 onChange={(e) => handleUpdateLessonPlanCell(row.id, 'knowledges', e.target.value)}
                                 onInput={handleTextareaInput}
-                                className={`w-full p-2.5 text-xs font-bold focus:outline-none resize-none overflow-hidden rounded-xl border ${isCompleted ? 'bg-emerald-100/40 text-emerald-950 border-emerald-300' : 'bg-slate-50 text-slate-800 border-slate-200'}`}
+                                className={`w-full p-2.5 text-xs font-bold focus:outline-none resize-none overflow-hidden rounded-xl border ${isCompleted ? 'bg-emerald-100/40 text-emerald-950 border-emerald-300 print:bg-transparent print:border-none' : 'bg-slate-50 text-slate-800 border-slate-200 print:bg-transparent print:border-none'}`}
                               />
                             </td>
 
                             {/* Estratégias com auto-crescimento (sem scrollbar) */}
-                            <td className="p-2 border-r border-slate-200 align-top">
+                            <td className="p-2 border-r border-slate-200 print:border-slate-300 align-top">
                               <textarea
                                 rows={3}
                                 value={row.strategies}
                                 onChange={(e) => handleUpdateLessonPlanCell(row.id, 'strategies', e.target.value)}
                                 onInput={handleTextareaInput}
-                                className={`w-full p-2.5 text-xs font-bold focus:outline-none resize-none overflow-hidden rounded-xl border ${isCompleted ? 'bg-emerald-100/40 text-emerald-950 border-emerald-300' : 'bg-slate-50 text-slate-800 border-slate-200'}`}
+                                className={`w-full p-2.5 text-xs font-bold focus:outline-none resize-none overflow-hidden rounded-xl border ${isCompleted ? 'bg-emerald-100/40 text-emerald-950 border-emerald-300 print:bg-transparent print:border-none' : 'bg-slate-50 text-slate-800 border-slate-200 print:bg-transparent print:border-none'}`}
                               />
                             </td>
 
                             {/* Recursos/Ambientes com auto-crescimento (sem scrollbar) */}
-                            <td className="p-2 border-r border-slate-200 align-top">
+                            <td className="p-2 border-r border-slate-200 print:border-slate-300 align-top">
                               <textarea
                                 rows={3}
                                 value={row.resources}
                                 onChange={(e) => handleUpdateLessonPlanCell(row.id, 'resources', e.target.value)}
                                 onInput={handleTextareaInput}
-                                className={`w-full p-2.5 text-xs font-bold focus:outline-none resize-none overflow-hidden rounded-xl border ${isCompleted ? 'bg-emerald-100/40 text-emerald-950 border-emerald-300' : 'bg-slate-50 text-slate-800 border-slate-200'}`}
+                                className={`w-full p-2.5 text-xs font-bold focus:outline-none resize-none overflow-hidden rounded-xl border ${isCompleted ? 'bg-emerald-100/40 text-emerald-950 border-emerald-300 print:bg-transparent print:border-none' : 'bg-slate-50 text-slate-800 border-slate-200 print:bg-transparent print:border-none'}`}
                               />
                             </td>
 
-                            {/* Status e Botão Excluir lado a lado na mesma linha */}
-                            <td className="p-2 align-middle text-center">
+                            {/* Status e Botão Excluir (Ocultos na Impressão) */}
+                            <td className="p-2 align-middle text-center print:hidden">
                               <div className="flex items-center justify-center gap-1.5">
                                 <button
                                   type="button"
@@ -1000,7 +1000,7 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                               return <div key={cIdx} className="h-12 md:h-14"></div>;
                             }
 
-                            const event = parsedEvents.find(
+                            const event = parsedEvents.path(
                               ev => ev.day === dayNum && ev.month === mObj.monthNum && ev.year === mObj.year
                             );
 
