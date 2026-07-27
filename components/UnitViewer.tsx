@@ -228,7 +228,6 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
         date: `${match[4]}-${match[3]}-${match[2]}` // Formato YYYY-MM-DD para o input type="date"
       };
     }
-    // Fallback padrão se estiver vazio ou fora do formato
     return { hours: '4', date: '2026-07-01' };
   };
 
@@ -247,6 +246,13 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
 
     const finalString = `${hours || '0'} horas - ${formattedDate}`;
     handleUpdateLessonPlanCell(rowId, 'hoursDate', finalString);
+  };
+
+  // Função para auto-ajustar altura dos textareas dinamicamente sem barras de rolagem
+  const handleTextareaInput = (e: React.FormEvent<HTMLTextAreaElement>) => {
+    const target = e.currentTarget;
+    target.style.height = 'auto';
+    target.style.height = `${target.scrollHeight}px`;
   };
 
   return (
@@ -399,7 +405,7 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
           {activeTab === 'geral' && (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               
-              {/* COLUNA 1: CAPACIDADES (Técnicas e Socioemocionais) */}
+              {/* COLUNA 1: CAPACIDADES */}
               <div className="space-y-6">
                 <div className="border-b border-slate-100 pb-3">
                   <h3 className="text-xs font-black uppercase text-blue-600 tracking-[0.2em]">
@@ -407,7 +413,6 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                   </h3>
                 </div>
 
-                {/* Form Adicionar Capacidade Técnica */}
                 <form onSubmit={handleAddTechnicalCapacity} className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-3">
                   <label className="text-[10px] font-black text-slate-500 uppercase tracking-wider block">+ Adicionar Capacidade Técnica</label>
                   <div className="flex gap-2">
@@ -424,7 +429,6 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                   </div>
                 </form>
 
-                {/* Listagem de Capacidades Técnicas */}
                 <div className="space-y-2">
                   <h4 className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Técnicas Cadastradas</h4>
                   {(!unit.technicalCapacities || unit.technicalCapacities.length === 0) ? (
@@ -450,7 +454,6 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                   )}
                 </div>
 
-                {/* Form Adicionar Capacidade Socioemocional */}
                 <form onSubmit={handleAddSocialCapacity} className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-3 pt-6">
                   <label className="text-[10px] font-black text-slate-500 uppercase tracking-wider block">+ Adicionar Capacidade Socioemocional</label>
                   <div className="flex gap-2">
@@ -467,7 +470,6 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                   </div>
                 </form>
 
-                {/* Listagem de Capacidades Socioemocionais */}
                 <div className="space-y-2">
                   <h4 className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Socioemocionais Cadastradas</h4>
                   {(!unit.socialCapacities || unit.socialCapacities.length === 0) ? (
@@ -492,7 +494,6 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                     ))
                   )}
                 </div>
-
               </div>
 
               {/* COLUNA 2: CONHECIMENTOS */}
@@ -503,7 +504,6 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                   </h3>
                 </div>
 
-                {/* Form Adicionar Conhecimento */}
                 <form onSubmit={handleAddKnowledge} className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-3">
                   <label className="text-[10px] font-black text-slate-500 uppercase tracking-wider block">+ Adicionar Conhecimento</label>
                   <div className="flex gap-2">
@@ -520,7 +520,6 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                   </div>
                 </form>
 
-                {/* Listagem de Conhecimentos */}
                 <div className="space-y-2">
                   <h4 className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Conhecimentos Cadastrados</h4>
                   {(!unit.knowledges || unit.knowledges.length === 0) ? (
@@ -545,9 +544,7 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                     ))
                   )}
                 </div>
-
               </div>
-
             </div>
           )}
 
@@ -571,8 +568,6 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
               ) : (
                 unit.learningSituations.map((sit) => (
                   <div key={sit.id} className="bg-white rounded-[2.5rem] border border-slate-200 shadow-xl p-6 md:p-8 space-y-6">
-                    
-                    {/* TÍTULO DA SITUAÇÃO COM BOTÃO EXCLUIR */}
                     <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-200">
                       <input
                         type="text"
@@ -589,29 +584,28 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                       </button>
                     </div>
 
-                    {/* CONTEXTUALIZAÇÃO */}
                     <div className="space-y-2">
                       <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block">Contextualização</label>
                       <textarea
                         rows={4}
                         value={sit.contextualization}
                         onChange={(e) => handleUpdateSituation(sit.id, 'contextualization', e.target.value)}
-                        className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 text-xs font-bold text-slate-800 leading-relaxed focus:outline-none focus:border-blue-500 shadow-inner"
+                        onInput={handleTextareaInput}
+                        className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 text-xs font-bold text-slate-800 leading-relaxed focus:outline-none focus:border-blue-500 shadow-inner resize-none overflow-hidden"
                       />
                     </div>
 
-                    {/* DESAFIO */}
                     <div className="space-y-2">
                       <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block">Desafio</label>
                       <textarea
                         rows={4}
                         value={sit.challenge}
                         onChange={(e) => handleUpdateSituation(sit.id, 'challenge', e.target.value)}
-                        className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 text-xs font-bold text-slate-800 leading-relaxed focus:outline-none focus:border-blue-500 shadow-inner"
+                        onInput={handleTextareaInput}
+                        className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 text-xs font-bold text-slate-800 leading-relaxed focus:outline-none focus:border-blue-500 shadow-inner resize-none overflow-hidden"
                       />
                     </div>
 
-                    {/* RESULTADOS ESPERADOS */}
                     <div className="space-y-4 pt-4 border-t border-slate-100">
                       <div className="flex justify-between items-center">
                         <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Resultados Esperados</label>
@@ -648,7 +642,6 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                         )}
                       </div>
                     </div>
-
                   </div>
                 ))
               )}
@@ -690,13 +683,13 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                     <tbody className="divide-y divide-slate-100 text-xs">
                       {unit.rubrics.map((row) => (
                         <tr key={row.id} className="hover:bg-slate-50/50 transition-colors">
-                          {/* Referência */}
                           <td className="p-4 border-r border-slate-100 align-top space-y-2">
                             <textarea
                               rows={3}
                               value={row.reference}
                               onChange={(e) => handleUpdateRubricCell(row.id, 'reference', e.target.value)}
-                              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs font-bold text-slate-800 focus:outline-none focus:border-blue-500"
+                              onInput={handleTextareaInput}
+                              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs font-bold text-slate-800 focus:outline-none focus:border-blue-500 resize-none overflow-hidden"
                             />
                             <button
                               type="button"
@@ -706,44 +699,40 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                               Excluir Linha
                             </button>
                           </td>
-
-                          {/* NSA */}
                           <td className="p-4 border-r border-slate-100 align-top">
                             <textarea
                               rows={4}
                               value={row.nsa}
                               onChange={(e) => handleUpdateRubricCell(row.id, 'nsa', e.target.value)}
-                              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs font-bold text-slate-800 focus:outline-none focus:border-blue-500"
+                              onInput={handleTextareaInput}
+                              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs font-bold text-slate-800 focus:outline-none focus:border-blue-500 resize-none overflow-hidden"
                             />
                           </td>
-
-                          {/* APO */}
                           <td className="p-4 border-r border-slate-100 align-top">
                             <textarea
                               rows={4}
                               value={row.apo}
                               onChange={(e) => handleUpdateRubricCell(row.id, 'apo', e.target.value)}
-                              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs font-bold text-slate-800 focus:outline-none focus:border-blue-500"
+                              onInput={handleTextareaInput}
+                              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs font-bold text-slate-800 focus:outline-none focus:border-blue-500 resize-none overflow-hidden"
                             />
                           </td>
-
-                          {/* PAR */}
                           <td className="p-4 border-r border-slate-100 align-top">
                             <textarea
                               rows={4}
                               value={row.par}
                               onChange={(e) => handleUpdateRubricCell(row.id, 'par', e.target.value)}
-                              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs font-bold text-slate-800 focus:outline-none focus:border-blue-500"
+                              onInput={handleTextareaInput}
+                              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs font-bold text-slate-800 focus:outline-none focus:border-blue-500 resize-none overflow-hidden"
                             />
                           </td>
-
-                          {/* AUT */}
                           <td className="p-4 align-top">
                             <textarea
                               rows={4}
                               value={row.aut}
                               onChange={(e) => handleUpdateRubricCell(row.id, 'aut', e.target.value)}
-                              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs font-bold text-slate-800 focus:outline-none focus:border-blue-500"
+                              onInput={handleTextareaInput}
+                              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs font-bold text-slate-800 focus:outline-none focus:border-blue-500 resize-none overflow-hidden"
                             />
                           </td>
                         </tr>
@@ -794,7 +783,7 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                         <th className="p-3 w-[24%] border-r border-slate-800 text-center">CONHECIMENTOS</th>
                         <th className="p-3 w-[16%] border-r border-slate-800 text-center">ESTRATÉGIAS</th>
                         <th className="p-3 border-r border-slate-800 text-center">RECURSOS/AMBIENTES</th>
-                        <th className="p-3 text-center w-16">STATUS</th>
+                        <th className="p-3 text-center w-24">STATUS</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-200 text-xs">
@@ -807,7 +796,7 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                             key={row.id} 
                             className={`transition-colors ${isCompleted ? 'bg-emerald-50/80 hover:bg-emerald-50' : 'bg-white hover:bg-slate-50'}`}
                           >
-                            {/* Horas/Aulas/Data Controladas (Input Numérico de Horas + Seletor de Data Nativo) */}
+                            {/* Horas/Aulas/Data com larguras de bordas ajustadas */}
                             <td className="p-2 border-r border-slate-200 align-top space-y-2">
                               <div className={`p-2 rounded-xl border space-y-2 ${isCompleted ? 'bg-emerald-100/60 border-emerald-300' : 'bg-slate-50 border-slate-200'}`}>
                                 <div>
@@ -818,7 +807,7 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                                     max="20"
                                     value={parsed.hours}
                                     onChange={(e) => handleUpdateHoursOrDate(row.id, row.hoursDate, e.target.value, parsed.date)}
-                                    className={`w-full p-1.5 text-xs font-bold focus:outline-none rounded-lg border text-center ${isCompleted ? 'bg-emerald-50 text-emerald-950 border-emerald-300' : 'bg-white text-slate-800 border-slate-300'}`}
+                                    className={`w-full p-2 text-xs font-bold focus:outline-none rounded-xl border text-center ${isCompleted ? 'bg-emerald-50 text-emerald-950 border-emerald-300' : 'bg-white text-slate-800 border-slate-200'}`}
                                   />
                                 </div>
                                 <div>
@@ -827,77 +816,79 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                                     type="date"
                                     value={parsed.date}
                                     onChange={(e) => handleUpdateHoursOrDate(row.id, row.hoursDate, parsed.hours, e.target.value)}
-                                    className={`w-full p-1.5 text-xs font-bold focus:outline-none rounded-lg border text-center ${isCompleted ? 'bg-emerald-50 text-emerald-950 border-emerald-300' : 'bg-white text-slate-800 border-slate-300'}`}
+                                    className={`w-full p-2 text-xs font-bold focus:outline-none rounded-xl border text-center ${isCompleted ? 'bg-emerald-50 text-emerald-950 border-emerald-300' : 'bg-white text-slate-800 border-slate-200'}`}
                                   />
                                 </div>
                               </div>
-                              <div>
-                                <button
-                                  type="button"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleDeleteLessonPlanRow(row.id);
-                                  }}
-                                  className="w-full bg-red-50 hover:bg-red-600 text-red-600 hover:text-white py-1 rounded-lg text-[9px] font-black uppercase transition-all cursor-pointer"
-                                >
-                                  Excluir
-                                </button>
-                              </div>
                             </td>
 
-                            {/* Capacidades */}
+                            {/* Capacidades com auto-crescimento (sem scrollbar) */}
                             <td className="p-2 border-r border-slate-200 align-top">
                               <textarea
-                                rows={5}
+                                rows={3}
                                 value={row.capacities}
                                 onChange={(e) => handleUpdateLessonPlanCell(row.id, 'capacities', e.target.value)}
-                                className={`w-full p-2 text-xs font-bold focus:outline-none resize-none rounded-xl border ${isCompleted ? 'bg-emerald-100/40 text-emerald-950 border-emerald-300' : 'bg-slate-50 text-slate-800 border-slate-200'}`}
+                                onInput={handleTextareaInput}
+                                className={`w-full p-2.5 text-xs font-bold focus:outline-none resize-none overflow-hidden rounded-xl border ${isCompleted ? 'bg-emerald-100/40 text-emerald-950 border-emerald-300' : 'bg-slate-50 text-slate-800 border-slate-200'}`}
                               />
                             </td>
 
-                            {/* Conhecimentos */}
+                            {/* Conhecimentos com auto-crescimento (sem scrollbar) */}
                             <td className="p-2 border-r border-slate-200 align-top">
                               <textarea
-                                rows={5}
+                                rows={3}
                                 value={row.knowledges}
                                 onChange={(e) => handleUpdateLessonPlanCell(row.id, 'knowledges', e.target.value)}
-                                className={`w-full p-2 text-xs font-bold focus:outline-none resize-none rounded-xl border ${isCompleted ? 'bg-emerald-100/40 text-emerald-950 border-emerald-300' : 'bg-slate-50 text-slate-800 border-slate-200'}`}
+                                onInput={handleTextareaInput}
+                                className={`w-full p-2.5 text-xs font-bold focus:outline-none resize-none overflow-hidden rounded-xl border ${isCompleted ? 'bg-emerald-100/40 text-emerald-950 border-emerald-300' : 'bg-slate-50 text-slate-800 border-slate-200'}`}
                               />
                             </td>
 
-                            {/* Estratégias */}
+                            {/* Estratégias com auto-crescimento (sem scrollbar) */}
                             <td className="p-2 border-r border-slate-200 align-top">
                               <textarea
-                                rows={5}
+                                rows={3}
                                 value={row.strategies}
                                 onChange={(e) => handleUpdateLessonPlanCell(row.id, 'strategies', e.target.value)}
-                                className={`w-full p-2 text-xs font-bold focus:outline-none resize-none rounded-xl border ${isCompleted ? 'bg-emerald-100/40 text-emerald-950 border-emerald-300' : 'bg-slate-50 text-slate-800 border-slate-200'}`}
+                                onInput={handleTextareaInput}
+                                className={`w-full p-2.5 text-xs font-bold focus:outline-none resize-none overflow-hidden rounded-xl border ${isCompleted ? 'bg-emerald-100/40 text-emerald-950 border-emerald-300' : 'bg-slate-50 text-slate-800 border-slate-200'}`}
                               />
                             </td>
 
-                            {/* Recursos/Ambientes */}
+                            {/* Recursos/Ambientes com auto-crescimento (sem scrollbar) */}
                             <td className="p-2 border-r border-slate-200 align-top">
                               <textarea
-                                rows={5}
+                                rows={3}
                                 value={row.resources}
                                 onChange={(e) => handleUpdateLessonPlanCell(row.id, 'resources', e.target.value)}
-                                className={`w-full p-2 text-xs font-bold focus:outline-none resize-none rounded-xl border ${isCompleted ? 'bg-emerald-100/40 text-emerald-950 border-emerald-300' : 'bg-slate-50 text-slate-800 border-slate-200'}`}
+                                onInput={handleTextareaInput}
+                                className={`w-full p-2.5 text-xs font-bold focus:outline-none resize-none overflow-hidden rounded-xl border ${isCompleted ? 'bg-emerald-100/40 text-emerald-950 border-emerald-300' : 'bg-slate-50 text-slate-800 border-slate-200'}`}
                               />
                             </td>
 
-                            {/* Status / OK */}
-                            <td className="p-2 align-middle text-center">
+                            {/* Status e Botão Excluir alinhados na mesma coluna */}
+                            <td className="p-2 align-middle text-center space-y-2">
                               <button
                                 type="button"
                                 onClick={() => handleUpdateLessonPlanCell(row.id, 'completed', !isCompleted)}
-                                className={`w-8 h-8 mx-auto rounded-xl flex items-center justify-center transition-all shadow-sm font-black text-[10px] uppercase cursor-pointer ${
+                                className={`w-full h-9 rounded-xl flex items-center justify-center transition-all shadow-sm font-black text-[10px] uppercase cursor-pointer ${
                                   isCompleted 
                                     ? 'bg-emerald-600 hover:bg-emerald-700 text-white' 
-                                    : 'bg-slate-200 hover:bg-slate-300 text-slate-700'
+                                    : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200'
                                 }`}
                                 title={isCompleted ? 'Aula marcada como dada (Concluída)' : 'Marcar como aula dada'}
                               >
-                                {isCompleted ? '✓' : 'OK'}
+                                {isCompleted ? '✓ CONCLUÍDO' : 'OK'}
+                              </button>
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleDeleteLessonPlanRow(row.id);
+                                }}
+                                className="w-full bg-red-50 hover:bg-red-600 text-red-600 hover:text-white py-1.5 rounded-xl text-[9px] font-black uppercase transition-all cursor-pointer border border-red-100 shadow-sm"
+                              >
+                                Excluir
                               </button>
                             </td>
                           </tr>
