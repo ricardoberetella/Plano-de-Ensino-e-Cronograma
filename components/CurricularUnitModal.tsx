@@ -48,7 +48,7 @@ export const CurricularUnitModal: React.FC<CurricularUnitModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-slate-900/90 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-[2.5rem] p-8 md:p-10 max-w-md w-full shadow-2xl border border-slate-200 space-y-6">
         <h3 className="text-xl font-[1000] text-slate-900 uppercase tracking-tight">
           {unit ? 'Editar Unidade Curricular' : 'Nova Unidade Curricular'}
@@ -57,7 +57,7 @@ export const CurricularUnitModal: React.FC<CurricularUnitModalProps> = ({
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-[10px] font-black uppercase text-slate-400 tracking-wider mb-1">
-              Sigla / Código (Ex: USIN-01)
+              Sigla / Código
             </label>
             <input
               type="text"
