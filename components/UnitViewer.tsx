@@ -33,10 +33,9 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
     setIsEditingHeader(false);
   };
 
-  // Funções de manipulação de Capacidades e Conhecimentos diretamente nas listas com botão de adicionar linha abaixo
-  const handleAddTechnicalCapacityBelow = (index: number) => {
-    const techs = [...(unit.technicalCapacities || [])];
-    techs.splice(index + 1, 0, '');
+  // Funções de manipulação de Capacidades e Conhecimentos
+  const handleAddTechnicalCapacity = () => {
+    const techs = [...(unit.technicalCapacities || []), ''];
     onUpdateUnit({ ...unit, technicalCapacities: techs });
   };
 
@@ -51,9 +50,8 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
     onUpdateUnit({ ...unit, technicalCapacities: updatedTechs });
   };
 
-  const handleAddSocialCapacityBelow = (index: number) => {
-    const socials = [...(unit.socialCapacities || [])];
-    socials.splice(index + 1, 0, '');
+  const handleAddSocialCapacity = () => {
+    const socials = [...(unit.socialCapacities || []), ''];
     onUpdateUnit({ ...unit, socialCapacities: socials });
   };
 
@@ -68,9 +66,8 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
     onUpdateUnit({ ...unit, socialCapacities: updatedSocials });
   };
 
-  const handleAddKnowledgeBelow = (index: number) => {
-    const knowledges = [...(unit.knowledges || [])];
-    knowledges.splice(index + 1, 0, '');
+  const handleAddKnowledge = () => {
+    const knowledges = [...(unit.knowledges || []), ''];
     onUpdateUnit({ ...unit, knowledges: knowledges });
   };
 
@@ -395,7 +392,7 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                 </h3>
               </div>
 
-              {/* TABELA COM 2 COLUNAS E OS 3 CABEÇALHOS SOLICITADOS */}
+              {/* TABELA COM 2 COLUNAS E OS 3 CABEÇALHOS COM BOTÕES DE ADICIONAR NAS BARRAS DOS TÓPICOS */}
               <div className="overflow-x-auto border border-slate-200 rounded-2xl shadow-sm bg-white">
                 <table className="w-full border-collapse text-left text-xs">
                   <thead>
@@ -412,21 +409,22 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                     
                     {/* SEÇÃO 1: CAPACIDADES TÉCNICAS */}
                     <tr className="bg-blue-50/50">
-                      <td colSpan={2} className="p-3 font-[1000] text-blue-950 uppercase text-[10px] tracking-widest border-t border-b border-slate-200">
-                        Capacidades Técnicas
+                      <td colSpan={2} className="p-3 font-[1000] text-blue-950 uppercase text-[10px] tracking-widest border-t border-b border-slate-200 flex justify-between items-center">
+                        <span>Capacidades Técnicas</span>
+                        <button
+                          type="button"
+                          onClick={handleAddTechnicalCapacity}
+                          title="Adicionar Capacidade Técnica"
+                          className="px-2.5 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-[10px] font-black uppercase shadow-sm transition-all"
+                        >
+                          + Adicionar
+                        </button>
                       </td>
                     </tr>
                     {(!unit.technicalCapacities || unit.technicalCapacities.length === 0) ? (
                       <tr>
                         <td className="p-4 text-slate-400 italic" colSpan={2}>
-                          Nenhuma capacidade técnica cadastrada.
-                          <button
-                            type="button"
-                            onClick={() => onUpdateUnit({ ...unit, technicalCapacities: [''] })}
-                            className="ml-3 px-3 py-1 bg-blue-600 text-white rounded-lg text-[9px] font-black uppercase"
-                          >
-                            + Adicionar Primeira
-                          </button>
+                          Nenhuma capacidade técnica cadastrada. Clique em "+ Adicionar" acima.
                         </td>
                       </tr>
                     ) : (
@@ -443,22 +441,12 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                               />
                               <button
                                 type="button"
-                                onClick={() => handleAddTechnicalCapacityBelow(index)}
-                                title="Adicionar linha abaixo"
-                                className="p-2 bg-slate-100 hover:bg-blue-600 hover:text-white text-slate-600 rounded-xl transition-colors text-xs font-black shrink-0"
+                                onClick={() => handleDeleteTechnicalCapacity(index)}
+                                title="Remover linha"
+                                className="p-2 bg-red-50 hover:bg-red-600 hover:text-white text-red-600 rounded-xl transition-colors text-[10px] font-black shrink-0 opacity-0 group-hover:opacity-100"
                               >
-                                +
+                                ✕
                               </button>
-                              {unit.technicalCapacities.length > 1 && (
-                                <button
-                                  type="button"
-                                  onClick={() => handleDeleteTechnicalCapacity(index)}
-                                  title="Remover linha"
-                                  className="p-2 bg-red-50 hover:bg-red-600 hover:text-white text-red-600 rounded-xl transition-colors text-[10px] font-black shrink-0 opacity-0 group-hover:opacity-100"
-                                >
-                                  ✕
-                                </button>
-                              )}
                             </div>
                           </td>
                           <td className="p-3 text-slate-300 italic text-xs align-middle bg-slate-50/30">
@@ -470,21 +458,22 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
 
                     {/* SEÇÃO 2: CAPACIDADES SOCIOEMOCIONAIS */}
                     <tr className="bg-emerald-50/50">
-                      <td colSpan={2} className="p-3 font-[1000] text-emerald-950 uppercase text-[10px] tracking-widest border-t border-b border-slate-200">
-                        Capacidades Socioemocionais
+                      <td colSpan={2} className="p-3 font-[1000] text-emerald-950 uppercase text-[10px] tracking-widest border-t border-b border-slate-200 flex justify-between items-center">
+                        <span>Capacidades Socioemocionais</span>
+                        <button
+                          type="button"
+                          onClick={handleAddSocialCapacity}
+                          title="Adicionar Capacidade Socioemocional"
+                          className="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-[10px] font-black uppercase shadow-sm transition-all"
+                        >
+                          + Adicionar
+                        </button>
                       </td>
                     </tr>
                     {(!unit.socialCapacities || unit.socialCapacities.length === 0) ? (
                       <tr>
                         <td className="p-4 text-slate-400 italic" colSpan={2}>
-                          Nenhuma capacidade socioemocional cadastrada.
-                          <button
-                            type="button"
-                            onClick={() => onUpdateUnit({ ...unit, socialCapacities: [''] })}
-                            className="ml-3 px-3 py-1 bg-emerald-600 text-white rounded-lg text-[9px] font-black uppercase"
-                          >
-                            + Adicionar Primeira
-                          </button>
+                          Nenhuma capacidade socioemocional cadastrada. Clique em "+ Adicionar" acima.
                         </td>
                       </tr>
                     ) : (
@@ -501,22 +490,12 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                               />
                               <button
                                 type="button"
-                                onClick={() => handleAddSocialCapacityBelow(index)}
-                                title="Adicionar linha abaixo"
-                                className="p-2 bg-slate-100 hover:bg-emerald-600 hover:text-white text-slate-600 rounded-xl transition-colors text-xs font-black shrink-0"
+                                onClick={() => handleDeleteSocialCapacity(index)}
+                                title="Remover linha"
+                                className="p-2 bg-red-50 hover:bg-red-600 hover:text-white text-red-600 rounded-xl transition-colors text-[10px] font-black shrink-0 opacity-0 group-hover:opacity-100"
                               >
-                                +
+                                ✕
                               </button>
-                              {unit.socialCapacities.length > 1 && (
-                                <button
-                                  type="button"
-                                  onClick={() => handleDeleteSocialCapacity(index)}
-                                  title="Remover linha"
-                                  className="p-2 bg-red-50 hover:bg-red-600 hover:text-white text-red-600 rounded-xl transition-colors text-[10px] font-black shrink-0 opacity-0 group-hover:opacity-100"
-                                >
-                                  ✕
-                                </button>
-                              )}
                             </div>
                           </td>
                           <td className="p-3 text-slate-300 italic text-xs align-middle bg-slate-50/30"></td>
@@ -524,32 +503,33 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                       ))
                     )}
 
-                    {/* SEÇÃO 3: CONHECIMENTOS (Na segunda coluna) */}
+                    {/* SEÇÃO 3: CONHECIMENTOS (Na segunda coluna e com botão na barra) */}
                     <tr className="bg-purple-50/50">
-                      <td colSpan={2} className="p-3 font-[1000] text-purple-950 uppercase text-[10px] tracking-widest border-t border-b border-slate-200">
-                        Conhecimentos
+                      <td colSpan={2} className="p-3 font-[1000] text-purple-950 uppercase text-[10px] tracking-widest border-t border-b border-slate-200 flex justify-between items-center">
+                        <span>Conhecimentos</span>
+                        <button
+                          type="button"
+                          onClick={handleAddKnowledge}
+                          title="Adicionar Conhecimento"
+                          className="px-2.5 py-1 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-[10px] font-black uppercase shadow-sm transition-all"
+                        >
+                          + Adicionar
+                        </button>
                       </td>
                     </tr>
                     {(!unit.knowledges || unit.knowledges.length === 0) ? (
                       <tr>
                         <td className="p-4 text-slate-400 italic" colSpan={2}>
-                          Nenhum conhecimento cadastrado.
-                          <button
-                            type="button"
-                            onClick={() => onUpdateUnit({ ...unit, knowledges: [''] })}
-                            className="ml-3 px-3 py-1 bg-purple-600 text-white rounded-lg text-[9px] font-black uppercase"
-                          >
-                            + Adicionar Primeiro
-                          </button>
+                          Nenhum conhecimento cadastrado. Clique em "+ Adicionar" acima.
                         </td>
                       </tr>
                     ) : (
                       unit.knowledges.map((item, index) => (
                         <tr key={index} className="hover:bg-slate-50/80 group">
-                          <td className="p-3 border-r border-slate-200 align-middle bg-slate-50/30">
+                          <td className="p-3 border-r border-slate-200 align-middle bg-slate-50/35">
                             {/* Lado esquerdo vazio para esta seção */}
                           </td>
-                          <td className="p-3 align-middle">
+                          <td className="p-3 align-middle bg-white">
                             <div className="flex items-center gap-2">
                               <input
                                 type="text"
@@ -560,22 +540,12 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                               />
                               <button
                                 type="button"
-                                onClick={() => handleAddKnowledgeBelow(index)}
-                                title="Adicionar linha abaixo"
-                                className="p-2 bg-slate-100 hover:bg-purple-600 hover:text-white text-slate-600 rounded-xl transition-colors text-xs font-black shrink-0"
+                                onClick={() => handleDeleteKnowledge(index)}
+                                title="Remover linha"
+                                className="p-2 bg-red-50 hover:bg-red-600 hover:text-white text-red-600 rounded-xl transition-colors text-[10px] font-black shrink-0 opacity-0 group-hover:opacity-100"
                               >
-                                +
+                                ✕
                               </button>
-                              {unit.knowledges.length > 1 && (
-                                <button
-                                  type="button"
-                                  onClick={() => handleDeleteKnowledge(index)}
-                                  title="Remover linha"
-                                  className="p-2 bg-red-50 hover:bg-red-600 hover:text-white text-red-600 rounded-xl transition-colors text-[10px] font-black shrink-0 opacity-0 group-hover:opacity-100"
-                                >
-                                  ✕
-                                </button>
-                              )}
                             </div>
                           </td>
                         </tr>
