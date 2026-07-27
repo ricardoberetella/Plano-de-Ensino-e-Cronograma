@@ -165,7 +165,7 @@ const CourseUnitsManager: React.FC<Props> = ({ units, onSaveUnits }) => {
                   <select
                     value={unit.semester || '1º'}
                     onChange={(e) => handleUpdateField(unit.id, 'semester', e.target.value)}
-                    className="bg-slate-100 border border-slate-200 rounded-xl px-3 py-2 text-[10px] font-black text-slate-700 uppercase"
+                    className="bg-slate-100 border border-slate-200 rounded-2xl px-4 py-2.5 text-[10px] font-black text-slate-700 uppercase focus:outline-none focus:border-blue-500"
                   >
                     <option value="1º">1º Semestre</option>
                     <option value="2º">2º Semestre</option>
@@ -174,9 +174,9 @@ const CourseUnitsManager: React.FC<Props> = ({ units, onSaveUnits }) => {
                   <button
                     type="button"
                     onClick={() => handleRemoveUnit(unit.id)}
-                    className="text-slate-400 hover:text-red-600 text-xs font-black p-2 transition-all"
+                    className="bg-red-50 text-red-600 hover:bg-red-600 hover:text-white px-4 py-2.5 rounded-2xl text-[10px] font-black uppercase transition-all shadow-sm"
                   >
-                    Excluir ✕
+                    Excluir
                   </button>
                 </div>
               </div>
