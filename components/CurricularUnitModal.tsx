@@ -20,16 +20,18 @@ export const CurricularUnitModal: React.FC<CurricularUnitModalProps> = ({
   const [semester, setSemester] = useState<SemesterNumber>(1);
 
   useEffect(() => {
-    if (unit) {
-      setCode(unit.code || '');
-      setName(unit.name || '');
-      setTotalHours(unit.totalHours || 40);
-      setSemester(unit.semester || 1);
-    } else {
-      setCode('');
-      setName('');
-      setTotalHours(40);
-      setSemester(1);
+    if (isOpen) {
+      if (unit) {
+        setCode(unit.code || '');
+        setName(unit.name || '');
+        setTotalHours(unit.totalHours || 40);
+        setSemester(unit.semester || 1);
+      } else {
+        setCode('');
+        setName('');
+        setTotalHours(40);
+        setSemester(1);
+      }
     }
   }, [unit, isOpen]);
 
@@ -47,7 +49,7 @@ export const CurricularUnitModal: React.FC<CurricularUnitModalProps> = ({
 
   return (
     <div className="fixed inset-0 bg-slate-900/90 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-[2.5rem] p-8 md:p-10 max-w-md w-full shadow-2xl border border-slate-200 space-y-6 animate-fadeIn">
+      <div className="bg-white rounded-[2.5rem] p-8 md:p-10 max-w-md w-full shadow-2xl border border-slate-200 space-y-6">
         <h3 className="text-xl font-[1000] text-slate-900 uppercase tracking-tight">
           {unit ? 'Editar Unidade Curricular' : 'Nova Unidade Curricular'}
         </h3>
