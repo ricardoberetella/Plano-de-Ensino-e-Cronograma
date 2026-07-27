@@ -210,9 +210,9 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
   };
 
   return (
-    <div className="space-y-6 w-full max-w-[98%] mx-auto pb-20 animate-fadeIn">
+    <div className="space-y-6 w-full max-w-[99%] mx-auto pb-20 animate-fadeIn">
       {/* Barra de Navegação Superior */}
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center px-2">
         <button
           onClick={onBack}
           className="text-xs font-black uppercase text-slate-500 hover:text-slate-900 transition-all flex items-center gap-1 bg-white px-4 py-2 rounded-xl border border-slate-200 shadow-sm"
@@ -399,8 +399,9 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                           className="flex-1 bg-transparent text-xs font-bold text-slate-800 focus:outline-none border-b border-transparent focus:border-blue-500"
                         />
                         <button
+                          type="button"
                           onClick={() => handleDeleteTechnicalCapacity(index)}
-                          className="text-slate-400 hover:text-red-600 text-[10px] font-black uppercase px-2 py-1 transition-colors"
+                          className="text-slate-400 hover:text-red-600 text-[10px] font-black uppercase px-2 py-1 transition-colors cursor-pointer"
                         >
                           Excluir ✕
                         </button>
@@ -441,8 +442,9 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                           className="flex-1 bg-transparent text-xs font-bold text-slate-800 focus:outline-none border-b border-transparent focus:border-blue-500"
                         />
                         <button
+                          type="button"
                           onClick={() => handleDeleteSocialCapacity(index)}
-                          className="text-slate-400 hover:text-red-600 text-[10px] font-black uppercase px-2 py-1 transition-colors"
+                          className="text-slate-400 hover:text-red-600 text-[10px] font-black uppercase px-2 py-1 transition-colors cursor-pointer"
                         >
                           Excluir ✕
                         </button>
@@ -493,8 +495,9 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                           className="flex-1 bg-transparent text-xs font-bold text-slate-800 focus:outline-none border-b border-transparent focus:border-blue-500"
                         />
                         <button
+                          type="button"
                           onClick={() => handleDeleteKnowledge(index)}
-                          className="text-slate-400 hover:text-red-600 text-[10px] font-black uppercase px-2 py-1 transition-colors"
+                          className="text-slate-400 hover:text-red-600 text-[10px] font-black uppercase px-2 py-1 transition-colors cursor-pointer"
                         >
                           Excluir ✕
                         </button>
@@ -513,8 +516,9 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
               <div className="flex justify-between items-center border-b border-slate-100 pb-4">
                 <h3 className="text-lg font-[1000] uppercase italic text-slate-900 tracking-wider">Situações-Problema</h3>
                 <button
+                  type="button"
                   onClick={handleAddSituation}
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-md transition-all"
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-md transition-all cursor-pointer"
                 >
                   + Adicionar Situação
                 </button>
@@ -537,8 +541,9 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                         className="w-full md:w-3/4 bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs font-[1000] text-slate-900 uppercase focus:outline-none focus:border-blue-500 shadow-sm"
                       />
                       <button
+                        type="button"
                         onClick={() => handleDeleteSituation(sit.id)}
-                        className="bg-red-50 text-red-600 hover:bg-red-600 hover:text-white px-4 py-2.5 rounded-xl text-[10px] font-black uppercase transition-all shadow-sm"
+                        className="bg-red-50 text-red-600 hover:bg-red-600 hover:text-white px-4 py-2.5 rounded-xl text-[10px] font-black uppercase transition-all shadow-sm cursor-pointer"
                       >
                         Excluir Situação
                       </button>
@@ -571,8 +576,9 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                       <div className="flex justify-between items-center">
                         <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Resultados Esperados</label>
                         <button
+                          type="button"
                           onClick={() => handleAddExpectedResult(sit.id)}
-                          className="bg-slate-900 hover:bg-slate-800 text-white px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-wider transition-all"
+                          className="bg-slate-900 hover:bg-slate-800 text-white px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-wider transition-all cursor-pointer"
                         >
                           + Adicionar Resultado
                         </button>
@@ -591,8 +597,9 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                                 className="flex-1 bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 focus:outline-none focus:border-blue-500"
                               />
                               <button
+                                type="button"
                                 onClick={() => handleDeleteExpectedResult(sit.id, rIndex)}
-                                className="bg-red-50 text-red-600 hover:bg-red-600 hover:text-white px-3 py-2 rounded-xl text-[10px] font-black uppercase transition-all"
+                                className="bg-red-50 text-red-600 hover:bg-red-600 hover:text-white px-3 py-2 rounded-xl text-[10px] font-black uppercase transition-all cursor-pointer"
                               >
                                 Remover
                               </button>
@@ -616,8 +623,9 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                   <p className="text-[10px] font-bold uppercase text-slate-400 mt-1">Critérios de Avaliação por Nível de Desempenho</p>
                 </div>
                 <button
+                  type="button"
                   onClick={handleAddRubricRow}
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-md transition-all"
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-md transition-all cursor-pointer"
                 >
                   + Adicionar Rubrica
                 </button>
@@ -651,8 +659,9 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                               className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs font-bold text-slate-800 focus:outline-none focus:border-blue-500"
                             />
                             <button
+                              type="button"
                               onClick={() => handleDeleteRubricRow(row.id)}
-                              className="w-full bg-red-50 hover:bg-red-600 text-red-600 hover:text-white py-1 rounded-lg text-[9px] font-black uppercase transition-all"
+                              className="w-full bg-red-50 hover:bg-red-600 text-red-600 hover:text-white py-1 rounded-lg text-[9px] font-black uppercase transition-all cursor-pointer"
                             >
                               Excluir Linha
                             </button>
@@ -714,8 +723,9 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                   <p className="text-[10px] font-bold uppercase text-slate-400 mt-1">Organização diária das aulas e distribuição de carga horária</p>
                 </div>
                 <button
+                  type="button"
                   onClick={handleAddLessonPlanRow}
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-md transition-all"
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-md transition-all cursor-pointer"
                 >
                   + Adicionar Aula / Data
                 </button>
@@ -726,19 +736,19 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                   Nenhum registro de aula cadastrado. Clique em "+ Adicionar Aula / Data" para iniciar.
                 </div>
               ) : (
-                <div className="overflow-x-auto shadow-md bg-white">
-                  <table className="w-full text-left border-collapse border border-slate-300">
+                <div className="overflow-x-auto shadow-md bg-white rounded-2xl border border-slate-200">
+                  <table className="w-full text-left border-collapse">
                     <thead>
                       <tr className="bg-slate-900 text-[10px] font-black uppercase tracking-wider text-white">
-                        <th className="p-3 w-1/6 border border-slate-700 text-center">HORAS/AULAS/DATA</th>
-                        <th className="p-3 w-1/4 border border-slate-700 text-center">CAPACIDADES</th>
-                        <th className="p-3 w-1/4 border border-slate-700 text-center">CONHECIMENTOS</th>
-                        <th className="p-3 w-1/5 border border-slate-700 text-center">ESTRATÉGIAS</th>
-                        <th className="p-3 border border-slate-700 text-center">RECURSOS/AMBIENTES</th>
-                        <th className="p-3 text-center border border-slate-700 w-16">STATUS</th>
+                        <th className="p-3 w-[16%] border-r border-slate-800 text-center">HORAS/AULAS/DATA</th>
+                        <th className="p-3 w-[24%] border-r border-slate-800 text-center">CAPACIDADES</th>
+                        <th className="p-3 w-[24%] border-r border-slate-800 text-center">CONHECIMENTOS</th>
+                        <th className="p-3 w-[18%] border-r border-slate-800 text-center">ESTRATÉGIAS</th>
+                        <th className="p-3 border-r border-slate-800 text-center">RECURSOS/AMBIENTES</th>
+                        <th className="p-3 text-center w-16">STATUS</th>
                       </tr>
                     </thead>
-                    <tbody className="text-xs">
+                    <tbody className="divide-y divide-slate-200 text-xs">
                       {unit.lessonPlan.map((row) => {
                         const isCompleted = row.completed;
                         return (
@@ -747,22 +757,22 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                             className={`transition-colors ${isCompleted ? 'bg-emerald-50/80 hover:bg-emerald-50' : 'bg-white hover:bg-slate-50'}`}
                           >
                             {/* Horas/Aulas/Data */}
-                            <td className="p-0 border border-slate-300 align-top">
+                            <td className="p-2 border-r border-slate-200 align-top">
                               <textarea
                                 rows={3}
                                 value={row.hoursDate}
                                 onChange={(e) => handleUpdateLessonPlanCell(row.id, 'hoursDate', e.target.value)}
-                                className={`w-full h-full p-2.5 text-xs font-bold focus:outline-none resize-none border-0 rounded-none ${isCompleted ? 'bg-emerald-100/60 text-emerald-900' : 'bg-transparent text-slate-800'}`}
+                                className={`w-full p-2 text-xs font-bold focus:outline-none resize-none rounded-xl border ${isCompleted ? 'bg-emerald-100/60 text-emerald-900 border-emerald-300' : 'bg-slate-50 text-slate-800 border-slate-200'}`}
                                 placeholder="Ex: 4 horas - 13/03/2026"
                               />
-                              <div className="p-1 bg-slate-50 border-t border-slate-200">
+                              <div className="mt-1">
                                 <button
                                   type="button"
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     handleDeleteLessonPlanRow(row.id);
                                   }}
-                                  className="w-full bg-red-50 hover:bg-red-600 text-red-600 hover:text-white py-0.5 rounded text-[8px] font-black uppercase transition-all cursor-pointer"
+                                  className="w-full bg-red-50 hover:bg-red-600 text-red-600 hover:text-white py-1 rounded-lg text-[9px] font-black uppercase transition-all cursor-pointer"
                                 >
                                   Excluir
                                 </button>
@@ -770,54 +780,54 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                             </td>
 
                             {/* Capacidades */}
-                            <td className="p-0 border border-slate-300 align-top">
+                            <td className="p-2 border-r border-slate-200 align-top">
                               <textarea
                                 rows={4}
                                 value={row.capacities}
                                 onChange={(e) => handleUpdateLessonPlanCell(row.id, 'capacities', e.target.value)}
-                                className={`w-full h-full p-2.5 text-xs font-bold focus:outline-none resize-none border-0 rounded-none ${isCompleted ? 'bg-emerald-100/40 text-emerald-950' : 'bg-transparent text-slate-800'}`}
+                                className={`w-full p-2 text-xs font-bold focus:outline-none resize-none rounded-xl border ${isCompleted ? 'bg-emerald-100/40 text-emerald-950 border-emerald-300' : 'bg-slate-50 text-slate-800 border-slate-200'}`}
                               />
                             </td>
 
                             {/* Conhecimentos */}
-                            <td className="p-0 border border-slate-300 align-top">
+                            <td className="p-2 border-r border-slate-200 align-top">
                               <textarea
                                 rows={4}
                                 value={row.knowledges}
                                 onChange={(e) => handleUpdateLessonPlanCell(row.id, 'knowledges', e.target.value)}
-                                className={`w-full h-full p-2.5 text-xs font-bold focus:outline-none resize-none border-0 rounded-none ${isCompleted ? 'bg-emerald-100/40 text-emerald-950' : 'bg-transparent text-slate-800'}`}
+                                className={`w-full p-2 text-xs font-bold focus:outline-none resize-none rounded-xl border ${isCompleted ? 'bg-emerald-100/40 text-emerald-950 border-emerald-300' : 'bg-slate-50 text-slate-800 border-slate-200'}`}
                               />
                             </td>
 
                             {/* Estratégias */}
-                            <td className="p-0 border border-slate-300 align-top">
+                            <td className="p-2 border-r border-slate-200 align-top">
                               <textarea
                                 rows={4}
                                 value={row.strategies}
                                 onChange={(e) => handleUpdateLessonPlanCell(row.id, 'strategies', e.target.value)}
-                                className={`w-full h-full p-2.5 text-xs font-bold focus:outline-none resize-none border-0 rounded-none ${isCompleted ? 'bg-emerald-100/40 text-emerald-950' : 'bg-transparent text-slate-800'}`}
+                                className={`w-full p-2 text-xs font-bold focus:outline-none resize-none rounded-xl border ${isCompleted ? 'bg-emerald-100/40 text-emerald-950 border-emerald-300' : 'bg-slate-50 text-slate-800 border-slate-200'}`}
                               />
                             </td>
 
                             {/* Recursos/Ambientes */}
-                            <td className="p-0 border border-slate-300 align-top">
+                            <td className="p-2 border-r border-slate-200 align-top">
                               <textarea
                                 rows={4}
                                 value={row.resources}
                                 onChange={(e) => handleUpdateLessonPlanCell(row.id, 'resources', e.target.value)}
-                                className={`w-full h-full p-2.5 text-xs font-bold focus:outline-none resize-none border-0 rounded-none ${isCompleted ? 'bg-emerald-100/40 text-emerald-950' : 'bg-transparent text-slate-800'}`}
+                                className={`w-full p-2 text-xs font-bold focus:outline-none resize-none rounded-xl border ${isCompleted ? 'bg-emerald-100/40 text-emerald-950 border-emerald-300' : 'bg-slate-50 text-slate-800 border-slate-200'}`}
                               />
                             </td>
 
-                            {/* Status / OK (Compacto e Centralizado) */}
-                            <td className="p-1 border border-slate-300 align-middle text-center">
+                            {/* Status / OK (Centralizado na vertical e horizontal) */}
+                            <td className="p-2 align-middle text-center">
                               <button
                                 type="button"
                                 onClick={() => handleUpdateLessonPlanCell(row.id, 'completed', !isCompleted)}
-                                className={`w-6 h-6 mx-auto rounded flex items-center justify-center transition-all shadow-sm font-black text-[9px] uppercase cursor-pointer ${
+                                className={`w-8 h-8 mx-auto rounded-xl flex items-center justify-center transition-all shadow-sm font-black text-[10px] uppercase cursor-pointer ${
                                   isCompleted 
                                     ? 'bg-emerald-600 hover:bg-emerald-700 text-white' 
-                                    : 'bg-slate-200 hover:bg-slate-300 text-slate-600'
+                                    : 'bg-slate-200 hover:bg-slate-300 text-slate-700'
                                 }`}
                                 title={isCompleted ? 'Aula marcada como dada (Concluída)' : 'Marcar como aula dada'}
                               >
@@ -834,59 +844,142 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
             </div>
           )}
 
-          {activeTab === 'calendario' && (
-            <div className="space-y-6 animate-fadeIn">
-              <div className="border-b border-slate-100 pb-4">
-                <h3 className="text-lg font-[1000] uppercase italic text-slate-900 tracking-wider">Calendário Geral e Sincronização</h3>
-                <p className="text-[10px] font-bold uppercase text-slate-400 mt-1">Visualização das datas preenchidas no plano de aula integradas por cor de unidade curricular</p>
-              </div>
+          {activeTab === 'calendario' && (() => {
+            // Parser auxiliar para extrair datas do formato "4 horas - DD/MM/YYYY" ou similar do plano de aula
+            const parsedEvents: { day: number; month: number; year: number; hours: string; completed: boolean }[] = [];
+            
+            if (unit.lessonPlan) {
+              unit.lessonPlan.forEach(row => {
+                const text = row.hoursDate || '';
+                // Procura por padrão DD/MM/AAAA ou DD/MM/YY
+                const match = text.match(/(\d{2})\/(\d{2})\/(\d{2,4})/);
+                if (match) {
+                  const day = parseInt(match[1], 10);
+                  const month = parseInt(match[2], 10);
+                  let year = parseInt(match[3], 10);
+                  if (year < 100) year += 2000;
 
-              <div className="bg-slate-50 p-6 rounded-[2rem] border border-slate-200 space-y-4">
-                <div className="flex items-center gap-3">
-                  <span className="w-4 h-4 rounded-full bg-blue-600 inline-block shadow-sm"></span>
-                  <span className="text-xs font-black uppercase text-slate-800">{unit.code || unit.id || 'UC'} — {unit.name}</span>
+                  // Extrai o rótulo de horas (ex: "4h", "4 horas", etc.) se houver antes do hífen
+                  const parts = text.split('-');
+                  const hoursLabel = parts.length > 1 ? parts[0].trim().replace(/h.*$/, 'h') : '2h';
+
+                  parsedEvents.push({
+                    day,
+                    month,
+                    year,
+                    hours: hoursLabel,
+                    completed: !!row.completed
+                  });
+                }
+              });
+            }
+
+            // Meses a exibir: Janeiro, Fevereiro, Março de 2026 (ou dinâmico conforme os dados)
+            const monthsToDisplay = [
+              { name: 'JANEIRO 2026', monthNum: 1, year: 2026 },
+              { name: 'FEVEREIRO 2026', monthNum: 2, year: 2026 },
+              { name: 'MARÇO 2026', monthNum: 3, year: 2026 }
+            ];
+
+            const getDaysInMonth = (month: number, year: number) => {
+              return new Date(year, month, 0).getDate();
+            };
+
+            const getFirstDayOfWeek = (month: number, year: number) => {
+              return new Date(year, month - 1, 1).getDay(); // 0 = Domingo, 1 = Segunda...
+            };
+
+            const weekDays = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
+
+            return (
+              <div className="space-y-6 animate-fadeIn">
+                {/* Cabeçalho centralizado na parte preta superior */}
+                <div className="bg-slate-900 rounded-[2.5rem] p-8 text-white shadow-xl relative overflow-hidden flex flex-col md:flex-row justify-between items-center gap-4">
+                  <div className="space-y-2 text-center md:text-left w-full">
+                    <h3 className="text-2xl md:text-3xl font-[1000] uppercase italic tracking-wider text-white">
+                      CALENDÁRIO DA UNIDADE
+                    </h3>
+                    <p className="text-[10px] font-bold uppercase text-slate-400 tracking-widest">
+                      PREENCHIDO AUTOMATICAMENTE PELAS DATAS DO PLANO DE AULA
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2 bg-slate-800 px-4 py-2 rounded-xl border border-slate-700 shrink-0">
+                    <span className="w-3 h-3 rounded-full bg-blue-500 inline-block animate-pulse"></span>
+                    <span className="text-xs font-black uppercase text-white tracking-wider">{unit.code || unit.id || 'LIDT'}</span>
+                  </div>
                 </div>
-                <p className="text-xs text-slate-600 font-medium leading-relaxed">
-                  As datas informadas na aba <strong>Plano de Aula</strong> são mapeadas automaticamente para o calendário geral da turma, destacando cada unidade curricular com sua respectiva cor institucional.
-                </p>
 
-                <div className="pt-4 border-t border-slate-200/60">
-                  <h4 className="text-[10px] font-black uppercase text-slate-400 tracking-wider mb-3">Datas Registradas no Cronograma desta UC:</h4>
-                  {(!unit.lessonPlan || unit.lessonPlan.length === 0) ? (
-                    <p className="text-xs text-slate-400 italic">Nenhuma data cadastrada no plano de aula ainda.</p>
-                  ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                      {unit.lessonPlan.map((row) => (
-                        <div 
-                          key={row.id} 
-                          className={`p-4 rounded-2xl border shadow-sm flex items-center justify-between transition-all ${
-                            row.completed 
-                              ? 'bg-emerald-50 border-emerald-200 shadow-emerald-50' 
-                              : 'bg-white border-slate-200'
-                          }`}
-                        >
-                          <div className="space-y-1">
-                            <div className="flex items-center gap-2">
-                              <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-md inline-block ${row.completed ? 'bg-emerald-200 text-emerald-900' : 'bg-blue-50 text-blue-600'}`}>
-                                {row.hoursDate.split('-')[0] || 'Aula'}
-                              </span>
-                              {row.completed && (
-                                <span className="text-[9px] font-black uppercase text-emerald-600 bg-emerald-100 px-1.5 py-0.5 rounded">
-                                  ✓ Dada
-                                </span>
-                              )}
-                            </div>
-                            <p className="text-xs font-bold text-slate-800">{row.hoursDate.split('-')[1] || row.hoursDate}</p>
-                          </div>
-                          <span className={`w-3 h-3 rounded-full inline-block ${row.completed ? 'bg-emerald-600' : 'bg-blue-600 animate-pulse'}`}></span>
+                {/* Grade de meses expandida em largura máxima */}
+                <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 pt-2">
+                  {monthsToDisplay.map((mObj, idx) => {
+                    const totalDays = getDaysInMonth(mObj.monthNum, mObj.year);
+                    const startDay = getFirstDayOfWeek(mObj.monthNum, mObj.year);
+                    
+                    // Montar array de células do mês
+                    const cells = [];
+                    for (let i = 0; i < startDay; i++) {
+                      cells.push(null); // dias vazios do mês anterior
+                    }
+                    for (let d = 1; d <= totalDays; d++) {
+                      cells.push(d);
+                    }
+
+                    return (
+                      <div key={idx} className="bg-white rounded-[2rem] border border-slate-200 shadow-xl overflow-hidden flex flex-col">
+                        {/* Título do Mês */}
+                        <div className="bg-slate-900 text-white text-center py-3.5 text-xs font-[1000] uppercase tracking-[0.2em] border-b border-slate-800">
+                          {mObj.name}
                         </div>
-                      ))}
-                    </div>
-                  )}
+
+                        {/* Dias da Semana */}
+                        <div className="grid grid-cols-7 bg-slate-50 border-b border-slate-200 text-center py-2 text-[10px] font-black text-slate-500">
+                          {weekDays.map((wd, wIndex) => (
+                            <span key={wIndex} className={wIndex === 0 ? 'text-red-500' : ''}>{wd}</span>
+                          ))}
+                        </div>
+
+                        {/* Dias do Mês */}
+                        <div className="grid grid-cols-7 p-3 gap-1.5 flex-1 bg-white">
+                          {cells.map((dayNum, cIdx) => {
+                            if (dayNum === null) {
+                              return <div key={cIdx} className="h-12 md:h-14"></div>;
+                            }
+
+                            // Verificar se há aula agendada neste dia
+                            const event = parsedEvents.find(
+                              ev => ev.day === dayNum && ev.month === mObj.monthNum && ev.year === mObj.year
+                            );
+
+                            const isSunday = cIdx % 7 === 0;
+
+                            return (
+                              <div
+                                key={cIdx}
+                                className={`h-12 md:h-14 rounded-2xl flex flex-col items-center justify-center p-1 border transition-all ${
+                                  event 
+                                    ? (event.completed ? 'bg-emerald-600 text-white border-emerald-700 shadow-md font-black' : 'bg-blue-600 text-white border-blue-700 shadow-md font-black')
+                                    : (isSunday ? 'text-red-500 bg-slate-50/50 border-transparent font-bold text-xs' : 'text-slate-700 bg-slate-50/80 hover:bg-slate-100 border-slate-100 font-bold text-xs')
+                                }`}
+                              >
+                                <span className={`text-xs ${event ? 'text-white font-[1000]' : ''}`}>
+                                  {dayNum < 10 ? `0${dayNum}` : dayNum}
+                                </span>
+                                {event && (
+                                  <span className="text-[9px] font-black uppercase tracking-tighter opacity-90 leading-none mt-0.5">
+                                    {event.hours}
+                                  </span>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
-            </div>
-          )}
+            );
+          })()}
         </div>
       </div>
     </div>
