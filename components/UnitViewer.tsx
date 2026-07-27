@@ -20,6 +20,11 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
   const [semester, setSemester] = useState<SemesterNumber>(unit.semester || 1);
   const [totalHours, setTotalHours] = useState(unit.totalHours || unit.workload || 80);
 
+  // Estados para inserção rápida nas colunas
+  const [newTechCap, setNewTechCap] = useState('');
+  const [newSocialCap, setNewSocialCap] = useState('');
+  const [newKnowledge, setNewKnowledge] = useState('');
+
   const handleSaveHeader = () => {
     onUpdateUnit({
       ...unit,
@@ -31,6 +36,64 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
       workload: totalHours
     });
     setIsEditingHeader(false);
+  };
+
+  // Funções de manipulação de Capacidades e Conhecimentos
+  const handleAddTechnicalCapacity = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newTechCap.trim()) return;
+    const updatedTechs = [...(unit.technicalCapacities || []), newTechCap.trim()];
+    onUpdateUnit({ ...unit, technicalCapacities: updatedTechs });
+    setNewTechCap('');
+  };
+
+  const handleDeleteTechnicalCapacity = (index: number) => {
+    const updatedTechs = (unit.technicalCapacities || []).filter((_, i) => i !== index);
+    onUpdateUnit({ ...unit, technicalCapacities: updatedTechs });
+  };
+
+  const handleUpdateTechnicalCapacity = (index: number, value: string) => {
+    const updatedTechs = [...(unit.technicalCapacities || [])];
+    updatedTechs[index] = value;
+    onUpdateUnit({ ...unit, technicalCapacities: updatedTechs });
+  };
+
+  const handleAddSocialCapacity = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newSocialCap.trim()) return;
+    const updatedSocials = [...(unit.socialCapacities || []), newSocialCap.trim()];
+    onUpdateUnit({ ...unit, socialCapacities: updatedSocials });
+    setNewSocialCap('');
+  };
+
+  const handleDeleteSocialCapacity = (index: number) => {
+    const updatedSocials = (unit.socialCapacities || []).filter((_, i) => i !== index);
+    onUpdateUnit({ ...unit, socialCapacities: updatedSocials });
+  };
+
+  const handleUpdateSocialCapacity = (index: number, value: string) => {
+    const updatedSocials = [...(unit.socialCapacities || [])];
+    updatedSocials[index] = value;
+    onUpdateUnit({ ...unit, socialCapacities: updatedSocials });
+  };
+
+  const handleAddKnowledge = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newKnowledge.trim()) return;
+    const updatedKnowledges = [...(unit.knowledges || []), newKnowledge.trim()];
+    onUpdateUnit({ ...unit, knowledges: updatedKnowledges });
+    setNewKnowledge('');
+  };
+
+  const handleDeleteKnowledge = (index: number) => {
+    const updatedKnowledges = (unit.knowledges || []).filter((_, i) => i !== index);
+    onUpdateUnit({ ...unit, knowledges: updatedKnowledges });
+  };
+
+  const handleUpdateKnowledge = (index: number, value: string) => {
+    const updatedKnowledges = [...(unit.knowledges || [])];
+    updatedKnowledges[index] = value;
+    onUpdateUnit({ ...unit, knowledges: updatedKnowledges });
   };
 
   return (
@@ -181,17 +244,154 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
 
         <div className="p-6 md:p-8 space-y-6">
           {activeTab === 'geral' && (
-            <div className="space-y-6">
-              <div className="flex justify-between items-center">
-                <h3 className="text-xs font-black uppercase text-blue-600 tracking-[0.2em]">
-                  Capacidades Técnicas e Socioemocionais
-                </h3>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              
+              {/* COLUNA 1: CAPACIDADES (Técnicas e Socioemocionais) */}
+              <div className="space-y-6">
+                <div className="border-b border-slate-100 pb-3">
+                  <h3 className="text-xs font-black uppercase text-blue-600 tracking-[0.2em]">
+                    1. Capacidades (Técnicas e Socioemocionais)
+                  </h3>
+                </div>
+
+                {/* Form Adicionar Capacidade Técnica */}
+                <form onSubmit={handleAddTechnicalCapacity} className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-3">
+                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-wider block">+ Adicionar Capacidade Técnica</label>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={newTechCap}
+                      onChange={(e) => setNewTechCap(e.target.value)}
+                      placeholder="Ex: Planejar processos de usinagem..."
+                      className="flex-1 bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 focus:outline-none focus:border-blue-500"
+                    />
+                    <button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl text-[10px] font-black uppercase transition-all shadow-sm">
+                      Adicionar
+                    </button>
+                  </div>
+                </form>
+
+                {/* Listagem de Capacidades Técnicas */}
+                <div className="space-y-2">
+                  <h4 className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Técnicas Cadastradas</h4>
+                  {(!unit.technicalCapacities || unit.technicalCapacities.length === 0) ? (
+                    <p className="text-xs text-slate-400 italic p-3 bg-slate-50 rounded-xl border border-dashed border-slate-200">Nenhuma capacidade técnica cadastrada.</p>
+                  ) : (
+                    unit.technicalCapacities.map((item, index) => (
+                      <div key={index} className="flex items-center gap-2 bg-white p-3 rounded-xl border border-slate-200 shadow-sm">
+                        <input
+                          type="text"
+                          value={item}
+                          onChange={(e) => handleUpdateTechnicalCapacity(index, e.target.value)}
+                          className="flex-1 bg-transparent text-xs font-bold text-slate-800 focus:outline-none border-b border-transparent focus:border-blue-500"
+                        />
+                        <button
+                          onClick={() => handleDeleteTechnicalCapacity(index)}
+                          className="text-slate-400 hover:text-red-600 text-[10px] font-black uppercase px-2 py-1 transition-colors"
+                        >
+                          Excluir ✕
+                        </button>
+                      </div>
+                    ))
+                  )}
+                </div>
+
+                {/* Form Adicionar Capacidade Socioemocional */}
+                <form onSubmit={handleAddSocialCapacity} className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-3 pt-6">
+                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-wider block">+ Adicionar Capacidade Socioemocional</label>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={newSocialCap}
+                      onChange={(e) => setNewSocialCap(e.target.value)}
+                      placeholder="Ex: Demonstrar organização no posto de trabalho..."
+                      className="flex-1 bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 focus:outline-none focus:border-blue-500"
+                    />
+                    <button type="submit" className="bg-slate-900 hover:bg-slate-800 text-white px-4 py-2 rounded-xl text-[10px] font-black uppercase transition-all shadow-sm">
+                      Adicionar
+                    </button>
+                  </div>
+                </form>
+
+                {/* Listagem de Capacidades Socioemocionais */}
+                <div className="space-y-2">
+                  <h4 className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Socioemocionais Cadastradas</h4>
+                  {(!unit.socialCapacities || unit.socialCapacities.length === 0) ? (
+                    <p className="text-xs text-slate-400 italic p-3 bg-slate-50 rounded-xl border border-dashed border-slate-200">Nenhuma capacidade socioemocional cadastrada.</p>
+                  ) : (
+                    unit.socialCapacities.map((item, index) => (
+                      <div key={index} className="flex items-center gap-2 bg-white p-3 rounded-xl border border-slate-200 shadow-sm">
+                        <input
+                          type="text"
+                          value={item}
+                          onChange={(e) => handleUpdateSocialCapacity(index, e.target.value)}
+                          className="flex-1 bg-transparent text-xs font-bold text-slate-800 focus:outline-none border-b border-transparent focus:border-blue-500"
+                        />
+                        <button
+                          onClick={() => handleDeleteSocialCapacity(index)}
+                          className="text-slate-400 hover:text-red-600 text-[10px] font-black uppercase px-2 py-1 transition-colors"
+                        >
+                          Excluir ✕
+                        </button>
+                      </div>
+                    ))
+                  )}
+                </div>
+
               </div>
-              <div className="p-8 text-center bg-slate-50 rounded-2xl border border-dashed border-slate-200">
-                <p className="text-xs font-bold text-slate-400 uppercase">
-                  Nenhuma capacidade cadastrada nesta unidade.
-                </p>
+
+              {/* COLUNA 2: CONHECIMENTOS */}
+              <div className="space-y-6">
+                <div className="border-b border-slate-100 pb-3">
+                  <h3 className="text-xs font-black uppercase text-blue-600 tracking-[0.2em]">
+                    2. Conhecimentos
+                  </h3>
+                </div>
+
+                {/* Form Adicionar Conhecimento */}
+                <form onSubmit={handleAddKnowledge} className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-3">
+                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-wider block">+ Adicionar Conhecimento</label>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={newKnowledge}
+                      onChange={(e) => setNewKnowledge(e.target.value)}
+                      placeholder="Ex: Parâmetros de corte para tornos CNC..."
+                      className="flex-1 bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 focus:outline-none focus:border-blue-500"
+                    />
+                    <button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl text-[10px] font-black uppercase transition-all shadow-sm">
+                      Adicionar
+                    </button>
+                  </div>
+                </form>
+
+                {/* Listagem de Conhecimentos */}
+                <div className="space-y-2">
+                  <h4 className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Conhecimentos Cadastrados</h4>
+                  {(!unit.knowledges || unit.knowledges.length === 0) ? (
+                    <p className="text-xs text-slate-400 italic p-3 bg-slate-50 rounded-xl border border-dashed border-slate-200">Nenhum conhecimento cadastrado.</p>
+                  ) : (
+                    unit.knowledges.map((item, index) => (
+                      <div key={index} className="flex items-center gap-2 bg-white p-3 rounded-xl border border-slate-200 shadow-sm">
+                        <input
+                          type="text"
+                          value={item}
+                          onChange={(e) => handleUpdateKnowledge(index, e.target.value)}
+                          className="flex-1 bg-transparent text-xs font-bold text-slate-800 focus:outline-none border-b border-transparent focus:border-blue-500"
+                        />
+                        <button
+                          onClick={() => handleDeleteKnowledge(index)}
+                          className="text-slate-400 hover:text-red-600 text-[10px] font-black uppercase px-2 py-1 transition-colors"
+                        >
+                          Excluir ✕
+                        </button>
+                      </div>
+                    ))
+                  )}
+                </div>
+
               </div>
+
             </div>
           )}
 
