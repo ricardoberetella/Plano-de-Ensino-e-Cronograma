@@ -605,12 +605,12 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                 <div className="overflow-x-auto rounded-[2rem] border border-slate-200 shadow-xl bg-white">
                   <table className="w-full text-left border-collapse">
                     <thead>
-                      <tr className="bg-slate-900 text-white text-[10px] font-black uppercase tracking-wider">
-                        <th className="p-4 w-1/5 border-r border-slate-800">Referência</th>
-                        <th className="p-4 w-1/5 border-r border-slate-800">NSA (Não Atende)</th>
-                        <th className="p-4 w-1/5 border-r border-slate-800">APO (Atende Parcialmente)</th>
-                        <th className="p-4 w-1/5 border-r border-slate-800">PAR (Atende com Ressalvas)</th>
-                        <th className="p-4 w-1/5">AUT (Atende com Autonomia)</th>
+                      <tr className="bg-slate-900 text-[10px] font-black uppercase tracking-wider">
+                        <th className="p-4 w-1/5 border-r border-slate-800 text-white">REFERÊNCIA</th>
+                        <th className="p-4 w-1/5 border-r border-slate-800 text-red-500">NSA</th>
+                        <th className="p-4 w-1/5 border-r border-slate-800 text-orange-500">APO</th>
+                        <th className="p-4 w-1/5 border-r border-slate-800 text-blue-400">PAR</th>
+                        <th className="p-4 w-1/5 text-emerald-400">AUT</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100 text-xs">
