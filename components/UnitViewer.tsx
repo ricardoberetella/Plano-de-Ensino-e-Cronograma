@@ -9,10 +9,10 @@ interface UnitViewerProps {
 export default function UnitViewer({ unit, onBack }: UnitViewerProps) {
   const [modalAberto, setModalAberto] = useState(false);
   
-  // Estados para as linhas de cada categoria
-  const [capacidadesTecnicas, setCapacidadesTecnicas] = useState<string[]>(['n']);
-  const [capacidadesSocioemocionais, setCapacidadesSocioemocionais] = useState<string[]>(['fee']);
-  const [conhecimentos, setConhecimentos] = useState<string[]>(['f']);
+  // Estados iniciados como arrays vazios
+  const [capacidadesTecnicas, setCapacidadesTecnicas] = useState<string[]>([]);
+  const [capacidadesSocioemocionais, setCapacidadesSocioemocionais] = useState<string[]>([]);
+  const [conhecimentos, setConhecimentos] = useState<string[]>([]);
 
   const adicionarItem = (tipo: 'tecnica' | 'socioemocional' | 'conhecimento') => {
     if (tipo === 'tecnica') {
@@ -97,20 +97,28 @@ export default function UnitViewer({ unit, onBack }: UnitViewerProps) {
           <div className="p-4 space-y-4">
             <div>
               <span className="text-xs font-bold text-gray-800 uppercase block mb-1">Capacidades Técnicas</span>
-              {capacidadesTecnicas.map((item, index) => (
-                <div key={index} className="p-2 bg-gray-50 border border-gray-200 rounded text-sm mb-1 text-slate-700">
-                  {item}
-                </div>
-              ))}
+              {capacidadesTecnicas.length === 0 ? (
+                <p className="text-xs text-gray-400 italic">Nenhuma capacidade técnica adicionada.</p>
+              ) : (
+                capacidadesTecnicas.map((item, index) => (
+                  <div key={index} className="p-2 bg-gray-50 border border-gray-200 rounded text-sm mb-1 text-slate-700">
+                    {item}
+                  </div>
+                ))
+              )}
             </div>
 
             <div>
               <span className="text-xs font-bold text-gray-800 uppercase block mb-1">Capacidades Socioemocionais</span>
-              {capacidadesSocioemocionais.map((item, index) => (
-                <div key={index} className="p-2 bg-gray-50 border border-gray-200 rounded text-sm mb-1 text-slate-700">
-                  {item}
-                </div>
-              ))}
+              {capacidadesSocioemocionais.length === 0 ? (
+                <p className="text-xs text-gray-400 italic">Nenhuma capacidade socioemocional adicionada.</p>
+              ) : (
+                capacidadesSocioemocionais.map((item, index) => (
+                  <div key={index} className="p-2 bg-gray-50 border border-gray-200 rounded text-sm mb-1 text-slate-700">
+                    {item}
+                  </div>
+                ))
+              )}
             </div>
           </div>
 
@@ -118,11 +126,15 @@ export default function UnitViewer({ unit, onBack }: UnitViewerProps) {
           <div className="p-4 space-y-4">
             <div>
               <span className="text-xs font-bold text-gray-800 uppercase block mb-1">Conhecimentos</span>
-              {conhecimentos.map((item, index) => (
-                <div key={index} className="p-2 bg-gray-50 border border-gray-200 rounded text-sm mb-1 text-slate-700">
-                  {item}
-                </div>
-              ))}
+              {conhecimentos.length === 0 ? (
+                <p className="text-xs text-gray-400 italic">Nenhum conhecimento adicionado.</p>
+              ) : (
+                conhecimentos.map((item, index) => (
+                  <div key={index} className="p-2 bg-gray-50 border border-gray-200 rounded text-sm mb-1 text-slate-700">
+                    {item}
+                  </div>
+                ))
+              )}
             </div>
           </div>
         </div>
