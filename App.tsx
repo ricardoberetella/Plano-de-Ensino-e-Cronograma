@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import Layout from './components/Layout';
 import Dashboard from './components/Dashboard';
-import PlanForm from './components/PlanForm';
+import CurricularUnitsManager from './components/CurricularUnitsManager';
 import UnitViewer from './components/UnitViewer';
 import Login from './components/Login';
 import GeneralCalendar from './components/GeneralCalendar';
@@ -662,11 +662,11 @@ const App: React.FC = () => {
             <GeneralCalendar plan={currentPlan} />
           )}
 
-          {view === ('editor' as ViewType) && (
-            <PlanForm
-              initialPlan={currentPlan || undefined}
-              onSave={handleSave}
-              onCancel={() => setView('dashboard')}
+          {view === ('editor' as ViewType) && currentPlan && (
+            <CurricularUnitsManager
+              currentPlan={currentPlan}
+              onSave={persistPlan}
+              onBack={() => setView('dashboard')}
             />
           )}
         </>
