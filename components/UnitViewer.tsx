@@ -185,12 +185,9 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
 
   // ==========================================
   // ESTADO LOCAL ROBUSTO PARA O PLANO DE AULA
-  // Resolve qualquer conflito de perda de foco ou delay
   // ==========================================
   const [lessonPlanList, setLessonPlanList] = useState(unit.lessonPlan || []);
-  const isInitialMount = useRef(true);
 
-  // Sincroniza o estado local apenas quando o ID da unidade mudar (troca de UC)
   useEffect(() => {
     setLessonPlanList(unit.lessonPlan || []);
   }, [unit.id]);
@@ -220,6 +217,36 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
     const updatedPlan = lessonPlanList.map(r => r.id === rowId ? { ...r, [field]: value } : r);
     setLessonPlanList(updatedPlan);
     onUpdateUnit({ ...unit, lessonPlan: updatedPlan });
+  };
+
+  // Auxiliares para separar horas e data no formato "X horas - DD/MM/AAAA"
+  const parseHoursAndDate = (hoursDateStr: string) => {
+    const match = (hoursDateStr || '').match(/^(\d+)\s*horas?\s*-\s*(\d{2})\/(\d{2})\/(\d{4})$/);
+    if (match) {
+      return {
+        hours: match[1],
+        date: `${match[4]}-${match[3]}-${match[2]}` // Formato YYYY-MM-DD para o input type="date"
+      };
+    }
+    // Fallback padrão se estiver vazio ou fora do formato
+    return { hours: '4', date: '2026-07-01' };
+  };
+
+  const handleUpdateHoursOrDate = (rowId: string, currentHoursDate: string, newHours: string, newDateIso: string) => {
+    const parsed = parseHoursAndDate(currentHoursDate);
+    const hours = newHours !== undefined ? newHours : parsed.hours;
+    const dateIso = newDateIso !== undefined ? newDateIso : parsed.date;
+
+    let formattedDate = '01/07/2026';
+    if (dateIso) {
+      const parts = dateIso.split('-');
+      if (parts.length === 3) {
+        formattedDate = `${parts[2]}/${parts[1]}/${parts[0]}`;
+      }
+    }
+
+    const finalString = `${hours || '0'} horas - ${formattedDate}`;
+    handleUpdateLessonPlanCell(rowId, 'hoursDate', finalString);
   };
 
   return (
@@ -762,10 +789,10 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                   <table className="w-full text-left border-collapse">
                     <thead>
                       <tr className="bg-slate-900 text-[10px] font-black uppercase tracking-wider text-white">
-                        <th className="p-3 w-[16%] border-r border-slate-800 text-center">HORAS/AULAS/DATA</th>
+                        <th className="p-3 w-[18%] border-r border-slate-800 text-center">HORAS/AULAS/DATA</th>
                         <th className="p-3 w-[24%] border-r border-slate-800 text-center">CAPACIDADES</th>
                         <th className="p-3 w-[24%] border-r border-slate-800 text-center">CONHECIMENTOS</th>
-                        <th className="p-3 w-[18%] border-r border-slate-800 text-center">ESTRATÉGIAS</th>
+                        <th className="p-3 w-[16%] border-r border-slate-800 text-center">ESTRATÉGIAS</th>
                         <th className="p-3 border-r border-slate-800 text-center">RECURSOS/AMBIENTES</th>
                         <th className="p-3 text-center w-16">STATUS</th>
                       </tr>
@@ -773,21 +800,38 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                     <tbody className="divide-y divide-slate-200 text-xs">
                       {lessonPlanList.map((row) => {
                         const isCompleted = row.completed;
+                        const parsed = parseHoursAndDate(row.hoursDate);
+
                         return (
                           <tr 
                             key={row.id} 
                             className={`transition-colors ${isCompleted ? 'bg-emerald-50/80 hover:bg-emerald-50' : 'bg-white hover:bg-slate-50'}`}
                           >
-                            {/* Horas/Aulas/Data */}
-                            <td className="p-2 border-r border-slate-200 align-top">
-                              <textarea
-                                rows={3}
-                                value={row.hoursDate}
-                                onChange={(e) => handleUpdateLessonPlanCell(row.id, 'hoursDate', e.target.value)}
-                                className={`w-full p-2 text-xs font-bold focus:outline-none resize-none rounded-xl border ${isCompleted ? 'bg-emerald-100/60 text-emerald-900 border-emerald-300' : 'bg-slate-50 text-slate-800 border-slate-200'}`}
-                                placeholder="Ex: 4 horas - 01/07/2026"
-                              />
-                              <div className="mt-1">
+                            {/* Horas/Aulas/Data Controladas (Input Numérico de Horas + Seletor de Data Nativo) */}
+                            <td className="p-2 border-r border-slate-200 align-top space-y-2">
+                              <div className={`p-2 rounded-xl border space-y-2 ${isCompleted ? 'bg-emerald-100/60 border-emerald-300' : 'bg-slate-50 border-slate-200'}`}>
+                                <div>
+                                  <label className="block text-[8px] font-black uppercase text-slate-500 mb-0.5">Qtd. Horas</label>
+                                  <input
+                                    type="number"
+                                    min="1"
+                                    max="20"
+                                    value={parsed.hours}
+                                    onChange={(e) => handleUpdateHoursOrDate(row.id, row.hoursDate, e.target.value, parsed.date)}
+                                    className={`w-full p-1.5 text-xs font-bold focus:outline-none rounded-lg border text-center ${isCompleted ? 'bg-emerald-50 text-emerald-950 border-emerald-300' : 'bg-white text-slate-800 border-slate-300'}`}
+                                  />
+                                </div>
+                                <div>
+                                  <label className="block text-[8px] font-black uppercase text-slate-500 mb-0.5">Data da Aula</label>
+                                  <input
+                                    type="date"
+                                    value={parsed.date}
+                                    onChange={(e) => handleUpdateHoursOrDate(row.id, row.hoursDate, parsed.hours, e.target.value)}
+                                    className={`w-full p-1.5 text-xs font-bold focus:outline-none rounded-lg border text-center ${isCompleted ? 'bg-emerald-50 text-emerald-950 border-emerald-300' : 'bg-white text-slate-800 border-slate-300'}`}
+                                  />
+                                </div>
+                              </div>
+                              <div>
                                 <button
                                   type="button"
                                   onClick={(e) => {
@@ -804,7 +848,7 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                             {/* Capacidades */}
                             <td className="p-2 border-r border-slate-200 align-top">
                               <textarea
-                                rows={4}
+                                rows={5}
                                 value={row.capacities}
                                 onChange={(e) => handleUpdateLessonPlanCell(row.id, 'capacities', e.target.value)}
                                 className={`w-full p-2 text-xs font-bold focus:outline-none resize-none rounded-xl border ${isCompleted ? 'bg-emerald-100/40 text-emerald-950 border-emerald-300' : 'bg-slate-50 text-slate-800 border-slate-200'}`}
@@ -814,7 +858,7 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                             {/* Conhecimentos */}
                             <td className="p-2 border-r border-slate-200 align-top">
                               <textarea
-                                rows={4}
+                                rows={5}
                                 value={row.knowledges}
                                 onChange={(e) => handleUpdateLessonPlanCell(row.id, 'knowledges', e.target.value)}
                                 className={`w-full p-2 text-xs font-bold focus:outline-none resize-none rounded-xl border ${isCompleted ? 'bg-emerald-100/40 text-emerald-950 border-emerald-300' : 'bg-slate-50 text-slate-800 border-slate-200'}`}
@@ -824,7 +868,7 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                             {/* Estratégias */}
                             <td className="p-2 border-r border-slate-200 align-top">
                               <textarea
-                                rows={4}
+                                rows={5}
                                 value={row.strategies}
                                 onChange={(e) => handleUpdateLessonPlanCell(row.id, 'strategies', e.target.value)}
                                 className={`w-full p-2 text-xs font-bold focus:outline-none resize-none rounded-xl border ${isCompleted ? 'bg-emerald-100/40 text-emerald-950 border-emerald-300' : 'bg-slate-50 text-slate-800 border-slate-200'}`}
@@ -834,7 +878,7 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                             {/* Recursos/Ambientes */}
                             <td className="p-2 border-r border-slate-200 align-top">
                               <textarea
-                                rows={4}
+                                rows={5}
                                 value={row.resources}
                                 onChange={(e) => handleUpdateLessonPlanCell(row.id, 'resources', e.target.value)}
                                 className={`w-full p-2 text-xs font-bold focus:outline-none resize-none rounded-xl border ${isCompleted ? 'bg-emerald-100/40 text-emerald-950 border-emerald-300' : 'bg-slate-50 text-slate-800 border-slate-200'}`}
