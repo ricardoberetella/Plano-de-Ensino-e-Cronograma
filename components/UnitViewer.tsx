@@ -6,7 +6,7 @@ interface UnitViewerProps {
   onBack: () => void;
 }
 
-export const UnitViewer: React.FC<UnitViewerProps> = ({ unit, onBack }) => {
+export default function UnitViewer({ unit, onBack }: UnitViewerProps) {
   const [modalAberto, setModalAberto] = useState(false);
   
   // Estados para as linhas de cada categoria
@@ -129,4 +129,4 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({ unit, onBack }) => {
       </div>
     </div>
   );
-};
+}
