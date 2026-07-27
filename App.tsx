@@ -82,10 +82,10 @@ const mergeUnitWithTemplate = (
     existingUnit.learningSituations?.length
       ? existingUnit.learningSituations
       : templateUnit.learningSituations || [],
-  rubrics:
-    existingUnit.rubrics?.length
-      ? existingUnit.rubrics
-      : templateUnit.rubrics || [],
+  rubrics: (existingUnit.rubrics || templateUnit.rubrics || []).map(r => ({
+    ...r,
+    nsa: r.nsa || { c: '', b: '', a: '' }
+  })),
   schedule:
     existingUnit.schedule?.length
       ? existingUnit.schedule
@@ -101,6 +101,17 @@ const App: React.FC = () => {
   const [selectedUnit, setSelectedUnit] = useState<CurricularUnit | null>(null);
   const [selectedSemester, setSelectedSemester] = useState<SemesterNumber>(1);
   const [isLoading, setIsLoading] = useState(true);
+
+  // Estados para Modal de Cadastro / Edição de UC
+  const [isUnitModalOpen, setIsUnitModalOpen] = useState(false);
+  const [editingUnit, setEditingUnit] = useState<CurricularUnit | null>(null);
+  const [unitForm, setUnitForm] = useState({
+    code: '',
+    name: '',
+    totalHours: 40,
+    semester: 1 as SemesterNumber,
+    order: 1
+  });
 
   const currentPlanSemesters = useMemo(() => {
     if (!currentPlan || !Array.isArray(currentPlan.units)) return [];
@@ -160,6 +171,10 @@ const App: React.FC = () => {
               semester: Number(originalUnit.semester || 1),
               order: Number(originalUnit.order || cleanedUnits.length + 1),
               active: originalUnit.active ?? true,
+              rubrics: (originalUnit.rubrics || []).map(r => ({
+                ...r,
+                nsa: r.nsa || { c: '', b: '', a: '' }
+              })),
               calendar: {
                 ...originalUnit.calendar,
                 semester:
@@ -185,6 +200,10 @@ const App: React.FC = () => {
           cleanedUnits.push({
             ...templateUnit,
             active: templateUnit.active ?? true,
+            rubrics: (templateUnit.rubrics || []).map(r => ({
+              ...r,
+              nsa: r.nsa || { c: '', b: '', a: '' }
+            })),
             calendar: {
               ...templateUnit.calendar,
               semester:
@@ -326,7 +345,6 @@ const App: React.FC = () => {
         setSelectedUnit(nextSelected);
       } catch (error) {
         console.error('Erro crítico ao carregar planos:', error);
-        // Fallback de segurança para nunca travar a tela de carregamento
         const fallbackTemplate = SAMPLE_PLANS[0];
         const fallbackPlan: TeachingPlan = {
           ...fallbackTemplate,
@@ -430,6 +448,95 @@ const App: React.FC = () => {
 
     const updatedUnit = updatedPlan.units.find(unit => unit.id === unitId);
     if (updatedUnit) setSelectedUnit(updatedUnit);
+  };
+
+  // Funções de Gerenciamento Manual de Unidades Curriculares
+  const handleOpenAddUnitModal = () => {
+    setEditingUnit(null);
+    setUnitForm({
+      code: '',
+      name: '',
+      totalHours: 40,
+      semester: selectedSemester || 1,
+      order: visibleUnits.length + 1
+    });
+    setIsUnitModalOpen(true);
+  };
+
+  const handleOpenEditUnitModal = (unit: CurricularUnit) => {
+    setEditingUnit(unit);
+    setUnitForm({
+      code: unit.code || '',
+      name: unit.name || '',
+      totalHours: unit.totalHours || 40,
+      semester: unit.semester || 1,
+      order: unit.order || 1
+    });
+    setIsUnitModalOpen(true);
+  };
+
+  const handleSaveUnitForm = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!currentPlan) return;
+
+    if (editingUnit) {
+      // Editar UC existente
+      const updatedUnits = currentPlan.units.map(u =>
+        u.id === editingUnit.id
+          ? {
+              ...u,
+              code: unitForm.code,
+              name: unitForm.name,
+              totalHours: Number(unitForm.totalHours),
+              semester: Number(unitForm.semester) as SemesterNumber,
+              order: Number(unitForm.order)
+            }
+          : u
+      );
+      const saved = await persistPlan({ ...currentPlan, units: updatedUnits });
+      const target = saved.units.find(u => u.id === editingUnit.id);
+      if (target) setSelectedUnit(target);
+    } else {
+      // Criar nova UC
+      const newUnitId = `uc-${Date.now()}`;
+      const newUnit: CurricularUnit = {
+        id: newUnitId,
+        code: unitForm.code || `UC-${Date.now().toString().slice(-4)}`,
+        name: unitForm.name,
+        totalHours: Number(unitForm.totalHours),
+        semester: Number(unitForm.semester) as SemesterNumber,
+        order: Number(unitForm.order),
+        active: true,
+        basicCapacities: [],
+        socioemocionalCapacities: [],
+        knowledge: [],
+        learningSituations: [],
+        rubrics: [],
+        schedule: []
+      };
+
+      const updatedUnits = [...currentPlan.units, newUnit];
+      const saved = await persistPlan({ ...currentPlan, units: updatedUnits });
+      const target = saved.units.find(u => u.id === newUnitId);
+      if (target) {
+        setSelectedSemester(target.semester);
+        setSelectedUnit(target);
+      }
+    }
+
+    setIsUnitModalOpen(false);
+  };
+
+  const handleDeleteUnit = async (unitId: string) => {
+    if (!currentPlan) return;
+    if (!window.confirm('Tem certeza que deseja excluir esta Unidade Curricular?')) return;
+
+    const updatedUnits = currentPlan.units.filter(u => u.id !== unitId);
+    const saved = await persistPlan({ ...currentPlan, units: updatedUnits });
+    const remaining = sortUnits(saved.units).filter(
+      u => Number(u.semester || 1) === Number(selectedSemester)
+    );
+    setSelectedUnit(remaining[0] || null);
   };
 
   const handleLogout = () => {
@@ -542,9 +649,17 @@ const App: React.FC = () => {
               </div>
 
               <div className="bg-slate-900 rounded-[2.5rem] p-8 md:p-12 text-white shadow-2xl">
-                <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 mb-8">
-                  III. Unidades Curriculares
-                </h3>
+                <div className="flex justify-between items-center mb-8">
+                  <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500">
+                    III. Unidades Curriculares
+                  </h3>
+                  <button
+                    onClick={handleOpenAddUnitModal}
+                    className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-xl text-[10px] font-black uppercase transition-all shadow-lg flex items-center gap-2"
+                  >
+                    + Nova Unidade Curricular
+                  </button>
+                </div>
 
                 <div className="flex flex-wrap gap-3 mb-8">
                   {currentPlanSemesters.map(semester => (
@@ -564,25 +679,56 @@ const App: React.FC = () => {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                   {visibleUnits.map((unit, index) => (
-                    <button
+                    <div
                       key={unit.id}
-                      onClick={() => {
-                        setSelectedUnit(unit);
-                        setSelectedSemester(unit.semester);
-                        setView('unidades-curriculares');
-                      }}
-                      className="bg-slate-800 p-8 rounded-3xl text-left hover:bg-blue-600 transition-all group relative overflow-hidden"
+                      className="bg-slate-800 p-6 rounded-3xl text-left relative overflow-hidden flex flex-col justify-between group border border-slate-700 hover:border-blue-500 transition-all"
                     >
-                      <span className="text-6xl font-black opacity-5 absolute -right-2 -bottom-2">
-                        {String(index + 1).padStart(2, '0')}
-                      </span>
-                      <p className="text-[9px] font-black text-blue-400 mb-2">
-                        {getUnitSigla(unit)}
-                      </p>
-                      <h4 className="font-black text-lg leading-tight uppercase line-clamp-2">
-                        {unit.name}
-                      </h4>
-                    </button>
+                      <div>
+                        <span className="text-6xl font-black opacity-5 absolute -right-2 -bottom-2 pointer-events-none">
+                          {String(index + 1).padStart(2, '0')}
+                        </span>
+                        <p className="text-[9px] font-black text-blue-400 mb-2">
+                          {getUnitSigla(unit)} ({unit.totalHours || 0}h)
+                        </p>
+                        <h4
+                          onClick={() => {
+                            setSelectedUnit(unit);
+                            setSelectedSemester(unit.semester);
+                            setView('unidades-curriculares');
+                          }}
+                          className="font-black text-lg leading-tight uppercase line-clamp-2 cursor-pointer hover:text-blue-300 mb-4"
+                        >
+                          {unit.name}
+                        </h4>
+                      </div>
+
+                      <div className="flex items-center gap-2 pt-4 border-t border-slate-700/60 z-10">
+                        <button
+                          onClick={() => {
+                            setSelectedUnit(unit);
+                            setSelectedSemester(unit.semester);
+                            setView('unidades-curriculares');
+                          }}
+                          className="flex-1 bg-blue-600/30 hover:bg-blue-600 text-blue-200 hover:text-white py-2 rounded-xl text-[9px] font-black uppercase transition-all"
+                        >
+                          Acessar
+                        </button>
+                        <button
+                          onClick={() => handleOpenEditUnitModal(unit)}
+                          className="px-3 py-2 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded-xl text-[9px] font-black uppercase transition-all"
+                          title="Editar UC"
+                        >
+                          Editar
+                        </button>
+                        <button
+                          onClick={() => handleDeleteUnit(unit.id)}
+                          className="px-3 py-2 bg-red-500/20 hover:bg-red-600 text-red-300 hover:text-white rounded-xl text-[9px] font-black uppercase transition-all"
+                          title="Excluir UC"
+                        >
+                          X
+                        </button>
+                      </div>
+                    </div>
                   ))}
                 </div>
               </div>
@@ -591,35 +737,55 @@ const App: React.FC = () => {
 
           {(view === 'unidades-curriculares' || view === 'plano-ensino') && currentPlan && (
             <div className="space-y-8 max-w-7xl mx-auto pb-20">
-              <div className="flex flex-wrap gap-3 px-1">
-                {currentPlanSemesters.map(semester => (
+              <div className="flex flex-wrap justify-between items-center gap-4 px-1">
+                <div className="flex flex-wrap gap-3">
+                  {currentPlanSemesters.map(semester => (
+                    <button
+                      key={semester}
+                      onClick={() => setSelectedSemester(semester)}
+                      className={`px-6 py-3 rounded-2xl text-[10px] font-black uppercase transition-all border-2 ${
+                        Number(selectedSemester) === Number(semester)
+                          ? 'bg-slate-900 border-slate-900 text-white shadow-lg'
+                          : 'bg-white border-slate-200 text-slate-400 hover:border-blue-300'
+                      }`}
+                    >
+                      {semester}º semestre
+                    </button>
+                  ))}
+                </div>
+
+                <div className="flex gap-2">
+                  {selectedUnit && (
+                    <button
+                      onClick={() => handleOpenEditUnitModal(selectedUnit)}
+                      className="bg-slate-800 hover:bg-slate-900 text-white px-4 py-3 rounded-2xl text-[10px] font-black uppercase transition-all shadow-md"
+                    >
+                      ✏️ Editar Unidade Atual
+                    </button>
+                  )}
                   <button
-                    key={semester}
-                    onClick={() => setSelectedSemester(semester)}
-                    className={`px-6 py-3 rounded-2xl text-[10px] font-black uppercase transition-all border-2 ${
-                      Number(selectedSemester) === Number(semester)
-                        ? 'bg-slate-900 border-slate-900 text-white shadow-lg'
-                        : 'bg-white border-slate-200 text-slate-400 hover:border-blue-300'
-                    }`}
+                    onClick={handleOpenAddUnitModal}
+                    className="bg-blue-600 hover:bg-blue-500 text-white px-5 py-3 rounded-2xl text-[10px] font-black uppercase transition-all shadow-lg flex items-center gap-2"
                   >
-                    {semester}º semestre
+                    + Adicionar Nova UC
                   </button>
-                ))}
+                </div>
               </div>
 
               <div className="flex gap-2 overflow-x-auto pb-4 scrollbar-hide px-1">
                 {visibleUnits.map(unit => (
-                  <button
-                    key={unit.id}
-                    onClick={() => setSelectedUnit(unit)}
-                    className={`flex-shrink-0 px-8 py-4 rounded-2xl text-[10px] font-black uppercase transition-all border-2 ${
-                      selectedUnit?.id === unit.id
-                        ? 'bg-blue-600 border-blue-600 text-white shadow-xl scale-105'
-                        : 'bg-white border-slate-200 text-slate-400 hover:border-blue-100'
-                    }`}
-                  >
-                    {getUnitSigla(unit)}
-                  </button>
+                  <div key={unit.id} className="relative group flex-shrink-0">
+                    <button
+                      onClick={() => setSelectedUnit(unit)}
+                      className={`px-8 py-4 rounded-2xl text-[10px] font-black uppercase transition-all border-2 ${
+                        selectedUnit?.id === unit.id
+                          ? 'bg-blue-600 border-blue-600 text-white shadow-xl scale-105'
+                          : 'bg-white border-slate-200 text-slate-400 hover:border-blue-100'
+                      }`}
+                    >
+                      {getUnitSigla(unit)}
+                    </button>
+                  </div>
                 ))}
               </div>
 
@@ -649,6 +815,95 @@ const App: React.FC = () => {
             <GeneralCalendar plan={currentPlan} />
           )}
         </>
+      )}
+
+      {/* MODAL DE CADASTRO E EDIÇÃO DE UNIDADE CURRICULAR */}
+      {isUnitModalOpen && (
+        <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-[2.5rem] p-8 md:p-12 max-w-lg w-full shadow-2xl border border-slate-200 animate-fadeIn">
+            <h3 className="text-xl font-[1000] text-slate-900 uppercase tracking-tight mb-6">
+              {editingUnit ? 'Editar Unidade Curricular' : 'Cadastrar Nova Unidade Curricular'}
+            </h3>
+
+            <form onSubmit={handleSaveUnitForm} className="space-y-4">
+              <div>
+                <label className="block text-[10px] font-black uppercase text-slate-500 tracking-wider mb-1">
+                  Sigla / Código (Ex: USIN-01)
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={unitForm.code}
+                  onChange={e => setUnitForm({ ...unitForm, code: e.target.value })}
+                  placeholder="Ex: MEC-01"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-sm font-bold text-slate-800 focus:outline-none focus:border-blue-600"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-black uppercase text-slate-500 tracking-wider mb-1">
+                  Nome da Unidade Curricular
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={unitForm.name}
+                  onChange={e => setUnitForm({ ...unitForm, name: e.target.value })}
+                  placeholder="Ex: Usinagem em Torno CNC"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-sm font-bold text-slate-800 focus:outline-none focus:border-blue-600"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-[10px] font-black uppercase text-slate-500 tracking-wider mb-1">
+                    Carga Horária (h)
+                  </label>
+                  <input
+                    type="number"
+                    required
+                    min={1}
+                    value={unitForm.totalHours}
+                    onChange={e => setUnitForm({ ...unitForm, totalHours: Number(e.target.value) })}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-sm font-bold text-slate-800 focus:outline-none focus:border-blue-600"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-black uppercase text-slate-500 tracking-wider mb-1">
+                    Semestre
+                  </label>
+                  <select
+                    value={unitForm.semester}
+                    onChange={e => setUnitForm({ ...unitForm, semester: Number(e.target.value) as SemesterNumber })}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-sm font-bold text-slate-800 focus:outline-none focus:border-blue-600"
+                  >
+                    <option value={1}>1º Semestre</option>
+                    <option value={2}>2º Semestre</option>
+                    <option value={3}>3º Semestre</option>
+                    <option value={4}>4º Semestre</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end gap-3 pt-6 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setIsUnitModalOpen(false)}
+                  className="px-6 py-3 rounded-2xl text-[10px] font-black uppercase text-slate-400 hover:bg-slate-100 transition-all"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  className="bg-blue-600 hover:bg-blue-500 text-white px-8 py-3 rounded-2xl text-[10px] font-black uppercase shadow-xl transition-all"
+                >
+                  Salvar Unidade
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
       )}
     </Layout>
   );
