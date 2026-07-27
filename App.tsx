@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import Layout from './components/Layout';
 import Dashboard from './components/Dashboard';
-import CurricularUnitsManager from './components/CurricularUnitsManager';
 import UnitViewer from './components/UnitViewer';
 import Login from './components/Login';
 import GeneralCalendar from './components/GeneralCalendar';
@@ -102,6 +101,12 @@ const App: React.FC = () => {
   const [selectedUnit, setSelectedUnit] = useState<CurricularUnit | null>(null);
   const [selectedSemester, setSelectedSemester] = useState<SemesterNumber>(1);
   const [isLoading, setIsLoading] = useState(true);
+
+  // Estados locais para o formulário de cadastro de unidade curricular
+  const [newCode, setNewCode] = useState('');
+  const [newName, setNewName] = useState('');
+  const [newWorkload, setNewWorkload] = useState<number>(40);
+  const [newSemester, setNewSemester] = useState<1 | 2>(1);
 
   const currentPlanSemesters = useMemo(() => {
     if (!currentPlan || !Array.isArray(currentPlan.units)) return [];
@@ -356,18 +361,6 @@ const App: React.FC = () => {
     return planToSave;
   };
 
-  const handleSave = async (updatedPlan: TeachingPlan) => {
-    try {
-      await persistPlan(updatedPlan);
-      const refreshed = await FirebaseService.getPlans(activeProfileId);
-      setPlans(refreshed);
-      setView('dashboard');
-    } catch (error) {
-      console.error('Erro ao salvar dados:', error);
-      throw error;
-    }
-  };
-
   const handleUpdateSchedule = async (
     unitId: string,
     newSchedule: ScheduleEntry[]
@@ -399,9 +392,7 @@ const App: React.FC = () => {
             ...unit,
             calendar: {
               ...newCalendar,
-              semester:
-                newCalendar.semester ||
-                unit.semester
+              semester: newCalendar.semester || unit.semester
             }
           }
         : unit
@@ -416,40 +407,59 @@ const App: React.FC = () => {
     if (updatedUnit) setSelectedUnit(updatedUnit);
   };
 
-  const handleUpdateUnit = async (updatedUnit: CurricularUnit) => {
-    if (!currentPlan) return;
+  const handleUpdateUnitField = async (id: string, field: keyof CurricularUnit, value: any) => {
+    if (!currentPlan || !currentPlan.units) return;
+    const updatedUnits = currentPlan.units.map(u => u.id === id ? { ...u, [field]: value } : u);
+    await persistPlan({
+      ...currentPlan,
+      units: updatedUnits
+    });
+  };
 
-    const normalizedUnit: CurricularUnit = {
-      ...updatedUnit,
-      code: updatedUnit.code || getUnitSigla(updatedUnit),
-      semester: Number(updatedUnit.semester || 1),
-      order: Number(updatedUnit.order || 1),
-      active: updatedUnit.active ?? true,
-      calendar: {
-        ...updatedUnit.calendar,
-        semester:
-          updatedUnit.calendar?.semester ||
-          Number(updatedUnit.semester || 1)
-      }
+  const handleDeleteUnit = async (id: string) => {
+    if (!currentPlan || !currentPlan.units) return;
+    if (window.confirm('Deseja realmente excluir esta unidade curricular?')) {
+      const updatedUnits = currentPlan.units.filter(u => u.id !== id);
+      await persistPlan({
+        ...currentPlan,
+        units: updatedUnits
+      });
+    }
+  };
+
+  const handleAddUnitSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!currentPlan) return;
+    if (!newCode.trim() || !newName.trim()) {
+      alert('Preencha a Sigla e o Nome da Unidade Curricular.');
+      return;
+    }
+
+    const createdUnit: CurricularUnit = {
+      id: `unit-${Date.now()}`,
+      code: newCode.trim().toUpperCase(),
+      name: newName.trim(),
+      workload: Number(newWorkload),
+      semester: Number(newSemester) as 1 | 2,
+      active: true,
+      basicCapacities: [],
+      socioemocionalCapacities: [],
+      knowledge: [],
+      learningSituations: [],
+      rubrics: [],
+      schedule: []
     };
 
-    const updatedUnits = currentPlan.units.map(unit =>
-      unit.id === normalizedUnit.id ? normalizedUnit : unit
-    );
-
-    const updatedPlan = await persistPlan({
+    const updatedUnits = [...(currentPlan.units || []), createdUnit];
+    await persistPlan({
       ...currentPlan,
       units: updatedUnits
     });
 
-    const savedUnit = updatedPlan.units.find(
-      unit => unit.id === normalizedUnit.id
-    );
-
-    if (savedUnit) {
-      setSelectedUnit(savedUnit);
-      setSelectedSemester(savedUnit.semester);
-    }
+    setNewCode('');
+    setNewName('');
+    setNewWorkload(40);
+    setNewSemester(1);
   };
 
   const handleLogout = () => {
@@ -508,7 +518,7 @@ const App: React.FC = () => {
               plans={plans}
               onEdit={plan => {
                 setCurrentPlan(plan);
-                setView('editor' as ViewType);
+                setView('unidades-curriculares' as ViewType);
               }}
               onView={openPlan}
               onRefresh={() => loadPlans(activeProfileId)}
@@ -653,7 +663,12 @@ const App: React.FC = () => {
                   onUpdateCalendar={newCalendar =>
                     handleUpdateCalendar(selectedUnit.id, newCalendar)
                   }
-                  onUpdateUnit={handleUpdateUnit}
+                  onUpdateUnit={async updatedUnit => {
+                    if (!currentPlan) return;
+                    const updatedUnits = currentPlan.units.map(u => u.id === updatedUnit.id ? updatedUnit : u);
+                    await persistPlan({ ...currentPlan, units: updatedUnits });
+                    setSelectedUnit(updatedUnit);
+                  }}
                 />
               </div>
             )}
@@ -662,12 +677,143 @@ const App: React.FC = () => {
             <GeneralCalendar plan={currentPlan} />
           )}
 
-          {view === ('editor' as ViewType) && currentPlan && (
-            <CurricularUnitsManager
-              currentPlan={currentPlan}
-              onSave={persistPlan}
-              onBack={() => setView('dashboard')}
-            />
+          {view === ('unidades-curriculares' as ViewType) && currentPlan && (
+            <div className="max-w-5xl mx-auto space-y-8 animate-fadeIn pb-20">
+              <div className="bg-white rounded-[2.5rem] p-8 border border-slate-200 shadow-xl">
+                <span className="text-[10px] font-black text-blue-600 uppercase tracking-widest block mb-1">
+                  Curso: {currentPlan.courseName}
+                </span>
+                <h2 className="text-3xl font-[1000] text-slate-900 uppercase tracking-tight">
+                  Unidades Curriculares
+                </h2>
+                <p className="text-xs text-slate-400 font-bold uppercase tracking-wider mt-1">
+                  Cadastro e gerenciamento das unidades, siglas, carga horária e semestres
+                </p>
+              </div>
+
+              {/* Formulário de Cadastro */}
+              <form onSubmit={handleAddUnitSubmit} className="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-xl space-y-6">
+                <h3 className="text-xs font-black text-slate-900 uppercase tracking-widest">+ Adicionar Nova Unidade Curricular</h3>
+                
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                  <div>
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Sigla / ID</label>
+                    <input
+                      type="text"
+                      value={newCode}
+                      onChange={(e) => setNewCode(e.target.value)}
+                      placeholder="Ex: MDU, LIDT..."
+                      className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-xs font-bold text-slate-800 uppercase focus:outline-none focus:border-blue-600"
+                    />
+                  </div>
+
+                  <div className="md:col-span-2">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Nome da Unidade</label>
+                    <input
+                      type="text"
+                      value={newName}
+                      onChange={(e) => setNewName(e.target.value)}
+                      placeholder="Ex: Mecânica de Usinagem Convencional..."
+                      className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-xs font-bold text-slate-800 focus:outline-none focus:border-blue-600"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Carga Horária (h)</label>
+                    <input
+                      type="number"
+                      value={newWorkload}
+                      onChange={(e) => setNewWorkload(Number(e.target.value))}
+                      className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-xs font-bold text-slate-800 focus:outline-none focus:border-blue-600"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex justify-between items-center pt-2">
+                  <div className="w-1/3">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Semestre</label>
+                    <select
+                      value={newSemester}
+                      onChange={(e) => setNewSemester(Number(e.target.value) as 1 | 2)}
+                      className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-xs font-bold text-slate-800 focus:outline-none focus:border-blue-600"
+                    >
+                      <option value={1}>1º Semestre</option>
+                      <option value={2}>2º Semestre</option>
+                    </select>
+                  </div>
+
+                  <button
+                    type="submit"
+                    className="bg-blue-600 hover:bg-slate-900 text-white px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-lg transition-all self-end"
+                  >
+                    Cadastrar Unidade
+                  </button>
+                </div>
+              </form>
+
+              {/* Lista de Unidades Cadastradas */}
+              <div className="bg-white rounded-[2.5rem] border border-slate-200 shadow-xl overflow-hidden">
+                <div className="p-6 border-b border-slate-100 bg-slate-50">
+                  <h3 className="text-xs font-black text-slate-800 uppercase tracking-wider">Unidades Cadastradas</h3>
+                </div>
+
+                <div className="divide-y divide-slate-100">
+                  {(!currentPlan.units || currentPlan.units.length === 0) ? (
+                    <div className="p-8 text-center text-slate-400 text-xs font-bold uppercase">
+                      Nenhuma unidade cadastrada neste curso.
+                    </div>
+                  ) : (
+                    currentPlan.units.map((unit) => (
+                      <div key={unit.id} className="p-6 flex flex-wrap items-center justify-between gap-4 hover:bg-slate-50/50">
+                        <div className="flex items-center gap-4">
+                          <span className="bg-blue-100 text-blue-700 px-3 py-1.5 rounded-xl font-mono text-xs font-black">
+                            {unit.code || 'S/SIGLA'}
+                          </span>
+                          <div>
+                            <input
+                              type="text"
+                              value={unit.name}
+                              onChange={(e) => handleUpdateUnitField(unit.id, 'name', e.target.value)}
+                              className="text-xs font-bold text-slate-900 bg-transparent border-b border-transparent hover:border-slate-300 focus:border-blue-600 outline-none w-72"
+                            />
+                            <div className="flex gap-4 mt-1">
+                              <span className="text-[10px] font-black text-slate-400 uppercase">
+                                Carga: 
+                                <input
+                                  type="number"
+                                  value={unit.workload || 0}
+                                  onChange={(e) => handleUpdateUnitField(unit.id, 'workload', Number(e.target.value))}
+                                  className="w-16 ml-1 bg-slate-50 border border-slate-200 rounded px-1 text-slate-700 font-bold"
+                                /> h
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-4">
+                          <select
+                            value={unit.semester || 1}
+                            onChange={(e) => handleUpdateUnitField(unit.id, 'semester', Number(e.target.value))}
+                            className="bg-slate-100 border border-slate-200 rounded-xl px-3 py-2 text-[10px] font-black text-slate-700 uppercase"
+                          >
+                            <option value={1}>1º Semestre</option>
+                            <option value={2}>2º Semestre</option>
+                          </select>
+
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteUnit(unit.id)}
+                            className="text-slate-400 hover:text-red-600 text-xs font-black p-2 transition-all"
+                          >
+                            Excluir ✕
+                          </button>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            </div>
           )}
         </>
       )}
