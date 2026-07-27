@@ -183,30 +183,39 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
     onUpdateUnit({ ...unit, rubrics: updated });
   };
 
-  // Funções para Plano de Aula / Cronograma
+  // Funções para Plano de Aula / Cronograma (Modificadas para uso estável com setState local imediato)
+  const [lessonPlanList, setLessonPlanList] = useState(unit.lessonPlan || []);
+
+  // Sincroniza caso mude externamente
+  React.useEffect(() => {
+    setLessonPlanList(unit.lessonPlan || []);
+  }, [unit.lessonPlan]);
+
   const handleAddLessonPlanRow = () => {
     const newRow = {
       id: Date.now().toString(),
-      hoursDate: '4 horas - 01/04/2026',
+      hoursDate: '4 horas - 01/07/2026',
       capacities: '- Descrever capacidade...',
       knowledges: '1. Conhecimento...',
       strategies: 'Exposição dialogada e prática...',
       resources: 'Sala de aula, projetor...',
       completed: false
     };
-    const currentPlan = unit.lessonPlan || [];
-    onUpdateUnit({ ...unit, lessonPlan: [...currentPlan, newRow] });
+    const updatedPlan = [...lessonPlanList, newRow];
+    setLessonPlanList(updatedPlan);
+    onUpdateUnit({ ...unit, lessonPlan: updatedPlan });
   };
 
   const handleDeleteLessonPlanRow = (rowId: string) => {
-    const currentPlan = unit.lessonPlan || [];
-    onUpdateUnit({ ...unit, lessonPlan: currentPlan.filter(r => r.id !== rowId) });
+    const updatedPlan = lessonPlanList.filter(r => r.id !== rowId);
+    setLessonPlanList(updatedPlan);
+    onUpdateUnit({ ...unit, lessonPlan: updatedPlan });
   };
 
   const handleUpdateLessonPlanCell = (rowId: string, field: string, value: any) => {
-    const currentPlan = unit.lessonPlan || [];
-    const updated = currentPlan.map(r => r.id === rowId ? { ...r, [field]: value } : r);
-    onUpdateUnit({ ...unit, lessonPlan: updated });
+    const updatedPlan = lessonPlanList.map(r => r.id === rowId ? { ...r, [field]: value } : r);
+    setLessonPlanList(updatedPlan);
+    onUpdateUnit({ ...unit, lessonPlan: updatedPlan });
   };
 
   return (
@@ -717,21 +726,30 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
 
           {activeTab === 'plano-aula' && (
             <div className="space-y-6 animate-fadeIn">
-              <div className="flex justify-between items-center border-b border-slate-100 pb-4">
+              <div className="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-slate-100 pb-4 gap-4">
                 <div>
                   <h3 className="text-lg font-[1000] uppercase italic text-slate-900 tracking-wider">Plano de Aula | Cronograma</h3>
                   <p className="text-[10px] font-bold uppercase text-slate-400 mt-1">Organização diária das aulas e distribuição de carga horária</p>
                 </div>
-                <button
-                  type="button"
-                  onClick={handleAddLessonPlanRow}
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-md transition-all cursor-pointer"
-                >
-                  + Adicionar Aula / Data
-                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={handleAddLessonPlanRow}
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-md transition-all cursor-pointer"
+                  >
+                    + Adicionar Aula / Data
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => window.print()}
+                    className="bg-red-600 hover:bg-red-700 text-white px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-md transition-all cursor-pointer"
+                  >
+                    Imprimir
+                  </button>
+                </div>
               </div>
 
-              {(!unit.lessonPlan || unit.lessonPlan.length === 0) ? (
+              {(lessonPlanList.length === 0) ? (
                 <div className="p-12 text-center bg-slate-50 rounded-2xl border border-dashed border-slate-200 text-slate-400 text-xs font-bold uppercase">
                   Nenhum registro de aula cadastrado. Clique em "+ Adicionar Aula / Data" para iniciar.
                 </div>
@@ -749,7 +767,7 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-200 text-xs">
-                      {unit.lessonPlan.map((row) => {
+                      {lessonPlanList.map((row) => {
                         const isCompleted = row.completed;
                         return (
                           <tr 
@@ -763,7 +781,7 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                                 value={row.hoursDate}
                                 onChange={(e) => handleUpdateLessonPlanCell(row.id, 'hoursDate', e.target.value)}
                                 className={`w-full p-2 text-xs font-bold focus:outline-none resize-none rounded-xl border ${isCompleted ? 'bg-emerald-100/60 text-emerald-900 border-emerald-300' : 'bg-slate-50 text-slate-800 border-slate-200'}`}
-                                placeholder="Ex: 4 horas - 13/03/2026"
+                                placeholder="Ex: 4 horas - 01/07/2026"
                               />
                               <div className="mt-1">
                                 <button
@@ -819,7 +837,7 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                               />
                             </td>
 
-                            {/* Status / OK (Centralizado na vertical e horizontal) */}
+                            {/* Status / OK */}
                             <td className="p-2 align-middle text-center">
                               <button
                                 type="button"
@@ -845,13 +863,11 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
           )}
 
           {activeTab === 'calendario' && (() => {
-            // Parser auxiliar para extrair datas do formato "4 horas - DD/MM/YYYY" ou similar do plano de aula
             const parsedEvents: { day: number; month: number; year: number; hours: string; completed: boolean }[] = [];
             
-            if (unit.lessonPlan) {
-              unit.lessonPlan.forEach(row => {
+            if (lessonPlanList) {
+              lessonPlanList.forEach(row => {
                 const text = row.hoursDate || '';
-                // Procura por padrão DD/MM/AAAA ou DD/MM/YY
                 const match = text.match(/(\d{2})\/(\d{2})\/(\d{2,4})/);
                 if (match) {
                   const day = parseInt(match[1], 10);
@@ -859,7 +875,6 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                   let year = parseInt(match[3], 10);
                   if (year < 100) year += 2000;
 
-                  // Extrai o rótulo de horas (ex: "4h", "4 horas", etc.) se houver antes do hífen
                   const parts = text.split('-');
                   const hoursLabel = parts.length > 1 ? parts[0].trim().replace(/h.*$/, 'h') : '2h';
 
@@ -874,11 +889,13 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
               });
             }
 
-            // Meses a exibir: Janeiro, Fevereiro, Março de 2026 (ou dinâmico conforme os dados)
             const monthsToDisplay = [
-              { name: 'JANEIRO 2026', monthNum: 1, year: 2026 },
-              { name: 'FEVEREIRO 2026', monthNum: 2, year: 2026 },
-              { name: 'MARÇO 2026', monthNum: 3, year: 2026 }
+              { name: 'JULHO 2026', monthNum: 7, year: 2026 },
+              { name: 'AGOSTO 2026', monthNum: 8, year: 2026 },
+              { name: 'SETEMBRO 2026', monthNum: 9, year: 2026 },
+              { name: 'OUTUBRO 2026', monthNum: 10, year: 2026 },
+              { name: 'NOVEMBRO 2026', monthNum: 11, year: 2026 },
+              { name: 'DEZEMBRO 2026', monthNum: 12, year: 2026 }
             ];
 
             const getDaysInMonth = (month: number, year: number) => {
@@ -886,14 +903,13 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
             };
 
             const getFirstDayOfWeek = (month: number, year: number) => {
-              return new Date(year, month - 1, 1).getDay(); // 0 = Domingo, 1 = Segunda...
+              return new Date(year, month - 1, 1).getDay();
             };
 
             const weekDays = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
 
             return (
               <div className="space-y-6 animate-fadeIn">
-                {/* Cabeçalho centralizado na parte preta superior */}
                 <div className="bg-slate-900 rounded-[2.5rem] p-8 text-white shadow-xl relative overflow-hidden flex flex-col md:flex-row justify-between items-center gap-4">
                   <div className="space-y-2 text-center md:text-left w-full">
                     <h3 className="text-2xl md:text-3xl font-[1000] uppercase italic tracking-wider text-white">
@@ -905,20 +921,18 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                   </div>
                   <div className="flex items-center gap-2 bg-slate-800 px-4 py-2 rounded-xl border border-slate-700 shrink-0">
                     <span className="w-3 h-3 rounded-full bg-blue-500 inline-block animate-pulse"></span>
-                    <span className="text-xs font-black uppercase text-white tracking-wider">{unit.code || unit.id || 'LIDT'}</span>
+                    <span className="text-xs font-black uppercase text-white tracking-wider">{unit.code || unit.id || 'UC'}</span>
                   </div>
                 </div>
 
-                {/* Grade de meses expandida em largura máxima */}
                 <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 pt-2">
                   {monthsToDisplay.map((mObj, idx) => {
                     const totalDays = getDaysInMonth(mObj.monthNum, mObj.year);
                     const startDay = getFirstDayOfWeek(mObj.monthNum, mObj.year);
                     
-                    // Montar array de células do mês
                     const cells = [];
                     for (let i = 0; i < startDay; i++) {
-                      cells.push(null); // dias vazios do mês anterior
+                      cells.push(null);
                     }
                     for (let d = 1; d <= totalDays; d++) {
                       cells.push(d);
@@ -926,26 +940,22 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
 
                     return (
                       <div key={idx} className="bg-white rounded-[2rem] border border-slate-200 shadow-xl overflow-hidden flex flex-col">
-                        {/* Título do Mês */}
                         <div className="bg-slate-900 text-white text-center py-3.5 text-xs font-[1000] uppercase tracking-[0.2em] border-b border-slate-800">
                           {mObj.name}
                         </div>
 
-                        {/* Dias da Semana */}
                         <div className="grid grid-cols-7 bg-slate-50 border-b border-slate-200 text-center py-2 text-[10px] font-black text-slate-500">
                           {weekDays.map((wd, wIndex) => (
                             <span key={wIndex} className={wIndex === 0 ? 'text-red-500' : ''}>{wd}</span>
                           ))}
                         </div>
 
-                        {/* Dias do Mês */}
                         <div className="grid grid-cols-7 p-3 gap-1.5 flex-1 bg-white">
                           {cells.map((dayNum, cIdx) => {
                             if (dayNum === null) {
                               return <div key={cIdx} className="h-12 md:h-14"></div>;
                             }
 
-                            // Verificar se há aula agendada neste dia
                             const event = parsedEvents.find(
                               ev => ev.day === dayNum && ev.month === mObj.monthNum && ev.year === mObj.year
                             );
