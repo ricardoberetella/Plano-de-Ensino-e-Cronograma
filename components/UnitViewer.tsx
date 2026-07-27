@@ -20,7 +20,7 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
   const [semester, setSemester] = useState<SemesterNumber>(unit.semester || 1);
   const [totalHours, setTotalHours] = useState(unit.totalHours || unit.workload || 80);
 
-  // Estados para inserção rápida nas colunas
+  // Estados para inserção rápida nas colunas (Geral)
   const [newTechCap, setNewTechCap] = useState('');
   const [newSocialCap, setNewSocialCap] = useState('');
   const [newKnowledge, setNewKnowledge] = useState('');
@@ -96,6 +96,68 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
     onUpdateUnit({ ...unit, knowledges: updatedKnowledges });
   };
 
+  // Funções para Situações-Problema
+  const handleAddSituation = () => {
+    const newSit = {
+      id: Date.now().toString(),
+      title: 'NOVA SITUAÇÃO-PROBLEMA: TÍTULO DA OPERAÇÃO',
+      contextualization: 'Insira o contexto industrial aqui...',
+      challenge: 'Insira o desafio proposto aos alunos aqui...',
+      expectedResults: ['Item 1: Descreva o resultado esperado...']
+    };
+    const currentList = unit.learningSituations || [];
+    onUpdateUnit({ ...unit, learningSituations: [...currentList, newSit] });
+  };
+
+  const handleDeleteSituation = (sitId: string) => {
+    if (window.confirm('Deseja realmente excluir esta Situação-Problema?')) {
+      const currentList = unit.learningSituations || [];
+      onUpdateUnit({ ...unit, learningSituations: currentList.filter(s => s.id !== sitId) });
+    }
+  };
+
+  const handleUpdateSituation = (sitId: string, field: string, value: any) => {
+    const currentList = unit.learningSituations || [];
+    const updated = currentList.map(s => s.id === sitId ? { ...s, [field]: value } : s);
+    onUpdateUnit({ ...unit, learningSituations: updated });
+  };
+
+  const handleAddExpectedResult = (sitId: string) => {
+    const currentList = unit.learningSituations || [];
+    const updated = currentList.map(s => {
+      if (s.id === sitId) {
+        return { ...s, expectedResults: [...(s.expectedResults || []), 'Novo resultado esperado...'] };
+      }
+      return s;
+    });
+    onUpdateUnit({ ...unit, learningSituations: updated });
+  };
+
+  const handleUpdateExpectedResult = (sitId: string, index: number, value: string) => {
+    const currentList = unit.learningSituations || [];
+    const updated = currentList.map(s => {
+      if (s.id === sitId) {
+        const results = [...(s.expectedResults || [])];
+        results[index] = value;
+        return { ...s, expectedResults: results };
+      }
+      return s;
+    });
+    onUpdateUnit({ ...unit, learningSituations: updated });
+  };
+
+  const handleDeleteExpectedResult = (sitId: string, index: number) => {
+    const currentList = unit.learningSituations || [];
+    const updated = currentList.map(s => {
+      if (s.id === sitId) {
+        const results = (s.expectedResults || []).filter((_, i) => i !== index);
+        return { ...s, expectedResults: results };
+      }
+      return s;
+    });
+    onUpdateUnit({ ...unit, learningSituations: updated });
+  };
+
   return (
     <div className="space-y-6 max-w-7xl mx-auto pb-20 animate-fadeIn">
       {/* Barra de Navegação Superior */}
@@ -114,7 +176,7 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
         </button>
       </div>
 
-      {/* CABEÇALHO ESCURO (Padrão Print 2) */}
+      {/* CABEÇALHO ESCURO */}
       <div className="bg-slate-900 rounded-[2.5rem] p-8 md:p-12 text-white shadow-2xl relative overflow-hidden border border-slate-800">
         <div className="absolute -right-10 -bottom-10 opacity-10 text-9xl font-[1000] select-none pointer-events-none">
           SENAI
@@ -395,7 +457,107 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
             </div>
           )}
 
-          {activeTab !== 'geral' && (
+          {activeTab === 'situacao-problema' && (
+            <div className="space-y-8 animate-fadeIn">
+              <div className="flex justify-between items-center border-b border-slate-100 pb-4">
+                <h3 className="text-lg font-[1000] uppercase italic text-slate-900 tracking-wider">Situações-Problema</h3>
+                <button
+                  onClick={handleAddSituation}
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-md transition-all"
+                >
+                  + Adicionar Situação
+                </button>
+              </div>
+
+              {(!unit.learningSituations || unit.learningSituations.length === 0) ? (
+                <div className="p-12 text-center bg-slate-50 rounded-2xl border border-dashed border-slate-200 text-slate-400 text-xs font-bold uppercase">
+                  Nenhuma situação-problema cadastrada. Clique em "Adicionar Situação" para iniciar.
+                </div>
+              ) : (
+                unit.learningSituations.map((sit) => (
+                  <div key={sit.id} className="bg-white rounded-[2.5rem] border border-slate-200 shadow-xl p-6 md:p-8 space-y-6">
+                    
+                    {/* TÍTULO DA SITUAÇÃO COM BOTÃO EXCLUIR */}
+                    <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                      <input
+                        type="text"
+                        value={sit.title}
+                        onChange={(e) => handleUpdateSituation(sit.id, 'title', e.target.value)}
+                        className="w-full md:w-3/4 bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs font-[1000] text-slate-900 uppercase focus:outline-none focus:border-blue-500 shadow-sm"
+                      />
+                      <button
+                        onClick={() => handleDeleteSituation(sit.id)}
+                        className="bg-red-50 text-red-600 hover:bg-red-600 hover:text-white px-4 py-2.5 rounded-xl text-[10px] font-black uppercase transition-all shadow-sm"
+                      >
+                        Excluir Situação
+                      </button>
+                    </div>
+
+                    {/* CONTEXTUALIZAÇÃO */}
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block">Contextualização</label>
+                      <textarea
+                        rows={4}
+                        value={sit.contextualization}
+                        onChange={(e) => handleUpdateSituation(sit.id, 'contextualization', e.target.value)}
+                        className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 text-xs font-bold text-slate-800 leading-relaxed focus:outline-none focus:border-blue-500 shadow-inner"
+                      />
+                    </div>
+
+                    {/* DESAFIO */}
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block">Desafio</label>
+                      <textarea
+                        rows={4}
+                        value={sit.challenge}
+                        onChange={(e) => handleUpdateSituation(sit.id, 'challenge', e.target.value)}
+                        className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 text-xs font-bold text-slate-800 leading-relaxed focus:outline-none focus:border-blue-500 shadow-inner"
+                      />
+                    </div>
+
+                    {/* RESULTADOS ESPERADOS */}
+                    <div className="space-y-4 pt-4 border-t border-slate-100">
+                      <div className="flex justify-between items-center">
+                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Resultados Esperados</label>
+                        <button
+                          onClick={() => handleAddExpectedResult(sit.id)}
+                          className="bg-slate-900 hover:bg-slate-800 text-white px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-wider transition-all"
+                        >
+                          + Adicionar Resultado
+                        </button>
+                      </div>
+
+                      <div className="space-y-3">
+                        {(!sit.expectedResults || sit.expectedResults.length === 0) ? (
+                          <p className="text-xs text-slate-400 italic p-3 bg-slate-50 rounded-xl border border-dashed border-slate-200">Nenhum resultado esperado cadastrado.</p>
+                        ) : (
+                          sit.expectedResults.map((res, rIndex) => (
+                            <div key={rIndex} className="flex items-center gap-3 bg-slate-50 p-3 rounded-2xl border border-slate-200">
+                              <input
+                                type="text"
+                                value={res}
+                                onChange={(e) => handleUpdateExpectedResult(sit.id, rIndex, e.target.value)}
+                                className="flex-1 bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 focus:outline-none focus:border-blue-500"
+                              />
+                              <button
+                                onClick={() => handleDeleteExpectedResult(sit.id, rIndex)}
+                                className="bg-red-50 text-red-600 hover:bg-red-600 hover:text-white px-3 py-2 rounded-xl text-[10px] font-black uppercase transition-all"
+                              >
+                                Remover
+                              </button>
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    </div>
+
+                  </div>
+                ))
+              )}
+            </div>
+          )}
+
+          {activeTab !== 'geral' && activeTab !== 'situacao-problema' && (
             <div className="p-8 text-center bg-slate-50 rounded-2xl border border-dashed border-slate-200">
               <p className="text-xs font-bold text-slate-400 uppercase">
                 Módulo de {activeTab.replace('-', ' ')} ativo.
