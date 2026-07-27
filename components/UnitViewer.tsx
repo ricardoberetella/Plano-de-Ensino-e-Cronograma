@@ -183,6 +183,31 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
     onUpdateUnit({ ...unit, rubrics: updated });
   };
 
+  // Funções para Plano de Aula / Cronograma
+  const handleAddLessonPlanRow = () => {
+    const newRow = {
+      id: Date.now().toString(),
+      hoursDate: '4 horas - 01/04/2026',
+      capacities: '- Descrever capacidade...',
+      knowledges: '1. Conhecimento...',
+      strategies: 'Exposição dialogada e prática...',
+      resources: 'Sala de aula, projetor...'
+    };
+    const currentPlan = unit.lessonPlan || [];
+    onUpdateUnit({ ...unit, lessonPlan: [...currentPlan, newRow] });
+  };
+
+  const handleDeleteLessonPlanRow = (rowId: string) => {
+    const currentPlan = unit.lessonPlan || [];
+    onUpdateUnit({ ...unit, lessonPlan: currentPlan.filter(r => r.id !== rowId) });
+  };
+
+  const handleUpdateLessonPlanCell = (rowId: string, field: string, value: string) => {
+    const currentPlan = unit.lessonPlan || [];
+    const updated = currentPlan.map(r => r.id === rowId ? { ...r, [field]: value } : r);
+    onUpdateUnit({ ...unit, lessonPlan: updated });
+  };
+
   return (
     <div className="space-y-6 max-w-7xl mx-auto pb-20 animate-fadeIn">
       {/* Barra de Navegação Superior */}
@@ -680,11 +705,142 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
             </div>
           )}
 
-          {activeTab !== 'geral' && activeTab !== 'situacao-problema' && activeTab !== 'rubricas' && (
-            <div className="p-8 text-center bg-slate-50 rounded-2xl border border-dashed border-slate-200">
-              <p className="text-xs font-bold text-slate-400 uppercase">
-                Módulo de {activeTab.replace('-', ' ')} ativo.
-              </p>
+          {activeTab === 'plano-aula' && (
+            <div className="space-y-6 animate-fadeIn">
+              <div className="flex justify-between items-center border-b border-slate-100 pb-4">
+                <div>
+                  <h3 className="text-lg font-[1000] uppercase italic text-slate-900 tracking-wider">Plano de Aula | Cronograma</h3>
+                  <p className="text-[10px] font-bold uppercase text-slate-400 mt-1">Organização diária das aulas e distribuição de carga horária</p>
+                </div>
+                <button
+                  onClick={handleAddLessonPlanRow}
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-md transition-all"
+                >
+                  + Adicionar Aula / Data
+                </button>
+              </div>
+
+              {(!unit.lessonPlan || unit.lessonPlan.length === 0) ? (
+                <div className="p-12 text-center bg-slate-50 rounded-2xl border border-dashed border-slate-200 text-slate-400 text-xs font-bold uppercase">
+                  Nenhum registro de aula cadastrado. Clique em "+ Adicionar Aula / Data" para iniciar.
+                </div>
+              ) : (
+                <div className="overflow-x-auto rounded-[2rem] border border-slate-200 shadow-xl bg-white">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="bg-slate-900 text-[10px] font-black uppercase tracking-wider text-white">
+                        <th className="p-4 w-1/6 border-r border-slate-800">Horas/Aulas/Data</th>
+                        <th className="p-4 w-1/4 border-r border-slate-800">Capacidades</th>
+                        <th className="p-4 w-1/4 border-r border-slate-800">Conhecimentos</th>
+                        <th className="p-4 w-1/5 border-r border-slate-800">Estratégias</th>
+                        <th className="p-4">Recursos/Ambientes</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100 text-xs">
+                      {unit.lessonPlan.map((row) => (
+                        <tr key={row.id} className="hover:bg-slate-50/50 transition-colors">
+                          {/* Horas/Aulas/Data */}
+                          <td className="p-4 border-r border-slate-100 align-top space-y-2">
+                            <textarea
+                              rows={2}
+                              value={row.hoursDate}
+                              onChange={(e) => handleUpdateLessonPlanCell(row.id, 'hoursDate', e.target.value)}
+                              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs font-bold text-slate-800 focus:outline-none focus:border-blue-500"
+                              placeholder="Ex: 4 horas - 13/03/2026"
+                            />
+                            <button
+                              onClick={() => handleDeleteLessonPlanRow(row.id)}
+                              className="w-full bg-red-50 hover:bg-red-600 text-red-600 hover:text-white py-1 rounded-lg text-[9px] font-black uppercase transition-all"
+                            >
+                              Excluir Linha
+                            </button>
+                          </td>
+
+                          {/* Capacidades */}
+                          <td className="p-4 border-r border-slate-100 align-top">
+                            <textarea
+                              rows={4}
+                              value={row.capacities}
+                              onChange={(e) => handleUpdateLessonPlanCell(row.id, 'capacities', e.target.value)}
+                              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs font-bold text-slate-800 focus:outline-none focus:border-blue-500"
+                            />
+                          </td>
+
+                          {/* Conhecimentos */}
+                          <td className="p-4 border-r border-slate-100 align-top">
+                            <textarea
+                              rows={4}
+                              value={row.knowledges}
+                              onChange={(e) => handleUpdateLessonPlanCell(row.id, 'knowledges', e.target.value)}
+                              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs font-bold text-slate-800 focus:outline-none focus:border-blue-500"
+                            />
+                          </td>
+
+                          {/* Estratégias */}
+                          <td className="p-4 border-r border-slate-100 align-top">
+                            <textarea
+                              rows={4}
+                              value={row.strategies}
+                              onChange={(e) => handleUpdateLessonPlanCell(row.id, 'strategies', e.target.value)}
+                              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs font-bold text-slate-800 focus:outline-none focus:border-blue-500"
+                            />
+                          </td>
+
+                          {/* Recursos/Ambientes */}
+                          <td className="p-4 align-top">
+                            <textarea
+                              rows={4}
+                              value={row.resources}
+                              onChange={(e) => handleUpdateLessonPlanCell(row.id, 'resources', e.target.value)}
+                              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs font-bold text-slate-800 focus:outline-none focus:border-blue-500"
+                            />
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          )}
+
+          {activeTab === 'calendario' && (
+            <div className="space-y-6 animate-fadeIn">
+              <div className="border-b border-slate-100 pb-4">
+                <h3 className="text-lg font-[1000] uppercase italic text-slate-900 tracking-wider">Calendário Geral e Sincronização</h3>
+                <p className="text-[10px] font-bold uppercase text-slate-400 mt-1">Visualização das datas preenchidas no plano de aula integradas por cor de unidade curricular</p>
+              </div>
+
+              <div className="bg-slate-50 p-6 rounded-[2rem] border border-slate-200 space-y-4">
+                <div className="flex items-center gap-3">
+                  <span className="w-4 h-4 rounded-full bg-blue-600 inline-block shadow-sm"></span>
+                  <span className="text-xs font-black uppercase text-slate-800">{unit.code || unit.id || 'UC'} — {unit.name}</span>
+                </div>
+                <p className="text-xs text-slate-600 font-medium leading-relaxed">
+                  As datas informadas na aba <strong>Plano de Aula</strong> são mapeadas automaticamente para o calendário geral da turma, destacando cada unidade curricular com sua respectiva cor institucional.
+                </p>
+
+                <div className="pt-4 border-t border-slate-200/60">
+                  <h4 className="text-[10px] font-black uppercase text-slate-400 tracking-wider mb-3">Datas Registradas no Cronograma desta UC:</h4>
+                  {(!unit.lessonPlan || unit.lessonPlan.length === 0) ? (
+                    <p className="text-xs text-slate-400 italic">Nenhuma data cadastrada no plano de aula ainda.</p>
+                  ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                      {unit.lessonPlan.map((row) => (
+                        <div key={row.id} className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+                          <div className="space-y-1">
+                            <span className="text-[9px] font-black uppercase text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md inline-block">
+                              {row.hoursDate.split('-')[0] || 'Aula'}
+                            </span>
+                            <p className="text-xs font-bold text-slate-800">{row.hoursDate.split('-')[1] || row.hoursDate}</p>
+                          </div>
+                          <span className="w-3 h-3 rounded-full bg-blue-600 inline-block animate-pulse"></span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
           )}
         </div>
