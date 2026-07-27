@@ -232,7 +232,12 @@ const App: React.FC = () => {
           SAMPLE_PLANS.find(plan => plan.profileId === profileId) ||
           SAMPLE_PLANS[0];
 
-        const dbPlans = await FirebaseService.getPlans(profileId);
+        let dbPlans = [];
+        try {
+          dbPlans = await FirebaseService.getPlans(profileId);
+        } catch (dbError) {
+          console.warn('Aviso: Falha ao buscar do Firebase, usando template padrão local.', dbError);
+        }
 
         if (!dbPlans || dbPlans.length === 0) {
           const defaultPlan: TeachingPlan = {
@@ -244,7 +249,11 @@ const App: React.FC = () => {
             units: sortUnits(template?.units || [])
           };
 
-          await FirebaseService.savePlan(defaultPlan);
+          try {
+            await FirebaseService.savePlan(defaultPlan);
+          } catch (e) {
+            console.warn('Não foi possível salvar plano padrão no Firebase:', e);
+          }
 
           setPlans([defaultPlan]);
           setCurrentPlan(defaultPlan);
@@ -260,6 +269,7 @@ const App: React.FC = () => {
           ) || null;
 
           setSelectedUnit(firstUnit);
+          setIsLoading(false);
           return;
         }
 
@@ -269,7 +279,11 @@ const App: React.FC = () => {
           const { normalizedPlan, updated } = normalizePlan(plan, template);
 
           if (updated) {
-            await FirebaseService.savePlan(normalizedPlan);
+            try {
+              await FirebaseService.savePlan(normalizedPlan);
+            } catch (e) {
+              console.warn('Erro ao atualizar plano normalizado:', e);
+            }
           }
 
           processedPlans.push(normalizedPlan);
@@ -311,12 +325,25 @@ const App: React.FC = () => {
 
         setSelectedUnit(nextSelected);
       } catch (error) {
-        console.error('Erro ao carregar Firebase:', error);
+        console.error('Erro crítico ao carregar planos:', error);
+        // Fallback de segurança para nunca travar a tela de carregamento
+        const fallbackTemplate = SAMPLE_PLANS[0];
+        const fallbackPlan: TeachingPlan = {
+          ...fallbackTemplate,
+          id: `plan-fallback-${activeProfileId}`,
+          profileId: activeProfileId,
+          version: SCHEDULE_VERSION,
+          units: sortUnits(fallbackTemplate?.units || [])
+        };
+        setPlans([fallbackPlan]);
+        setCurrentPlan(fallbackPlan);
+        setSelectedSemester(1);
+        setSelectedUnit(fallbackPlan.units[0] || null);
       } finally {
         setIsLoading(false);
       }
     },
-    [currentPlan?.id, normalizePlan, selectedSemester, selectedUnit?.id]
+    [activeProfileId, currentPlan?.id, normalizePlan, selectedSemester, selectedUnit?.id]
   );
 
   useEffect(() => {
@@ -351,7 +378,11 @@ const App: React.FC = () => {
       previous.map(plan => (plan.id === planToSave.id ? planToSave : plan))
     );
 
-    await FirebaseService.savePlan(planToSave);
+    try {
+      await FirebaseService.savePlan(planToSave);
+    } catch (e) {
+      console.warn('Erro ao salvar plano no Firebase:', e);
+    }
     return planToSave;
   };
 
@@ -558,7 +589,6 @@ const App: React.FC = () => {
             </div>
           )}
 
-          {/* Mapeamento unificado para Unidades Curriculares contendo Cronograma, Situações, Capacidades e Conhecimentos */}
           {(view === 'unidades-curriculares' || view === 'plano-ensino') && currentPlan && (
             <div className="space-y-8 max-w-7xl mx-auto pb-20">
               <div className="flex flex-wrap gap-3 px-1">
