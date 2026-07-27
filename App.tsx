@@ -653,7 +653,6 @@ const App: React.FC = () => {
                 ))}
               </div>
 
-              {/* Aqui chamamos novamente o UnitViewer original com todo o layout e detalhes completos de capacidades, conhecimentos e situações de aprendizagem */}
               <UnitViewer
                 unit={selectedUnit}
                 onUpdateSchedule={newSchedule =>
@@ -692,7 +691,6 @@ const App: React.FC = () => {
                 </p>
               </div>
 
-              {/* Formulário de Cadastro */}
               <form onSubmit={handleAddUnitSubmit} className="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-xl space-y-6">
                 <h3 className="text-xs font-black text-slate-900 uppercase tracking-widest">+ Adicionar Nova Unidade Curricular</h3>
                 
@@ -752,7 +750,6 @@ const App: React.FC = () => {
                 </div>
               </form>
 
-              {/* Lista de Unidades Cadastradas */}
               <div className="bg-white rounded-[2.5rem] border border-slate-200 shadow-xl overflow-hidden">
                 <div className="p-6 border-b border-slate-100 bg-slate-50">
                   <h3 className="text-xs font-black text-slate-800 uppercase tracking-wider">Unidades Cadastradas</h3>
