@@ -158,6 +158,31 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
     onUpdateUnit({ ...unit, learningSituations: updated });
   };
 
+  // Funções para Rubricas
+  const handleAddRubricRow = () => {
+    const newRow = {
+      id: Date.now().toString(),
+      reference: 'Nova Capacidade / Referência...',
+      nsa: 'Não atende...',
+      apo: 'Atende parcialmente...',
+      par: 'Atende com ressalvas...',
+      aut: 'Atende com autonomia...'
+    };
+    const currentRubrics = unit.rubrics || [];
+    onUpdateUnit({ ...unit, rubrics: [...currentRubrics, newRow] });
+  };
+
+  const handleDeleteRubricRow = (rubricId: string) => {
+    const currentRubrics = unit.rubrics || [];
+    onUpdateUnit({ ...unit, rubrics: currentRubrics.filter(r => r.id !== rubricId) });
+  };
+
+  const handleUpdateRubricCell = (rubricId: string, field: 'reference' | 'nsa' | 'apo' | 'par' | 'aut', value: string) => {
+    const currentRubrics = unit.rubrics || [];
+    const updated = currentRubrics.map(r => r.id === rubricId ? { ...r, [field]: value } : r);
+    onUpdateUnit({ ...unit, rubrics: updated });
+  };
+
   return (
     <div className="space-y-6 max-w-7xl mx-auto pb-20 animate-fadeIn">
       {/* Barra de Navegação Superior */}
@@ -557,7 +582,105 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
             </div>
           )}
 
-          {activeTab !== 'geral' && activeTab !== 'situacao-problema' && (
+          {activeTab === 'rubricas' && (
+            <div className="space-y-6 animate-fadeIn">
+              <div className="flex justify-between items-center border-b border-slate-100 pb-4">
+                <div>
+                  <h3 className="text-lg font-[1000] uppercase italic text-slate-900 tracking-wider">Matriz de Rubricas</h3>
+                  <p className="text-[10px] font-bold uppercase text-slate-400 mt-1">Critérios de Avaliação por Nível de Desempenho</p>
+                </div>
+                <button
+                  onClick={handleAddRubricRow}
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-md transition-all"
+                >
+                  + Adicionar Rubrica
+                </button>
+              </div>
+
+              {(!unit.rubrics || unit.rubrics.length === 0) ? (
+                <div className="p-12 text-center bg-slate-50 rounded-2xl border border-dashed border-slate-200 text-slate-400 text-xs font-bold uppercase">
+                  Nenhuma rubrica cadastrada. Clique em "+ Adicionar Rubrica" para iniciar.
+                </div>
+              ) : (
+                <div className="overflow-x-auto rounded-[2rem] border border-slate-200 shadow-xl bg-white">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="bg-slate-900 text-white text-[10px] font-black uppercase tracking-wider">
+                        <th className="p-4 w-1/5 border-r border-slate-800">Referência</th>
+                        <th className="p-4 w-1/5 border-r border-slate-800">NSA (Não Atende)</th>
+                        <th className="p-4 w-1/5 border-r border-slate-800">APO (Atende Parcialmente)</th>
+                        <th className="p-4 w-1/5 border-r border-slate-800">PAR (Atende com Ressalvas)</th>
+                        <th className="p-4 w-1/5">AUT (Atende com Autonomia)</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100 text-xs">
+                      {unit.rubrics.map((row) => (
+                        <tr key={row.id} className="hover:bg-slate-50/50 transition-colors">
+                          {/* Referência */}
+                          <td className="p-4 border-r border-slate-100 align-top space-y-2">
+                            <textarea
+                              rows={3}
+                              value={row.reference}
+                              onChange={(e) => handleUpdateRubricCell(row.id, 'reference', e.target.value)}
+                              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs font-bold text-slate-800 focus:outline-none focus:border-blue-500"
+                            />
+                            <button
+                              onClick={() => handleDeleteRubricRow(row.id)}
+                              className="w-full bg-red-50 hover:bg-red-600 text-red-600 hover:text-white py-1 rounded-lg text-[9px] font-black uppercase transition-all"
+                            >
+                              Excluir Linha
+                            </button>
+                          </td>
+
+                          {/* NSA */}
+                          <td className="p-4 border-r border-slate-100 align-top">
+                            <textarea
+                              rows={4}
+                              value={row.nsa}
+                              onChange={(e) => handleUpdateRubricCell(row.id, 'nsa', e.target.value)}
+                              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs font-bold text-slate-800 focus:outline-none focus:border-blue-500"
+                            />
+                          </td>
+
+                          {/* APO */}
+                          <td className="p-4 border-r border-slate-100 align-top">
+                            <textarea
+                              rows={4}
+                              value={row.apo}
+                              onChange={(e) => handleUpdateRubricCell(row.id, 'apo', e.target.value)}
+                              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs font-bold text-slate-800 focus:outline-none focus:border-blue-500"
+                            />
+                          </td>
+
+                          {/* PAR */}
+                          <td className="p-4 border-r border-slate-100 align-top">
+                            <textarea
+                              rows={4}
+                              value={row.par}
+                              onChange={(e) => handleUpdateRubricCell(row.id, 'par', e.target.value)}
+                              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs font-bold text-slate-800 focus:outline-none focus:border-blue-500"
+                            />
+                          </td>
+
+                          {/* AUT */}
+                          <td className="p-4 align-top">
+                            <textarea
+                              rows={4}
+                              value={row.aut}
+                              onChange={(e) => handleUpdateRubricCell(row.id, 'aut', e.target.value)}
+                              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs font-bold text-slate-800 focus:outline-none focus:border-blue-500"
+                            />
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          )}
+
+          {activeTab !== 'geral' && activeTab !== 'situacao-problema' && activeTab !== 'rubricas' && (
             <div className="p-8 text-center bg-slate-50 rounded-2xl border border-dashed border-slate-200">
               <p className="text-xs font-bold text-slate-400 uppercase">
                 Módulo de {activeTab.replace('-', ' ')} ativo.
