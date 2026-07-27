@@ -778,7 +778,7 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                   <table className="w-full text-left border-collapse">
                     <thead>
                       <tr className="bg-slate-900 text-[10px] font-black uppercase tracking-wider text-white">
-                        <th className="p-3 w-[18%] border-r border-slate-800 text-center">HORAS/AULAS/DATA</th>
+                        <th className="p-3 w-[22%] border-r border-slate-800 text-center">HORAS/AULAS/DATA</th>
                         <th className="p-3 w-[24%] border-r border-slate-800 text-center">CAPACIDADES</th>
                         <th className="p-3 w-[24%] border-r border-slate-800 text-center">CONHECIMENTOS</th>
                         <th className="p-3 w-[16%] border-r border-slate-800 text-center">ESTRATÉGIAS</th>
@@ -796,28 +796,30 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                             key={row.id} 
                             className={`transition-colors ${isCompleted ? 'bg-emerald-50/80 hover:bg-emerald-50' : 'bg-white hover:bg-slate-50'}`}
                           >
-                            {/* Horas/Aulas/Data com larguras de bordas ajustadas */}
-                            <td className="p-2 border-r border-slate-200 align-top space-y-2">
+                            {/* Horas e Data lado a lado com bordas perfeitamente alinhadas aos outros quadros */}
+                            <td className="p-2 border-r border-slate-200 align-top">
                               <div className={`p-2 rounded-xl border space-y-2 ${isCompleted ? 'bg-emerald-100/60 border-emerald-300' : 'bg-slate-50 border-slate-200'}`}>
-                                <div>
-                                  <label className="block text-[8px] font-black uppercase text-slate-500 mb-0.5">Qtd. Horas</label>
-                                  <input
-                                    type="number"
-                                    min="1"
-                                    max="20"
-                                    value={parsed.hours}
-                                    onChange={(e) => handleUpdateHoursOrDate(row.id, row.hoursDate, e.target.value, parsed.date)}
-                                    className={`w-full p-2 text-xs font-bold focus:outline-none rounded-xl border text-center ${isCompleted ? 'bg-emerald-50 text-emerald-950 border-emerald-300' : 'bg-white text-slate-800 border-slate-200'}`}
-                                  />
-                                </div>
-                                <div>
-                                  <label className="block text-[8px] font-black uppercase text-slate-500 mb-0.5">Data da Aula</label>
-                                  <input
-                                    type="date"
-                                    value={parsed.date}
-                                    onChange={(e) => handleUpdateHoursOrDate(row.id, row.hoursDate, parsed.hours, e.target.value)}
-                                    className={`w-full p-2 text-xs font-bold focus:outline-none rounded-xl border text-center ${isCompleted ? 'bg-emerald-50 text-emerald-950 border-emerald-300' : 'bg-white text-slate-800 border-slate-200'}`}
-                                  />
+                                <div className="grid grid-cols-2 gap-2">
+                                  <div>
+                                    <label className="block text-[8px] font-black uppercase text-slate-500 mb-0.5">QTD. HORAS</label>
+                                    <input
+                                      type="number"
+                                      min="1"
+                                      max="20"
+                                      value={parsed.hours}
+                                      onChange={(e) => handleUpdateHoursOrDate(row.id, row.hoursDate, e.target.value, parsed.date)}
+                                      className={`w-full p-2 text-xs font-bold focus:outline-none rounded-xl border text-center ${isCompleted ? 'bg-emerald-50 text-emerald-950 border-emerald-300' : 'bg-white text-slate-800 border-slate-200'}`}
+                                    />
+                                  </div>
+                                  <div>
+                                    <label className="block text-[8px] font-black uppercase text-slate-500 mb-0.5">DATA DA AULA</label>
+                                    <input
+                                      type="date"
+                                      value={parsed.date}
+                                      onChange={(e) => handleUpdateHoursOrDate(row.id, row.hoursDate, parsed.hours, e.target.value)}
+                                      className={`w-full p-2 text-xs font-bold focus:outline-none rounded-xl border text-center ${isCompleted ? 'bg-emerald-50 text-emerald-950 border-emerald-300' : 'bg-white text-slate-800 border-slate-200'}`}
+                                    />
+                                  </div>
                                 </div>
                               </div>
                             </td>
@@ -866,30 +868,33 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                               />
                             </td>
 
-                            {/* Status e Botão Excluir alinhados na mesma coluna */}
-                            <td className="p-2 align-middle text-center space-y-2">
-                              <button
-                                type="button"
-                                onClick={() => handleUpdateLessonPlanCell(row.id, 'completed', !isCompleted)}
-                                className={`w-full h-9 rounded-xl flex items-center justify-center transition-all shadow-sm font-black text-[10px] uppercase cursor-pointer ${
-                                  isCompleted 
-                                    ? 'bg-emerald-600 hover:bg-emerald-700 text-white' 
-                                    : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200'
-                                }`}
-                                title={isCompleted ? 'Aula marcada como dada (Concluída)' : 'Marcar como aula dada'}
-                              >
-                                {isCompleted ? '✓ CONCLUÍDO' : 'OK'}
-                              </button>
-                              <button
-                                type="button"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleDeleteLessonPlanRow(row.id);
-                                }}
-                                className="w-full bg-red-50 hover:bg-red-600 text-red-600 hover:text-white py-1.5 rounded-xl text-[9px] font-black uppercase transition-all cursor-pointer border border-red-100 shadow-sm"
-                              >
-                                Excluir
-                              </button>
+                            {/* Status e Botão Excluir lado a lado na mesma linha */}
+                            <td className="p-2 align-middle text-center">
+                              <div className="flex items-center justify-center gap-1.5">
+                                <button
+                                  type="button"
+                                  onClick={() => handleUpdateLessonPlanCell(row.id, 'completed', !isCompleted)}
+                                  className={`flex-1 h-9 rounded-xl flex items-center justify-center transition-all shadow-sm font-black text-[10px] uppercase cursor-pointer ${
+                                    isCompleted 
+                                      ? 'bg-emerald-600 hover:bg-emerald-700 text-white' 
+                                      : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200'
+                                  }`}
+                                  title={isCompleted ? 'Aula marcada como dada (Concluída)' : 'Marcar como aula dada'}
+                                >
+                                  {isCompleted ? '✓' : 'OK'}
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleDeleteLessonPlanRow(row.id);
+                                  }}
+                                  className="flex-1 bg-red-50 hover:bg-red-600 text-red-600 hover:text-white h-9 rounded-xl text-[9px] font-black uppercase transition-all cursor-pointer border border-red-100 shadow-sm flex items-center justify-center"
+                                  title="Excluir Aula"
+                                >
+                                  Excluir
+                                </button>
+                              </div>
                             </td>
                           </tr>
                         );
