@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { CurricularUnit, SemesterNumber } from '../types';
 
 interface UnitViewerProps {
@@ -183,13 +183,17 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
     onUpdateUnit({ ...unit, rubrics: updated });
   };
 
-  // Funções para Plano de Aula / Cronograma (Modificadas para uso estável com setState local imediato)
+  // ==========================================
+  // ESTADO LOCAL ROBUSTO PARA O PLANO DE AULA
+  // Resolve qualquer conflito de perda de foco ou delay
+  // ==========================================
   const [lessonPlanList, setLessonPlanList] = useState(unit.lessonPlan || []);
+  const isInitialMount = useRef(true);
 
-  // Sincroniza caso mude externamente
-  React.useEffect(() => {
+  // Sincroniza o estado local apenas quando o ID da unidade mudar (troca de UC)
+  useEffect(() => {
     setLessonPlanList(unit.lessonPlan || []);
-  }, [unit.lessonPlan]);
+  }, [unit.id]);
 
   const handleAddLessonPlanRow = () => {
     const newRow = {
