@@ -847,7 +847,6 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                 </button>
               </div>
 
-              {/* Tabela do Plano de Aula sem barra de rolagem e colunas otimizadas */}
               <div className="border border-slate-300 rounded-2xl overflow-hidden shadow-sm bg-white">
                 <table className="w-full border-collapse text-left text-xs">
                   <thead className="bg-[#111827] text-white uppercase text-[10px] tracking-wider">
@@ -871,7 +870,6 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                         const parsedHD = parseHoursAndDate(row.hoursDate);
                         return (
                           <tr key={row.id} className="hover:bg-slate-50/80 group align-top">
-                            {/* Coluna Carga / Data unificada no mesmo alinhamento */}
                             <td className="p-3 border-r border-slate-200 bg-white">
                               <div className="flex items-center gap-1 mb-2">
                                 <input
@@ -894,7 +892,6 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                               </div>
                             </td>
 
-                            {/* Coluna Capacidades */}
                             <td className="p-3 border-r border-slate-200 bg-white">
                               <textarea
                                 rows={2}
@@ -906,7 +903,6 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                               />
                             </td>
 
-                            {/* Coluna Conhecimentos */}
                             <td className="p-3 border-r border-slate-200 bg-white">
                               <textarea
                                 rows={2}
@@ -918,7 +914,6 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                               />
                             </td>
 
-                            {/* Coluna Estratégias / Recursos */}
                             <td className="p-3 border-r border-slate-200 bg-white space-y-2">
                               <textarea
                                 rows={2}
@@ -938,7 +933,6 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                               />
                             </td>
 
-                            {/* Coluna Ações (Estreita e discreta) */}
                             <td className="p-2 text-center align-middle bg-white w-16">
                               <button
                                 type="button"
@@ -975,3 +969,6 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
     </div>
   );
 };
+
+// Adicionado o export default para resolver o erro do Rollup/Vite no build da Vercel
+export default UnitViewer;
