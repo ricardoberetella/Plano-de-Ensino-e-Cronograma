@@ -36,7 +36,7 @@ const CapacityRowItem = memo(({ row, type, onUpdate, onDelete }: CapacityRowItem
 
   return (
     <tr className="hover:bg-slate-50/80 group">
-      <td className="p-3 bg-white relative">
+      <td className="px-3 py-1.5 bg-white relative">
         <div className="flex items-start gap-2">
           <textarea
             ref={textareaRef}
@@ -88,7 +88,7 @@ const KnowledgeRowItem = memo(({ row, onUpdate, onDelete }: KnowledgeRowItemProp
 
   return (
     <tr className="hover:bg-slate-50/80 group">
-      <td className="p-3 bg-white relative">
+      <td className="px-3 py-1.5 bg-white relative">
         <div className="flex items-start gap-2">
           <textarea
             ref={textareaRef}
@@ -550,9 +550,9 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                       +
                     </button>
                   </div>
-                  <div className="overflow-x-auto border border-slate-200 rounded-b-2xl shadow-sm bg-white">
+                  <div className="overflow-x-auto border border-slate-200 rounded-b-2xl shadow-sm bg-white p-2">
                     <table className="w-full border-collapse text-left text-xs">
-                      <tbody className="divide-y divide-slate-200">
+                      <tbody className="divide-y divide-slate-100">
                         {knowRows.map((row) => (
                           <KnowledgeRowItem
                             key={row.id}
@@ -596,11 +596,11 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                       </button>
                     </div>
                   </div>
-                  <div className="overflow-x-auto border border-slate-200 rounded-b-2xl shadow-sm bg-white p-4 space-y-4">
+                  <div className="overflow-x-auto border border-slate-200 rounded-b-2xl shadow-sm bg-white p-2 space-y-2">
                     {/* Lista de Capacidades Técnicas (sem rótulo interno) */}
-                    <div className="space-y-2">
+                    <div className="space-y-1">
                       <table className="w-full border-collapse text-left text-xs">
-                        <tbody className="divide-y divide-slate-200">
+                        <tbody className="divide-y divide-slate-100">
                           {techRows.map((row) => (
                             <CapacityRowItem
                               key={row.id}
@@ -615,9 +615,9 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                     </div>
 
                     {/* Lista de Capacidades Socioemocionais (sem rótulo interno) */}
-                    <div className="space-y-2">
+                    <div className="space-y-1">
                       <table className="w-full border-collapse text-left text-xs">
-                        <tbody className="divide-y divide-slate-200">
+                        <tbody className="divide-y divide-slate-100">
                           {socialRows.map((row) => (
                             <CapacityRowItem
                               key={row.id}
@@ -876,7 +876,7 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                     ) : (
                       lessonPlanList.map((row) => {
                         const parsed = parseHoursAndDate(row.hoursDate);
-                        return (
+                    return (
                           <tr key={row.id} className="hover:bg-slate-50/50">
                             <td className="p-3 border-r border-slate-200 align-top space-y-2">
                               <div className="flex items-center gap-1">
