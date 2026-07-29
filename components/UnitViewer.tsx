@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { CurricularUnit, SemesterNumber } from '../types';
 
 interface UnitViewerProps {
@@ -142,17 +142,16 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
     onUpdateUnit({ ...unit, learningSituations: updated });
   };
 
-  // --- TRATAMENTO SEGURO DE RUBRICAS (Evita [object Object] e travamentos) ---
+  // --- TRATAMENTO ESTÁVEL E FLUIDO DE RUBRICAS ---
   const sanitizeText = (val: any): string => {
     if (typeof val === 'string') return val;
     if (val && typeof val === 'object') {
-      // Se por acaso veio um objeto salvo incorretamente, tenta extrair string ou converte vazio
       return val.text || val.reference || '';
     }
     return '';
   };
 
-  const initialRubrics = (unit.rubrics || []).map(r => ({
+  const parseInitialRubrics = () => (unit.rubrics || []).map(r => ({
     id: r.id || Math.random().toString(),
     reference: sanitizeText(r.reference),
     nsa: sanitizeText(r.nsa),
@@ -161,42 +160,38 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
     aut: sanitizeText(r.aut)
   }));
 
-  const [rubricsList, setRubricsList] = useState(initialRubrics);
+  const [rubricsList, setRubricsList] = useState(parseInitialRubrics);
+  const rubricsRef = useRef(rubricsList);
+  rubricsRef.current = rubricsList;
 
   useEffect(() => {
-    setRubricsList((unit.rubrics || []).map(r => ({
-      id: r.id || Math.random().toString(),
-      reference: sanitizeText(r.reference),
-      nsa: sanitizeText(r.nsa),
-      apo: sanitizeText(r.apo),
-      par: sanitizeText(r.par),
-      aut: sanitizeText(r.aut)
-    })));
-  }, [unit.id, unit.rubrics]);
+    setRubricsList(parseInitialRubrics());
+  }, [unit.id]);
 
   const handleAddRubricRow = () => {
     const newRow = {
       id: Date.now().toString(),
-      reference: 'Nova Capacidade / Referência...',
-      nsa: 'Não atende...',
-      apo: 'Atende parcialmente...',
-      par: 'Atende com ressalvas...',
-      aut: 'Atende com autonomia...'
+      reference: '',
+      nsa: '',
+      apo: '',
+      par: '',
+      aut: ''
     };
-    const updated = [...rubricsList, newRow];
+    const updated = [...rubricsRef.current, newRow];
     setRubricsList(updated);
     onUpdateUnit({ ...unit, rubrics: updated });
   };
 
   const handleDeleteRubricRow = (rubricId: string) => {
-    const updated = rubricsList.filter(r => r.id !== rubricId);
+    const updated = rubricsRef.current.filter(r => r.id !== rubricId);
     setRubricsList(updated);
     onUpdateUnit({ ...unit, rubrics: updated });
   };
 
   const handleUpdateRubricCell = (rubricId: string, field: 'reference' | 'nsa' | 'apo' | 'par' | 'aut', value: string) => {
-    const updated = rubricsList.map(r => r.id === rubricId ? { ...r, [field]: value } : r);
+    const updated = rubricsRef.current.map(r => r.id === rubricId ? { ...r, [field]: value } : r);
     setRubricsList(updated);
+    // Salva sem travar a digitação
     onUpdateUnit({ ...unit, rubrics: updated });
   };
 
@@ -438,7 +433,6 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                         <button
                           type="button"
                           onClick={handleAddTechnicalCapacity}
-                          title="Adicionar Capacidade Técnica"
                           className="px-2.5 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-[10px] font-black uppercase shadow-sm transition-all"
                         >
                           + Adicionar
@@ -448,7 +442,7 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                     {(!unit.technicalCapacities || unit.technicalCapacities.length === 0) ? (
                       <tr>
                         <td className="p-4 text-slate-400 italic" colSpan={2}>
-                          Nenhuma capacidade técnica cadastrada. Clique em "+ Adicionar" acima.
+                          Nenhuma capacidade técnica cadastrada.
                         </td>
                       </tr>
                     ) : (
@@ -466,14 +460,13 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                               <button
                                 type="button"
                                 onClick={() => handleDeleteTechnicalCapacity(index)}
-                                title="Remover linha"
-                                className="p-2 bg-red-50 hover:bg-red-600 hover:text-white text-red-600 rounded-xl transition-colors text-[10px] font-black shrink-0 opacity-0 group-hover:opacity-100"
+                                className="p-2 text-slate-300 hover:text-red-600 transition-colors text-xs font-black shrink-0"
                               >
                                 ✕
                               </button>
                             </div>
                           </td>
-                          <td className="p-3 text-slate-300 italic text-xs align-middle bg-slate-50/30"></td>
+                          <td className="p-3 bg-slate-50/30"></td>
                         </tr>
                       ))
                     )}
@@ -484,7 +477,6 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                         <button
                           type="button"
                           onClick={handleAddSocialCapacity}
-                          title="Adicionar Capacidade Socioemocional"
                           className="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-[10px] font-black uppercase shadow-sm transition-all"
                         >
                           + Adicionar
@@ -494,7 +486,7 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                     {(!unit.socialCapacities || unit.socialCapacities.length === 0) ? (
                       <tr>
                         <td className="p-4 text-slate-400 italic" colSpan={2}>
-                          Nenhuma capacidade socioemocional cadastrada. Clique em "+ Adicionar" acima.
+                          Nenhuma capacidade socioemocional cadastrada.
                         </td>
                       </tr>
                     ) : (
@@ -512,14 +504,13 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                               <button
                                 type="button"
                                 onClick={() => handleDeleteSocialCapacity(index)}
-                                title="Remover linha"
-                                className="p-2 bg-red-50 hover:bg-red-600 hover:text-white text-red-600 rounded-xl transition-colors text-[10px] font-black shrink-0 opacity-0 group-hover:opacity-100"
+                                className="p-2 text-slate-300 hover:text-red-600 transition-colors text-xs font-black shrink-0"
                               >
                                 ✕
                               </button>
                             </div>
                           </td>
-                          <td className="p-3 text-slate-300 italic text-xs align-middle bg-slate-50/30"></td>
+                          <td className="p-3 bg-slate-50/30"></td>
                         </tr>
                       ))
                     )}
@@ -530,7 +521,6 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                         <button
                           type="button"
                           onClick={handleAddKnowledge}
-                          title="Adicionar Conhecimento"
                           className="px-2.5 py-1 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-[10px] font-black uppercase shadow-sm transition-all"
                         >
                           + Adicionar
@@ -540,13 +530,13 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                     {(!unit.knowledges || unit.knowledges.length === 0) ? (
                       <tr>
                         <td className="p-4 text-slate-400 italic" colSpan={2}>
-                          Nenhum conhecimento cadastrado. Clique em "+ Adicionar" acima.
+                          Nenhum conhecimento cadastrado.
                         </td>
                       </tr>
                     ) : (
                       unit.knowledges.map((item, index) => (
                         <tr key={index} className="hover:bg-slate-50/80 group">
-                          <td className="p-3 border-r border-slate-200 align-middle bg-slate-50/35"></td>
+                          <td className="p-3 border-r border-slate-200 bg-slate-50/35"></td>
                           <td className="p-3 align-middle bg-white">
                             <div className="flex items-center gap-2">
                               <input
@@ -559,8 +549,7 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                               <button
                                 type="button"
                                 onClick={() => handleDeleteKnowledge(index)}
-                                title="Remover linha"
-                                className="p-2 bg-red-50 hover:bg-red-600 hover:text-white text-red-600 rounded-xl transition-colors text-[10px] font-black shrink-0 opacity-0 group-hover:opacity-100"
+                                className="p-2 text-slate-300 hover:text-red-600 transition-colors text-xs font-black shrink-0"
                               >
                                 ✕
                               </button>
@@ -590,7 +579,7 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
 
               {(!unit.learningSituations || unit.learningSituations.length === 0) ? (
                 <div className="p-12 text-center bg-slate-50 rounded-2xl border border-dashed border-slate-200 text-slate-400 text-xs font-bold uppercase">
-                  Nenhuma situação-problema cadastrada. Clique em "Adicionar Situação" para iniciar.
+                  Nenhuma situação-problema cadastrada.
                 </div>
               ) : (
                 unit.learningSituations.map((sit) => (
@@ -605,9 +594,9 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                       <button
                         type="button"
                         onClick={() => handleDeleteSituation(sit.id)}
-                        className="bg-red-50 text-red-600 hover:bg-red-600 hover:text-white px-4 py-2.5 rounded-xl text-[10px] font-black uppercase transition-all shadow-sm cursor-pointer"
+                        className="text-slate-400 hover:text-red-600 p-2 text-xs font-black transition-colors"
                       >
-                        Excluir Situação
+                        ✕ Excluir Situação
                       </button>
                     </div>
 
@@ -647,7 +636,7 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
 
                       <div className="space-y-3">
                         {(!sit.expectedResults || sit.expectedResults.length === 0) ? (
-                          <p className="text-xs text-slate-400 italic p-3 bg-slate-50 rounded-xl border border-dashed border-slate-200">Nenhum resultado esperado cadastrado.</p>
+                          <p className="text-xs text-slate-400 italic p-3 bg-slate-50 rounded-xl border border-dashed border-slate-200">Nenhum resultado esperado.</p>
                         ) : (
                           sit.expectedResults.map((res, rIndex) => (
                             <div key={rIndex} className="flex items-center gap-3 bg-slate-50 p-3 rounded-2xl border border-slate-200">
@@ -660,7 +649,7 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                               <button
                                 type="button"
                                 onClick={() => handleDeleteExpectedResult(sit.id, rIndex)}
-                                className="p-2 bg-red-50 text-red-600 hover:bg-red-600 hover:text-white rounded-xl text-xs font-black transition-all cursor-pointer"
+                                className="text-slate-300 hover:text-red-600 p-2 text-xs font-black transition-colors"
                               >
                                 ✕
                               </button>
@@ -695,23 +684,24 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                 <table className="w-full border-collapse text-left text-xs">
                   <thead>
                     <tr className="bg-slate-900 text-white text-[10px] font-black uppercase tracking-wider">
-                      <th className="p-3 border border-slate-700 w-1/5">Referência</th>
-                      <th className="p-3 border border-slate-700 w-1/5 text-red-400">NSA</th>
-                      <th className="p-3 border border-slate-700 w-1/5 text-orange-400">APO</th>
-                      <th className="p-3 border border-slate-700 w-1/5 text-blue-400">PAR</th>
-                      <th className="p-3 border border-slate-700 w-1/5 text-emerald-400">AUT</th>
+                      <th className="p-3 border border-slate-700 w-[22%]">Referência</th>
+                      <th className="p-3 border border-slate-700 w-[18%] text-red-400">NSA</th>
+                      <th className="p-3 border border-slate-700 w-[18%] text-orange-400">APO</th>
+                      <th className="p-3 border border-slate-700 w-[18%] text-blue-400">PAR</th>
+                      <th className="p-3 border border-slate-700 w-[18%] text-emerald-400">AUT</th>
+                      <th className="p-3 border border-slate-700 w-10 text-center">Ações</th>
                     </tr>
                   </thead>
                   <tbody>
                     {rubricsList.length === 0 ? (
                       <tr>
-                        <td colSpan={5} className="p-6 text-center text-slate-400 italic text-xs">
+                        <td colSpan={6} className="p-6 text-center text-slate-400 italic text-xs">
                           Nenhuma rubrica cadastrada. Clique em "+ Adicionar Rubrica" acima.
                         </td>
                       </tr>
                     ) : (
                       rubricsList.map((row) => (
-                        <tr key={row.id} className="hover:bg-slate-50/50">
+                        <tr key={row.id} className="hover:bg-slate-50/50 group">
                           <td className="p-2 border border-slate-300 align-top bg-slate-50/60">
                             <textarea
                               rows={3}
@@ -720,15 +710,6 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                               placeholder="Capacidade / Referência..."
                               className="w-full bg-transparent border-none focus:ring-0 text-xs font-bold text-slate-900 resize-none outline-none"
                             />
-                            <div className="pt-2 border-t border-slate-200 mt-2 flex justify-end">
-                              <button
-                                type="button"
-                                onClick={() => handleDeleteRubricRow(row.id)}
-                                className="text-[9px] font-black uppercase text-red-600 hover:text-red-800 bg-red-50 hover:bg-red-100 px-2 py-1 rounded transition-colors"
-                              >
-                                Excluir Linha
-                              </button>
-                            </div>
                           </td>
                           <td className="p-2 border border-slate-300 align-top">
                             <textarea
@@ -765,6 +746,16 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                               placeholder="Atende com autonomia..."
                               className="w-full bg-transparent border-none focus:ring-0 text-xs text-slate-700 resize-none outline-none"
                             />
+                          </td>
+                          <td className="p-2 border border-slate-300 align-middle text-center bg-slate-50/30">
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteRubricRow(row.id)}
+                              title="Excluir linha"
+                              className="text-slate-300 hover:text-red-600 transition-colors text-xs font-black p-1"
+                            >
+                              ✕
+                            </button>
                           </td>
                         </tr>
                       ))
@@ -862,7 +853,7 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                               <button
                                 type="button"
                                 onClick={() => handleDeleteLessonPlanRow(row.id)}
-                                className="p-2 bg-red-50 text-red-600 hover:bg-red-600 hover:text-white rounded-xl text-xs font-black transition-all cursor-pointer"
+                                className="text-slate-300 hover:text-red-600 transition-colors text-xs font-black p-1"
                               >
                                 ✕
                               </button>
