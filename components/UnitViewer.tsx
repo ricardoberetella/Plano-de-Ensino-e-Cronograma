@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, memo } from 'react';
 import { CurricularUnit, SemesterNumber } from '../types';
 
 interface UnitViewerProps {
@@ -13,6 +13,72 @@ interface MatrixRow {
   social: string;
   knowledge: string;
 }
+
+// Sub-componente isolado e memoizado para evitar perda de foco e lentidão na digitação
+interface MatrixRowItemProps {
+  row: MatrixRow;
+  onUpdate: (id: string, field: 'technical' | 'social' | 'knowledge', value: string) => void;
+  onDelete: (id: string) => void;
+}
+
+const MatrixRowItem = memo(({ row, onUpdate, onDelete }: MatrixRowItemProps) => {
+  const [tech, setTech] = useState(row.technical);
+  const [social, setSocial] = useState(row.social);
+  const [know, setKnow] = useState(row.knowledge);
+
+  useEffect(() => { setTech(row.technical); }, [row.technical]);
+  useEffect(() => { setSocial(row.social); }, [row.social]);
+  useEffect(() => { setKnow(row.knowledge); }, [row.knowledge]);
+
+  return (
+    <tr className="hover:bg-slate-50/80 group align-top">
+      <td className="p-3 border-r border-slate-200 space-y-2 bg-slate-50/20 relative">
+        <input
+          type="text"
+          value={tech}
+          onChange={(e) => {
+            setTech(e.target.value);
+            onUpdate(row.id, 'technical', e.target.value);
+          }}
+          placeholder="Digite a capacidade técnica..."
+          className="w-full bg-white hover:bg-slate-50 focus:bg-white focus:ring-1 focus:ring-blue-500 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 outline-none border border-slate-200 shadow-sm transition-all"
+        />
+        <input
+          type="text"
+          value={social}
+          onChange={(e) => {
+            setSocial(e.target.value);
+            onUpdate(row.id, 'social', e.target.value);
+          }}
+          placeholder="Digite a capacidade socioemocional..."
+          className="w-full bg-white hover:bg-slate-50 focus:bg-white focus:ring-1 focus:ring-emerald-500 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 outline-none border border-slate-200 shadow-sm transition-all"
+        />
+      </td>
+      <td className="p-3 bg-white relative">
+        <div className="flex items-center gap-2">
+          <input
+            type="text"
+            value={know}
+            onChange={(e) => {
+              setKnow(e.target.value);
+              onUpdate(row.id, 'knowledge', e.target.value);
+            }}
+            placeholder="Digite o conhecimento..."
+            className="w-full bg-white hover:bg-slate-50 focus:bg-white focus:ring-1 focus:ring-purple-500 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 outline-none border border-slate-200 shadow-sm transition-all"
+          />
+          <button
+            type="button"
+            onClick={() => onDelete(row.id)}
+            title="Excluir Linha"
+            className="p-2 text-slate-300 hover:text-red-600 transition-colors text-xs font-black shrink-0 cursor-pointer"
+          >
+            ✕
+          </button>
+        </div>
+      </td>
+    </tr>
+  );
+}, (prevProps, nextProps) => prevProps.row === nextProps.row);
 
 export const UnitViewer: React.FC<UnitViewerProps> = ({
   unit,
@@ -40,7 +106,6 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
     setIsEditingHeader(false);
   };
 
-  // Conversão segura da Matriz Curricular em linhas estruturadas com IDs fixos
   const getInitialMatrixRows = (): MatrixRow[] => {
     const techList = unit.technicalCapacities || [];
     const socialList = unit.socialCapacities || [];
@@ -50,7 +115,7 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
     const rows: MatrixRow[] = [];
     for (let i = 0; i < maxLen; i++) {
       rows.push({
-        id: `row-${i}-${Date.now()}`,
+        id: `row-${i}`,
         technical: techList[i] || '',
         social: socialList[i] || '',
         knowledge: knowList[i] || ''
@@ -60,10 +125,6 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
   };
 
   const [matrixRows, setMatrixRows] = useState<MatrixRow[]>(getInitialMatrixRows);
-
-  useEffect(() => {
-    setMatrixRows(getInitialMatrixRows());
-  }, [unit.id]);
 
   const syncMatrixToUnit = (newRows: MatrixRow[]) => {
     const technicalCapacities = newRows.map(r => r.technical);
@@ -79,29 +140,35 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
   };
 
   const handleAddMatrixRow = () => {
-    const newRows = [
-      ...matrixRows,
-      { id: `row-${Date.now()}-${Math.random()}`, technical: '', social: '', knowledge: '' }
-    ];
-    setMatrixRows(newRows);
-    syncMatrixToUnit(newRows);
+    setMatrixRows(prev => {
+      const newRows = [
+        ...prev,
+        { id: `row-${Date.now()}-${Math.random()}`, technical: '', social: '', knowledge: '' }
+      ];
+      syncMatrixToUnit(newRows);
+      return newRows;
+    });
   };
 
   const handleDeleteMatrixRow = (rowId: string) => {
-    const newRows = matrixRows.filter(r => r.id !== rowId);
-    setMatrixRows(newRows);
-    syncMatrixToUnit(newRows);
+    setMatrixRows(prev => {
+      const newRows = prev.filter(r => r.id !== rowId);
+      syncMatrixToUnit(newRows);
+      return newRows;
+    });
   };
 
   const handleUpdateMatrixCell = (rowId: string, field: 'technical' | 'social' | 'knowledge', value: string) => {
-    const newRows = matrixRows.map(r => {
-      if (r.id === rowId) {
-        return { ...r, [field]: value };
-      }
-      return r;
+    setMatrixRows(prev => {
+      const newRows = prev.map(r => {
+        if (r.id === rowId) {
+          return { ...r, [field]: value };
+        }
+        return r;
+      });
+      syncMatrixToUnit(newRows);
+      return newRows;
     });
-    setMatrixRows(newRows);
-    syncMatrixToUnit(newRows);
   };
 
   const handleAddSituation = () => {
@@ -186,10 +253,6 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
   const rubricsRef = useRef(rubricsList);
   rubricsRef.current = rubricsList;
 
-  useEffect(() => {
-    setRubricsList(parseInitialRubrics());
-  }, [unit.id]);
-
   const handleAddRubricRow = () => {
     const newRow = {
       id: Date.now().toString(),
@@ -217,10 +280,6 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
   };
 
   const [lessonPlanList, setLessonPlanList] = useState(unit.lessonPlan || []);
-
-  useEffect(() => {
-    setLessonPlanList(unit.lessonPlan || []);
-  }, [unit.id]);
 
   const handleAddLessonPlanRow = () => {
     const newRow = {
@@ -288,13 +347,13 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
       <div className="flex justify-between items-center px-2 print:hidden">
         <button
           onClick={onBack}
-          className="text-xs font-black uppercase text-slate-500 hover:text-slate-900 transition-all flex items-center gap-1 bg-white px-4 py-2 rounded-xl border border-slate-200 shadow-sm"
+          className="text-xs font-black uppercase text-slate-500 hover:text-slate-900 transition-all flex items-center gap-1 bg-white px-4 py-2 rounded-xl border border-slate-200 shadow-sm cursor-pointer"
         >
           ← Voltar para Painel
         </button>
         <button
           onClick={() => setIsEditingHeader(!isEditingHeader)}
-          className="bg-slate-900 hover:bg-blue-600 text-white px-5 py-2.5 rounded-xl text-[10px] font-black uppercase transition-all shadow-md"
+          className="bg-slate-900 hover:bg-blue-600 text-white px-5 py-2.5 rounded-xl text-[10px] font-black uppercase transition-all shadow-md cursor-pointer"
         >
           {isEditingHeader ? 'Cancelar Edição' : 'Editar Unidade Atual'}
         </button>
@@ -356,7 +415,7 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
               <select
                 value={semester}
                 onChange={e => setSemester(Number(e.target.value) as SemesterNumber)}
-                className="bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 text-xs font-bold text-white uppercase focus:outline-none"
+                className="bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 text-xs font-bold text-white uppercase focus:outline-none cursor-pointer"
               >
                 <option value={1}>1º Semestre</option>
                 <option value={2}>2º Semestre</option>
@@ -366,13 +425,13 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
               <div className="flex gap-2">
                 <button
                   onClick={() => setIsEditingHeader(false)}
-                  className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-xl text-[10px] font-black uppercase transition-all"
+                  className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-xl text-[10px] font-black uppercase transition-all cursor-pointer"
                 >
                   Cancelar
                 </button>
                 <button
                   onClick={handleSaveHeader}
-                  className="px-5 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-[10px] font-black uppercase shadow-lg transition-all"
+                  className="px-5 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-[10px] font-black uppercase shadow-lg transition-all cursor-pointer"
                 >
                   Salvar
                 </button>
@@ -386,7 +445,7 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
         <div className="flex flex-wrap gap-2 border-b border-slate-100 p-4 print:hidden">
           <button
             onClick={() => setActiveTab('geral')}
-            className={`px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all ${
+            className={`px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all cursor-pointer ${
               activeTab === 'geral' ? 'bg-slate-900 text-white shadow-md' : 'bg-slate-50 text-slate-600 hover:bg-slate-100'
             }`}
           >
@@ -394,7 +453,7 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
           </button>
           <button
             onClick={() => setActiveTab('situacao-problema')}
-            className={`px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all ${
+            className={`px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all cursor-pointer ${
               activeTab === 'situacao-problema' ? 'bg-slate-900 text-white shadow-md' : 'bg-slate-50 text-slate-600 hover:bg-slate-100'
             }`}
           >
@@ -402,7 +461,7 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
           </button>
           <button
             onClick={() => setActiveTab('rubricas')}
-            className={`px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all ${
+            className={`px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all cursor-pointer ${
               activeTab === 'rubricas' ? 'bg-slate-900 text-white shadow-md' : 'bg-slate-50 text-slate-600 hover:bg-slate-100'
             }`}
           >
@@ -410,7 +469,7 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
           </button>
           <button
             onClick={() => setActiveTab('plano-aula')}
-            className={`px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all ${
+            className={`px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all cursor-pointer ${
               activeTab === 'plano-aula' ? 'bg-slate-900 text-white shadow-md' : 'bg-slate-50 text-slate-600 hover:bg-slate-100'
             }`}
           >
@@ -418,7 +477,7 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
           </button>
           <button
             onClick={() => setActiveTab('calendario')}
-            className={`px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all ${
+            className={`px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all cursor-pointer ${
               activeTab === 'calendario' ? 'bg-slate-900 text-white shadow-md' : 'bg-slate-50 text-slate-600 hover:bg-slate-100'
             }`}
           >
@@ -437,7 +496,7 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                   <button
                     type="button"
                     onClick={handleAddMatrixRow}
-                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-[10px] font-black uppercase shadow-sm transition-all"
+                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-[10px] font-black uppercase shadow-sm transition-all cursor-pointer"
                   >
                     + Adicionar Linha na Matriz
                   </button>
@@ -458,51 +517,12 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                   </thead>
                   <tbody className="divide-y divide-slate-200">
                     {matrixRows.map((row) => (
-                      <tr key={row.id} className="hover:bg-slate-50/80 group align-top">
-                        {/* Lado Esquerdo: Capacidade Técnica e Socioemocional */}
-                        <td className="p-3 border-r border-slate-200 space-y-2 bg-slate-50/20 relative">
-                          <div className="flex items-center gap-2">
-                            <input
-                              type="text"
-                              value={row.technical}
-                              onChange={(e) => handleUpdateMatrixCell(row.id, 'technical', e.target.value)}
-                              placeholder="Digite a capacidade técnica..."
-                              className="w-full bg-white hover:bg-slate-50 focus:bg-white focus:ring-1 focus:ring-blue-500 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 outline-none border border-slate-200 shadow-sm transition-all"
-                            />
-                          </div>
-
-                          <div className="flex items-center gap-2">
-                            <input
-                              type="text"
-                              value={row.social}
-                              onChange={(e) => handleUpdateMatrixCell(row.id, 'social', e.target.value)}
-                              placeholder="Digite a capacidade socioemocional..."
-                              className="w-full bg-white hover:bg-slate-50 focus:bg-white focus:ring-1 focus:ring-emerald-500 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 outline-none border border-slate-200 shadow-sm transition-all"
-                            />
-                          </div>
-                        </td>
-
-                        {/* Lado Direito: Conhecimentos e Botão de Excluir Linha */}
-                        <td className="p-3 bg-white relative">
-                          <div className="flex items-center gap-2">
-                            <input
-                              type="text"
-                              value={row.knowledge}
-                              onChange={(e) => handleUpdateMatrixCell(row.id, 'knowledge', e.target.value)}
-                              placeholder="Digite o conhecimento..."
-                              className="w-full bg-white hover:bg-slate-50 focus:bg-white focus:ring-1 focus:ring-purple-500 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 outline-none border border-slate-200 shadow-sm transition-all"
-                            />
-                            <button
-                              type="button"
-                              onClick={() => handleDeleteMatrixRow(row.id)}
-                              title="Excluir Linha"
-                              className="p-2 text-slate-300 hover:text-red-600 transition-colors text-xs font-black shrink-0"
-                            >
-                              ✕
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
+                      <MatrixRowItem
+                        key={row.id}
+                        row={row}
+                        onUpdate={handleUpdateMatrixCell}
+                        onDelete={handleDeleteMatrixRow}
+                      />
                     ))}
 
                     {matrixRows.length === 0 && (
@@ -548,7 +568,7 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                       <button
                         type="button"
                         onClick={() => handleDeleteSituation(sit.id)}
-                        className="text-slate-400 hover:text-red-600 p-2 text-xs font-black transition-colors"
+                        className="text-slate-400 hover:text-red-600 p-2 text-xs font-black transition-colors cursor-pointer"
                       >
                         ✕ Excluir Situação
                       </button>
@@ -603,7 +623,7 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                               <button
                                 type="button"
                                 onClick={() => handleDeleteExpectedResult(sit.id, rIndex)}
-                                className="text-slate-300 hover:text-red-600 p-2 text-xs font-black transition-colors"
+                                className="text-slate-300 hover:text-red-600 p-2 text-xs font-black transition-colors cursor-pointer"
                               >
                                 ✕
                               </button>
@@ -706,7 +726,7 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                               type="button"
                               onClick={() => handleDeleteRubricRow(row.id)}
                               title="Excluir"
-                              className="text-slate-300 hover:text-red-600 transition-colors text-xs font-black p-1"
+                              className="text-slate-300 hover:text-red-600 transition-colors text-xs font-black p-1 cursor-pointer"
                             >
                               ✕
                             </button>
@@ -808,7 +828,7 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                                 type="button"
                                 onClick={() => handleDeleteLessonPlanRow(row.id)}
                                 title="Excluir"
-                                className="text-slate-300 hover:text-red-600 transition-colors text-xs font-black p-1"
+                                className="text-slate-300 hover:text-red-600 transition-colors text-xs font-black p-1 cursor-pointer"
                               >
                                 ✕
                               </button>
