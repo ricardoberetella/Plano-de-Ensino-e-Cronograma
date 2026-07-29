@@ -537,43 +537,7 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
           {activeTab === 'geral' && (
             <div className="space-y-8">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Lado Esquerdo: Conhecimentos */}
-                <div className="space-y-3">
-                  <div className="bg-slate-900 text-white px-4 py-3 rounded-t-2xl flex items-center justify-between">
-                    <span className="text-[10px] font-black uppercase tracking-wider">CONHECIMENTOS</span>
-                    <button
-                      type="button"
-                      onClick={handleAddKnowledge}
-                      title="Adicionar Conhecimento"
-                      className="text-black bg-white hover:bg-slate-200 rounded-full w-5 h-5 flex items-center justify-center font-black text-xs transition-colors cursor-pointer shadow-sm"
-                    >
-                      +
-                    </button>
-                  </div>
-                  <div className="overflow-x-auto border border-slate-200 rounded-b-2xl shadow-sm bg-white p-2">
-                    <table className="w-full border-collapse text-left text-xs">
-                      <tbody className="divide-y divide-slate-100">
-                        {knowRows.map((row) => (
-                          <KnowledgeRowItem
-                            key={row.id}
-                            row={row}
-                            onUpdate={handleUpdateKnowledge}
-                            onDelete={handleDeleteKnowledge}
-                          />
-                        ))}
-                        {knowRows.length === 0 && (
-                          <tr>
-                            <td className="p-6 text-center text-slate-400 italic">
-                              Nenhum conhecimento cadastrado. Clique no "+" acima.
-                            </td>
-                          </tr>
-                        )}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-
-                {/* Lado Direito: Capacidades Técnicas e Socioemocionais unificadas */}
+                {/* Lado Esquerdo: Capacidades Técnicas e Socioemocionais */}
                 <div className="space-y-3">
                   <div className="bg-slate-900 text-white px-4 py-3 rounded-t-2xl flex items-center justify-between">
                     <span className="text-[10px] font-black uppercase tracking-wider">CAPACIDADES TÉCNICAS E SOCIOEMOCIONAIS</span>
@@ -596,46 +560,78 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                       </button>
                     </div>
                   </div>
-                  <div className="overflow-x-auto border border-slate-200 rounded-b-2xl shadow-sm bg-white p-2 space-y-2">
-                    {/* Lista de Capacidades Técnicas (sem rótulo interno) */}
-                    <div className="space-y-1">
-                      <table className="w-full border-collapse text-left text-xs">
-                        <tbody className="divide-y divide-slate-100">
-                          {techRows.map((row) => (
-                            <CapacityRowItem
-                              key={row.id}
-                              row={row}
-                              type="technical"
-                              onUpdate={handleUpdateCapacity}
-                              onDelete={handleDeleteCapacity}
-                            />
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
+                  <div className="border border-slate-200 rounded-b-2xl shadow-sm bg-white p-2 space-y-1">
+                    {/* Lista de Capacidades Técnicas */}
+                    <table className="w-full border-collapse text-left text-xs">
+                      <tbody className="divide-y divide-slate-100">
+                        {techRows.map((row) => (
+                          <CapacityRowItem
+                            key={row.id}
+                            row={row}
+                            type="technical"
+                            onUpdate={handleUpdateCapacity}
+                            onDelete={handleDeleteCapacity}
+                          />
+                        ))}
+                      </tbody>
+                    </table>
 
-                    {/* Lista de Capacidades Socioemocionais (sem rótulo interno) */}
-                    <div className="space-y-1">
-                      <table className="w-full border-collapse text-left text-xs">
-                        <tbody className="divide-y divide-slate-100">
-                          {socialRows.map((row) => (
-                            <CapacityRowItem
-                              key={row.id}
-                              row={row}
-                              type="social"
-                              onUpdate={handleUpdateCapacity}
-                              onDelete={handleDeleteCapacity}
-                            />
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
+                    {/* Lista de Capacidades Socioemocionais */}
+                    <table className="w-full border-collapse text-left text-xs">
+                      <tbody className="divide-y divide-slate-100">
+                        {socialRows.map((row) => (
+                          <CapacityRowItem
+                            key={row.id}
+                            row={row}
+                            type="social"
+                            onUpdate={handleUpdateCapacity}
+                            onDelete={handleDeleteCapacity}
+                          />
+                        ))}
+                      </tbody>
+                    </table>
 
                     {techRows.length === 0 && socialRows.length === 0 && (
                       <div className="p-6 text-center text-slate-400 italic text-xs">
                         Nenhuma capacidade cadastrada. Clique em +T ou +S acima.
                       </div>
                     )}
+                  </div>
+                </div>
+
+                {/* Lado Direito: Conhecimentos */}
+                <div className="space-y-3">
+                  <div className="bg-slate-900 text-white px-4 py-3 rounded-t-2xl flex items-center justify-between">
+                    <span className="text-[10px] font-black uppercase tracking-wider">CONHECIMENTOS</span>
+                    <button
+                      type="button"
+                      onClick={handleAddKnowledge}
+                      title="Adicionar Conhecimento"
+                      className="text-black bg-white hover:bg-slate-200 rounded-full w-5 h-5 flex items-center justify-center font-black text-xs transition-colors cursor-pointer shadow-sm"
+                    >
+                      +
+                    </button>
+                  </div>
+                  <div className="border border-slate-200 rounded-b-2xl shadow-sm bg-white p-2">
+                    <table className="w-full border-collapse text-left text-xs">
+                      <tbody className="divide-y divide-slate-100">
+                        {knowRows.map((row) => (
+                          <KnowledgeRowItem
+                            key={row.id}
+                            row={row}
+                            onUpdate={handleUpdateKnowledge}
+                            onDelete={handleDeleteKnowledge}
+                          />
+                        ))}
+                        {knowRows.length === 0 && (
+                          <tr>
+                            <td className="p-6 text-center text-slate-400 italic">
+                              Nenhum conhecimento cadastrado. Clique no "+" acima.
+                            </td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
                   </div>
                 </div>
               </div>
@@ -876,7 +872,7 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                     ) : (
                       lessonPlanList.map((row) => {
                         const parsed = parseHoursAndDate(row.hoursDate);
-                    return (
+                        return (
                           <tr key={row.id} className="hover:bg-slate-50/50">
                             <td className="p-3 border-r border-slate-200 align-top space-y-2">
                               <div className="flex items-center gap-1">
