@@ -9,8 +9,8 @@ interface LayoutProps {
 export default function Layout({ children, activeTab, setActiveTab }: LayoutProps) {
   return (
     <div className="flex min-h-screen bg-slate-100">
-      {/* Menu lateral mais estreito (w-52) para ganhar espaço à direita */}
-      <aside className="w-52 bg-[#0B1120] text-white flex flex-col justify-between p-4 shrink-0 shadow-xl">
+      {/* Menu lateral mais estreito (w-56) para ganhar espaço à direita */}
+      <aside className="w-56 bg-[#0B1120] text-white flex flex-col justify-between p-4 shrink-0 shadow-xl">
         <div className="space-y-8">
           {/* Logo SENAI */}
           <div className="bg-red-600 text-white font-black text-center py-2.5 rounded-xl text-lg tracking-wider shadow-md">
