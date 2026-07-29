@@ -48,7 +48,7 @@ const CapacityRowItem = memo(({ row, type, onUpdate, onDelete }: CapacityRowItem
               e.currentTarget.style.height = 'auto';
               e.currentTarget.style.height = `${e.currentTarget.scrollHeight}px`;
             }}
-            placeholder={type === 'technical' ? "Digite a capacidade..." : "Digite a capacidade socioemocional..."}
+            placeholder={type === 'technical' ? "Digite a capacidade técnica..." : "Digite a capacidade socioemocional..."}
             className={`w-full bg-white hover:bg-slate-50 focus:bg-white focus:ring-1 ${type === 'technical' ? 'focus:ring-blue-500' : 'focus:ring-emerald-500'} rounded-xl px-3 py-2 text-xs font-bold text-slate-800 outline-none border border-slate-200 shadow-sm transition-all resize-none overflow-hidden leading-relaxed`}
           />
           <button
@@ -573,82 +573,69 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                   </div>
                 </div>
 
-                {/* Lado Direito: Capacidades (Técnicas e Socioemocionais unificadas com título único) */}
-                <div className="space-y-6">
-                  {/* Capacidades Técnicas e Socioemocionais */}
-                  <div className="space-y-3">
-                    <div className="bg-slate-900 text-white px-4 py-3 rounded-t-2xl flex items-center justify-between">
-                      <span className="text-[10px] font-black uppercase tracking-wider">CAPACIDADES TÉCNICAS E SOCIOEMOCIONAIS</span>
-                      <div className="flex items-center gap-2">
-                        <button
-                          type="button"
-                          onClick={() => handleAddCapacity('technical')}
-                          title="Adicionar Capacidade Técnica"
-                          className="text-black bg-white hover:bg-slate-200 rounded-full w-5 h-5 flex items-center justify-center font-black text-xs transition-colors cursor-pointer shadow-sm"
-                        >
-                          +T
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleAddCapacity('social')}
-                          title="Adicionar Capacidade Socioemocional"
-                          className="text-black bg-white hover:bg-slate-200 rounded-full w-5 h-5 flex items-center justify-center font-black text-xs transition-colors cursor-pointer shadow-sm"
-                        >
-                          +S
-                        </button>
-                      </div>
+                {/* Lado Direito: Capacidades Técnicas e Socioemocionais unificadas */}
+                <div className="space-y-3">
+                  <div className="bg-slate-900 text-white px-4 py-3 rounded-t-2xl flex items-center justify-between">
+                    <span className="text-[10px] font-black uppercase tracking-wider">CAPACIDADES TÉCNICAS E SOCIOEMOCIONAIS</span>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => handleAddCapacity('technical')}
+                        title="Adicionar Capacidade Técnica"
+                        className="text-black bg-white hover:bg-slate-200 rounded-full w-5 h-5 flex items-center justify-center font-black text-xs transition-colors cursor-pointer shadow-sm"
+                      >
+                        +T
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleAddCapacity('social')}
+                        title="Adicionar Capacidade Socioemocional"
+                        className="text-black bg-white hover:bg-slate-200 rounded-full w-5 h-5 flex items-center justify-center font-black text-xs transition-colors cursor-pointer shadow-sm"
+                      >
+                        +S
+                      </button>
                     </div>
-                    <div className="overflow-x-auto border border-slate-200 rounded-b-2xl shadow-sm bg-white space-y-4 p-4">
-                      {/* Sub-bloco Técnicas */}
-                      <div className="space-y-2">
-                        <div className="text-[9px] font-black text-slate-400 uppercase tracking-wider px-1">Técnicas</div>
-                        <table className="w-full border-collapse text-left text-xs">
-                          <tbody className="divide-y divide-slate-200">
-                            {techRows.map((row) => (
-                              <CapacityRowItem
-                                key={row.id}
-                                row={row}
-                                type="technical"
-                                onUpdate={handleUpdateCapacity}
-                                onDelete={handleDeleteCapacity}
-                              />
-                            ))}
-                            {techRows.length === 0 && (
-                              <tr>
-                                <td className="p-4 text-center text-slate-400 italic text-[11px]">
-                                  Nenhuma capacidade técnica cadastrada.
-                                </td>
-                              </tr>
-                            )}
-                          </tbody>
-                        </table>
-                      </div>
+                  </div>
+                  <div className="overflow-x-auto border border-slate-200 rounded-b-2xl shadow-sm bg-white p-4 space-y-4">
+                    {/* Lista de Capacidades Técnicas (sem rótulo interno) */}
+                    <div className="space-y-2">
+                      <table className="w-full border-collapse text-left text-xs">
+                        <tbody className="divide-y divide-slate-200">
+                          {techRows.map((row) => (
+                            <CapacityRowItem
+                              key={row.id}
+                              row={row}
+                              type="technical"
+                              onUpdate={handleUpdateCapacity}
+                              onDelete={handleDeleteCapacity}
+                            />
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
 
-                      {/* Sub-bloco Socioemocionais */}
-                      <div className="space-y-2 pt-2 border-t border-slate-100">
-                        <div className="text-[9px] font-black text-slate-400 uppercase tracking-wider px-1">Socioemocionais</div>
-                        <table className="w-full border-collapse text-left text-xs">
-                          <tbody className="divide-y divide-slate-200">
-                            {socialRows.map((row) => (
-                              <CapacityRowItem
-                                key={row.id}
-                                row={row}
-                                type="social"
-                                onUpdate={handleUpdateCapacity}
-                                onDelete={handleDeleteCapacity}
-                              />
-                            ))}
-                            {socialRows.length === 0 && (
-                              <tr>
-                                <td className="p-4 text-center text-slate-400 italic text-[11px]">
-                                  Nenhuma capacidade socioemocional cadastrada.
-                                </td>
-                              </tr>
-                            )}
-                          </tbody>
-                        </table>
-                      </div>
+                    {/* Lista de Capacidades Socioemocionais (sem rótulo interno) */}
+                    <div className="space-y-2">
+                      <table className="w-full border-collapse text-left text-xs">
+                        <tbody className="divide-y divide-slate-200">
+                          {socialRows.map((row) => (
+                            <CapacityRowItem
+                              key={row.id}
+                              row={row}
+                              type="social"
+                              onUpdate={handleUpdateCapacity}
+                              onDelete={handleDeleteCapacity}
+                            />
+                          ))}
+                        </tbody>
+                      </table>
                     </div>
+
+                    {techRows.length === 0 && socialRows.length === 0 && (
+                      <div className="p-6 text-center text-slate-400 italic text-xs">
+                        Nenhuma capacidade cadastrada. Clique em +T ou +S acima.
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
