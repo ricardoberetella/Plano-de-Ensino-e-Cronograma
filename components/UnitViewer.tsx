@@ -130,7 +130,6 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
   const [semester, setSemester] = useState<SemesterNumber>(unit.semester || 1);
   const [totalHours, setTotalHours] = useState(unit.totalHours || unit.workload || 80);
 
-  // Paleta de cores dinâmica baseada no ID/Código da UC
   const unitColors = [
     { bg: 'bg-red-600', text: 'text-red-600', border: 'border-red-600', light: 'bg-red-50' },
     { bg: 'bg-blue-600', text: 'text-blue-600', border: 'border-blue-600', light: 'bg-blue-50' },
@@ -402,7 +401,6 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
     target.style.height = `${target.scrollHeight}px`;
   };
 
-  // Mapear datas de aulas cadastradas no formato 'YYYY-MM-DD' para exibição no calendário
   const getScheduledClassDates = () => {
     const datesMap: { [dateStr: string]: { hours: string; capacities: string } } = {};
     (unit.lessonPlan || []).forEach(row => {
@@ -418,7 +416,6 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
   };
   const scheduledDates = getScheduledClassDates();
 
-  // Configuração dos meses por semestre (1º Sem: Jan-Jun | 2º Sem: Jul-Dez)
   const currentSemester = unit.semester || 1;
   const semesterMonths = currentSemester === 1 
     ? [ { name: 'Janeiro', month: 0 }, { name: 'Fevereiro', month: 1 }, { name: 'Março', month: 2 }, { name: 'Abril', month: 3 }, { name: 'Maio', month: 4 }, { name: 'Junho', month: 5 } ]
@@ -429,12 +426,9 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
   const getDaysInMonth = (year: number, month: number) => {
     const date = new Date(year, month, 1);
     const days: { dateStr: string; dayNum: number; isCurrentMonth: boolean }[] = [];
-    
-    // Dia da semana do primeiro dia (0 = Domingo, 1 = Segunda, etc.)
     const firstDayIndex = date.getDay();
-    
-    // Dias do mês anterior para preencher a primeira semana
     const prevMonthLastDay = new Date(year, month, 0).getDate();
+    
     for (let i = firstDayIndex - 1; i >= 0; i--) {
       const dNum = prevMonthLastDay - i;
       const prevM = month === 0 ? 11 : month - 1;
@@ -443,14 +437,12 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
       days.push({ dateStr: dStr, dayNum: dNum, isCurrentMonth: false });
     }
 
-    // Dias do mês atual
     const totalDays = new Date(year, month + 1, 0).getDate();
     for (let i = 1; i <= totalDays; i++) {
       const dStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
       days.push({ dateStr: dStr, dayNum: i, isCurrentMonth: true });
     }
 
-    // Completar até fechar linhas de 7 (múltiplo de 7)
     const remaining = 7 - (days.length % 7);
     if (remaining < 7) {
       for (let i = 1; i <= remaining; i++) {
@@ -819,14 +811,14 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
 
               <div className="border border-slate-300 rounded-2xl overflow-hidden shadow-sm bg-white">
                 <table className="w-full border-collapse text-left text-xs">
-                  <thead className="bg-[#111827] text-white uppercase text-[10px] tracking-wider">
+                  <thead className="bg-[#101827] text-white uppercase text-[10px] tracking-wider">
                     <tr>
-                      <th className="py-3 px-3 w-1/5 border-r border-slate-700">Referência / Critério</th>
-                      <th className="py-3 px-3 w-1/5 border-r border-slate-700">NSA (Não Satisfatório)</th>
-                      <th className="py-3 px-3 w-1/5 border-r border-slate-700">APO (Atende Parcialmente)</th>
-                      <th className="py-3 px-3 w-1/5 border-r border-slate-700">PAR (Atende Plenamente)</th>
-                      <th className="py-3 px-3 w-1/5 border-r border-slate-700">AUT (Atende com Autonomia)</th>
-                      <th className="py-3 px-2 w-16 text-center">Ações</th>
+                      <th className="py-3 px-3 w-1/5 border-r border-slate-700">REFERÊNCIA / CRITÉRIO</th>
+                      <th className="py-3 px-3 w-1/5 border-r border-slate-700">NSA (NÃO SATISFATÓRIO)</th>
+                      <th className="py-3 px-3 w-1/5 border-r border-slate-700">APO (ATENDE PARCIALMENTE)</th>
+                      <th className="py-3 px-3 w-1/5 border-r border-slate-700">PAR (ATENDE PLENAMENTE)</th>
+                      <th className="py-3 px-3 w-1/5 border-r border-slate-700">AUT (ATENDE COM AUTONOMIA)</th>
+                      <th className="py-3 px-2 w-16 text-center">AÇÕES</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-200">
@@ -923,13 +915,13 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
 
               <div className="border border-slate-300 rounded-2xl overflow-hidden shadow-sm bg-white">
                 <table className="w-full border-collapse text-left text-xs">
-                  <thead className="bg-[#111827] text-white uppercase text-[10px] tracking-wider">
+                  <thead className="bg-[#101827] text-white uppercase text-[10px] tracking-wider">
                     <tr>
-                      <th className="py-3 px-3 w-32">Carga / Data</th>
-                      <th className="py-3 px-4">Capacidades</th>
-                      <th className="py-3 px-4">Conhecimentos</th>
-                      <th className="py-3 px-4">Estratégias / Recursos</th>
-                      <th className="py-3 px-2 w-16 text-center">Ações</th>
+                      <th className="py-3 px-3 w-32 border-r border-slate-700">CARGA / DATA</th>
+                      <th className="py-3 px-4 border-r border-slate-700">CAPACIDADES</th>
+                      <th className="py-3 px-4 border-r border-slate-700">CONHECIMENTOS</th>
+                      <th className="py-3 px-4 border-r border-slate-700">ESTRATÉGIAS / RECURSOS</th>
+                      <th className="py-3 px-2 w-16 text-center">AÇÕES</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-200">
