@@ -36,8 +36,8 @@ const CapacityRowItem = memo(({ row, type, onUpdate, onDelete }: CapacityRowItem
 
   return (
     <tr className="hover:bg-slate-50/80 group">
-      <td className="px-3 py-1.5 bg-white relative">
-        <div className="relative">
+      <td className="px-3 py-2 bg-white relative">
+        <div className="relative pr-6">
           <textarea
             ref={textareaRef}
             rows={1}
@@ -49,13 +49,13 @@ const CapacityRowItem = memo(({ row, type, onUpdate, onDelete }: CapacityRowItem
               e.currentTarget.style.height = `${e.currentTarget.scrollHeight}px`;
             }}
             placeholder={type === 'technical' ? "Digite a capacidade técnica..." : "Digite a capacidade socioemocional..."}
-            className={`w-full bg-transparent hover:bg-slate-50/50 focus:bg-white focus:ring-1 ${type === 'technical' ? 'focus:ring-blue-500' : 'focus:ring-emerald-500'} rounded-xl px-3 py-2 pr-8 text-xs font-bold text-slate-800 outline-none border-none shadow-none transition-all resize-none overflow-hidden leading-relaxed`}
+            className="w-full bg-transparent focus:bg-white rounded-none px-1 py-1 text-xs font-bold text-slate-800 outline-none border-none shadow-none transition-all resize-none overflow-hidden leading-relaxed"
           />
           <button
             type="button"
             onClick={() => onDelete(row.id, type)}
             title="Excluir Linha"
-            className="absolute top-2 right-2 text-slate-300 hover:text-red-600 transition-colors text-[10px] font-black cursor-pointer opacity-0 group-hover:opacity-100"
+            className="absolute top-1 right-1 text-slate-300 hover:text-red-600 transition-colors text-[10px] font-black cursor-pointer opacity-0 group-hover:opacity-100 p-1"
           >
             ✕
           </button>
@@ -88,8 +88,8 @@ const KnowledgeRowItem = memo(({ row, onUpdate, onDelete }: KnowledgeRowItemProp
 
   return (
     <tr className="hover:bg-slate-50/80 group">
-      <td className="px-3 py-1.5 bg-white relative">
-        <div className="relative">
+      <td className="px-3 py-2 bg-white relative">
+        <div className="relative pr-6">
           <textarea
             ref={textareaRef}
             rows={1}
@@ -101,13 +101,13 @@ const KnowledgeRowItem = memo(({ row, onUpdate, onDelete }: KnowledgeRowItemProp
               e.currentTarget.style.height = `${e.currentTarget.scrollHeight}px`;
             }}
             placeholder="Digite o conhecimento..."
-            className="w-full bg-transparent hover:bg-slate-50/50 focus:bg-white focus:ring-1 focus:ring-purple-500 rounded-xl px-3 py-2 pr-8 text-xs font-bold text-slate-800 outline-none border-none shadow-none transition-all resize-none overflow-hidden leading-relaxed"
+            className="w-full bg-transparent focus:bg-white rounded-none px-1 py-1 text-xs font-bold text-slate-800 outline-none border-none shadow-none transition-all resize-none overflow-hidden leading-relaxed"
           />
           <button
             type="button"
             onClick={() => onDelete(row.id)}
             title="Excluir Linha"
-            className="absolute top-2 right-2 text-slate-300 hover:text-red-600 transition-colors text-[10px] font-black cursor-pointer opacity-0 group-hover:opacity-100"
+            className="absolute top-1 right-1 text-slate-300 hover:text-red-600 transition-colors text-[10px] font-black cursor-pointer opacity-0 group-hover:opacity-100 p-1"
           >
             ✕
           </button>
@@ -537,22 +537,78 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
           {activeTab === 'geral' && (
             <div className="space-y-8">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Lado Esquerdo: Conhecimentos (Invertido conforme solicitado) */}
-                <div className="space-y-3">
-                  <div className="bg-slate-900 text-white px-4 py-3 rounded-t-2xl flex items-center justify-between">
+                {/* Lado Esquerdo: Capacidades Técnicas e Socioemocionais */}
+                <div className="space-y-0 border border-slate-300 rounded-2xl overflow-hidden shadow-sm bg-white">
+                  <div className="bg-slate-900 text-white px-4 py-3 flex items-center justify-between">
+                    <span className="text-[10px] font-black uppercase tracking-wider">CAPACIDADES TÉCNICAS E SOCIOEMOCIONAIS</span>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => handleAddCapacity('technical')}
+                        title="Adicionar Capacidade Técnica"
+                        className="text-black bg-white hover:bg-slate-200 rounded-full w-6 h-6 flex items-center justify-center font-black text-xs transition-colors cursor-pointer shadow-sm"
+                      >
+                        +T
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleAddCapacity('social')}
+                        title="Adicionar Capacidade Socioemocional"
+                        className="text-black bg-white hover:bg-slate-200 rounded-full w-6 h-6 flex items-center justify-center font-black text-xs transition-colors cursor-pointer shadow-sm"
+                      >
+                        +S
+                      </button>
+                    </div>
+                  </div>
+                  <div className="p-0">
+                    <table className="w-full border-collapse text-left text-xs">
+                      <tbody className="divide-y divide-slate-200">
+                        {techRows.map((row) => (
+                          <CapacityRowItem
+                            key={row.id}
+                            row={row}
+                            type="technical"
+                            onUpdate={handleUpdateCapacity}
+                            onDelete={handleDeleteCapacity}
+                          />
+                        ))}
+                        {socialRows.map((row) => (
+                          <CapacityRowItem
+                            key={row.id}
+                            row={row}
+                            type="social"
+                            onUpdate={handleUpdateCapacity}
+                            onDelete={handleDeleteCapacity}
+                          />
+                        ))}
+                        {techRows.length === 0 && socialRows.length === 0 && (
+                          <tr>
+                            <td className="p-6 text-center text-slate-400 italic text-xs">
+                              Nenhuma capacidade cadastrada. Clique em +T ou +S acima.
+                            </td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                {/* Lado Direito: Conhecimentos */}
+                <div className="space-y-0 border border-slate-300 rounded-2xl overflow-hidden shadow-sm bg-white">
+                  <div className="bg-slate-900 text-white px-4 py-3 flex items-center justify-between">
                     <span className="text-[10px] font-black uppercase tracking-wider">CONHECIMENTOS</span>
                     <button
                       type="button"
                       onClick={handleAddKnowledge}
                       title="Adicionar Conhecimento"
-                      className="text-black bg-white hover:bg-slate-200 rounded-full w-5 h-5 flex items-center justify-center font-black text-xs transition-colors cursor-pointer shadow-sm"
+                      className="text-black bg-white hover:bg-slate-200 rounded-full w-6 h-6 flex items-center justify-center font-black text-xs transition-colors cursor-pointer shadow-sm"
                     >
                       +
                     </button>
                   </div>
-                  <div className="border border-slate-200 rounded-b-2xl shadow-sm bg-white p-2">
+                  <div className="p-0">
                     <table className="w-full border-collapse text-left text-xs">
-                      <tbody className="divide-y divide-slate-100">
+                      <tbody className="divide-y divide-slate-200">
                         {knowRows.map((row) => (
                           <KnowledgeRowItem
                             key={row.id}
@@ -563,75 +619,13 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                         ))}
                         {knowRows.length === 0 && (
                           <tr>
-                            <td className="p-6 text-center text-slate-400 italic">
+                            <td className="p-6 text-center text-slate-400 italic text-xs">
                               Nenhum conhecimento cadastrado. Clique no "+" acima.
                             </td>
                           </tr>
                         )}
                       </tbody>
                     </table>
-                  </div>
-                </div>
-
-                {/* Lado Direito: Capacidades Técnicas e Socioemocionais (Invertido conforme solicitado) */}
-                <div className="space-y-3">
-                  <div className="bg-slate-900 text-white px-4 py-3 rounded-t-2xl flex items-center justify-between">
-                    <span className="text-[10px] font-black uppercase tracking-wider">CAPACIDADES TÉCNICAS E SOCIOEMOCIONAIS</span>
-                    <div className="flex items-center gap-2">
-                      <button
-                        type="button"
-                        onClick={() => handleAddCapacity('technical')}
-                        title="Adicionar Capacidade Técnica"
-                        className="text-black bg-white hover:bg-slate-200 rounded-full w-5 h-5 flex items-center justify-center font-black text-xs transition-colors cursor-pointer shadow-sm"
-                      >
-                        +T
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleAddCapacity('social')}
-                        title="Adicionar Capacidade Socioemocional"
-                        className="text-black bg-white hover:bg-slate-200 rounded-full w-5 h-5 flex items-center justify-center font-black text-xs transition-colors cursor-pointer shadow-sm"
-                      >
-                        +S
-                      </button>
-                    </div>
-                  </div>
-                  <div className="border border-slate-200 rounded-b-2xl shadow-sm bg-white p-2 space-y-1">
-                    {/* Lista de Capacidades Técnicas */}
-                    <table className="w-full border-collapse text-left text-xs">
-                      <tbody className="divide-y divide-slate-100">
-                        {techRows.map((row) => (
-                          <CapacityRowItem
-                            key={row.id}
-                            row={row}
-                            type="technical"
-                            onUpdate={handleUpdateCapacity}
-                            onDelete={handleDeleteCapacity}
-                          />
-                        ))}
-                      </tbody>
-                    </table>
-
-                    {/* Lista de Capacidades Socioemocionais */}
-                    <table className="w-full border-collapse text-left text-xs">
-                      <tbody className="divide-y divide-slate-100">
-                        {socialRows.map((row) => (
-                          <CapacityRowItem
-                            key={row.id}
-                            row={row}
-                            type="social"
-                            onUpdate={handleUpdateCapacity}
-                            onDelete={handleDeleteCapacity}
-                          />
-                        ))}
-                      </tbody>
-                    </table>
-
-                    {techRows.length === 0 && socialRows.length === 0 && (
-                      <div className="p-6 text-center text-slate-400 italic text-xs">
-                        Nenhuma capacidade cadastrada. Clique em +T ou +S acima.
-                      </div>
-                    )}
                   </div>
                 </div>
               </div>
