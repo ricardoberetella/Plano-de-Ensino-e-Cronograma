@@ -7,61 +7,71 @@ interface UnitViewerProps {
   onBack: () => void;
 }
 
-interface MatrixRow {
+interface ItemRow {
   id: string;
-  technical: string;
-  social: string;
-  knowledge: string;
+  value: string;
 }
 
-// Sub-componente isolado e memoizado para evitar perda de foco e lentidão na digitação
-interface MatrixRowItemProps {
-  row: MatrixRow;
-  onUpdate: (id: string, field: 'technical' | 'social' | 'knowledge', value: string) => void;
-  onDelete: (id: string) => void;
+// Sub-componentes isolados e memoizados para máxima performance e preservação de foco
+interface CapacityRowItemProps {
+  row: ItemRow;
+  type: 'technical' | 'social';
+  onUpdate: (id: string, type: 'technical' | 'social', value: string) => void;
+  onDelete: (id: string, type: 'technical' | 'social') => void;
 }
 
-const MatrixRowItem = memo(({ row, onUpdate, onDelete }: MatrixRowItemProps) => {
-  const [tech, setTech] = useState(row.technical);
-  const [social, setSocial] = useState(row.social);
-  const [know, setKnow] = useState(row.knowledge);
-
-  useEffect(() => { setTech(row.technical); }, [row.technical]);
-  useEffect(() => { setSocial(row.social); }, [row.social]);
-  useEffect(() => { setKnow(row.knowledge); }, [row.knowledge]);
+const CapacityRowItem = memo(({ row, type, onUpdate, onDelete }: CapacityRowItemProps) => {
+  const [val, setVal] = useState(row.value);
+  useEffect(() => { setVal(row.value); }, [row.value]);
 
   return (
-    <tr className="hover:bg-slate-50/80 group align-top">
-      <td className="p-3 border-r border-slate-200 space-y-2 bg-slate-50/20 relative">
-        <input
-          type="text"
-          value={tech}
-          onChange={(e) => {
-            setTech(e.target.value);
-            onUpdate(row.id, 'technical', e.target.value);
-          }}
-          placeholder="Digite a capacidade técnica..."
-          className="w-full bg-white hover:bg-slate-50 focus:bg-white focus:ring-1 focus:ring-blue-500 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 outline-none border border-slate-200 shadow-sm transition-all"
-        />
-        <input
-          type="text"
-          value={social}
-          onChange={(e) => {
-            setSocial(e.target.value);
-            onUpdate(row.id, 'social', e.target.value);
-          }}
-          placeholder="Digite a capacidade socioemocional..."
-          className="w-full bg-white hover:bg-slate-50 focus:bg-white focus:ring-1 focus:ring-emerald-500 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 outline-none border border-slate-200 shadow-sm transition-all"
-        />
-      </td>
+    <tr className="hover:bg-slate-50/80 group">
       <td className="p-3 bg-white relative">
         <div className="flex items-center gap-2">
           <input
             type="text"
-            value={know}
+            value={val}
             onChange={(e) => {
-              setKnow(e.target.value);
-              onUpdate(row.id, 'knowledge', e.target.value);
+              setVal(e.target.value);
+              onUpdate(row.id, type, e.target.value);
+            }}
+            placeholder={type === 'technical' ? "Digite a capacidade técnica..." : "Digite a capacidade socioemocional..."}
+            className={`w-full bg-white hover:bg-slate-50 focus:bg-white focus:ring-1 ${type === 'technical' ? 'focus:ring-blue-500' : 'focus:ring-emerald-500'} rounded-xl px-3 py-2 text-xs font-bold text-slate-800 outline-none border border-slate-200 shadow-sm transition-all`}
+          />
+          <button
+            type="button"
+            onClick={() => onDelete(row.id, type)}
+            title="Excluir Linha"
+            className="p-2 text-slate-300 hover:text-red-600 transition-colors text-xs font-black shrink-0 cursor-pointer"
+          >
+            ✕
+          </button>
+        </div>
+      </td>
+    </tr>
+  );
+}, (prevProps, nextProps) => prevProps.row === nextProps.row && prevProps.type === nextProps.type);
+
+interface KnowledgeRowItemProps {
+  row: ItemRow;
+  onUpdate: (id: string, value: string) => void;
+  onDelete: (id: string) => void;
+}
+
+const KnowledgeRowItem = memo(({ row, onUpdate, onDelete }: KnowledgeRowItemProps) => {
+  const [val, setVal] = useState(row.value);
+  useEffect(() => { setVal(row.value); }, [row.value]);
+
+  return (
+    <tr className="hover:bg-slate-50/80 group">
+      <td className="p-3 bg-white relative">
+        <div className="flex items-center gap-2">
+          <input
+            type="text"
+            value={val}
+            onChange={(e) => {
+              setVal(e.target.value);
+              onUpdate(row.id, e.target.value);
             }}
             placeholder="Digite o conhecimento..."
             className="w-full bg-white hover:bg-slate-50 focus:bg-white focus:ring-1 focus:ring-purple-500 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 outline-none border border-slate-200 shadow-sm transition-all"
@@ -106,69 +116,81 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
     setIsEditingHeader(false);
   };
 
-  const getInitialMatrixRows = (): MatrixRow[] => {
-    const techList = unit.technicalCapacities || [];
-    const socialList = unit.socialCapacities || [];
-    const knowList = unit.knowledges || [];
-    const maxLen = Math.max(techList.length, socialList.length, knowList.length, 1);
+  // Inicialização independente para cada tabela
+  const [techRows, setTechRows] = useState<ItemRow[]>(() => 
+    (unit.technicalCapacities || []).map((val, idx) => ({ id: `tech-${idx}-${Math.random()}`, value: val }))
+  );
 
-    const rows: MatrixRow[] = [];
-    for (let i = 0; i < maxLen; i++) {
-      rows.push({
-        id: `row-${i}`,
-        technical: techList[i] || '',
-        social: socialList[i] || '',
-        knowledge: knowList[i] || ''
-      });
-    }
-    return rows;
-  };
+  const [socialRows, setSocialRows] = useState<ItemRow[]>(() => 
+    (unit.socialCapacities || []).map((val, idx) => ({ id: `social-${idx}-${Math.random()}`, value: val }))
+  );
 
-  const [matrixRows, setMatrixRows] = useState<MatrixRow[]>(getInitialMatrixRows);
+  const [knowRows, setKnowRows] = useState<ItemRow[]>(() => 
+    (unit.knowledges || []).map((val, idx) => ({ id: `know-${idx}-${Math.random()}`, value: val }))
+  );
 
-  const syncMatrixToUnit = (newRows: MatrixRow[]) => {
-    const technicalCapacities = newRows.map(r => r.technical);
-    const socialCapacities = newRows.map(r => r.social);
-    const knowledges = newRows.map(r => r.knowledge);
-
+  const syncData = (newTechs: ItemRow[], newSocials: ItemRow[], newKnows: ItemRow[]) => {
     onUpdateUnit({
       ...unit,
-      technicalCapacities,
-      socialCapacities,
-      knowledges
+      technicalCapacities: newTechs.map(r => r.value),
+      socialCapacities: newSocials.map(r => r.value),
+      knowledges: newKnows.map(r => r.value)
     });
   };
 
-  const handleAddMatrixRow = () => {
-    setMatrixRows(prev => {
-      const newRows = [
-        ...prev,
-        { id: `row-${Date.now()}-${Math.random()}`, technical: '', social: '', knowledge: '' }
-      ];
-      syncMatrixToUnit(newRows);
-      return newRows;
-    });
+  const handleAddCapacity = (type: 'technical' | 'social') => {
+    const newItem: ItemRow = { id: `item-${Date.now()}-${Math.random()}`, value: '' };
+    if (type === 'technical') {
+      const updated = [...techRows, newItem];
+      setTechRows(updated);
+      syncData(updated, socialRows, knowRows);
+    } else {
+      const updated = [...socialRows, newItem];
+      setSocialRows(updated);
+      syncData(techRows, updated, knowRows);
+    }
   };
 
-  const handleDeleteMatrixRow = (rowId: string) => {
-    setMatrixRows(prev => {
-      const newRows = prev.filter(r => r.id !== rowId);
-      syncMatrixToUnit(newRows);
-      return newRows;
-    });
+  const handleDeleteCapacity = (id: string, type: 'technical' | 'social') => {
+    if (type === 'technical') {
+      const updated = techRows.filter(r => r.id !== id);
+      setTechRows(updated);
+      syncData(updated, socialRows, knowRows);
+    } else {
+      const updated = socialRows.filter(r => r.id !== id);
+      setSocialRows(updated);
+      syncData(techRows, updated, knowRows);
+    }
   };
 
-  const handleUpdateMatrixCell = (rowId: string, field: 'technical' | 'social' | 'knowledge', value: string) => {
-    setMatrixRows(prev => {
-      const newRows = prev.map(r => {
-        if (r.id === rowId) {
-          return { ...r, [field]: value };
-        }
-        return r;
-      });
-      syncMatrixToUnit(newRows);
-      return newRows;
-    });
+  const handleUpdateCapacity = (id: string, type: 'technical' | 'social', value: string) => {
+    if (type === 'technical') {
+      const updated = techRows.map(r => r.id === id ? { ...r, value } : r);
+      setTechRows(updated);
+      syncData(updated, socialRows, knowRows);
+    } else {
+      const updated = socialRows.map(r => r.id === id ? { ...r, value } : r);
+      setSocialRows(updated);
+      syncData(techRows, updated, knowRows);
+    }
+  };
+
+  const handleAddKnowledge = () => {
+    const updated = [...knowRows, { id: `know-${Date.now()}-${Math.random()}`, value: '' }];
+    setKnowRows(updated);
+    syncData(techRows, socialRows, updated);
+  };
+
+  const handleDeleteKnowledge = (id: string) => {
+    const updated = knowRows.filter(r => r.id !== id);
+    setKnowRows(updated);
+    syncData(techRows, socialRows, updated);
+  };
+
+  const handleUpdateKnowledge = (id: string, value: string) => {
+    const updated = knowRows.map(r => r.id === id ? { ...r, value } : r);
+    setKnowRows(updated);
+    syncData(techRows, socialRows, updated);
   };
 
   const handleAddSituation = () => {
@@ -487,64 +509,141 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
 
         <div className="p-4 md:p-6 space-y-6 print:p-0">
           {activeTab === 'geral' && (
-            <div className="space-y-6">
+            <div className="space-y-8">
               <div className="border-b border-slate-100 pb-3">
                 <h3 className="text-xs font-black uppercase text-blue-600 tracking-[0.2em]">
-                  Matriz Curricular (Capacidades e Conhecimentos)
+                  Matriz Curricular (Capacidades e Conhecimentos em Colunas Independentes)
                 </h3>
               </div>
 
-              <div className="overflow-x-auto border border-slate-200 rounded-2xl shadow-sm bg-white">
-                <table className="w-full border-collapse text-left text-xs">
-                  <thead>
-                    <tr className="bg-slate-900 text-white text-[10px] font-black uppercase tracking-wider">
-                      <th className="p-4 w-1/2 border-r border-slate-800 text-center">
-                        <div className="flex items-center justify-center gap-2">
-                          <span>CAPACIDADES (TÉCNICAS E SOCIOEMOCIONAIS)</span>
-                          <button
-                            type="button"
-                            onClick={handleAddMatrixRow}
-                            title="Adicionar Linha"
-                            className="text-white hover:text-blue-400 font-bold text-sm px-1 transition-colors cursor-pointer"
-                          >
-                            +
-                          </button>
-                        </div>
-                      </th>
-                      <th className="p-4 w-1/2 text-center">
-                        <div className="flex items-center justify-center gap-2">
-                          <span>CONHECIMENTOS</span>
-                          <button
-                            type="button"
-                            onClick={handleAddMatrixRow}
-                            title="Adicionar Linha"
-                            className="text-white hover:text-blue-400 font-bold text-sm px-1 transition-colors cursor-pointer"
-                          >
-                            +
-                          </button>
-                        </div>
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-200">
-                    {matrixRows.map((row) => (
-                      <MatrixRowItem
-                        key={row.id}
-                        row={row}
-                        onUpdate={handleUpdateMatrixCell}
-                        onDelete={handleDeleteMatrixRow}
-                      />
-                    ))}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Tabela de Capacidades Técnicas */}
+                <div className="space-y-3">
+                  <div className="overflow-x-auto border border-slate-200 rounded-2xl shadow-sm bg-white">
+                    <table className="w-full border-collapse text-left text-xs">
+                      <thead>
+                        <tr className="bg-slate-900 text-white text-[10px] font-black uppercase tracking-wider">
+                          <th className="p-4 text-center">
+                            <div className="flex items-center justify-center gap-2">
+                              <span>CAPACIDADES TÉCNICAS</span>
+                              <button
+                                type="button"
+                                onClick={() => handleAddCapacity('technical')}
+                                title="Adicionar Capacidade Técnica"
+                                className="text-black bg-white hover:bg-slate-200 rounded-full w-5 h-5 flex items-center justify-center font-black text-xs transition-colors cursor-pointer shadow-sm"
+                              >
+                                +
+                              </button>
+                            </div>
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-200">
+                        {techRows.map((row) => (
+                          <CapacityRowItem
+                            key={row.id}
+                            row={row}
+                            type="technical"
+                            onUpdate={handleUpdateCapacity}
+                            onDelete={handleDeleteCapacity}
+                          />
+                        ))}
+                        {techRows.length === 0 && (
+                          <tr>
+                            <td className="p-6 text-center text-slate-400 italic">
+                              Nenhuma capacidade técnica cadastrada. Clique no "+" no cabeçalho.
+                            </td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
 
-                    {matrixRows.length === 0 && (
-                      <tr>
-                        <td className="p-6 text-center text-slate-400 italic" colSpan={2}>
-                          Nenhum registro cadastrado na matriz. Clique no botão "+" no cabeçalho para adicionar.
-                        </td>
+                {/* Tabela de Capacidades Socioemocionais */}
+                <div className="space-y-3">
+                  <div className="overflow-x-auto border border-slate-200 rounded-2xl shadow-sm bg-white">
+                    <table className="w-full border-collapse text-left text-xs">
+                      <thead>
+                        <tr className="bg-slate-900 text-white text-[10px] font-black uppercase tracking-wider">
+                          <th className="p-4 text-center">
+                            <div className="flex items-center justify-center gap-2">
+                              <span>CAPACIDADES SOCIOEMOCIONAIS</span>
+                              <button
+                                type="button"
+                                onClick={() => handleAddCapacity('social')}
+                                title="Adicionar Capacidade Socioemocional"
+                                className="text-black bg-white hover:bg-slate-200 rounded-full w-5 h-5 flex items-center justify-center font-black text-xs transition-colors cursor-pointer shadow-sm"
+                              >
+                                +
+                              </button>
+                            </div>
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-200">
+                        {socialRows.map((row) => (
+                          <CapacityRowItem
+                            key={row.id}
+                            row={row}
+                            type="social"
+                            onUpdate={handleUpdateCapacity}
+                            onDelete={handleDeleteCapacity}
+                          />
+                        ))}
+                        {socialRows.length === 0 && (
+                          <tr>
+                            <td className="p-6 text-center text-slate-400 italic">
+                              Nenhuma capacidade socioemocional cadastrada. Clique no "+" no cabeçalho.
+                            </td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+
+              {/* Tabela de Conhecimentos */}
+              <div className="space-y-3 pt-4">
+                <div className="overflow-x-auto border border-slate-200 rounded-2xl shadow-sm bg-white">
+                  <table className="w-full border-collapse text-left text-xs">
+                    <thead>
+                      <tr className="bg-slate-900 text-white text-[10px] font-black uppercase tracking-wider">
+                        <th className="p-4 text-center">
+                          <div className="flex items-center justify-center gap-2">
+                            <span>CONHECIMENTOS</span>
+                            <button
+                              type="button"
+                              onClick={handleAddKnowledge}
+                              title="Adicionar Conhecimento"
+                              className="text-black bg-white hover:bg-slate-200 rounded-full w-5 h-5 flex items-center justify-center font-black text-xs transition-colors cursor-pointer shadow-sm"
+                            >
+                              +
+                            </button>
+                          </div>
+                        </th>
                       </tr>
-                    )}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody className="divide-y divide-slate-200">
+                      {knowRows.map((row) => (
+                        <KnowledgeRowItem
+                          key={row.id}
+                          row={row}
+                          onUpdate={handleUpdateKnowledge}
+                          onDelete={handleDeleteKnowledge}
+                        />
+                      ))}
+                      {knowRows.length === 0 && (
+                        <tr>
+                          <td className="p-6 text-center text-slate-400 italic">
+                            Nenhum conhecimento cadastrado. Clique no "+" no cabeçalho.
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
           )}
