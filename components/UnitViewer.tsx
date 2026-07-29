@@ -1,4 +1,4 @@
-import React, abaReact, { useState } from 'react';
+import React, { useState } from 'react';
 import { CurricularUnit } from '../types';
 
 interface UnitViewerProps {
