@@ -142,6 +142,38 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
     onUpdateUnit({ ...unit, learningSituations: updated });
   };
 
+  // --- TRATAMENTO SEGURO DE RUBRICAS (Evita [object Object] e travamentos) ---
+  const sanitizeText = (val: any): string => {
+    if (typeof val === 'string') return val;
+    if (val && typeof val === 'object') {
+      // Se por acaso veio um objeto salvo incorretamente, tenta extrair string ou converte vazio
+      return val.text || val.reference || '';
+    }
+    return '';
+  };
+
+  const initialRubrics = (unit.rubrics || []).map(r => ({
+    id: r.id || Math.random().toString(),
+    reference: sanitizeText(r.reference),
+    nsa: sanitizeText(r.nsa),
+    apo: sanitizeText(r.apo),
+    par: sanitizeText(r.par),
+    aut: sanitizeText(r.aut)
+  }));
+
+  const [rubricsList, setRubricsList] = useState(initialRubrics);
+
+  useEffect(() => {
+    setRubricsList((unit.rubrics || []).map(r => ({
+      id: r.id || Math.random().toString(),
+      reference: sanitizeText(r.reference),
+      nsa: sanitizeText(r.nsa),
+      apo: sanitizeText(r.apo),
+      par: sanitizeText(r.par),
+      aut: sanitizeText(r.aut)
+    })));
+  }, [unit.id, unit.rubrics]);
+
   const handleAddRubricRow = () => {
     const newRow = {
       id: Date.now().toString(),
@@ -151,18 +183,20 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
       par: 'Atende com ressalvas...',
       aut: 'Atende com autonomia...'
     };
-    const currentRubrics = unit.rubrics || [];
-    onUpdateUnit({ ...unit, rubrics: [...currentRubrics, newRow] });
+    const updated = [...rubricsList, newRow];
+    setRubricsList(updated);
+    onUpdateUnit({ ...unit, rubrics: updated });
   };
 
   const handleDeleteRubricRow = (rubricId: string) => {
-    const currentRubrics = unit.rubrics || [];
-    onUpdateUnit({ ...unit, rubrics: currentRubrics.filter(r => r.id !== rubricId) });
+    const updated = rubricsList.filter(r => r.id !== rubricId);
+    setRubricsList(updated);
+    onUpdateUnit({ ...unit, rubrics: updated });
   };
 
   const handleUpdateRubricCell = (rubricId: string, field: 'reference' | 'nsa' | 'apo' | 'par' | 'aut', value: string) => {
-    const currentRubrics = unit.rubrics || [];
-    const updated = currentRubrics.map(r => r.id === rubricId ? { ...r, [field]: value } : r);
+    const updated = rubricsList.map(r => r.id === rubricId ? { ...r, [field]: value } : r);
+    setRubricsList(updated);
     onUpdateUnit({ ...unit, rubrics: updated });
   };
 
@@ -669,19 +703,19 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                     </tr>
                   </thead>
                   <tbody>
-                    {(!unit.rubrics || unit.rubrics.length === 0) ? (
+                    {rubricsList.length === 0 ? (
                       <tr>
                         <td colSpan={5} className="p-6 text-center text-slate-400 italic text-xs">
                           Nenhuma rubrica cadastrada. Clique em "+ Adicionar Rubrica" acima.
                         </td>
                       </tr>
                     ) : (
-                      unit.rubrics.map((row) => (
+                      rubricsList.map((row) => (
                         <tr key={row.id} className="hover:bg-slate-50/50">
                           <td className="p-2 border border-slate-300 align-top bg-slate-50/60">
                             <textarea
                               rows={3}
-                              value={typeof row.reference === 'string' ? row.reference : JSON.stringify(row.reference || '')}
+                              value={row.reference}
                               onChange={(e) => handleUpdateRubricCell(row.id, 'reference', e.target.value)}
                               placeholder="Capacidade / Referência..."
                               className="w-full bg-transparent border-none focus:ring-0 text-xs font-bold text-slate-900 resize-none outline-none"
@@ -699,7 +733,7 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                           <td className="p-2 border border-slate-300 align-top">
                             <textarea
                               rows={4}
-                              value={typeof row.nsa === 'string' ? row.nsa : JSON.stringify(row.nsa || '')}
+                              value={row.nsa}
                               onChange={(e) => handleUpdateRubricCell(row.id, 'nsa', e.target.value)}
                               placeholder="Não atende..."
                               className="w-full bg-transparent border-none focus:ring-0 text-xs text-slate-700 resize-none outline-none"
@@ -708,7 +742,7 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                           <td className="p-2 border border-slate-300 align-top">
                             <textarea
                               rows={4}
-                              value={typeof row.apo === 'string' ? row.apo : JSON.stringify(row.apo || '')}
+                              value={row.apo}
                               onChange={(e) => handleUpdateRubricCell(row.id, 'apo', e.target.value)}
                               placeholder="Atende parcialmente..."
                               className="w-full bg-transparent border-none focus:ring-0 text-xs text-slate-700 resize-none outline-none"
@@ -717,7 +751,7 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                           <td className="p-2 border border-slate-300 align-top">
                             <textarea
                               rows={4}
-                              value={typeof row.par === 'string' ? row.par : JSON.stringify(row.par || '')}
+                              value={row.par}
                               onChange={(e) => handleUpdateRubricCell(row.id, 'par', e.target.value)}
                               placeholder="Atende com ressalvas..."
                               className="w-full bg-transparent border-none focus:ring-0 text-xs text-slate-700 resize-none outline-none"
@@ -726,7 +760,7 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                           <td className="p-2 border border-slate-300 align-top">
                             <textarea
                               rows={4}
-                              value={typeof row.aut === 'string' ? row.aut : JSON.stringify(row.aut || '')}
+                              value={row.aut}
                               onChange={(e) => handleUpdateRubricCell(row.id, 'aut', e.target.value)}
                               placeholder="Atende com autonomia..."
                               className="w-full bg-transparent border-none focus:ring-0 text-xs text-slate-700 resize-none outline-none"
