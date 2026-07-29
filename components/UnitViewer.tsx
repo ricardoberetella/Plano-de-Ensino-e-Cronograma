@@ -488,30 +488,41 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
         <div className="p-4 md:p-6 space-y-6 print:p-0">
           {activeTab === 'geral' && (
             <div className="space-y-6">
-              <div className="flex flex-wrap items-center justify-between border-b border-slate-100 pb-3 gap-4">
+              <div className="border-b border-slate-100 pb-3">
                 <h3 className="text-xs font-black uppercase text-blue-600 tracking-[0.2em]">
                   Matriz Curricular (Capacidades e Conhecimentos)
                 </h3>
-                <div className="flex flex-wrap items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={handleAddMatrixRow}
-                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-[10px] font-black uppercase shadow-sm transition-all cursor-pointer"
-                  >
-                    + Adicionar Linha na Matriz
-                  </button>
-                </div>
               </div>
 
               <div className="overflow-x-auto border border-slate-200 rounded-2xl shadow-sm bg-white">
                 <table className="w-full border-collapse text-left text-xs">
                   <thead>
                     <tr className="bg-slate-900 text-white text-[10px] font-black uppercase tracking-wider">
-                      <th className="p-4 w-1/2 border-r border-slate-800">
-                        CAPACIDADES (TÉCNICAS E SOCIOEMOCIONAIS)
+                      <th className="p-4 w-1/2 border-r border-slate-800 text-center">
+                        <div className="flex items-center justify-center gap-2">
+                          <span>CAPACIDADES (TÉCNICAS E SOCIOEMOCIONAIS)</span>
+                          <button
+                            type="button"
+                            onClick={handleAddMatrixRow}
+                            title="Adicionar Linha"
+                            className="text-white hover:text-blue-400 font-bold text-sm px-1 transition-colors cursor-pointer"
+                          >
+                            +
+                          </button>
+                        </div>
                       </th>
-                      <th className="p-4 w-1/2">
-                        CONHECIMENTOS
+                      <th className="p-4 w-1/2 text-center">
+                        <div className="flex items-center justify-center gap-2">
+                          <span>CONHECIMENTOS</span>
+                          <button
+                            type="button"
+                            onClick={handleAddMatrixRow}
+                            title="Adicionar Linha"
+                            className="text-white hover:text-blue-400 font-bold text-sm px-1 transition-colors cursor-pointer"
+                          >
+                            +
+                          </button>
+                        </div>
                       </th>
                     </tr>
                   </thead>
@@ -528,7 +539,7 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                     {matrixRows.length === 0 && (
                       <tr>
                         <td className="p-6 text-center text-slate-400 italic" colSpan={2}>
-                          Nenhum registro cadastrado na matriz. Clique em "+ Adicionar Linha na Matriz".
+                          Nenhum registro cadastrado na matriz. Clique no botão "+" no cabeçalho para adicionar.
                         </td>
                       </tr>
                     )}
