@@ -460,15 +460,15 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
 
                       return (
                         <tr key={index} className="hover:bg-slate-50/80 group align-top">
-                          {/* Lado Esquerdo: Capacidades Independentes (Técnicas e Socioemocionais) sem bordas internas extras */}
+                          {/* Lado Esquerdo: Capacidades Limpas (Sem sub-containers ou wrappers com borda) */}
                           <td className="p-3 border-r border-slate-200 space-y-2 bg-slate-50/20">
-                            <div className="flex items-center gap-2 px-1">
+                            <div className="flex items-center gap-2">
                               <input
                                 type="text"
                                 value={tech !== undefined ? tech : ''}
                                 onChange={(e) => handleUpdateTechnicalCapacity(index, e.target.value)}
                                 placeholder="Digite a capacidade técnica..."
-                                className="w-full bg-transparent hover:bg-slate-100/60 focus:bg-white focus:ring-1 focus:ring-blue-500 rounded-lg px-2 py-1.5 text-xs font-bold text-slate-800 outline-none border border-transparent transition-all"
+                                className="w-full bg-white hover:bg-slate-50 focus:bg-white focus:ring-1 focus:ring-blue-500 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 outline-none border border-slate-200 shadow-sm transition-all"
                               />
                               {tech !== undefined && (
                                 <button
@@ -482,13 +482,13 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                               )}
                             </div>
 
-                            <div className="flex items-center gap-2 px-1">
+                            <div className="flex items-center gap-2">
                               <input
                                 type="text"
                                 value={social !== undefined ? social : ''}
                                 onChange={(e) => handleUpdateSocialCapacity(index, e.target.value)}
                                 placeholder="Digite a capacidade socioemocional..."
-                                className="w-full bg-transparent hover:bg-slate-100/60 focus:bg-white focus:ring-1 focus:ring-emerald-500 rounded-lg px-2 py-1.5 text-xs font-bold text-slate-800 outline-none border border-transparent transition-all"
+                                className="w-full bg-white hover:bg-slate-50 focus:bg-white focus:ring-1 focus:ring-emerald-500 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 outline-none border border-slate-200 shadow-sm transition-all"
                               />
                               {social !== undefined && (
                                 <button
@@ -505,13 +505,13 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
 
                           {/* Lado Direito: Conhecimentos Independentes */}
                           <td className="p-3 bg-white">
-                            <div className="flex items-center gap-2 px-1">
+                            <div className="flex items-center gap-2">
                               <input
                                 type="text"
                                 value={knowledge !== undefined ? knowledge : ''}
                                 onChange={(e) => handleUpdateKnowledge(index, e.target.value)}
                                 placeholder="Digite o conhecimento..."
-                                className="w-full bg-transparent hover:bg-slate-50 focus:bg-white focus:ring-1 focus:ring-purple-500 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 outline-none border border-transparent transition-all"
+                                className="w-full bg-white hover:bg-slate-50 focus:bg-white focus:ring-1 focus:ring-purple-500 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 outline-none border border-slate-200 shadow-sm transition-all"
                               />
                               {knowledge !== undefined && (
                                 <button
@@ -808,7 +808,7 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                                 rows={3}
                                 value={row.knowledges || ''}
                                 onChange={(e) => handleUpdateLessonPlanCell(row.id, 'knowledges', e.target.value)}
-                                className="w-full bg-transparent border border-transparent focus:border-slate-200 focus:bg-white rounded-lg p-1 text-xs font-bold text-slate-800 restored-none outline-none"
+                                className="w-full bg-transparent border border-transparent focus:border-slate-200 focus:bg-white rounded-lg p-1 text-xs font-bold text-slate-800 outline-none"
                               />
                             </td>
                             <td className="p-3 border-r border-slate-200 align-top space-y-2">
