@@ -445,10 +445,10 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                   <thead>
                     <tr className="bg-slate-900 text-white text-[10px] font-black uppercase tracking-wider">
                       <th className="p-4 w-1/2 border-r border-slate-800">
-                        CONHECIMENTOS
+                        CAPACIDADES (TÉCNICAS E SOCIOEMOCIONAIS)
                       </th>
                       <th className="p-4 w-1/2">
-                        CAPACIDADES (TÉCNICAS E SOCIOEMOCIONAIS)
+                        CONHECIMENTOS
                       </th>
                     </tr>
                   </thead>
@@ -460,31 +460,8 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
 
                       return (
                         <tr key={index} className="hover:bg-slate-50/80 group align-top">
-                          {/* Lado Esquerdo: Conhecimentos Independentes */}
-                          <td className="p-3 border-r border-slate-200 bg-white">
-                            <div className="flex items-center gap-2">
-                              <input
-                                type="text"
-                                value={knowledge !== undefined ? knowledge : ''}
-                                onChange={(e) => handleUpdateKnowledge(index, e.target.value)}
-                                placeholder="Digite o conhecimento..."
-                                className="w-full bg-transparent focus:bg-white focus:ring-1 focus:ring-purple-500 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 outline-none border border-transparent focus:border-purple-300"
-                              />
-                              {knowledge !== undefined && (
-                                <button
-                                  type="button"
-                                  onClick={() => handleDeleteKnowledge(index)}
-                                  title="Excluir"
-                                  className="p-1 text-slate-300 hover:text-red-600 transition-colors text-xs font-black shrink-0"
-                                >
-                                  ✕
-                                </button>
-                              )}
-                            </div>
-                          </td>
-
-                          {/* Lado Direito: Capacidades Independentes (Técnicas e Socioemocionais) */}
-                          <td className="p-3 space-y-2 bg-slate-50/20">
+                          {/* Lado Esquerdo: Capacidades Independentes (Técnicas e Socioemocionais) */}
+                          <td className="p-3 border-r border-slate-200 space-y-2 bg-slate-50/20">
                             <div className="flex items-center gap-2 bg-blue-50/40 p-1.5 rounded-xl border border-blue-200">
                               <input
                                 type="text"
@@ -517,6 +494,29 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                                 <button
                                   type="button"
                                   onClick={() => handleDeleteSocialCapacity(index)}
+                                  title="Excluir"
+                                  className="p-1 text-slate-300 hover:text-red-600 transition-colors text-xs font-black shrink-0"
+                                >
+                                  ✕
+                                </button>
+                              )}
+                            </div>
+                          </td>
+
+                          {/* Lado Direito: Conhecimentos Independentes */}
+                          <td className="p-3 bg-white">
+                            <div className="flex items-center gap-2">
+                              <input
+                                type="text"
+                                value={knowledge !== undefined ? knowledge : ''}
+                                onChange={(e) => handleUpdateKnowledge(index, e.target.value)}
+                                placeholder="Digite o conhecimento..."
+                                className="w-full bg-transparent focus:bg-white focus:ring-1 focus:ring-purple-500 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 outline-none border border-transparent focus:border-purple-300"
+                              />
+                              {knowledge !== undefined && (
+                                <button
+                                  type="button"
+                                  onClick={() => handleDeleteKnowledge(index)}
                                   title="Excluir"
                                   className="p-1 text-slate-300 hover:text-red-600 transition-colors text-xs font-black shrink-0"
                                 >
