@@ -260,6 +260,11 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
     target.style.height = `${target.scrollHeight}px`;
   };
 
+  const techCaps = unit.technicalCapacities || [];
+  const socialCaps = unit.socialCapacities || [];
+  const knowledgesList = unit.knowledges || [];
+  const maxRows = Math.max(techCaps.length, socialCaps.length, knowledgesList.length, 1);
+
   return (
     <div className="space-y-6 w-full max-w-[99%] mx-auto pb-20 animate-fadeIn">
       <div className="flex justify-between items-center px-2 print:hidden">
@@ -440,129 +445,98 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                   <thead>
                     <tr className="bg-slate-900 text-white text-[10px] font-black uppercase tracking-wider">
                       <th className="p-4 w-1/2 border-r border-slate-800">
-                        Capacidades (Técnicas e Socioemocionais)
+                        CONHECIMENTOS
                       </th>
                       <th className="p-4 w-1/2">
-                        Conhecimentos
+                        CAPACIDADES (TÉCNICAS E SOCIOEMOCIONAIS)
                       </th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-200">
-                    {/* Linha para Capacidades Técnicas */}
-                    <tr className="bg-blue-50/50">
-                      <td colSpan={2} className="p-3 font-[1000] text-blue-950 uppercase text-[10px] tracking-widest border-t border-b border-slate-200">
-                        Capacidades Técnicas
-                      </td>
-                    </tr>
-                    {(!unit.technicalCapacities || unit.technicalCapacities.length === 0) ? (
-                      <tr>
-                        <td className="p-4 text-slate-400 italic" colSpan={2}>
-                          Nenhuma capacidade técnica cadastrada.
-                        </td>
-                      </tr>
-                    ) : (
-                      unit.technicalCapacities.map((item, index) => (
-                        <tr key={index} className="hover:bg-slate-50/80 group">
-                          <td className="p-3 border-r border-slate-200 align-middle">
-                            <div className="flex items-center gap-2">
-                              <input
-                                type="text"
-                                value={item}
-                                onChange={(e) => handleUpdateTechnicalCapacity(index, e.target.value)}
-                                placeholder="Digite a capacidade técnica..."
-                                className="w-full bg-transparent focus:bg-white focus:ring-1 focus:ring-blue-500 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 outline-none border border-transparent focus:border-blue-300"
-                              />
-                              <button
-                                type="button"
-                                onClick={() => handleDeleteTechnicalCapacity(index)}
-                                title="Excluir"
-                                className="p-1 text-slate-300 hover:text-red-600 transition-colors text-xs font-black shrink-0"
-                              >
-                                ✕
-                              </button>
-                            </div>
-                          </td>
-                          <td className="p-3 bg-slate-50/30"></td>
-                        </tr>
-                      ))
-                    )}
+                    {Array.from({ length: maxRows }).map((_, index) => {
+                      const tech = techCaps[index];
+                      const social = socialCaps[index];
+                      const knowledge = knowledgesList[index];
 
-                    {/* Linha para Capacidades Socioemocionais */}
-                    <tr className="bg-emerald-50/50">
-                      <td colSpan={2} className="p-3 font-[1000] text-emerald-950 uppercase text-[10px] tracking-widest border-t border-b border-slate-200">
-                        Capacidades Socioemocionais
-                      </td>
-                    </tr>
-                    {(!unit.socialCapacities || unit.socialCapacities.length === 0) ? (
-                      <tr>
-                        <td className="p-4 text-slate-400 italic" colSpan={2}>
-                          Nenhuma capacidade socioemocional cadastrada.
-                        </td>
-                      </tr>
-                    ) : (
-                      unit.socialCapacities.map((item, index) => (
-                        <tr key={index} className="hover:bg-slate-50/80 group">
-                          <td className="p-3 border-r border-slate-200 align-middle">
-                            <div className="flex items-center gap-2">
-                              <input
-                                type="text"
-                                value={item}
-                                onChange={(e) => handleUpdateSocialCapacity(index, e.target.value)}
-                                placeholder="Digite a capacidade socioemocional..."
-                                className="w-full bg-transparent focus:bg-white focus:ring-1 focus:ring-emerald-500 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 outline-none border border-transparent focus:border-emerald-300"
-                              />
-                              <button
-                                type="button"
-                                onClick={() => handleDeleteSocialCapacity(index)}
-                                title="Excluir"
-                                className="p-1 text-slate-300 hover:text-red-600 transition-colors text-xs font-black shrink-0"
-                              >
-                                ✕
-                              </button>
-                            </div>
+                      return (
+                        <tr key={index} className="hover:bg-slate-50/80 group align-top">
+                          {/* Lado Esquerdo: Conhecimentos */}
+                          <td className="p-3 border-r border-slate-200 bg-white">
+                            {knowledge !== undefined ? (
+                              <div className="flex items-center gap-2">
+                                <input
+                                  type="text"
+                                  value={knowledge}
+                                  onChange={(e) => handleUpdateKnowledge(index, e.target.value)}
+                                  placeholder="Digite o conhecimento..."
+                                  className="w-full bg-transparent focus:bg-white focus:ring-1 focus:ring-purple-500 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 outline-none border border-transparent focus:border-purple-300"
+                                />
+                                <button
+                                  type="button"
+                                  onClick={() => handleDeleteKnowledge(index)}
+                                  title="Excluir"
+                                  className="p-1 text-slate-300 hover:text-red-600 transition-colors text-xs font-black shrink-0"
+                                >
+                                  ✕
+                                </button>
+                              </div>
+                            ) : null}
                           </td>
-                          <td className="p-3 bg-slate-50/30"></td>
-                        </tr>
-                      ))
-                    )}
 
-                    {/* Linha para Conhecimentos */}
-                    <tr className="bg-purple-50/50">
-                      <td colSpan={2} className="p-3 font-[1000] text-purple-950 uppercase text-[10px] tracking-widest border-t border-b border-slate-200">
-                        Conhecimentos
-                      </td>
-                    </tr>
-                    {(!unit.knowledges || unit.knowledges.length === 0) ? (
-                      <tr>
-                        <td className="p-4 text-slate-400 italic" colSpan={2}>
-                          Nenhum conhecimento cadastrado.
-                        </td>
-                      </tr>
-                    ) : (
-                      unit.knowledges.map((item, index) => (
-                        <tr key={index} className="hover:bg-slate-50/80 group">
-                          <td className="p-3 border-r border-slate-200 bg-slate-50/35"></td>
-                          <td className="p-3 align-middle bg-white">
-                            <div className="flex items-center gap-2">
-                              <input
-                                type="text"
-                                value={item}
-                                onChange={(e) => handleUpdateKnowledge(index, e.target.value)}
-                                placeholder="Digite o conhecimento..."
-                                className="w-full bg-transparent focus:bg-white focus:ring-1 focus:ring-purple-500 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 outline-none border border-transparent focus:border-purple-300"
-                              />
-                              <button
-                                type="button"
-                                onClick={() => handleDeleteKnowledge(index)}
-                                title="Excluir"
-                                className="p-1 text-slate-300 hover:text-red-600 transition-colors text-xs font-black shrink-0"
-                              >
-                                ✕
-                              </button>
-                            </div>
+                          {/* Lado Direito: Capacidades (Técnicas e Socioemocionais empilhadas ou misturadas) */}
+                          <td className="p-3 space-y-2 bg-slate-50/20">
+                            {tech !== undefined && (
+                              <div className="flex items-center gap-2 bg-blue-50/40 p-1.5 rounded-xl border border-blue-100">
+                                <span className="text-[9px] font-black uppercase text-blue-700 bg-blue-100 px-2 py-1 rounded-lg shrink-0">Técnica</span>
+                                <input
+                                  type="text"
+                                  value={tech}
+                                  onChange={(e) => handleUpdateTechnicalCapacity(index, e.target.value)}
+                                  placeholder="Digite a capacidade técnica..."
+                                  className="w-full bg-transparent focus:bg-white focus:ring-1 focus:ring-blue-500 rounded-lg px-2 py-1 text-xs font-bold text-slate-800 outline-none border border-transparent"
+                                />
+                                <button
+                                  type="button"
+                                  onClick={() => handleDeleteTechnicalCapacity(index)}
+                                  title="Excluir"
+                                  className="p-1 text-slate-300 hover:text-red-600 transition-colors text-xs font-black shrink-0"
+                                >
+                                  ✕
+                                </button>
+                              </div>
+                            )}
+
+                            {social !== undefined && (
+                              <div className="flex items-center gap-2 bg-emerald-50/40 p-1.5 rounded-xl border border-emerald-100">
+                                <span className="text-[9px] font-black uppercase text-emerald-700 bg-emerald-100 px-2 py-1 rounded-lg shrink-0">Socioemocional</span>
+                                <input
+                                  type="text"
+                                  value={social}
+                                  onChange={(e) => handleUpdateSocialCapacity(index, e.target.value)}
+                                  placeholder="Digite a capacidade socioemocional..."
+                                  className="w-full bg-transparent focus:bg-white focus:ring-1 focus:ring-emerald-500 rounded-lg px-2 py-1 text-xs font-bold text-slate-800 outline-none border border-transparent"
+                                />
+                                <button
+                                  type="button"
+                                  onClick={() => handleDeleteSocialCapacity(index)}
+                                  title="Excluir"
+                                  className="p-1 text-slate-300 hover:text-red-600 transition-colors text-xs font-black shrink-0"
+                                >
+                                  ✕
+                                </button>
+                              </div>
+                            )}
                           </td>
                         </tr>
-                      ))
+                      );
+                    })}
+
+                    {maxRows === 0 && (
+                      <tr>
+                        <td className="p-4 text-slate-400 italic" colSpan={2}>
+                          Nenhum registro cadastrado.
+                        </td>
+                      </tr>
                     )}
                   </tbody>
                 </table>
@@ -876,7 +850,7 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
           )}
 
           {activeTab === 'calendario' && (
-            <div className="p-12 text-center bg-slate-50 rounded-2xl border border-slate-200 text-slate-500 font-bold uppercase text-xs">
+            <div className="p-12 text-center bg-slate-50 restructured-2xl border border-slate-200 text-slate-500 font-bold uppercase text-xs">
               Módulo de Calendário em desenvolvimento.
             </div>
           )}
