@@ -537,7 +537,6 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
           {activeTab === 'geral' && (
             <div className="space-y-8">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Lado Esquerdo: Capacidades Técnicas e Socioemocionais */}
                 <div className="space-y-0 border border-slate-300 rounded-2xl overflow-hidden shadow-sm bg-white">
                   <div className="bg-slate-900 text-white px-4 py-3 flex items-center justify-between">
                     <span className="text-[10px] font-black uppercase tracking-wider">CAPACIDADES TÉCNICAS E SOCIOEMOCIONAIS</span>
@@ -593,7 +592,6 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                   </div>
                 </div>
 
-                {/* Lado Direito: Conhecimentos */}
                 <div className="space-y-0 border border-slate-300 rounded-2xl overflow-hidden shadow-sm bg-white">
                   <div className="bg-slate-900 text-white px-4 py-3 flex items-center justify-between">
                     <span className="text-[10px] font-black uppercase tracking-wider">CONHECIMENTOS</span>
@@ -735,92 +733,94 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
           {activeTab === 'rubricas' && (
             <div className="space-y-6 animate-fadeIn">
               <div className="flex justify-between items-center border-b border-slate-100 pb-4">
-                <div>
-                  <h3 className="text-lg font-[1000] uppercase italic text-slate-900 tracking-wider">Matriz de Rubricas</h3>
-                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Critérios de avaliação por nível de desempenho</p>
-                </div>
+                <h3 className="text-lg font-[1000] uppercase italic text-slate-900 tracking-wider">Matriz de Rubricas de Avaliação</h3>
                 <button
                   type="button"
                   onClick={handleAddRubricRow}
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-md transition-all cursor-pointer"
+                  className="bg-slate-900 hover:bg-slate-800 text-white px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-md transition-all cursor-pointer"
                 >
-                  + Adicionar Rubrica
+                  + Adicionar Critério de Rubrica
                 </button>
               </div>
 
-              <div className="overflow-x-auto border border-slate-300 rounded-lg bg-white shadow-sm">
+              <div className="border border-slate-300 rounded-2xl overflow-hidden shadow-sm bg-white">
                 <table className="w-full border-collapse text-left text-xs">
-                  <thead>
-                    <tr className="bg-slate-900 text-white text-[10px] font-black uppercase tracking-wider">
-                      <th className="p-3 border border-slate-700 w-[22%]">Referência</th>
-                      <th className="p-3 border border-slate-700 w-[18%] text-red-400">NSA</th>
-                      <th className="p-3 border border-slate-700 w-[18%] text-orange-400">APO</th>
-                      <th className="p-3 border border-slate-700 w-[18%] text-blue-400">PAR</th>
-                      <th className="p-3 border border-slate-700 w-[18%] text-emerald-400">AUT</th>
-                      <th className="p-3 border border-slate-700 w-10 text-center">Ações</th>
+                  <thead className="bg-[#111827] text-white uppercase text-[10px] tracking-wider">
+                    <tr>
+                      <th className="py-3 px-3 w-1/5 border-r border-slate-700">Referência / Critério</th>
+                      <th className="py-3 px-3 w-1/5 border-r border-slate-700">NSA (Não Satisfatório)</th>
+                      <th className="py-3 px-3 w-1/5 border-r border-slate-700">APO (Atende Parcialmente)</th>
+                      <th className="py-3 px-3 w-1/5 border-r border-slate-700">PAR (Atende Plenamente)</th>
+                      <th className="py-3 px-3 w-1/5 border-r border-slate-700">AUT (Atende com Autonomia)</th>
+                      <th className="py-3 px-2 w-16 text-center">Ações</th>
                     </tr>
                   </thead>
-                  <tbody>
+                  <tbody className="divide-y divide-slate-200">
                     {rubricsList.length === 0 ? (
                       <tr>
-                        <td colSpan={6} className="p-6 text-center text-slate-400 italic text-xs">
-                          Nenhuma rubrica cadastrada. Clique em "+ Adicionar Rubrica" acima.
+                        <td colSpan={6} className="p-8 text-center text-slate-400 italic text-xs uppercase font-bold">
+                          Nenhum critério de rubrica cadastrado. Clique no botão acima para adicionar.
                         </td>
                       </tr>
                     ) : (
-                      rubricsList.map((row) => (
-                        <tr key={row.id} className="hover:bg-slate-50/50 group">
-                          <td className="p-2 border border-slate-300 align-top bg-slate-50/60">
+                      rubricsList.map((rubric) => (
+                        <tr key={rubric.id} className="hover:bg-slate-50/80 group align-top">
+                          <td className="p-2 border-r border-slate-200 bg-white">
                             <textarea
-                              rows={3}
-                              value={row.reference}
-                              onChange={(e) => handleUpdateRubricCell(row.id, 'reference', e.target.value)}
-                              placeholder="Capacidade / Referência..."
-                              className="w-full bg-transparent border-none focus:ring-0 text-xs font-bold text-slate-900 resize-none outline-none"
+                              rows={2}
+                              value={rubric.reference}
+                              onChange={(e) => handleUpdateRubricCell(rubric.id, 'reference', e.target.value)}
+                              onInput={handleTextareaInput}
+                              placeholder="Critério..."
+                              className="w-full bg-transparent focus:bg-white rounded-none p-1 text-xs font-bold text-slate-800 outline-none resize-none overflow-hidden leading-relaxed"
                             />
                           </td>
-                          <td className="p-2 border border-slate-300 align-top">
+                          <td className="p-2 border-r border-slate-200 bg-white">
                             <textarea
-                              rows={4}
-                              value={row.nsa}
-                              onChange={(e) => handleUpdateRubricCell(row.id, 'nsa', e.target.value)}
-                              placeholder="Não atende..."
-                              className="w-full bg-transparent border-none focus:ring-0 text-xs text-slate-700 resize-none outline-none"
+                              rows={2}
+                              value={rubric.nsa}
+                              onChange={(e) => handleUpdateRubricCell(rubric.id, 'nsa', e.target.value)}
+                              onInput={handleTextareaInput}
+                              placeholder="NSA..."
+                              className="w-full bg-transparent focus:bg-white rounded-none p-1 text-xs font-medium text-slate-700 outline-none resize-none overflow-hidden leading-relaxed"
                             />
                           </td>
-                          <td className="p-2 border border-slate-300 align-top">
+                          <td className="p-2 border-r border-slate-200 bg-white">
                             <textarea
-                              rows={4}
-                              value={row.apo}
-                              onChange={(e) => handleUpdateRubricCell(row.id, 'apo', e.target.value)}
-                              placeholder="Atende parcialmente..."
-                              className="w-full bg-transparent border-none focus:ring-0 text-xs text-slate-700 resize-none outline-none"
+                              rows={2}
+                              value={rubric.apo}
+                              onChange={(e) => handleUpdateRubricCell(rubric.id, 'apo', e.target.value)}
+                              onInput={handleTextareaInput}
+                              placeholder="APO..."
+                              className="w-full bg-transparent focus:bg-white rounded-none p-1 text-xs font-medium text-slate-700 outline-none resize-none overflow-hidden leading-relaxed"
                             />
                           </td>
-                          <td className="p-2 border border-slate-300 align-top">
+                          <td className="p-2 border-r border-slate-200 bg-white">
                             <textarea
-                              rows={4}
-                              value={row.par}
-                              onChange={(e) => handleUpdateRubricCell(row.id, 'par', e.target.value)}
-                              placeholder="Atende com ressalvas..."
-                              className="w-full bg-transparent border-none focus:ring-0 text-xs text-slate-700 resize-none outline-none"
+                              rows={2}
+                              value={rubric.par}
+                              onChange={(e) => handleUpdateRubricCell(rubric.id, 'par', e.target.value)}
+                              onInput={handleTextareaInput}
+                              placeholder="PAR..."
+                              className="w-full bg-transparent focus:bg-white rounded-none p-1 text-xs font-medium text-slate-700 outline-none resize-none overflow-hidden leading-relaxed"
                             />
                           </td>
-                          <td className="p-2 border border-slate-300 align-top">
+                          <td className="p-2 border-r border-slate-200 bg-white">
                             <textarea
-                              rows={4}
-                              value={row.aut}
-                              onChange={(e) => handleUpdateRubricCell(row.id, 'aut', e.target.value)}
-                              placeholder="Atende com autonomia..."
-                              className="w-full bg-transparent border-none focus:ring-0 text-xs text-slate-700 resize-none outline-none"
+                              rows={2}
+                              value={rubric.aut}
+                              onChange={(e) => handleUpdateRubricCell(rubric.id, 'aut', e.target.value)}
+                              onInput={handleTextareaInput}
+                              placeholder="AUT..."
+                              className="w-full bg-transparent focus:bg-white rounded-none p-1 text-xs font-medium text-slate-700 outline-none resize-none overflow-hidden leading-relaxed"
                             />
                           </td>
-                          <td className="p-2 border border-slate-300 align-middle text-center bg-slate-50/30">
+                          <td className="p-2 text-center align-middle bg-white">
                             <button
                               type="button"
-                              onClick={() => handleDeleteRubricRow(row.id)}
-                              title="Excluir"
-                              className="text-slate-300 hover:text-red-600 transition-colors text-xs font-black p-1 cursor-pointer"
+                              onClick={() => handleDeleteRubricRow(rubric.id)}
+                              title="Excluir Critério"
+                              className="text-slate-300 hover:text-red-600 p-1.5 rounded-full hover:bg-slate-100 transition-colors opacity-0 group-hover:opacity-100 cursor-pointer text-xs font-black"
                             >
                               ✕
                             </button>
@@ -837,92 +837,114 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
           {activeTab === 'plano-aula' && (
             <div className="space-y-6 animate-fadeIn">
               <div className="flex justify-between items-center border-b border-slate-100 pb-4">
-                <h3 className="text-lg font-[1000] uppercase italic text-slate-900 tracking-wider">Plano de Aula / Cronograma</h3>
+                <h3 className="text-lg font-[1000] uppercase italic text-slate-900 tracking-wider">Plano de Aula e Cronograma Diário</h3>
                 <button
                   type="button"
                   onClick={handleAddLessonPlanRow}
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-md transition-all cursor-pointer"
+                  className="bg-slate-900 hover:bg-slate-800 text-white px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-md transition-all cursor-pointer"
                 >
-                  + Adicionar Aula
+                  + Adicionar Linha de Aula
                 </button>
               </div>
 
-              <div className="overflow-x-auto border border-slate-200 rounded-2xl shadow-sm bg-white">
+              {/* Tabela do Plano de Aula sem barra de rolagem e colunas otimizadas */}
+              <div className="border border-slate-300 rounded-2xl overflow-hidden shadow-sm bg-white">
                 <table className="w-full border-collapse text-left text-xs">
-                  <thead>
-                    <tr className="bg-slate-900 text-white text-[10px] font-black uppercase tracking-wider">
-                      <th className="p-4 border-r border-slate-800 w-1/6">Carga / Data</th>
-                      <th className="p-4 border-r border-slate-800 w-1/4">Capacidades</th>
-                      <th className="p-4 border-r border-slate-800 w-1/4">Conhecimentos</th>
-                      <th className="p-4 border-r border-slate-800 w-1/6">Estratégias / Recursos</th>
-                      <th className="p-4 text-center w-16">Ações</th>
+                  <thead className="bg-[#111827] text-white uppercase text-[10px] tracking-wider">
+                    <tr>
+                      <th className="py-3 px-3 w-32">Carga / Data</th>
+                      <th className="py-3 px-4">Capacidades</th>
+                      <th className="py-3 px-4">Conhecimentos</th>
+                      <th className="py-3 px-4">Estratégias / Recursos</th>
+                      <th className="py-3 px-2 w-16 text-center">Ações</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-200">
                     {lessonPlanList.length === 0 ? (
                       <tr>
-                        <td colSpan={5} className="p-6 text-center text-slate-400 italic">Nenhum plano de aula cadastrado.</td>
+                        <td colSpan={5} className="p-8 text-center text-slate-400 italic text-xs uppercase font-bold">
+                          Nenhum planejamento diário cadastrado. Clique no botão acima para adicionar.
+                        </td>
                       </tr>
                     ) : (
                       lessonPlanList.map((row) => {
-                        const parsed = parseHoursAndDate(row.hoursDate);
+                        const parsedHD = parseHoursAndDate(row.hoursDate);
                         return (
-                          <tr key={row.id} className="hover:bg-slate-50/50">
-                            <td className="p-3 border-r border-slate-200 align-top space-y-2">
-                              <div className="flex items-center gap-1">
+                          <tr key={row.id} className="hover:bg-slate-50/80 group align-top">
+                            {/* Coluna Carga / Data unificada no mesmo alinhamento */}
+                            <td className="p-3 border-r border-slate-200 bg-white">
+                              <div className="flex items-center gap-1 mb-2">
                                 <input
                                   type="number"
-                                  value={parsed.hours}
-                                  onChange={(e) => handleUpdateHoursOrDate(row.id, row.hoursDate, e.target.value, parsed.date)}
-                                  className="w-12 bg-slate-50 border border-slate-200 rounded-lg p-1 text-xs font-bold text-center"
+                                  min="1"
+                                  max="9"
+                                  value={parsedHD.hours}
+                                  onChange={(e) => handleUpdateHoursOrDate(row.id, row.hoursDate, e.target.value, parsedHD.date)}
+                                  className="w-10 text-center border border-slate-300 rounded px-1 py-1 text-xs font-bold text-slate-800 bg-white focus:outline-none focus:ring-1 focus:ring-blue-500"
                                 />
-                                <span className="text-[10px] font-bold text-slate-500">h</span>
+                                <span className="text-slate-600 text-xs font-bold">h</span>
                               </div>
-                              <input
-                                type="date"
-                                value={parsed.date}
-                                onChange={(e) => handleUpdateHoursOrDate(row.id, row.hoursDate, parsed.hours, e.target.value)}
-                                className="w-full bg-slate-50 border border-slate-200 rounded-lg p-1 text-[10px] font-bold text-slate-700"
-                              />
+                              <div>
+                                <input
+                                  type="date"
+                                  value={parsedHD.date}
+                                  onChange={(e) => handleUpdateHoursOrDate(row.id, row.hoursDate, parsedHD.hours, e.target.value)}
+                                  className="w-full text-[10px] border border-slate-300 rounded px-1.5 py-1 text-slate-700 bg-white focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                />
+                              </div>
                             </td>
-                            <td className="p-3 border-r border-slate-200 align-top">
+
+                            {/* Coluna Capacidades */}
+                            <td className="p-3 border-r border-slate-200 bg-white">
                               <textarea
-                                rows={3}
+                                rows={2}
                                 value={row.capacities || ''}
                                 onChange={(e) => handleUpdateLessonPlanCell(row.id, 'capacities', e.target.value)}
-                                className="w-full bg-transparent border border-transparent focus:border-slate-200 focus:bg-white rounded-lg p-1 text-xs font-bold text-slate-800 resize-none outline-none"
+                                onInput={handleTextareaInput}
+                                placeholder="Capacidades..."
+                                className="w-full bg-transparent focus:bg-white rounded-none p-1 text-xs font-bold text-slate-800 outline-none resize-none overflow-hidden leading-relaxed"
                               />
                             </td>
-                            <td className="p-3 border-r border-slate-200 align-top">
+
+                            {/* Coluna Conhecimentos */}
+                            <td className="p-3 border-r border-slate-200 bg-white">
                               <textarea
-                                rows={3}
+                                rows={2}
                                 value={row.knowledges || ''}
                                 onChange={(e) => handleUpdateLessonPlanCell(row.id, 'knowledges', e.target.value)}
-                                className="w-full bg-transparent border border-transparent focus:border-slate-200 focus:bg-white rounded-lg p-1 text-xs font-bold text-slate-800 outline-none"
+                                onInput={handleTextareaInput}
+                                placeholder="Conhecimentos..."
+                                className="w-full bg-transparent focus:bg-white rounded-none p-1 text-xs font-medium text-slate-700 outline-none resize-none overflow-hidden leading-relaxed"
                               />
                             </td>
-                            <td className="p-3 border-r border-slate-200 align-top space-y-2">
+
+                            {/* Coluna Estratégias / Recursos */}
+                            <td className="p-3 border-r border-slate-200 bg-white space-y-2">
                               <textarea
                                 rows={2}
                                 value={row.strategies || ''}
                                 onChange={(e) => handleUpdateLessonPlanCell(row.id, 'strategies', e.target.value)}
-                                placeholder="Estratégia..."
-                                className="w-full bg-transparent border border-transparent focus:border-slate-200 focus:bg-white rounded-lg p-1 text-[11px] text-slate-700 resize-none outline-none"
+                                onInput={handleTextareaInput}
+                                placeholder="Estratégias metodológicas..."
+                                className="w-full bg-transparent focus:bg-white rounded-none p-1 text-xs font-medium text-slate-700 outline-none resize-none overflow-hidden leading-relaxed"
                               />
                               <textarea
-                                rows={2}
+                                rows={1}
                                 value={row.resources || ''}
                                 onChange={(e) => handleUpdateLessonPlanCell(row.id, 'resources', e.target.value)}
-                                placeholder="Recursos..."
-                                className="w-full bg-transparent border border-transparent focus:border-slate-200 focus:bg-white rounded-lg p-1 text-[11px] text-slate-500 resize-none outline-none"
+                                onInput={handleTextareaInput}
+                                placeholder="Recursos didáticos..."
+                                className="w-full bg-transparent focus:bg-white rounded-none p-1 text-[11px] text-slate-500 outline-none resize-none overflow-hidden leading-relaxed border-t border-slate-100 pt-1"
                               />
                             </td>
-                            <td className="p-3 text-center align-middle">
+
+                            {/* Coluna Ações (Estreita e discreta) */}
+                            <td className="p-2 text-center align-middle bg-white w-16">
                               <button
                                 type="button"
                                 onClick={() => handleDeleteLessonPlanRow(row.id)}
-                                title="Excluir"
-                                className="text-slate-300 hover:text-red-600 transition-colors text-xs font-black p-1 cursor-pointer"
+                                title="Excluir Linha"
+                                className="text-slate-300 hover:text-red-600 p-1.5 rounded-full hover:bg-slate-100 transition-colors opacity-0 group-hover:opacity-100 cursor-pointer text-xs font-black"
                               >
                                 ✕
                               </button>
@@ -938,8 +960,14 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
           )}
 
           {activeTab === 'calendario' && (
-            <div className="p-12 text-center bg-slate-50 rounded-2xl border border-slate-200 text-slate-500 font-bold uppercase text-xs">
-              Módulo de Calendário em desenvolvimento.
+            <div className="space-y-6 animate-fadeIn">
+              <div className="border-b border-slate-100 pb-4">
+                <h3 className="text-lg font-[1000] uppercase italic text-slate-900 tracking-wider">Calendário Escolar e Sincronização</h3>
+              </div>
+              <div className="p-8 bg-slate-50 rounded-2xl border border-slate-200 text-center space-y-3">
+                <p className="text-xs font-bold text-slate-700 uppercase">O calendário está integrado automaticamente com as datas definidas no Plano de Aula.</p>
+                <p className="text-xs text-slate-500">Altere as datas nas linhas do cronograma para refletir imediatamente nos registros de frequência e agendamento letivo.</p>
+              </div>
             </div>
           )}
         </div>
@@ -947,5 +975,3 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
     </div>
   );
 };
-
-export default UnitViewer;
