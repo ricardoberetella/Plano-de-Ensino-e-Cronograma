@@ -12,7 +12,7 @@ interface ItemRow {
   value: string;
 }
 
-// Sub-componentes isolados e memoizados para máxima performance e preservação de foco
+// Sub-componentes isolados e memoizados com suporte a textarea autoajustável
 interface CapacityRowItemProps {
   row: ItemRow;
   type: 'technical' | 'social';
@@ -22,21 +22,35 @@ interface CapacityRowItemProps {
 
 const CapacityRowItem = memo(({ row, type, onUpdate, onDelete }: CapacityRowItemProps) => {
   const [val, setVal] = useState(row.value);
-  useEffect(() => { setVal(row.value); }, [row.value]);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    setVal(row.value);
+  }, [row.value]);
+
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+    }
+  }, [val]);
 
   return (
     <tr className="hover:bg-slate-50/80 group">
       <td className="p-3 bg-white relative">
-        <div className="flex items-center gap-2">
-          <input
-            type="text"
+        <div className="flex items-start gap-2">
+          <textarea
+            ref={textareaRef}
+            rows={1}
             value={val}
             onChange={(e) => {
               setVal(e.target.value);
               onUpdate(row.id, type, e.target.value);
+              e.currentTarget.style.height = 'auto';
+              e.currentTarget.style.height = `${e.currentTarget.scrollHeight}px`;
             }}
             placeholder={type === 'technical' ? "Digite a capacidade técnica..." : "Digite a capacidade socioemocional..."}
-            className={`w-full bg-white hover:bg-slate-50 focus:bg-white focus:ring-1 ${type === 'technical' ? 'focus:ring-blue-500' : 'focus:ring-emerald-500'} rounded-xl px-3 py-2 text-xs font-bold text-slate-800 outline-none border border-slate-200 shadow-sm transition-all`}
+            className={`w-full bg-white hover:bg-slate-50 focus:bg-white focus:ring-1 ${type === 'technical' ? 'focus:ring-blue-500' : 'focus:ring-emerald-500'} rounded-xl px-3 py-2 text-xs font-bold text-slate-800 outline-none border border-slate-200 shadow-sm transition-all resize-none overflow-hidden leading-relaxed`}
           />
           <button
             type="button"
@@ -60,21 +74,35 @@ interface KnowledgeRowItemProps {
 
 const KnowledgeRowItem = memo(({ row, onUpdate, onDelete }: KnowledgeRowItemProps) => {
   const [val, setVal] = useState(row.value);
-  useEffect(() => { setVal(row.value); }, [row.value]);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    setVal(row.value);
+  }, [row.value]);
+
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+    }
+  }, [val]);
 
   return (
     <tr className="hover:bg-slate-50/80 group">
       <td className="p-3 bg-white relative">
-        <div className="flex items-center gap-2">
-          <input
-            type="text"
+        <div className="flex items-start gap-2">
+          <textarea
+            ref={textareaRef}
+            rows={1}
             value={val}
             onChange={(e) => {
               setVal(e.target.value);
               onUpdate(row.id, e.target.value);
+              e.currentTarget.style.height = 'auto';
+              e.currentTarget.style.height = `${e.currentTarget.scrollHeight}px`;
             }}
             placeholder="Digite o conhecimento..."
-            className="w-full bg-white hover:bg-slate-50 focus:bg-white focus:ring-1 focus:ring-purple-500 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 outline-none border border-slate-200 shadow-sm transition-all"
+            className="w-full bg-white hover:bg-slate-50 focus:bg-white focus:ring-1 focus:ring-purple-500 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 outline-none border border-slate-200 shadow-sm transition-all resize-none overflow-hidden leading-relaxed"
           />
           <button
             type="button"
@@ -116,7 +144,6 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
     setIsEditingHeader(false);
   };
 
-  // Inicialização independente para cada tabela
   const [techRows, setTechRows] = useState<ItemRow[]>(() => 
     (unit.technicalCapacities || []).map((val, idx) => ({ id: `tech-${idx}-${Math.random()}`, value: val }))
   );
@@ -512,7 +539,7 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
             <div className="space-y-8">
               <div className="border-b border-slate-100 pb-3">
                 <h3 className="text-xs font-black uppercase text-blue-600 tracking-[0.2em]">
-                  Matriz Curricular (Capacidades e Conhecimentos em Colunas Independentes)
+                  Matriz Curricular (Capacidades e Conhecimentos)
                 </h3>
               </div>
 
