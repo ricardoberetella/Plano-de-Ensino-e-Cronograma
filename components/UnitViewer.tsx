@@ -33,7 +33,6 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
     setIsEditingHeader(false);
   };
 
-  // Funções de manipulação de Capacidades e Conhecimentos
   const handleAddTechnicalCapacity = () => {
     const techs = [...(unit.technicalCapacities || []), ''];
     onUpdateUnit({ ...unit, technicalCapacities: techs });
@@ -82,7 +81,6 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
     onUpdateUnit({ ...unit, knowledges: updatedKnowledges });
   };
 
-  // Funções para Situações-Problema
   const handleAddSituation = () => {
     const newSit = {
       id: Date.now().toString(),
@@ -144,7 +142,6 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
     onUpdateUnit({ ...unit, learningSituations: updated });
   };
 
-  // Funções para Rubricas
   const handleAddRubricRow = () => {
     const newRow = {
       id: Date.now().toString(),
@@ -169,7 +166,6 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
     onUpdateUnit({ ...unit, rubrics: updated });
   };
 
-  // Estado local para o plano de aula
   const [lessonPlanList, setLessonPlanList] = useState(unit.lessonPlan || []);
 
   useEffect(() => {
@@ -239,7 +235,6 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
 
   return (
     <div className="space-y-6 w-full max-w-[99%] mx-auto pb-20 animate-fadeIn">
-      {/* Barra de Navegação Superior */}
       <div className="flex justify-between items-center px-2 print:hidden">
         <button
           onClick={onBack}
@@ -255,7 +250,6 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
         </button>
       </div>
 
-      {/* CABEÇALHO ESCURO */}
       <div className="bg-slate-900 rounded-[2.5rem] p-8 md:p-12 text-white shadow-2xl relative overflow-hidden border border-slate-800 print:bg-white print:text-slate-900 print:border-none print:shadow-none print:p-0 print:mb-6">
         <div className="absolute -right-10 -bottom-10 opacity-10 text-9xl font-[1000] select-none pointer-events-none print:hidden">
           SENAI
@@ -338,7 +332,6 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
         )}
       </div>
 
-      {/* ABAS DE NAVEGAÇÃO INTERNA */}
       <div className="bg-white rounded-[2rem] border border-slate-200 shadow-xl overflow-hidden p-2 print:border-none print:shadow-none print:p-0">
         <div className="flex flex-wrap gap-2 border-b border-slate-100 p-4 print:hidden">
           <button
@@ -392,7 +385,6 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                 </h3>
               </div>
 
-              {/* TABELA COM 2 COLUNAS E OS 3 CABEÇALHOS COM BOTÕES DE ADICIONAR NAS BARRAS DOS TÓPICOS */}
               <div className="overflow-x-auto border border-slate-200 rounded-2xl shadow-sm bg-white">
                 <table className="w-full border-collapse text-left text-xs">
                   <thead>
@@ -406,8 +398,6 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-200">
-                    
-                    {/* SEÇÃO 1: CAPACIDADES TÉCNICAS */}
                     <tr className="bg-blue-50/50">
                       <td colSpan={2} className="p-3 font-[1000] text-blue-950 uppercase text-[10px] tracking-widest border-t border-b border-slate-200 flex justify-between items-center">
                         <span>Capacidades Técnicas</span>
@@ -449,14 +439,11 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                               </button>
                             </div>
                           </td>
-                          <td className="p-3 text-slate-300 italic text-xs align-middle bg-slate-50/30">
-                            {/* Célula vazia para manter o alinhamento da coluna da direita */}
-                          </td>
+                          <td className="p-3 text-slate-300 italic text-xs align-middle bg-slate-50/30"></td>
                         </tr>
                       ))
                     )}
 
-                    {/* SEÇÃO 2: CAPACIDADES SOCIOEMOCIONAIS */}
                     <tr className="bg-emerald-50/50">
                       <td colSpan={2} className="p-3 font-[1000] text-emerald-950 uppercase text-[10px] tracking-widest border-t border-b border-slate-200 flex justify-between items-center">
                         <span>Capacidades Socioemocionais</span>
@@ -503,7 +490,6 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                       ))
                     )}
 
-                    {/* SEÇÃO 3: CONHECIMENTOS */}
                     <tr className="bg-purple-50/50">
                       <td colSpan={2} className="p-3 font-[1000] text-purple-950 uppercase text-[10px] tracking-widest border-t border-b border-slate-200 flex justify-between items-center">
                         <span>Conhecimentos</span>
@@ -549,7 +535,6 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                         </tr>
                       ))
                     )}
-
                   </tbody>
                 </table>
               </div>
@@ -672,7 +657,6 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                 </button>
               </div>
 
-              {/* Tabela de Rubricas com estilo simples igual ao Excel (Bordas finas limpas) */}
               <div className="overflow-x-auto border border-slate-300 rounded-lg bg-white shadow-sm">
                 <table className="w-full border-collapse text-left text-xs">
                   <thead>
@@ -694,7 +678,6 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                     ) : (
                       unit.rubrics.map((row) => (
                         <tr key={row.id} className="hover:bg-slate-50/50">
-                          {/* Coluna Referência */}
                           <td className="p-2 border border-slate-300 align-top bg-slate-50/60">
                             <textarea
                               rows={3}
@@ -713,8 +696,6 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                               </button>
                             </div>
                           </td>
-
-                          {/* Coluna NSA */}
                           <td className="p-2 border border-slate-300 align-top">
                             <textarea
                               rows={4}
@@ -724,8 +705,6 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                               className="w-full bg-transparent border-none focus:ring-0 text-xs text-slate-700 resize-none outline-none"
                             />
                           </td>
-
-                          {/* Coluna APO */}
                           <td className="p-2 border border-slate-300 align-top">
                             <textarea
                               rows={4}
@@ -735,8 +714,6 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                               className="w-full bg-transparent border-none focus:ring-0 text-xs text-slate-700 resize-none outline-none"
                             />
                           </td>
-
-                          {/* Coluna PAR */}
                           <td className="p-2 border border-slate-300 align-top">
                             <textarea
                               rows={4}
@@ -746,8 +723,6 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                               className="w-full bg-transparent border-none focus:ring-0 text-xs text-slate-700 resize-none outline-none"
                             />
                           </td>
-
-                          {/* Coluna AUT */}
                           <td className="p-2 border border-slate-300 align-top">
                             <textarea
                               rows={4}
@@ -878,3 +853,5 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
     </div>
   );
 };
+
+export default UnitViewer;
