@@ -12,7 +12,6 @@ interface ItemRow {
   value: string;
 }
 
-// Sub-componentes isolados e memoizados com suporte a textarea autoajustável
 interface CapacityRowItemProps {
   row: ItemRow;
   type: 'technical' | 'social';
@@ -574,79 +573,81 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                   </div>
                 </div>
 
-                {/* Lado Direito: Capacidades (Técnicas e Socioemocionais unificadas) */}
+                {/* Lado Direito: Capacidades (Técnicas e Socioemocionais unificadas com título único) */}
                 <div className="space-y-6">
-                  {/* Capacidades Técnicas */}
+                  {/* Capacidades Técnicas e Socioemocionais */}
                   <div className="space-y-3">
                     <div className="bg-slate-900 text-white px-4 py-3 rounded-t-2xl flex items-center justify-between">
-                      <span className="text-[10px] font-black uppercase tracking-wider">CAPACIDADES TÉCNICAS</span>
-                      <button
-                        type="button"
-                        onClick={() => handleAddCapacity('technical')}
-                        title="Adicionar Capacidade Técnica"
-                        className="text-black bg-white hover:bg-slate-200 rounded-full w-5 h-5 flex items-center justify-center font-black text-xs transition-colors cursor-pointer shadow-sm"
-                      >
-                        +
-                      </button>
+                      <span className="text-[10px] font-black uppercase tracking-wider">CAPACIDADES TÉCNICAS E SOCIOEMOCIONAIS</span>
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => handleAddCapacity('technical')}
+                          title="Adicionar Capacidade Técnica"
+                          className="text-black bg-white hover:bg-slate-200 rounded-full w-5 h-5 flex items-center justify-center font-black text-xs transition-colors cursor-pointer shadow-sm"
+                        >
+                          +T
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleAddCapacity('social')}
+                          title="Adicionar Capacidade Socioemocional"
+                          className="text-black bg-white hover:bg-slate-200 rounded-full w-5 h-5 flex items-center justify-center font-black text-xs transition-colors cursor-pointer shadow-sm"
+                        >
+                          +S
+                        </button>
+                      </div>
                     </div>
-                    <div className="overflow-x-auto border border-slate-200 rounded-b-2xl shadow-sm bg-white">
-                      <table className="w-full border-collapse text-left text-xs">
-                        <tbody className="divide-y divide-slate-200">
-                          {techRows.map((row) => (
-                            <CapacityRowItem
-                              key={row.id}
-                              row={row}
-                              type="technical"
-                              onUpdate={handleUpdateCapacity}
-                              onDelete={handleDeleteCapacity}
-                            />
-                          ))}
-                          {techRows.length === 0 && (
-                            <tr>
-                              <td className="p-6 text-center text-slate-400 italic">
-                                Nenhuma capacidade técnica cadastrada.
-                              </td>
-                            </tr>
-                          )}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
+                    <div className="overflow-x-auto border border-slate-200 rounded-b-2xl shadow-sm bg-white space-y-4 p-4">
+                      {/* Sub-bloco Técnicas */}
+                      <div className="space-y-2">
+                        <div className="text-[9px] font-black text-slate-400 uppercase tracking-wider px-1">Técnicas</div>
+                        <table className="w-full border-collapse text-left text-xs">
+                          <tbody className="divide-y divide-slate-200">
+                            {techRows.map((row) => (
+                              <CapacityRowItem
+                                key={row.id}
+                                row={row}
+                                type="technical"
+                                onUpdate={handleUpdateCapacity}
+                                onDelete={handleDeleteCapacity}
+                              />
+                            ))}
+                            {techRows.length === 0 && (
+                              <tr>
+                                <td className="p-4 text-center text-slate-400 italic text-[11px]">
+                                  Nenhuma capacidade técnica cadastrada.
+                                </td>
+                              </tr>
+                            )}
+                          </tbody>
+                        </table>
+                      </div>
 
-                  {/* Capacidades Socioemocionais */}
-                  <div className="space-y-3">
-                    <div className="bg-slate-900 text-white px-4 py-3 rounded-t-2xl flex items-center justify-between">
-                      <span className="text-[10px] font-black uppercase tracking-wider">CAPACIDADES SOCIOEMOCIONAIS</span>
-                      <button
-                        type="button"
-                        onClick={() => handleAddCapacity('social')}
-                        title="Adicionar Capacidade Socioemocional"
-                        className="text-black bg-white hover:bg-slate-200 rounded-full w-5 h-5 flex items-center justify-center font-black text-xs transition-colors cursor-pointer shadow-sm"
-                      >
-                        +
-                      </button>
-                    </div>
-                    <div className="overflow-x-auto border border-slate-200 rounded-b-2xl shadow-sm bg-white">
-                      <table className="w-full border-collapse text-left text-xs">
-                        <tbody className="divide-y divide-slate-200">
-                          {socialRows.map((row) => (
-                            <CapacityRowItem
-                              key={row.id}
-                              row={row}
-                              type="social"
-                              onUpdate={handleUpdateCapacity}
-                              onDelete={handleDeleteCapacity}
-                            />
-                          ))}
-                          {socialRows.length === 0 && (
-                            <tr>
-                              <td className="p-6 text-center text-slate-400 italic">
-                                Nenhuma capacidade socioemocional cadastrada.
-                              </td>
-                            </tr>
-                          )}
-                        </tbody>
-                      </table>
+                      {/* Sub-bloco Socioemocionais */}
+                      <div className="space-y-2 pt-2 border-t border-slate-100">
+                        <div className="text-[9px] font-black text-slate-400 uppercase tracking-wider px-1">Socioemocionais</div>
+                        <table className="w-full border-collapse text-left text-xs">
+                          <tbody className="divide-y divide-slate-200">
+                            {socialRows.map((row) => (
+                              <CapacityRowItem
+                                key={row.id}
+                                row={row}
+                                type="social"
+                                onUpdate={handleUpdateCapacity}
+                                onDelete={handleDeleteCapacity}
+                              />
+                            ))}
+                            {socialRows.length === 0 && (
+                              <tr>
+                                <td className="p-4 text-center text-slate-400 italic text-[11px]">
+                                  Nenhuma capacidade socioemocional cadastrada.
+                                </td>
+                              </tr>
+                            )}
+                          </tbody>
+                        </table>
+                      </div>
                     </div>
                   </div>
                 </div>
