@@ -49,7 +49,7 @@ const CapacityRowItem = memo(({ row, type, onUpdate, onDelete }: CapacityRowItem
               e.currentTarget.style.height = 'auto';
               e.currentTarget.style.height = `${e.currentTarget.scrollHeight}px`;
             }}
-            placeholder={type === 'technical' ? "Digite a capacidade técnica..." : "Digite a capacidade socioemocional..."}
+            placeholder={type === 'technical' ? "Digite a capacidade..." : "Digite a capacidade socioemocional..."}
             className={`w-full bg-white hover:bg-slate-50 focus:bg-white focus:ring-1 ${type === 'technical' ? 'focus:ring-blue-500' : 'focus:ring-emerald-500'} rounded-xl px-3 py-2 text-xs font-bold text-slate-800 outline-none border border-slate-200 shadow-sm transition-all resize-none overflow-hidden leading-relaxed`}
           />
           <button
@@ -537,48 +537,35 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
         <div className="p-4 md:p-6 space-y-6 print:p-0">
           {activeTab === 'geral' && (
             <div className="space-y-8">
-              <div className="border-b border-slate-100 pb-3">
-                <h3 className="text-xs font-black uppercase text-blue-600 tracking-[0.2em]">
-                  Matriz Curricular (Capacidades e Conhecimentos)
-                </h3>
-              </div>
-
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Tabela de Capacidades Técnicas */}
+                {/* Lado Esquerdo: Conhecimentos */}
                 <div className="space-y-3">
-                  <div className="overflow-x-auto border border-slate-200 rounded-2xl shadow-sm bg-white">
+                  <div className="bg-slate-900 text-white px-4 py-3 rounded-t-2xl flex items-center justify-between">
+                    <span className="text-[10px] font-black uppercase tracking-wider">CONHECIMENTOS</span>
+                    <button
+                      type="button"
+                      onClick={handleAddKnowledge}
+                      title="Adicionar Conhecimento"
+                      className="text-black bg-white hover:bg-slate-200 rounded-full w-5 h-5 flex items-center justify-center font-black text-xs transition-colors cursor-pointer shadow-sm"
+                    >
+                      +
+                    </button>
+                  </div>
+                  <div className="overflow-x-auto border border-slate-200 rounded-b-2xl shadow-sm bg-white">
                     <table className="w-full border-collapse text-left text-xs">
-                      <thead>
-                        <tr className="bg-slate-900 text-white text-[10px] font-black uppercase tracking-wider">
-                          <th className="p-4 text-center">
-                            <div className="flex items-center justify-center gap-2">
-                              <span>CAPACIDADES TÉCNICAS</span>
-                              <button
-                                type="button"
-                                onClick={() => handleAddCapacity('technical')}
-                                title="Adicionar Capacidade Técnica"
-                                className="text-black bg-white hover:bg-slate-200 rounded-full w-5 h-5 flex items-center justify-center font-black text-xs transition-colors cursor-pointer shadow-sm"
-                              >
-                                +
-                              </button>
-                            </div>
-                          </th>
-                        </tr>
-                      </thead>
                       <tbody className="divide-y divide-slate-200">
-                        {techRows.map((row) => (
-                          <CapacityRowItem
+                        {knowRows.map((row) => (
+                          <KnowledgeRowItem
                             key={row.id}
                             row={row}
-                            type="technical"
-                            onUpdate={handleUpdateCapacity}
-                            onDelete={handleDeleteCapacity}
+                            onUpdate={handleUpdateKnowledge}
+                            onDelete={handleDeleteKnowledge}
                           />
                         ))}
-                        {techRows.length === 0 && (
+                        {knowRows.length === 0 && (
                           <tr>
                             <td className="p-6 text-center text-slate-400 italic">
-                              Nenhuma capacidade técnica cadastrada. Clique no "+" no cabeçalho.
+                              Nenhum conhecimento cadastrado. Clique no "+" acima.
                             </td>
                           </tr>
                         )}
@@ -587,89 +574,81 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                   </div>
                 </div>
 
-                {/* Tabela de Capacidades Socioemocionais */}
-                <div className="space-y-3">
-                  <div className="overflow-x-auto border border-slate-200 rounded-2xl shadow-sm bg-white">
-                    <table className="w-full border-collapse text-left text-xs">
-                      <thead>
-                        <tr className="bg-slate-900 text-white text-[10px] font-black uppercase tracking-wider">
-                          <th className="p-4 text-center">
-                            <div className="flex items-center justify-center gap-2">
-                              <span>CAPACIDADES SOCIOEMOCIONAIS</span>
-                              <button
-                                type="button"
-                                onClick={() => handleAddCapacity('social')}
-                                title="Adicionar Capacidade Socioemocional"
-                                className="text-black bg-white hover:bg-slate-200 rounded-full w-5 h-5 flex items-center justify-center font-black text-xs transition-colors cursor-pointer shadow-sm"
-                              >
-                                +
-                              </button>
-                            </div>
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-slate-200">
-                        {socialRows.map((row) => (
-                          <CapacityRowItem
-                            key={row.id}
-                            row={row}
-                            type="social"
-                            onUpdate={handleUpdateCapacity}
-                            onDelete={handleDeleteCapacity}
-                          />
-                        ))}
-                        {socialRows.length === 0 && (
-                          <tr>
-                            <td className="p-6 text-center text-slate-400 italic">
-                              Nenhuma capacidade socioemocional cadastrada. Clique no "+" no cabeçalho.
-                            </td>
-                          </tr>
-                        )}
-                      </tbody>
-                    </table>
+                {/* Lado Direito: Capacidades (Técnicas e Socioemocionais unificadas) */}
+                <div className="space-y-6">
+                  {/* Capacidades Técnicas */}
+                  <div className="space-y-3">
+                    <div className="bg-slate-900 text-white px-4 py-3 rounded-t-2xl flex items-center justify-between">
+                      <span className="text-[10px] font-black uppercase tracking-wider">CAPACIDADES TÉCNICAS</span>
+                      <button
+                        type="button"
+                        onClick={() => handleAddCapacity('technical')}
+                        title="Adicionar Capacidade Técnica"
+                        className="text-black bg-white hover:bg-slate-200 rounded-full w-5 h-5 flex items-center justify-center font-black text-xs transition-colors cursor-pointer shadow-sm"
+                      >
+                        +
+                      </button>
+                    </div>
+                    <div className="overflow-x-auto border border-slate-200 rounded-b-2xl shadow-sm bg-white">
+                      <table className="w-full border-collapse text-left text-xs">
+                        <tbody className="divide-y divide-slate-200">
+                          {techRows.map((row) => (
+                            <CapacityRowItem
+                              key={row.id}
+                              row={row}
+                              type="technical"
+                              onUpdate={handleUpdateCapacity}
+                              onDelete={handleDeleteCapacity}
+                            />
+                          ))}
+                          {techRows.length === 0 && (
+                            <tr>
+                              <td className="p-6 text-center text-slate-400 italic">
+                                Nenhuma capacidade técnica cadastrada.
+                              </td>
+                            </tr>
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
-                </div>
-              </div>
 
-              {/* Tabela de Conhecimentos */}
-              <div className="space-y-3 pt-4">
-                <div className="overflow-x-auto border border-slate-200 rounded-2xl shadow-sm bg-white">
-                  <table className="w-full border-collapse text-left text-xs">
-                    <thead>
-                      <tr className="bg-slate-900 text-white text-[10px] font-black uppercase tracking-wider">
-                        <th className="p-4 text-center">
-                          <div className="flex items-center justify-center gap-2">
-                            <span>CONHECIMENTOS</span>
-                            <button
-                              type="button"
-                              onClick={handleAddKnowledge}
-                              title="Adicionar Conhecimento"
-                              className="text-black bg-white hover:bg-slate-200 rounded-full w-5 h-5 flex items-center justify-center font-black text-xs transition-colors cursor-pointer shadow-sm"
-                            >
-                              +
-                            </button>
-                          </div>
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-200">
-                      {knowRows.map((row) => (
-                        <KnowledgeRowItem
-                          key={row.id}
-                          row={row}
-                          onUpdate={handleUpdateKnowledge}
-                          onDelete={handleDeleteKnowledge}
-                        />
-                      ))}
-                      {knowRows.length === 0 && (
-                        <tr>
-                          <td className="p-6 text-center text-slate-400 italic">
-                            Nenhum conhecimento cadastrado. Clique no "+" no cabeçalho.
-                          </td>
-                        </tr>
-                      )}
-                    </tbody>
-                  </table>
+                  {/* Capacidades Socioemocionais */}
+                  <div className="space-y-3">
+                    <div className="bg-slate-900 text-white px-4 py-3 rounded-t-2xl flex items-center justify-between">
+                      <span className="text-[10px] font-black uppercase tracking-wider">CAPACIDADES SOCIOEMOCIONAIS</span>
+                      <button
+                        type="button"
+                        onClick={() => handleAddCapacity('social')}
+                        title="Adicionar Capacidade Socioemocional"
+                        className="text-black bg-white hover:bg-slate-200 rounded-full w-5 h-5 flex items-center justify-center font-black text-xs transition-colors cursor-pointer shadow-sm"
+                      >
+                        +
+                      </button>
+                    </div>
+                    <div className="overflow-x-auto border border-slate-200 rounded-b-2xl shadow-sm bg-white">
+                      <table className="w-full border-collapse text-left text-xs">
+                        <tbody className="divide-y divide-slate-200">
+                          {socialRows.map((row) => (
+                            <CapacityRowItem
+                              key={row.id}
+                              row={row}
+                              type="social"
+                              onUpdate={handleUpdateCapacity}
+                              onDelete={handleDeleteCapacity}
+                            />
+                          ))}
+                          {socialRows.length === 0 && (
+                            <tr>
+                              <td className="p-6 text-center text-slate-400 italic">
+                                Nenhuma capacidade socioemocional cadastrada.
+                              </td>
+                            </tr>
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
