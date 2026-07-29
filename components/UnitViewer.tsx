@@ -503,7 +503,7 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                       ))
                     )}
 
-                    {/* SEÇÃO 3: CONHECIMENTOS (Na segunda coluna e com botão na barra) */}
+                    {/* SEÇÃO 3: CONHECIMENTOS */}
                     <tr className="bg-purple-50/50">
                       <td colSpan={2} className="p-3 font-[1000] text-purple-950 uppercase text-[10px] tracking-widest border-t border-b border-slate-200 flex justify-between items-center">
                         <span>Conhecimentos</span>
@@ -526,9 +526,7 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                     ) : (
                       unit.knowledges.map((item, index) => (
                         <tr key={index} className="hover:bg-slate-50/80 group">
-                          <td className="p-3 border-r border-slate-200 align-middle bg-slate-50/35">
-                            {/* Lado esquerdo vazio para esta seção */}
-                          </td>
+                          <td className="p-3 border-r border-slate-200 align-middle bg-slate-50/35"></td>
                           <td className="p-3 align-middle bg-white">
                             <div className="flex items-center gap-2">
                               <input
@@ -643,9 +641,9 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                               <button
                                 type="button"
                                 onClick={() => handleDeleteExpectedResult(sit.id, rIndex)}
-                                className="bg-red-50 text-red-600 hover:bg-red-600 hover:text-white px-3 py-2 rounded-xl text-[10px] font-black uppercase transition-all cursor-pointer"
+                                className="p-2 bg-red-50 text-red-600 hover:bg-red-600 hover:text-white rounded-xl text-xs font-black transition-all cursor-pointer"
                               >
-                                Remover
+                                ✕
                               </button>
                             </div>
                           ))
@@ -663,7 +661,7 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
               <div className="flex justify-between items-center border-b border-slate-100 pb-4">
                 <div>
                   <h3 className="text-lg font-[1000] uppercase italic text-slate-900 tracking-wider">Matriz de Rubricas</h3>
-                  <p className="text-[10px] font-bold uppercase text-slate-400 mt-1">Critérios de Avaliação por Nível de Desempenho</p>
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Critérios de avaliação por nível de desempenho</p>
                 </div>
                 <button
                   type="button"
@@ -674,374 +672,209 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
                 </button>
               </div>
 
-              {(!unit.rubrics || unit.rubrics.length === 0) ? (
-                <div className="p-12 text-center bg-slate-50 rounded-2xl border border-dashed border-slate-200 text-slate-400 text-xs font-bold uppercase">
-                  Nenhuma rubrica cadastrada. Clique em "+ Adicionar Rubrica" para iniciar.
-                </div>
-              ) : (
-                <div className="overflow-x-auto rounded-[2rem] border border-slate-200 shadow-xl bg-white">
-                  <table className="w-full text-left border-collapse">
-                    <thead>
-                      <tr className="bg-slate-900 text-[10px] font-black uppercase tracking-wider">
-                        <th className="p-4 w-1/5 border-r border-slate-800 text-white">REFERÊNCIA</th>
-                        <th className="p-4 w-1/5 border-r border-slate-800 text-red-500">NSA</th>
-                        <th className="p-4 w-1/5 border-r border-slate-800 text-orange-500">APO</th>
-                        <th className="p-4 w-1/5 border-r border-slate-800 text-blue-400">PAR</th>
-                        <th className="p-4 w-1/5 text-emerald-400">AUT</th>
+              {/* Tabela de Rubricas com estilo simples igual ao Excel (Bordas finas limpas) */}
+              <div className="overflow-x-auto border border-slate-300 rounded-lg bg-white shadow-sm">
+                <table className="w-full border-collapse text-left text-xs">
+                  <thead>
+                    <tr className="bg-slate-900 text-white text-[10px] font-black uppercase tracking-wider">
+                      <th className="p-3 border border-slate-700 w-1/5">Referência</th>
+                      <th className="p-3 border border-slate-700 w-1/5 text-red-400">NSA</th>
+                      <th className="p-3 border border-slate-700 w-1/5 text-orange-400">APO</th>
+                      <th className="p-3 border border-slate-700 w-1/5 text-blue-400">PAR</th>
+                      <th className="p-3 border border-slate-700 w-1/5 text-emerald-400">AUT</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {(!unit.rubrics || unit.rubrics.length === 0) ? (
+                      <tr>
+                        <td colSpan={5} className="p-6 text-center text-slate-400 italic text-xs">
+                          Nenhuma rubrica cadastrada. Clique em "+ Adicionar Rubrica" acima.
+                        </td>
                       </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-100 text-xs">
-                      {unit.rubrics.map((row) => (
-                        <tr key={row.id} className="hover:bg-slate-50/50 transition-colors">
-                          <td className="p-4 border-r border-slate-100 align-top space-y-2">
+                    ) : (
+                      unit.rubrics.map((row) => (
+                        <tr key={row.id} className="hover:bg-slate-50/50">
+                          {/* Coluna Referência */}
+                          <td className="p-2 border border-slate-300 align-top bg-slate-50/60">
                             <textarea
                               rows={3}
-                              value={row.reference}
+                              value={typeof row.reference === 'string' ? row.reference : JSON.stringify(row.reference || '')}
                               onChange={(e) => handleUpdateRubricCell(row.id, 'reference', e.target.value)}
-                              onInput={handleTextareaInput}
-                              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs font-bold text-slate-800 focus:outline-none focus:border-blue-500 resize-none overflow-hidden"
+                              placeholder="Capacidade / Referência..."
+                              className="w-full bg-transparent border-none focus:ring-0 text-xs font-bold text-slate-900 resize-none outline-none"
                             />
-                            <button
-                              type="button"
-                              onClick={() => handleDeleteRubricRow(row.id)}
-                              className="w-full bg-red-50 hover:bg-red-600 text-red-600 hover:text-white py-1 rounded-lg text-[9px] font-black uppercase transition-all cursor-pointer"
-                            >
-                              Excluir Linha
-                            </button>
+                            <div className="pt-2 border-t border-slate-200 mt-2 flex justify-end">
+                              <button
+                                type="button"
+                                onClick={() => handleDeleteRubricRow(row.id)}
+                                className="text-[9px] font-black uppercase text-red-600 hover:text-red-800 bg-red-50 hover:bg-red-100 px-2 py-1 rounded transition-colors"
+                              >
+                                Excluir Linha
+                              </button>
+                            </div>
                           </td>
-                          <td className="p-4 border-r border-slate-100 align-top">
+
+                          {/* Coluna NSA */}
+                          <td className="p-2 border border-slate-300 align-top">
                             <textarea
                               rows={4}
-                              value={row.nsa}
+                              value={typeof row.nsa === 'string' ? row.nsa : JSON.stringify(row.nsa || '')}
                               onChange={(e) => handleUpdateRubricCell(row.id, 'nsa', e.target.value)}
-                              onInput={handleTextareaInput}
-                              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs font-bold text-slate-800 focus:outline-none focus:border-blue-500 resize-none overflow-hidden"
+                              placeholder="Não atende..."
+                              className="w-full bg-transparent border-none focus:ring-0 text-xs text-slate-700 resize-none outline-none"
                             />
                           </td>
-                          <td className="p-4 border-r border-slate-100 align-top">
+
+                          {/* Coluna APO */}
+                          <td className="p-2 border border-slate-300 align-top">
                             <textarea
                               rows={4}
-                              value={row.apo}
+                              value={typeof row.apo === 'string' ? row.apo : JSON.stringify(row.apo || '')}
                               onChange={(e) => handleUpdateRubricCell(row.id, 'apo', e.target.value)}
-                              onInput={handleTextareaInput}
-                              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs font-bold text-slate-800 focus:outline-none focus:border-blue-500 resize-none overflow-hidden"
+                              placeholder="Atende parcialmente..."
+                              className="w-full bg-transparent border-none focus:ring-0 text-xs text-slate-700 resize-none outline-none"
                             />
                           </td>
-                          <td className="p-4 border-r border-slate-100 align-top">
+
+                          {/* Coluna PAR */}
+                          <td className="p-2 border border-slate-300 align-top">
                             <textarea
                               rows={4}
-                              value={row.par}
+                              value={typeof row.par === 'string' ? row.par : JSON.stringify(row.par || '')}
                               onChange={(e) => handleUpdateRubricCell(row.id, 'par', e.target.value)}
-                              onInput={handleTextareaInput}
-                              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs font-bold text-slate-800 focus:outline-none focus:border-blue-500 resize-none overflow-hidden"
+                              placeholder="Atende com ressalvas..."
+                              className="w-full bg-transparent border-none focus:ring-0 text-xs text-slate-700 resize-none outline-none"
                             />
                           </td>
-                          <td className="p-4 align-top">
+
+                          {/* Coluna AUT */}
+                          <td className="p-2 border border-slate-300 align-top">
                             <textarea
                               rows={4}
-                              value={row.aut}
+                              value={typeof row.aut === 'string' ? row.aut : JSON.stringify(row.aut || '')}
                               onChange={(e) => handleUpdateRubricCell(row.id, 'aut', e.target.value)}
-                              onInput={handleTextareaInput}
-                              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs font-bold text-slate-800 focus:outline-none focus:border-blue-500 resize-none overflow-hidden"
+                              placeholder="Atende com autonomia..."
+                              className="w-full bg-transparent border-none focus:ring-0 text-xs text-slate-700 resize-none outline-none"
                             />
                           </td>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </div>
           )}
 
           {activeTab === 'plano-aula' && (
             <div className="space-y-6 animate-fadeIn">
-              <div className="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-slate-100 pb-4 gap-4 print:hidden">
-                <div>
-                  <h3 className="text-lg font-[1000] uppercase italic text-slate-900 tracking-wider">Plano de Aula | Cronograma</h3>
-                  <p className="text-[10px] font-bold uppercase text-slate-400 mt-1">Organização diária das aulas e distribuição de carga horária</p>
-                </div>
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={handleAddLessonPlanRow}
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-md transition-all cursor-pointer"
-                  >
-                    + Adicionar Aula / Data
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => window.print()}
-                    className="bg-red-600 hover:bg-red-700 text-white px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-md transition-all cursor-pointer"
-                  >
-                    Imprimir PDF
-                  </button>
-                </div>
+              <div className="flex justify-between items-center border-b border-slate-100 pb-4">
+                <h3 className="text-lg font-[1000] uppercase italic text-slate-900 tracking-wider">Plano de Aula / Cronograma</h3>
+                <button
+                  type="button"
+                  onClick={handleAddLessonPlanRow}
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-md transition-all cursor-pointer"
+                >
+                  + Adicionar Aula
+                </button>
               </div>
 
-              {(lessonPlanList.length === 0) ? (
-                <div className="p-12 text-center bg-slate-50 rounded-2xl border border-dashed border-slate-200 text-slate-400 text-xs font-bold uppercase">
-                  Nenhum registro de aula cadastrado. Clique em "+ Adicionar Aula / Data" para iniciar.
-                </div>
-              ) : (
-                <div className="overflow-x-auto shadow-md bg-white rounded-2xl border border-slate-200 print:shadow-none print:border-slate-300">
-                  <table className="w-full text-left border-collapse">
-                    <thead>
-                      <tr className="bg-slate-900 text-[10px] font-black uppercase tracking-wider text-white print:bg-slate-200 print:text-slate-900">
-                        <th className="p-3 w-[24%] border-r border-slate-800 print:border-slate-300 text-center">HORAS/AULAS/DATA</th>
-                        <th className="p-3 w-[22%] border-r border-slate-800 print:border-slate-300 text-center">CAPACIDADES</th>
-                        <th className="p-3 w-[22%] border-r border-slate-800 print:border-slate-300 text-center">CONHECIMENTOS</th>
-                        <th className="p-3 w-[16%] border-r border-slate-800 print:border-slate-300 text-center">ESTRATÉGIAS</th>
-                        <th className="p-3 border-r border-slate-800 print:border-slate-300 text-center">RECURSOS/AMBIENTES</th>
-                        <th className="p-3 text-center w-20 print:hidden">STATUS</th>
+              <div className="overflow-x-auto border border-slate-200 rounded-2xl shadow-sm bg-white">
+                <table className="w-full border-collapse text-left text-xs">
+                  <thead>
+                    <tr className="bg-slate-900 text-white text-[10px] font-black uppercase tracking-wider">
+                      <th className="p-4 border-r border-slate-800 w-1/6">Carga / Data</th>
+                      <th className="p-4 border-r border-slate-800 w-1/4">Capacidades</th>
+                      <th className="p-4 border-r border-slate-800 w-1/4">Conhecimentos</th>
+                      <th className="p-4 border-r border-slate-800 w-1/6">Estratégias / Recursos</th>
+                      <th className="p-4 text-center w-16">Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-200">
+                    {lessonPlanList.length === 0 ? (
+                      <tr>
+                        <td colSpan={5} className="p-6 text-center text-slate-400 italic">Nenhum plano de aula cadastrado.</td>
                       </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-200 text-xs">
-                      {lessonPlanList.map((row) => {
-                        const isCompleted = row.completed;
+                    ) : (
+                      lessonPlanList.map((row) => {
                         const parsed = parseHoursAndDate(row.hoursDate);
-
                         return (
-                          <tr 
-                            key={row.id} 
-                            className={`transition-colors ${isCompleted ? 'bg-emerald-50/80 hover:bg-emerald-50 print:bg-white' : 'bg-white hover:bg-slate-50'}`}
-                          >
-                            <td className="p-2 border-r border-slate-200 print:border-slate-300 align-top">
-                              <div className={`p-2 rounded-xl border space-y-2 ${isCompleted ? 'bg-emerald-100/60 border-emerald-300 print:bg-white print:border-slate-300' : 'bg-slate-50 border-slate-200 print:bg-white print:border-slate-300'}`}>
-                                <div className="grid grid-cols-12 gap-1.5">
-                                  <div className="col-span-4">
-                                    <label className="block text-[8px] font-black uppercase text-slate-500 mb-0.5">QTD. H</label>
-                                    <input
-                                      type="number"
-                                      min="1"
-                                      max="9"
-                                      value={parsed.hours}
-                                      onChange={(e) => handleUpdateHoursOrDate(row.id, row.hoursDate, e.target.value, parsed.date)}
-                                      className={`w-full p-2 text-xs font-bold focus:outline-none rounded-xl border text-center ${isCompleted ? 'bg-emerald-50 text-emerald-950 border-emerald-300 print:bg-transparent print:border-none' : 'bg-white text-slate-800 border-slate-200 print:bg-transparent print:border-none'}`}
-                                    />
-                                  </div>
-                                  <div className="col-span-8">
-                                    <label className="block text-[8px] font-black uppercase text-slate-500 mb-0.5">DATA DA AULA</label>
-                                    <input
-                                      type="date"
-                                      value={parsed.date}
-                                      onChange={(e) => handleUpdateHoursOrDate(row.id, row.hoursDate, parsed.hours, e.target.value)}
-                                      className={`w-full p-2 text-xs font-bold focus:outline-none rounded-xl border text-center ${isCompleted ? 'bg-emerald-50 text-emerald-950 border-emerald-300 print:bg-transparent print:border-none' : 'bg-white text-slate-800 border-slate-200 print:bg-transparent print:border-none'}`}
-                                    />
-                                  </div>
-                                </div>
+                          <tr key={row.id} className="hover:bg-slate-50/50">
+                            <td className="p-3 border-r border-slate-200 align-top space-y-2">
+                              <div className="flex items-center gap-1">
+                                <input
+                                  type="number"
+                                  value={parsed.hours}
+                                  onChange={(e) => handleUpdateHoursOrDate(row.id, row.hoursDate, e.target.value, parsed.date)}
+                                  className="w-12 bg-slate-50 border border-slate-200 rounded-lg p-1 text-xs font-bold text-center"
+                                />
+                                <span className="text-[10px] font-bold text-slate-500">h</span>
                               </div>
+                              <input
+                                type="date"
+                                value={parsed.date}
+                                onChange={(e) => handleUpdateHoursOrDate(row.id, row.hoursDate, parsed.hours, e.target.value)}
+                                className="w-full bg-slate-50 border border-slate-200 rounded-lg p-1 text-[10px] font-bold text-slate-700"
+                              />
                             </td>
-
-                            <td className="p-2 border-r border-slate-200 print:border-slate-300 align-top">
+                            <td className="p-3 border-r border-slate-200 align-top">
                               <textarea
                                 rows={3}
-                                value={row.capacities}
+                                value={row.capacities || ''}
                                 onChange={(e) => handleUpdateLessonPlanCell(row.id, 'capacities', e.target.value)}
-                                onInput={handleTextareaInput}
-                                className={`w-full p-2.5 text-xs font-bold focus:outline-none resize-none overflow-hidden rounded-xl border ${isCompleted ? 'bg-emerald-100/40 text-emerald-950 border-emerald-300 print:bg-transparent print:border-none' : 'bg-slate-50 text-slate-800 border-slate-200 print:bg-transparent print:border-none'}`}
+                                className="w-full bg-transparent border border-transparent focus:border-slate-200 focus:bg-white rounded-lg p-1 text-xs font-bold text-slate-800 resize-none outline-none"
                               />
                             </td>
-
-                            <td className="p-2 border-r border-slate-200 print:border-slate-300 align-top">
+                            <td className="p-3 border-r border-slate-200 align-top">
                               <textarea
                                 rows={3}
-                                value={row.knowledges}
+                                value={row.knowledges || ''}
                                 onChange={(e) => handleUpdateLessonPlanCell(row.id, 'knowledges', e.target.value)}
-                                onInput={handleTextareaInput}
-                                className={`w-full p-2.5 text-xs font-bold focus:outline-none resize-none overflow-hidden rounded-xl border ${isCompleted ? 'bg-emerald-100/40 text-emerald-950 border-emerald-300 print:bg-transparent print:border-none' : 'bg-slate-50 text-slate-800 border-slate-200 print:bg-transparent print:border-none'}`}
+                                className="w-full bg-transparent border border-transparent focus:border-slate-200 focus:bg-white rounded-lg p-1 text-xs font-bold text-slate-800 resize-none outline-none"
                               />
                             </td>
-
-                            <td className="p-2 border-r border-slate-200 print:border-slate-300 align-top">
+                            <td className="p-3 border-r border-slate-200 align-top space-y-2">
                               <textarea
-                                rows={3}
-                                value={row.strategies}
+                                rows={2}
+                                value={row.strategies || ''}
                                 onChange={(e) => handleUpdateLessonPlanCell(row.id, 'strategies', e.target.value)}
-                                onInput={handleTextareaInput}
-                                className={`w-full p-2.5 text-xs font-bold focus:outline-none resize-none overflow-hidden rounded-xl border ${isCompleted ? 'bg-emerald-100/40 text-emerald-950 border-emerald-300 print:bg-transparent print:border-none' : 'bg-slate-50 text-slate-800 border-slate-200 print:bg-transparent print:border-none'}`}
+                                placeholder="Estratégia..."
+                                className="w-full bg-transparent border border-transparent focus:border-slate-200 focus:bg-white rounded-lg p-1 text-[11px] text-slate-700 resize-none outline-none"
                               />
-                            </td>
-
-                            <td className="p-2 border-r border-slate-200 print:border-slate-300 align-top">
                               <textarea
-                                rows={3}
-                                value={row.resources}
+                                rows={2}
+                                value={row.resources || ''}
                                 onChange={(e) => handleUpdateLessonPlanCell(row.id, 'resources', e.target.value)}
-                                onInput={handleTextareaInput}
-                                className={`w-full p-2.5 text-xs font-bold focus:outline-none resize-none overflow-hidden rounded-xl border ${isCompleted ? 'bg-emerald-100/40 text-emerald-950 border-emerald-300 print:bg-transparent print:border-none' : 'bg-slate-50 text-slate-800 border-slate-200 print:bg-transparent print:border-none'}`}
+                                placeholder="Recursos..."
+                                className="w-full bg-transparent border border-transparent focus:border-slate-200 focus:bg-white rounded-lg p-1 text-[11px] text-slate-500 resize-none outline-none"
                               />
                             </td>
-
-                            <td className="p-2 align-middle text-center print:hidden">
-                              <div className="flex items-center justify-center gap-1.5">
-                                <button
-                                  type="button"
-                                  onClick={() => handleUpdateLessonPlanCell(row.id, 'completed', !isCompleted)}
-                                  className={`flex-1 h-9 rounded-xl flex items-center justify-center transition-all shadow-sm font-black text-[10px] uppercase cursor-pointer ${
-                                    isCompleted 
-                                      ? 'bg-emerald-600 hover:bg-emerald-700 text-white' 
-                                      : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200'
-                                  }`}
-                                  title={isCompleted ? 'Aula marcada como dada (Concluída)' : 'Marcar como aula dada'}
-                                >
-                                  {isCompleted ? '✓' : 'OK'}
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleDeleteLessonPlanRow(row.id);
-                                  }}
-                                  className="flex-1 bg-red-50 hover:bg-red-600 text-red-600 hover:text-white h-9 rounded-xl text-[9px] font-black uppercase transition-all cursor-pointer border border-red-100 shadow-sm flex items-center justify-center"
-                                  title="Excluir Aula"
-                                >
-                                  Excluir
-                                </button>
-                              </div>
+                            <td className="p-3 text-center align-middle">
+                              <button
+                                type="button"
+                                onClick={() => handleDeleteLessonPlanRow(row.id)}
+                                className="p-2 bg-red-50 text-red-600 hover:bg-red-600 hover:text-white rounded-xl text-xs font-black transition-all cursor-pointer"
+                              >
+                                ✕
+                              </button>
                             </td>
                           </tr>
                         );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-              )}
+                      })
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </div>
           )}
 
-          {activeTab === 'calendario' && (() => {
-            const parsedEvents: { day: number; month: number; year: number; hours: string; completed: boolean }[] = [];
-            
-            if (lessonPlanList) {
-              lessonPlanList.forEach(row => {
-                const text = row.hoursDate || '';
-                const match = text.match(/(\d{2})\/(\d{2})\/(\d{2,4})/);
-                if (match) {
-                  const day = parseInt(match[1], 10);
-                  const month = parseInt(match[2], 10);
-                  let year = parseInt(match[3], 10);
-                  if (year < 100) year += 2000;
-
-                  const parts = text.split('-');
-                  const hoursLabel = parts.length > 1 ? parts[0].trim().replace(/h.*$/, 'h') : '2h';
-
-                  parsedEvents.push({
-                    day,
-                    month,
-                    year,
-                    hours: hoursLabel,
-                    completed: !!row.completed
-                  });
-                }
-              });
-            }
-
-            const monthsToDisplay = [
-              { name: 'JULHO 2026', monthNum: 7, year: 2026 },
-              { name: 'AGOSTO 2026', monthNum: 8, year: 2026 },
-              { name: 'SETEMBRO 2026', monthNum: 9, year: 2026 },
-              { name: 'OUTUBRO 2026', monthNum: 10, year: 2026 },
-              { name: 'NOVEMBRO 2026', monthNum: 11, year: 2026 },
-              { name: 'DEZEMBRO 2026', monthNum: 12, year: 2026 }
-            ];
-
-            const getDaysInMonth = (month: number, year: number) => {
-              return new Date(year, month, 0).getDate();
-            };
-
-            const getFirstDayOfWeek = (month: number, year: number) => {
-              return new Date(year, month - 1, 1).getDay();
-            };
-
-            const weekDays = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
-
-            return (
-              <div className="space-y-6 animate-fadeIn">
-                <div className="bg-slate-900 rounded-[2.5rem] p-8 text-white shadow-xl relative overflow-hidden flex flex-col md:flex-row justify-between items-center gap-4">
-                  <div className="space-y-2 text-center md:text-left w-full">
-                    <h3 className="text-2xl md:text-3xl font-[1000] uppercase italic tracking-wider text-white">
-                      CALENDÁRIO DA UNIDADE
-                    </h3>
-                    <p className="text-[10px] font-bold uppercase text-slate-400 tracking-widest">
-                      PREENCHIDO AUTOMATICAMENTE PELAS DATAS DO PLANO DE AULA
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-2 bg-slate-800 px-4 py-2 rounded-xl border border-slate-700 shrink-0">
-                    <span className="w-3 h-3 rounded-full bg-blue-500 inline-block animate-pulse"></span>
-                    <span className="text-xs font-black uppercase text-white tracking-wider">{unit.code || unit.id || 'UC'}</span>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 pt-2">
-                  {monthsToDisplay.map((mObj, idx) => {
-                    const totalDays = getDaysInMonth(mObj.monthNum, mObj.year);
-                    const startDay = getFirstDayOfWeek(mObj.monthNum, mObj.year);
-                    
-                    const cells = [];
-                    for (let i = 0; i < startDay; i++) {
-                      cells.push(null);
-                    }
-                    for (let d = 1; d <= totalDays; d++) {
-                      cells.push(d);
-                    }
-
-                    return (
-                      <div key={idx} className="bg-white rounded-[2rem] border border-slate-200 shadow-xl overflow-hidden flex flex-col">
-                        <div className="bg-slate-900 text-white text-center py-3.5 text-xs font-[1000] uppercase tracking-[0.2em] border-b border-slate-800">
-                          {mObj.name}
-                        </div>
-
-                        <div className="grid grid-cols-7 bg-slate-50 border-b border-slate-200 text-center py-2 text-[10px] font-black text-slate-500">
-                          {weekDays.map((wd, wIndex) => (
-                            <span key={wIndex} className={wIndex === 0 ? 'text-red-500' : ''}>{wd}</span>
-                          ))}
-                        </div>
-
-                        <div className="grid grid-cols-7 p-3 gap-1.5 flex-1 bg-white">
-                          {cells.map((dayNum, cIdx) => {
-                            if (dayNum === null) {
-                              return <div key={cIdx} className="h-12 md:h-14"></div>;
-                            }
-
-                            const event = parsedEvents.find(
-                              ev => ev.day === dayNum && ev.month === mObj.monthNum && ev.year === mObj.year
-                            );
-
-                            const isSunday = cIdx % 7 === 0;
-
-                            return (
-                              <div
-                                key={cIdx}
-                                className={`h-12 md:h-14 rounded-2xl flex flex-col items-center justify-center p-1 border transition-all ${
-                                  event 
-                                    ? (event.completed ? 'bg-emerald-600 text-white border-emerald-700 shadow-md font-black' : 'bg-blue-600 text-white border-blue-700 shadow-md font-black')
-                                    : (isSunday ? 'text-red-500 bg-slate-50/50 border-transparent font-bold text-xs' : 'text-slate-700 bg-slate-50/80 hover:bg-slate-100 border-slate-100 font-bold text-xs')
-                                }`}
-                              >
-                                <span className={`text-xs ${event ? 'text-white font-[1000]' : ''}`}>
-                                  {dayNum < 10 ? `0${dayNum}` : dayNum}
-                                </span>
-                                {event && (
-                                  <span className="text-[9px] font-black uppercase tracking-tighter opacity-90 leading-none mt-0.5">
-                                    {event.hours}
-                                  </span>
-                                )}
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            );
-          })()}
+          {activeTab === 'calendario' && (
+            <div className="p-12 text-center bg-slate-50 rounded-2xl border border-slate-200 text-slate-500 font-bold uppercase text-xs">
+              Módulo de Calendário em desenvolvimento.
+            </div>
+          )}
         </div>
       </div>
     </div>
   );
 };
-
-export default UnitViewer;
