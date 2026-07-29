@@ -130,6 +130,18 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
   const [semester, setSemester] = useState<SemesterNumber>(unit.semester || 1);
   const [totalHours, setTotalHours] = useState(unit.totalHours || unit.workload || 80);
 
+  // Paleta de cores dinâmica baseada no ID/Código da UC
+  const unitColors = [
+    { bg: 'bg-red-600', text: 'text-red-600', border: 'border-red-600', light: 'bg-red-50' },
+    { bg: 'bg-blue-600', text: 'text-blue-600', border: 'border-blue-600', light: 'bg-blue-50' },
+    { bg: 'bg-amber-600', text: 'text-amber-600', border: 'border-amber-600', light: 'bg-amber-50' },
+    { bg: 'bg-emerald-600', text: 'text-emerald-600', border: 'border-emerald-600', light: 'bg-emerald-50' },
+    { bg: 'bg-purple-600', text: 'text-purple-600', border: 'border-purple-600', light: 'bg-purple-50' },
+    { bg: 'bg-indigo-600', text: 'text-indigo-600', border: 'border-indigo-600', light: 'bg-indigo-50' }
+  ];
+  const colorIndex = (code || name || 'A').split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % unitColors.length;
+  const currentTheme = unitColors[colorIndex];
+
   const handleSaveHeader = () => {
     onUpdateUnit({
       ...unit,
@@ -390,6 +402,68 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
     target.style.height = `${target.scrollHeight}px`;
   };
 
+  // Mapear datas de aulas cadastradas no formato 'YYYY-MM-DD' para exibição no calendário
+  const getScheduledClassDates = () => {
+    const datesMap: { [dateStr: string]: { hours: string; capacities: string } } = {};
+    (unit.lessonPlan || []).forEach(row => {
+      const parsed = parseHoursAndDate(row.hoursDate);
+      if (parsed.date) {
+        datesMap[parsed.date] = {
+          hours: parsed.hours,
+          capacities: row.capacities || 'Aula agendada'
+        };
+      }
+    });
+    return datesMap;
+  };
+  const scheduledDates = getScheduledClassDates();
+
+  // Configuração dos meses por semestre (1º Sem: Jan-Jun | 2º Sem: Jul-Dez)
+  const currentSemester = unit.semester || 1;
+  const semesterMonths = currentSemester === 1 
+    ? [ { name: 'Janeiro', month: 0 }, { name: 'Fevereiro', month: 1 }, { name: 'Março', month: 2 }, { name: 'Abril', month: 3 }, { name: 'Maio', month: 4 }, { name: 'Junho', month: 5 } ]
+    : [ { name: 'Julho', month: 6 }, { name: 'Agosto', month: 7 }, { name: 'Setembro', month: 8 }, { name: 'Outubro', month: 9 }, { name: 'Novembro', month: 10 }, { name: 'Dezembro', month: 11 } ];
+  
+  const calendarYear = 2026;
+
+  const getDaysInMonth = (year: number, month: number) => {
+    const date = new Date(year, month, 1);
+    const days: { dateStr: string; dayNum: number; isCurrentMonth: boolean }[] = [];
+    
+    // Dia da semana do primeiro dia (0 = Domingo, 1 = Segunda, etc.)
+    const firstDayIndex = date.getDay();
+    
+    // Dias do mês anterior para preencher a primeira semana
+    const prevMonthLastDay = new Date(year, month, 0).getDate();
+    for (let i = firstDayIndex - 1; i >= 0; i--) {
+      const dNum = prevMonthLastDay - i;
+      const prevM = month === 0 ? 11 : month - 1;
+      const prevY = month === 0 ? year - 1 : year;
+      const dStr = `${prevY}-${String(prevM + 1).padStart(2, '0')}-${String(dNum).padStart(2, '0')}`;
+      days.push({ dateStr: dStr, dayNum: dNum, isCurrentMonth: false });
+    }
+
+    // Dias do mês atual
+    const totalDays = new Date(year, month + 1, 0).getDate();
+    for (let i = 1; i <= totalDays; i++) {
+      const dStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
+      days.push({ dateStr: dStr, dayNum: i, isCurrentMonth: true });
+    }
+
+    // Completar até fechar linhas de 7 (múltiplo de 7)
+    const remaining = 7 - (days.length % 7);
+    if (remaining < 7) {
+      for (let i = 1; i <= remaining; i++) {
+        const nextM = month === 11 ? 0 : month + 1;
+        const nextY = month === 11 ? year + 1 : year;
+        const dStr = `${nextY}-${String(nextM + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
+        days.push({ dateStr: dStr, dayNum: i, isCurrentMonth: false });
+      }
+    }
+
+    return days;
+  };
+
   return (
     <div className="space-y-6 w-full max-w-[99%] mx-auto pb-20 animate-fadeIn">
       <div className="flex justify-between items-center px-2 print:hidden">
@@ -414,7 +488,7 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
 
         {!isEditingHeader ? (
           <div className="space-y-4 relative z-10 print:space-y-2">
-            <div className="inline-flex items-center gap-2 bg-red-600 text-white px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-md print:hidden">
+            <div className={`inline-flex items-center gap-2 ${currentTheme.bg} text-white px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-md print:hidden`}>
               <span>{unit.code || unit.id || 'UC'}</span>
               <span>—</span>
               <span>{unit.semester || 1}º Semestre</span>
@@ -955,12 +1029,59 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
 
           {activeTab === 'calendario' && (
             <div className="space-y-6 animate-fadeIn">
-              <div className="border-b border-slate-100 pb-4">
-                <h3 className="text-lg font-[1000] uppercase italic text-slate-900 tracking-wider">Calendário Escolar e Sincronização</h3>
+              <div className="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-slate-100 pb-4 gap-4">
+                <div>
+                  <h3 className="text-lg font-[1000] uppercase italic text-slate-900 tracking-wider">
+                    Calendário Letivo — {currentSemester}º Semestre ({currentSemester === 1 ? 'Janeiro a Junho' : 'Julho a Dezembro'})
+                  </h3>
+                  <p className="text-xs text-slate-500 font-medium">Os dias com aulas agendadas no plano aparecem destacados com a cor da unidade curricular.</p>
+                </div>
+                <div className="flex items-center gap-2 bg-slate-100 px-4 py-2 rounded-xl">
+                  <span className={`w-3 h-3 rounded-full ${currentTheme.bg}`}></span>
+                  <span className="text-xs font-black uppercase text-slate-700">{unit.code || unit.id || 'UC'}</span>
+                </div>
               </div>
-              <div className="p-8 bg-slate-50 rounded-2xl border border-slate-200 text-center space-y-3">
-                <p className="text-xs font-bold text-slate-700 uppercase">O calendário está integrado automaticamente com as datas definidas no Plano de Aula.</p>
-                <p className="text-xs text-slate-500">Altere as datas nas linhas do cronograma para refletir imediatamente nos registros de frequência e agendamento letivo.</p>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {semesterMonths.map(({ name: monthName, month: monthIndex }) => {
+                  const daysList = getDaysInMonth(calendarYear, monthIndex);
+                  return (
+                    <div key={monthIndex} className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-3">
+                      <h4 className="text-xs font-black uppercase tracking-wider text-slate-900 text-center bg-slate-50 py-2 rounded-xl">
+                        {monthName} {calendarYear}
+                      </h4>
+                      <div className="grid grid-cols-7 text-center text-[10px] font-black uppercase text-slate-400">
+                        <span>D</span><span>S</span><span>T</span><span>Q</span><span>Q</span><span>S</span><span>S</span>
+                      </div>
+                      <div className="grid grid-cols-7 gap-1">
+                        {daysList.map((d, dIdx) => {
+                          const classData = scheduledDates[d.dateStr];
+                          const isScheduled = !!classData && d.isCurrentMonth;
+                          return (
+                            <div
+                              key={dIdx}
+                              title={isScheduled ? `${classData.hours}h de aula: ${classData.capacities}` : ''}
+                              className={`h-9 flex flex-col items-center justify-center rounded-xl text-xs font-bold transition-all relative ${
+                                !d.isCurrentMonth
+                                  ? 'text-slate-300 bg-transparent'
+                                  : isScheduled
+                                  ? `${currentTheme.bg} text-white shadow-md font-black scale-105 ring-2 ring-white`
+                                  : 'text-slate-700 bg-slate-50 hover:bg-slate-100'
+                              }`}
+                            >
+                              <span>{d.dayNum}</span>
+                              {isScheduled && (
+                                <span className="absolute bottom-1 text-[8px] opacity-90 leading-none">
+                                  {classData.hours}h
+                                </span>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           )}
@@ -970,5 +1091,4 @@ export const UnitViewer: React.FC<UnitViewerProps> = ({
   );
 };
 
-// Adicionado o export default para resolver o erro do Rollup/Vite no build da Vercel
 export default UnitViewer;
