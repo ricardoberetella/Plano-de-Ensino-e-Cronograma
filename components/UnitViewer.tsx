@@ -294,25 +294,25 @@ export function UnitViewer() {
 
                 <th className="p-3 text-sm font-bold">
 
-                  <span className="text-red-400 font-extrabold">NSA</span> (NÃO SATISFATÓRIO)
+                  <span className="text-red-400 font-extrabold">NSA</span>
 
                 </th>
 
                 <th className="p-3 text-sm font-bold">
 
-                  <span className="text-amber-400 font-extrabold">APO</span> (ATENDE PARCIALMENTE)
+                  <span className="text-amber-400 font-extrabold">APO</span>
 
                 </th>
 
                 <th className="p-3 text-sm font-bold">
 
-                  <span className="text-blue-400 font-extrabold">PAR</span> (ATENDE PLENAMENTE)
+                  <span className="text-blue-400 font-extrabold">PAR</span>
 
                 </th>
 
                 <th className="p-3 text-sm font-bold">
 
-                  <span className="text-emerald-400 font-extrabold">AUT</span> (ATENDE COM AUTONOMIA)
+                  <span className="text-emerald-400 font-extrabold">AUT</span>
 
                 </th>
 
@@ -603,8 +603,3 @@ export function UnitViewer() {
 
 
 export default UnitViewer;
-
-
-
-este e o correto......... 
-
