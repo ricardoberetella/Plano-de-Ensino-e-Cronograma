@@ -174,74 +174,64 @@ export function UnitViewer() {
 
           <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
 
-            <input
-
-              type="text"
-
+            <textarea
+              rows={1}
               placeholder="Referência / Critério"
-
               value={newCriterion.reference}
-
-              onChange={(e) => setNewCriterion({ ...newCriterion, reference: e.target.value })}
-
-              className="p-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900"
-
+              onChange={(e) => {
+                e.target.style.height = 'auto';
+                e.target.style.height = e.target.scrollHeight + 'px';
+                setNewCriterion({ ...newCriterion, reference: e.target.value });
+              }}
+              className="p-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900 resize-none overflow-hidden break-all whitespace-pre-wrap"
             />
 
-            <input
-
-              type="text"
-
+            <textarea
+              rows={1}
               placeholder="NSA (Não Satisfatório)"
-
               value={newCriterion.nsa}
-
-              onChange={(e) => setNewCriterion({ ...newCriterion, nsa: e.target.value })}
-
-              className="p-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900"
-
+              onChange={(e) => {
+                e.target.style.height = 'auto';
+                e.target.style.height = e.target.scrollHeight + 'px';
+                setNewCriterion({ ...newCriterion, nsa: e.target.value });
+              }}
+              className="p-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900 resize-none overflow-hidden break-all whitespace-pre-wrap"
             />
 
-            <input
-
-              type="text"
-
+            <textarea
+              rows={1}
               placeholder="APO (Atende Parcialmente)"
-
               value={newCriterion.apo}
-
-              onChange={(e) => setNewCriterion({ ...newCriterion, apo: e.target.value })}
-
-              className="p-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900"
-
+              onChange={(e) => {
+                e.target.style.height = 'auto';
+                e.target.style.height = e.target.scrollHeight + 'px';
+                setNewCriterion({ ...newCriterion, apo: e.target.value });
+              }}
+              className="p-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900 resize-none overflow-hidden break-all whitespace-pre-wrap"
             />
 
-            <input
-
-              type="text"
-
+            <textarea
+              rows={1}
               placeholder="PAR (Atende Plenamente)"
-
               value={newCriterion.par}
-
-              onChange={(e) => setNewCriterion({ ...newCriterion, par: e.target.value })}
-
-              className="p-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900"
-
+              onChange={(e) => {
+                e.target.style.height = 'auto';
+                e.target.style.height = e.target.scrollHeight + 'px';
+                setNewCriterion({ ...newCriterion, par: e.target.value });
+              }}
+              className="p-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900 resize-none overflow-hidden break-all whitespace-pre-wrap"
             />
 
-            <input
-
-              type="text"
-
+            <textarea
+              rows={1}
               placeholder="AUT (Atende com Autonomia)"
-
               value={newCriterion.aut}
-
-              onChange={(e) => setNewCriterion({ ...newCriterion, aut: e.target.value })}
-
-              className="p-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900"
-
+              onChange={(e) => {
+                e.target.style.height = 'auto';
+                e.target.style.height = e.target.scrollHeight + 'px';
+                setNewCriterion({ ...newCriterion, aut: e.target.value });
+              }}
+              className="p-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900 resize-none overflow-hidden break-all whitespace-pre-wrap"
             />
 
           </div>
