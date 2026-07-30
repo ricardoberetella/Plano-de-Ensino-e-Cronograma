@@ -10,7 +10,7 @@ interface RubricCriterion {
   aut: string;
 }
 
-export function RubricasMatriz() {
+export function UnitViewer() {
   const [criteria, setCriteria] = useState<RubricCriterion[]>([
     {
       id: '1',
@@ -299,3 +299,5 @@ export function RubricasMatriz() {
     </div>
   );
 }
+
+export default UnitViewer;
