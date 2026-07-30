@@ -284,39 +284,39 @@ export function UnitViewer() {
 
         <div className="overflow-x-auto">
 
-          <table className="w-full text-left border-collapse">
+          <table className="w-full table-fixed text-left border-collapse">
 
             <thead>
 
               <tr className="bg-slate-900 text-white">
 
-                <th className="p-3 text-sm font-bold">REFERÊNCIA / CRITÉRIO</th>
+                <th className="w-1/6 p-3 text-sm font-bold">REFERÊNCIA / CRITÉRIO</th>
 
-                <th className="p-3 text-sm font-bold">
+                <th className="w-1/6 p-3 text-sm font-bold">
 
                   <span className="text-red-400 font-extrabold">NSA</span>
 
                 </th>
 
-                <th className="p-3 text-sm font-bold">
+                <th className="w-1/6 p-3 text-sm font-bold">
 
                   <span className="text-amber-400 font-extrabold">APO</span>
 
                 </th>
 
-                <th className="p-3 text-sm font-bold">
+                <th className="w-1/6 p-3 text-sm font-bold">
 
                   <span className="text-blue-400 font-extrabold">PAR</span>
 
                 </th>
 
-                <th className="p-3 text-sm font-bold">
+                <th className="w-1/6 p-3 text-sm font-bold">
 
                   <span className="text-emerald-400 font-extrabold">AUT</span>
 
                 </th>
 
-                <th className="p-3 text-sm font-bold text-center w-24">AÇÕES</th>
+                <th className="w-1/6 p-3 text-sm font-bold text-center">AÇÕES</th>
 
               </tr>
 
@@ -464,9 +464,9 @@ export function UnitViewer() {
 
                   <tr key={item.id} className="hover:bg-slate-50/80 transition-colors">
 
-                    <td className="p-3 text-sm font-medium text-slate-800">{item.reference}</td>
+                    <td className="p-3 text-sm font-medium text-slate-800 align-top break-all whitespace-pre-wrap">{item.reference}</td>
 
-                    <td className="p-3 text-sm text-slate-700">
+                    <td className="p-3 text-sm text-slate-700 align-top break-all whitespace-pre-wrap">
 
                       {item.nsa && (
 
@@ -482,7 +482,7 @@ export function UnitViewer() {
 
                     </td>
 
-                    <td className="p-3 text-sm text-slate-700">
+                    <td className="p-3 text-sm text-slate-700 align-top break-all whitespace-pre-wrap">
 
                       {item.apo && (
 
@@ -498,7 +498,7 @@ export function UnitViewer() {
 
                     </td>
 
-                    <td className="p-3 text-sm text-slate-700">
+                    <td className="p-3 text-sm text-slate-700 align-top break-all whitespace-pre-wrap">
 
                       {item.par && (
 
@@ -514,7 +514,7 @@ export function UnitViewer() {
 
                     </td>
 
-                    <td className="p-3 text-sm text-slate-700">
+                    <td className="p-3 text-sm text-slate-700 align-top break-all whitespace-pre-wrap">
 
                       {item.aut && (
 
