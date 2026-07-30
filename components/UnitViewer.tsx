@@ -179,11 +179,16 @@ export function UnitViewer() {
               placeholder="Referência / Critério"
               value={newCriterion.reference}
               onChange={(e) => {
-                e.target.style.height = 'auto';
-                e.target.style.height = e.target.scrollHeight + 'px';
+                e.currentTarget.style.height = "auto";
+                e.currentTarget.style.height = e.currentTarget.scrollHeight + "px";
                 setNewCriterion({ ...newCriterion, reference: e.target.value });
               }}
-              className="p-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900 resize-none overflow-hidden break-all whitespace-pre-wrap"
+              onInput={(e) => {
+                e.currentTarget.style.height = "auto";
+                e.currentTarget.style.height = e.currentTarget.scrollHeight + "px";
+              }}
+              style={{ minHeight: '38px' }}
+              className="p-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900 resize-none overflow-hidden break-all whitespace-pre-wrap leading-5"
             />
 
             <textarea
@@ -191,11 +196,16 @@ export function UnitViewer() {
               placeholder="NSA (Não Satisfatório)"
               value={newCriterion.nsa}
               onChange={(e) => {
-                e.target.style.height = 'auto';
-                e.target.style.height = e.target.scrollHeight + 'px';
+                e.currentTarget.style.height = "auto";
+                e.currentTarget.style.height = e.currentTarget.scrollHeight + "px";
                 setNewCriterion({ ...newCriterion, nsa: e.target.value });
               }}
-              className="p-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900 resize-none overflow-hidden break-all whitespace-pre-wrap"
+              onInput={(e) => {
+                e.currentTarget.style.height = "auto";
+                e.currentTarget.style.height = e.currentTarget.scrollHeight + "px";
+              }}
+              style={{ minHeight: '38px' }}
+              className="p-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900 resize-none overflow-hidden break-all whitespace-pre-wrap leading-5"
             />
 
             <textarea
@@ -203,11 +213,16 @@ export function UnitViewer() {
               placeholder="APO (Atende Parcialmente)"
               value={newCriterion.apo}
               onChange={(e) => {
-                e.target.style.height = 'auto';
-                e.target.style.height = e.target.scrollHeight + 'px';
+                e.currentTarget.style.height = "auto";
+                e.currentTarget.style.height = e.currentTarget.scrollHeight + "px";
                 setNewCriterion({ ...newCriterion, apo: e.target.value });
               }}
-              className="p-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900 resize-none overflow-hidden break-all whitespace-pre-wrap"
+              onInput={(e) => {
+                e.currentTarget.style.height = "auto";
+                e.currentTarget.style.height = e.currentTarget.scrollHeight + "px";
+              }}
+              style={{ minHeight: '38px' }}
+              className="p-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900 resize-none overflow-hidden break-all whitespace-pre-wrap leading-5"
             />
 
             <textarea
@@ -215,11 +230,16 @@ export function UnitViewer() {
               placeholder="PAR (Atende Plenamente)"
               value={newCriterion.par}
               onChange={(e) => {
-                e.target.style.height = 'auto';
-                e.target.style.height = e.target.scrollHeight + 'px';
+                e.currentTarget.style.height = "auto";
+                e.currentTarget.style.height = e.currentTarget.scrollHeight + "px";
                 setNewCriterion({ ...newCriterion, par: e.target.value });
               }}
-              className="p-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900 resize-none overflow-hidden break-all whitespace-pre-wrap"
+              onInput={(e) => {
+                e.currentTarget.style.height = "auto";
+                e.currentTarget.style.height = e.currentTarget.scrollHeight + "px";
+              }}
+              style={{ minHeight: '38px' }}
+              className="p-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900 resize-none overflow-hidden break-all whitespace-pre-wrap leading-5"
             />
 
             <textarea
@@ -227,11 +247,16 @@ export function UnitViewer() {
               placeholder="AUT (Atende com Autonomia)"
               value={newCriterion.aut}
               onChange={(e) => {
-                e.target.style.height = 'auto';
-                e.target.style.height = e.target.scrollHeight + 'px';
+                e.currentTarget.style.height = "auto";
+                e.currentTarget.style.height = e.currentTarget.scrollHeight + "px";
                 setNewCriterion({ ...newCriterion, aut: e.target.value });
               }}
-              className="p-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900 resize-none overflow-hidden break-all whitespace-pre-wrap"
+              onInput={(e) => {
+                e.currentTarget.style.height = "auto";
+                e.currentTarget.style.height = e.currentTarget.scrollHeight + "px";
+              }}
+              style={{ minHeight: '38px' }}
+              className="p-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900 resize-none overflow-hidden break-all whitespace-pre-wrap leading-5"
             />
 
           </div>
