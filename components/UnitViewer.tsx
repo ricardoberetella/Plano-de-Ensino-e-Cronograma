@@ -146,16 +146,16 @@ export function UnitViewer() {
               <tr className="bg-slate-900 text-white">
                 <th className="p-3 text-sm font-bold">REFERÊNCIA / CRITÉRIO</th>
                 <th className="p-3 text-sm font-bold">
-                  <span className="text-red-400 font-extrabold">NSA</span> (NÃO SATISFATÓRIO)
+                  <span className="text-red-400 font-extrabold">NSA</span>
                 </th>
                 <th className="p-3 text-sm font-bold">
-                  <span className="text-amber-400 font-extrabold">APO</span> (ATENDE PARCIALMENTE)
+                  <span className="text-amber-400 font-extrabold">APO</span>
                 </th>
                 <th className="p-3 text-sm font-bold">
-                  <span className="text-blue-400 font-extrabold">PAR</span> (ATENDE PLENAMENTE)
+                  <span className="text-blue-400 font-extrabold">PAR</span>
                 </th>
                 <th className="p-3 text-sm font-bold">
-                  <span className="text-emerald-400 font-extrabold">AUT</span> (ATENDE COM AUTONOMIA)
+                  <span className="text-emerald-400 font-extrabold">AUT</span>
                 </th>
                 <th className="p-3 text-sm font-bold text-center w-24">AÇÕES</th>
               </tr>
