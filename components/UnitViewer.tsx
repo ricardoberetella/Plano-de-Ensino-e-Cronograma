@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-
 import { Plus, Trash2, Edit2, Save, X } from 'lucide-react';
 
 interface RubricCriterion {
@@ -15,11 +14,11 @@ export function UnitViewer() {
   const [criteria, setCriteria] = useState<RubricCriterion[]>([
     {
       id: '1',
-      reference: 'effefefeef',
-      nsa: 'fefefefefefef',
-      apo: '',
-      par: '',
-      aut: '',
+      reference: 'Planejar e executar operações de usinagem conforme especificação técnica.',
+      nsa: 'Não atende aos parâmetros básicos de dimensionamento e acabamento exigidos no desenho.',
+      apo: 'Atende parcialmente, apresentando pequenos desvios dimensionais ou de acabamento.',
+      par: 'Atende plenamente a todos os requisitos dimensionais e geométricos especificados.',
+      aut: 'Atende com autonomia total, demonstrando domínio do processo, otimização de parâmetros e excelente acabamento.',
     },
   ]);
 
@@ -55,7 +54,6 @@ export function UnitViewer() {
     setCriteria(
       criteria.map((c) => (c.id === editingId ? editForm : c))
     );
-
     setEditingId(null);
   };
 
@@ -108,118 +106,68 @@ export function UnitViewer() {
 
           <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
             <textarea
-              rows={1}
+              rows={2}
               placeholder="Referência / Critério"
               value={newCriterion.reference}
-              onChange={(e) => {
-                e.currentTarget.style.height = 'auto';
-                e.currentTarget.style.height =
-                  e.currentTarget.scrollHeight + 'px';
-
+              onChange={(e) =>
                 setNewCriterion({
                   ...newCriterion,
                   reference: e.target.value,
-                });
-              }}
-              onInput={(e) => {
-                e.currentTarget.style.height = 'auto';
-                e.currentTarget.style.height =
-                  e.currentTarget.scrollHeight + 'px';
-              }}
-              style={{ minHeight: '38px' }}
-              className="p-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900 resize-none overflow-hidden break-all whitespace-pre-wrap leading-5"
+                })
+              }
+              className="p-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900 resize-y leading-5"
             />
 
             <textarea
-              rows={1}
+              rows={2}
               placeholder="NSA (Não Satisfatório)"
               value={newCriterion.nsa}
-              onChange={(e) => {
-                e.currentTarget.style.height = 'auto';
-                e.currentTarget.style.height =
-                  e.currentTarget.scrollHeight + 'px';
-
+              onChange={(e) =>
                 setNewCriterion({
                   ...newCriterion,
                   nsa: e.target.value,
-                });
-              }}
-              onInput={(e) => {
-                e.currentTarget.style.height = 'auto';
-                e.currentTarget.style.height =
-                  e.currentTarget.scrollHeight + 'px';
-              }}
-              style={{ minHeight: '38px' }}
-              className="p-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900 resize-none overflow-hidden break-all whitespace-pre-wrap leading-5"
+                })
+              }
+              className="p-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900 resize-y leading-5"
             />
 
             <textarea
-              rows={1}
+              rows={2}
               placeholder="APO (Atende Parcialmente)"
               value={newCriterion.apo}
-              onChange={(e) => {
-                e.currentTarget.style.height = 'auto';
-                e.currentTarget.style.height =
-                  e.currentTarget.scrollHeight + 'px';
-
+              onChange={(e) =>
                 setNewCriterion({
                   ...newCriterion,
                   apo: e.target.value,
-                });
-              }}
-              onInput={(e) => {
-                e.currentTarget.style.height = 'auto';
-                e.currentTarget.style.height =
-                  e.currentTarget.scrollHeight + 'px';
-              }}
-              style={{ minHeight: '38px' }}
-              className="p-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900 resize-none overflow-hidden break-all whitespace-pre-wrap leading-5"
+                })
+              }
+              className="p-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900 resize-y leading-5"
             />
 
             <textarea
-              rows={1}
+              rows={2}
               placeholder="PAR (Atende Plenamente)"
               value={newCriterion.par}
-              onChange={(e) => {
-                e.currentTarget.style.height = 'auto';
-                e.currentTarget.style.height =
-                  e.currentTarget.scrollHeight + 'px';
-
+              onChange={(e) =>
                 setNewCriterion({
                   ...newCriterion,
                   par: e.target.value,
-                });
-              }}
-              onInput={(e) => {
-                e.currentTarget.style.height = 'auto';
-                e.currentTarget.style.height =
-                  e.currentTarget.scrollHeight + 'px';
-              }}
-              style={{ minHeight: '38px' }}
-              className="p-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900 resize-none overflow-hidden break-all whitespace-pre-wrap leading-5"
+                })
+              }
+              className="p-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900 resize-y leading-5"
             />
 
             <textarea
-              rows={1}
+              rows={2}
               placeholder="AUT (Atende com Autonomia)"
               value={newCriterion.aut}
-              onChange={(e) => {
-                e.currentTarget.style.height = 'auto';
-                e.currentTarget.style.height =
-                  e.currentTarget.scrollHeight + 'px';
-
+              onChange={(e) =>
                 setNewCriterion({
                   ...newCriterion,
                   aut: e.target.value,
-                });
-              }}
-              onInput={(e) => {
-                e.currentTarget.style.height = 'auto';
-                e.currentTarget.style.height =
-                  e.currentTarget.scrollHeight + 'px';
-              }}
-              style={{ minHeight: '38px' }}
-              className="p-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900 resize-none overflow-hidden break-all whitespace-pre-wrap leading-5"
+                })
+              }
+              className="p-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900 resize-y leading-5"
             />
           </div>
 
@@ -249,31 +197,18 @@ export function UnitViewer() {
                 <th className="w-1/6 p-3 text-sm font-bold">
                   REFERÊNCIA / CRITÉRIO
                 </th>
-
                 <th className="w-1/6 p-3 text-sm font-bold">
-                  <span className="text-red-400 font-extrabold">
-                    NSA
-                  </span>
+                  <span className="text-red-400 font-extrabold">NSA</span>
                 </th>
-
                 <th className="w-1/6 p-3 text-sm font-bold">
-                  <span className="text-amber-400 font-extrabold">
-                    APO
-                  </span>
+                  <span className="text-amber-400 font-extrabold">APO</span>
                 </th>
-
                 <th className="w-1/6 p-3 text-sm font-bold">
-                  <span className="text-blue-400 font-extrabold">
-                    PAR
-                  </span>
+                  <span className="text-blue-400 font-extrabold">PAR</span>
                 </th>
-
                 <th className="w-1/6 p-3 text-sm font-bold">
-                  <span className="text-emerald-400 font-extrabold">
-                    AUT
-                  </span>
+                  <span className="text-emerald-400 font-extrabold">AUT</span>
                 </th>
-
                 <th className="w-1/6 p-3 text-sm font-bold text-center">
                   AÇÕES
                 </th>
@@ -287,9 +222,9 @@ export function UnitViewer() {
                 if (isEditing) {
                   return (
                     <tr key={item.id} className="bg-slate-50">
-                      <td className="p-3">
-                        <input
-                          type="text"
+                      <td className="p-2 align-top">
+                        <textarea
+                          rows={2}
                           value={editForm.reference}
                           onChange={(e) =>
                             setEditForm({
@@ -297,13 +232,13 @@ export function UnitViewer() {
                               reference: e.target.value,
                             })
                           }
-                          className="w-full p-1.5 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900"
+                          className="w-full p-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900 resize-y leading-5"
                         />
                       </td>
 
-                      <td className="p-3">
-                        <input
-                          type="text"
+                      <td className="p-2 align-top">
+                        <textarea
+                          rows={2}
                           value={editForm.nsa}
                           onChange={(e) =>
                             setEditForm({
@@ -311,13 +246,13 @@ export function UnitViewer() {
                               nsa: e.target.value,
                             })
                           }
-                          className="w-full p-1.5 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900"
+                          className="w-full p-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900 resize-y leading-5"
                         />
                       </td>
 
-                      <td className="p-3">
-                        <input
-                          type="text"
+                      <td className="p-2 align-top">
+                        <textarea
+                          rows={2}
                           value={editForm.apo}
                           onChange={(e) =>
                             setEditForm({
@@ -325,13 +260,13 @@ export function UnitViewer() {
                               apo: e.target.value,
                             })
                           }
-                          className="w-full p-1.5 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900"
+                          className="w-full p-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900 resize-y leading-5"
                         />
                       </td>
 
-                      <td className="p-3">
-                        <input
-                          type="text"
+                      <td className="p-2 align-top">
+                        <textarea
+                          rows={2}
                           value={editForm.par}
                           onChange={(e) =>
                             setEditForm({
@@ -339,13 +274,13 @@ export function UnitViewer() {
                               par: e.target.value,
                             })
                           }
-                          className="w-full p-1.5 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900"
+                          className="w-full p-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900 resize-y leading-5"
                         />
                       </td>
 
-                      <td className="p-3">
-                        <input
-                          type="text"
+                      <td className="p-2 align-top">
+                        <textarea
+                          rows={2}
                           value={editForm.aut}
                           onChange={(e) =>
                             setEditForm({
@@ -353,11 +288,11 @@ export function UnitViewer() {
                               aut: e.target.value,
                             })
                           }
-                          className="w-full p-1.5 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900"
+                          className="w-full p-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900 resize-y leading-5"
                         />
                       </td>
 
-                      <td className="p-3 text-center">
+                      <td className="p-3 text-center align-middle">
                         <div className="flex items-center justify-center gap-1">
                           <button
                             onClick={handleSaveEdit}
@@ -385,27 +320,27 @@ export function UnitViewer() {
                     key={item.id}
                     className="hover:bg-slate-50/80 transition-colors"
                   >
-                    <td className="p-3 text-sm font-medium text-slate-800 align-top break-all whitespace-pre-wrap">
+                    <td className="p-3 text-sm font-medium text-slate-800 align-top break-words whitespace-pre-wrap">
                       {item.reference}
                     </td>
 
-                    <td className="p-3 text-sm text-slate-700 align-top break-all whitespace-pre-wrap">
+                    <td className="p-3 text-sm text-slate-700 align-top break-words whitespace-pre-wrap">
                       {item.nsa}
                     </td>
 
-                    <td className="p-3 text-sm text-slate-700 align-top break-all whitespace-pre-wrap">
+                    <td className="p-3 text-sm text-slate-700 align-top break-words whitespace-pre-wrap">
                       {item.apo}
                     </td>
 
-                    <td className="p-3 text-sm text-slate-700 align-top break-all whitespace-pre-wrap">
+                    <td className="p-3 text-sm text-slate-700 align-top break-words whitespace-pre-wrap">
                       {item.par}
                     </td>
 
-                    <td className="p-3 text-sm text-slate-700 align-top break-all whitespace-pre-wrap">
+                    <td className="p-3 text-sm text-slate-700 align-top break-words whitespace-pre-wrap">
                       {item.aut}
                     </td>
 
-                    <td className="p-3 text-center">
+                    <td className="p-3 text-center align-middle">
                       <div className="flex items-center justify-center gap-1">
                         <button
                           onClick={() => handleEdit(item)}
