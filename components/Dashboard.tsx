@@ -74,18 +74,6 @@ const Dashboard: React.FC<DashboardProps> = ({
     setIsUnitModalOpen(false);
   };
 
-  const handleDeleteUnit = (unitId: string) => {
-    if (!editingPlan) return;
-    if (!window.confirm('Deseja realmente excluir esta Unidade Curricular?')) return;
-
-    const updatedUnits = editingPlan.units.filter(u => u.id !== unitId);
-    setEditingPlan({
-      ...editingPlan,
-      units: updatedUnits,
-      updatedAt: new Date().toISOString()
-    });
-  };
-
   const handleSaveFullPlan = () => {
     if (!editingPlan) return;
     if (onUpdatePlan) {
@@ -275,7 +263,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                         </div>
                       </div>
 
-                      {/* Botões de Ação */}
+                      {/* Botões de Ação (Apenas Editar) */}
                       <div className="flex items-center gap-2 w-full md:w-auto justify-end border-t md:border-t-0 pt-2 md:pt-0 border-slate-200">
                         <button
                           type="button"
@@ -283,13 +271,6 @@ const Dashboard: React.FC<DashboardProps> = ({
                           className="px-3.5 py-2 bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 rounded-xl text-[10px] font-black uppercase transition-all shadow-sm"
                         >
                           Editar
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleDeleteUnit(unit.id)}
-                          className="px-3.5 py-2 bg-red-50 hover:bg-red-600 text-red-600 hover:text-white rounded-xl text-[10px] font-black uppercase transition-all shadow-sm"
-                        >
-                          Excluir
                         </button>
                       </div>
                     </div>
